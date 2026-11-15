@@ -47,6 +47,12 @@ Kleine punten (toegankelijkheid, componenttests, rooktest, woordgrenzen bij een 
 
 **Typografie** is het eigenlijke ontwerpwerk: één schreefloze letter voor de tool (zoals de Helvetica van de site), een rustige, goed leesbare zetting voor de Bijbeltekst (regelbreedte, regelafstand, versnummers), duidelijk verschil tussen bron, vereenvoudiging en regels zonder kleur, en een vaste schaal van groottes en gewichten.
 
+**Keuzes na de eerste ronde (2026-11-15):** variant a (Werkblad) is het uitgangspunt voor de layout, met de grijze naslag en elementen van c; drie nieuwe layouts (d, e, f) bouwen daarop voort. **Letters zijn een apart spoor:** alles schreefloos zoals Word, met een duidelijk verschil tussen Bijbeltekst en tool; tien combinaties in `ontwerp/letters.md`. De opmaak van de Bijbeltekst (kleuren, arcering, vet, cursief, onderstreept) blijft in elk ontwerp gelijk aan Word en wordt niet opnieuw ontworpen; `ontwerp/opmaakcontrole.mjs` controleert dat.
+
+**Letters en kleur (2026-11-15):** Bijbeltekst in **Atkinson Hyperlegible Next** (schreefloos, in maat het dichtst bij Aptos: 5% breder; gemaakt om tekens goed te onderscheiden), in Word-zwart. Tool in **Inter** met toolkleur **`#6b4f4b`** (warm bruingrijs, verwant aan het donkerrood); alternatief antraciet `#383e42`. Afgevallen: schreefletters, smalle letters, en monospaced voor de tool (DM Mono scheidde tekst en tool duidelijker, maar leest minder als één geheel en is breder). Vastgelegd in `src/ontwerp/keuze-letters-kleur.css`; geldt voor de layouts d, e en f. Bij de definitieve keuze leveren we de letters zelf mee (geen Google Fonts in de site).
+
+**Layout (2026-11-15):** de eigenaar kiest **e, A met lucht** (`ontwerp/variant-e.md`): de kolommen van a, geen lijnen tussen verzen, veel witruimte, grijze zijbalk en naslag zoals c, regels klein in de toolkleur. Bekend punt: een vers met veel regels wordt een hoge rij met wit onder de vereenvoudiging.
+
 **Werkwijze:**
 1. **Analyse.** Schermafbeeldingen van de huidige tool en de taken van de redacteur als verloop uitgeschreven (een vers aanpassen, een vertaalvraag beantwoorden, een hoofdstuk naar Word brengen). Wat werkt, wat schuurt, welke patronen ontbreken.
 2. **Richtingen met Claude Design.** Binnen de basis hierboven twee of drie typografische richtingen voor de schermen die het meest tellen: lezen en bewerken, het menu bij een woord, het voorbeeldvenster met varianten. Altijd met echte Lukas-tekst, ook uit een druk hoofdstuk. De eigenaar kiest, de redacteur reageert, daarna itereren.

@@ -29,6 +29,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [x] **Fase 4** (structurele keuzes) gebouwd op branch `fase-4-structureel` met /autopilot: tabblad Vervangen met voorbeeldvenster en vinkjes per plek, toepassen via de tussenstand met behoud van opmaak, terugdraaien in één keer, herkomst "structurele keuze" in tussenstand en export.
   - [ ] Vervangen: een vondst over een opmaakgrens kan alleen met de hand; overwegen of de tool die ook kan vervangen (met keuze welke opmaak blijft).
   - [ ] Vervangen: de toegepaste keuzes gaan nog niet mee in de export (`structureleKeuzes` blijft leeg); alleen de herkomst per vers.
+  - [ ] Vervangen: de context in het voorbeeldvenster begint en eindigt midden in een woord ("n jullie naam"); knippen op woordgrenzen, met "…".
   - [ ] Vervangen: een lege "Vervang door" verwijdert tekst zonder waarschuwing (wel terug te draaien); bevestiging of waarschuwing in het voorbeeld.
   - [ ] Vervangen, toegankelijkheid: "vervangen door" voor schermlezers bij `del`/`ins`; focus na toepassen naar de samenvatting; `.alleen-lezers` naar een gedeeld CSS-bestand (nu in `besloten.css`).
   - [ ] Vervangen: woordgrenzen bij een apostrof ("zo" in "zo'n", "m" in "m'n"); aansluitende stukken met gelijke opmaak samenvoegen voordat een vondst "met de hand" wordt (alleen als dat in de data voorkomt).

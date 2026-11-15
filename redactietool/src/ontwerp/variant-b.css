@@ -1,0 +1,865 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap');
+
+/*
+ * Variant b, "Dicht bij Word".
+ * Bijbeltekst: Figtree (schreefloos, open, lijkt op Aptos). Gereedschap: IBM Plex Sans Condensed,
+ * versnummers en kleine labels: IBM Plex Mono. Alleen wit, zwart, grijs en donkerrood #a61816.
+ * Rood staat nooit in de tekstkolommen; kleuren van de Bijbeltekst (inline) blijven ongemoeid.
+ */
+
+:root {
+	--tekst: #111;
+	--gedempt: #5c5c5c;
+	--rand: #dcdcdc;
+	--vlak: #f4f4f4;
+	--accent: #a61816;
+	--gekozen: #f1f1f1;
+	--zijbalk-breedte: 13.5rem;
+	--paneel-breedte: 30rem;
+	--tool: 'IBM Plex Sans Condensed', 'Arial Narrow', sans-serif;
+	--mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+	--bijbel: 'Figtree', Aptos, 'Segoe UI', sans-serif;
+	font-family: var(--tool);
+	font-size: 16px;
+	line-height: 1.45;
+}
+
+body {
+	font-family: var(--tool);
+}
+
+a {
+	color: inherit;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/* ---------- Knoppen en formulier: gereedschap, vierkant, zwart omlijnd ---------- */
+
+.indeling button {
+	padding: 0.3rem 0.8rem;
+	background: #fff;
+	border: 1px solid var(--tekst);
+	border-radius: 0;
+	color: var(--tekst);
+	font: 500 0.875rem/1.3 var(--tool);
+}
+
+.indeling button:hover:not(:disabled) {
+	background: var(--tekst);
+	color: #fff;
+}
+
+.indeling button:disabled {
+	border-color: #bbb;
+	color: #999;
+}
+
+.indeling button[aria-pressed='true'] {
+	background: var(--tekst);
+	color: #fff;
+}
+
+.indeling :is(input, select, textarea):not([type='checkbox']) {
+	padding: 0.4rem 0.5rem;
+	background: #fff;
+	border: 1px solid var(--tekst);
+	border-radius: 0;
+	color: var(--tekst);
+	font: 400 1rem/1.3 var(--tool);
+}
+
+.indeling input[type='checkbox'] {
+	accent-color: var(--tekst);
+}
+
+.indeling label {
+	font-family: var(--tool);
+}
+
+/* Labels boven velden: klein, hoofdletters, mono */
+.besloten-filters label,
+.vertaalvragen .filters label,
+.vervangen-formulier label,
+.zoekveld,
+.hoofdstukacties-export label {
+	color: var(--gedempt);
+	font: 500 0.7rem/1.2 var(--mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.zoekveld input {
+	margin-top: 0.35rem;
+}
+
+/* Hoofdactie: donkerrood gevuld */
+.indeling .vervangen .toepassen,
+.indeling .verseditor-acties button:first-child,
+.indeling .vervangen-formulier button[type='submit'] {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #fff;
+}
+
+.indeling .vervangen .toepassen:hover:not(:disabled),
+.indeling .verseditor-acties button:first-child:hover,
+.indeling .vervangen-formulier button[type='submit']:hover {
+	background: #7e1210;
+	border-color: #7e1210;
+}
+
+.indeling .vervangen .toepassen:disabled {
+	background: #fff;
+	border-color: #bbb;
+	color: #999;
+}
+
+/* ---------- Zijbalk ---------- */
+
+.zijbalk {
+	padding: 1.25rem 0 1.5rem;
+	background: #fff;
+	border-right: 1px solid var(--tekst);
+}
+
+.zijbalk h2 {
+	margin: 0 1.25rem 0.75rem;
+	font: 700 1.5rem/1.1 var(--tool);
+	letter-spacing: -0.01em;
+}
+
+.zijbalk .naar-begrippen {
+	margin: 0 0 1rem;
+	padding: 0.5rem 1.25rem;
+	border-top: 1px solid var(--tekst);
+	border-bottom: 1px solid var(--rand);
+	font: 500 0.7rem/1.2 var(--mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.zijbalk .naar-begrippen:hover {
+	background: var(--vlak);
+}
+
+.zijbalk .naar-begrippen[aria-current='page'] {
+	background: none;
+	color: var(--tekst);
+	border-left: 3px solid var(--accent);
+	padding-left: calc(1.25rem - 3px);
+	font-weight: 600;
+}
+
+.zijbalk a {
+	display: grid;
+	grid-template-columns: 2.25rem 1fr 4.25rem;
+	gap: 0 0.25rem;
+	align-items: baseline;
+	padding: 0.2rem 1.25rem;
+	border-radius: 0;
+}
+
+.zijbalk li a:hover {
+	background: var(--vlak);
+}
+
+.zijbalk li a[aria-current='page'] {
+	padding-left: calc(1.25rem - 3px);
+	background: none;
+	border-left: 3px solid var(--accent);
+	color: var(--tekst);
+	font-weight: 600;
+}
+
+.zijbalk li a[aria-current='page'] .hoofdstuknummer {
+	color: var(--accent);
+}
+
+.hoofdstuknummer {
+	min-width: 0;
+	font: 500 0.9rem/1.5 var(--mono);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Status: gewone woorden, geen omlijning */
+.status {
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	color: var(--gedempt);
+	font: 400 0.8125rem/1.4 var(--tool);
+}
+
+.status-goedgekeurd {
+	color: var(--tekst);
+	font-weight: 600;
+}
+
+.status-nog-niet-begonnen {
+	color: #8a8a8a;
+}
+
+.zijbalk a:hover .status-nog-niet-begonnen,
+.zijbalk a[aria-current='page'] .status-nog-niet-begonnen {
+	color: #8a8a8a;
+}
+
+.zijbalk a[aria-current='page'] .status:not(.status-goedgekeurd) {
+	color: var(--gedempt);
+	font-weight: 400;
+}
+
+.open-vragen {
+	color: var(--tekst);
+	font: 500 0.7rem/1.4 var(--mono);
+	text-align: right;
+}
+
+/* ---------- Hoofdstuk ---------- */
+
+main {
+	padding: 1.5rem 2rem 4rem;
+}
+
+.hoofdstuk h1 {
+	font: 700 2.25rem/1.1 var(--tool);
+	letter-spacing: -0.015em;
+}
+
+.hoofdstukstatus {
+	align-items: baseline;
+	gap: 0.75rem;
+	margin: 0.4rem 0 0;
+}
+
+.hoofdstukstatus .status {
+	font: 500 0.7rem/1.4 var(--mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.versie {
+	color: var(--gedempt);
+	font: 400 0.7rem/1.4 var(--mono);
+}
+
+.goedgekeurd {
+	max-width: 44rem;
+	margin: 0.75rem 0 0;
+	padding: 0 0 0 0.75rem;
+	background: none;
+	border-left: 2px solid var(--tekst);
+	font-size: 0.9rem;
+}
+
+.hoofdstukacties {
+	margin-top: 1rem;
+}
+
+.hoofdstukacties-aantal {
+	font: 400 0.75rem/1.4 var(--mono);
+}
+
+.hoofdstukacties-safari,
+.hoofdstukacties-verouderd,
+.verswaarschuwingen,
+.versverouderd,
+.versopslagfout {
+	padding: 0.4rem 0.75rem;
+	background: var(--vlak);
+	border-left: 2px solid var(--tekst);
+}
+
+.hoofdstukacties-export {
+	border: 1px solid var(--tekst);
+	border-radius: 0;
+	background: #fff;
+}
+
+.hoofdstukacties-export textarea {
+	font: 400 1rem/1.4 var(--tool);
+}
+
+/* Leesstroom: kolomkoppen zijn labels, rijen zijn dunne lijnen */
+
+table.verzen {
+	table-layout: fixed;
+	margin-top: 1.5rem;
+}
+
+table.verzen thead th {
+	padding: 0.5rem 0.75rem;
+	border-bottom: 1px solid var(--tekst);
+	color: var(--gedempt);
+	font: 500 0.68rem/1.2 var(--mono);
+	letter-spacing: 0.08em;
+}
+
+table.verzen thead th:nth-child(1) {
+	width: 4rem;
+}
+
+table.verzen thead th:nth-child(2) {
+	width: 26%;
+}
+
+table.verzen thead th:nth-child(3) {
+	width: 43%;
+}
+
+/* Het werkstuk: de vereenvoudiging heeft het label in zwart */
+table.verzen thead th:nth-child(3) {
+	color: var(--tekst);
+	font-weight: 600;
+}
+
+table.verzen td,
+table.verzen th.versnummer {
+	padding: 1.1rem 0.75rem;
+	border-bottom: 1px solid var(--rand);
+	vertical-align: baseline;
+}
+
+table.verzen td:nth-child(3) {
+	padding-left: 1.5rem;
+	padding-right: 5.5rem;
+}
+
+/* Versnummer: mono, grijs, geen link-uiterlijk; het ?-teken in zwart */
+table.verzen th.versnummer {
+	width: 4rem;
+	padding-right: 0.25rem;
+	padding-left: 0.75rem;
+	border-left: 3px solid transparent;
+	color: var(--gedempt);
+	font: 500 0.8rem/1.4 var(--mono);
+	font-variant-numeric: tabular-nums;
+}
+
+.versnummer a {
+	color: inherit;
+	text-decoration: none;
+}
+
+table.verzen tr.vers:hover th.versnummer a {
+	text-decoration: underline;
+}
+
+.vraagmarkering {
+	margin-left: 0.3rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	color: var(--tekst);
+	font: 700 0.8rem/1 var(--mono);
+}
+
+/* Bijbeltekst: Figtree. Bron is referentie (kleiner, grijs), vereenvoudiging is het werkstuk. */
+table.verzen tr.vers > td:not(.regels) {
+	font-family: var(--bijbel);
+}
+
+/* Bijbeltekst in Word-zwart (automatisch); kleuren, arcering en markeringen komen ongewijzigd uit het Word-sjabloon. Alleen grootte en letter verschillen. */
+table.verzen tr.vers > td:nth-child(2) {
+	color: #000;
+	font-size: 1rem;
+	line-height: 1.55;
+}
+
+table.verzen tr.vers > td:nth-child(3) {
+	position: relative;
+	color: #000;
+	font-size: 1.1875rem;
+	line-height: 1.5;
+}
+
+table.verzen td > p + p {
+	margin-top: 0.6rem;
+}
+
+/* Alles in de cel dat geen Bijbeltekst is, blijft gereedschap */
+.versacties,
+.verseditor-acties,
+.verswaarschuwingen,
+.versverouderd,
+.versopslagfout {
+	font-family: var(--tool);
+	font-size: 0.8125rem;
+	line-height: 1.4;
+	font-weight: 400;
+}
+
+.versverouderd .eerdere-tekst {
+	font-family: var(--bijbel);
+	font-size: 1rem;
+	border-left-color: #999;
+}
+
+/* Gekozen vers: licht grijs vlak, rode streep alleen in de goot bij het versnummer */
+tr.vers-gekozen > *,
+tr.vers-gekozen + tr.regels-onder > * {
+	background: var(--gekozen);
+}
+
+tr.vers-gekozen th.versnummer {
+	border-left-color: var(--accent);
+	color: var(--tekst);
+	font-weight: 600;
+}
+
+/* Bewerken: pas zichtbaar bij hover, focus of gekozen vers; rustig tekstlinkje rechtsboven */
+.versacties {
+	margin: 0;
+	gap: 0.25rem 0.75rem;
+}
+
+.versacties > button,
+.verseditor-acties button:not(:first-child) {
+	padding: 0;
+	background: none;
+	border: 0;
+	border-radius: 0;
+	color: var(--tekst);
+	font: 500 0.75rem/1.4 var(--mono);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.indeling .versacties > button:hover:not(:disabled),
+.indeling .verseditor-acties button:not(:first-child):hover {
+	background: none;
+	color: var(--accent);
+}
+
+.versacties > button[aria-label^='Bewerken'] {
+	position: absolute;
+	top: 1.2rem;
+	right: 0.75rem;
+	opacity: 0;
+}
+
+tr.vers:hover .versacties > button[aria-label^='Bewerken'],
+tr.vers:focus-within .versacties > button[aria-label^='Bewerken'],
+tr.vers-gekozen .versacties > button[aria-label^='Bewerken'] {
+	opacity: 1;
+}
+
+.versmarkering {
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	color: var(--gedempt);
+	font: 500 0.7rem/1.4 var(--mono);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.versacties:has(.versmarkering) {
+	margin-top: 0.5rem;
+}
+
+/* Editor: zwart kader, rood alleen als focus */
+.verseditor .ProseMirror {
+	padding: 0.5rem 0.75rem;
+	border: 2px solid var(--tekst);
+	border-radius: 0;
+	font-family: var(--bijbel);
+}
+
+.verseditor .ProseMirror:focus {
+	border-color: var(--accent);
+	box-shadow: none;
+}
+
+.verseditor-acties {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem 0.75rem;
+	margin-top: 0.6rem;
+	color: var(--gedempt);
+}
+
+/* ---------- Regels: een rustige notitiekolom, geen chips ---------- */
+
+table.verzen td.regels {
+	width: auto;
+	padding-left: 1.25rem;
+	border-left: 1px solid var(--rand);
+	color: #444;
+	font: 400 0.8125rem/1.45 var(--tool);
+}
+
+.logblok ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.logblok li + li {
+	margin-top: 0.45rem;
+}
+
+.logblok + .logblok {
+	margin-top: 0.6rem;
+}
+
+.logbereik,
+.geen-regels {
+	color: var(--gedempt);
+	font: 500 0.68rem/1.4 var(--mono);
+	letter-spacing: 0.04em;
+}
+
+tr.regels-onder td {
+	padding-top: 0.6rem;
+	padding-bottom: 0.9rem;
+	padding-left: 4.75rem;
+	font-size: 0.8125rem;
+	line-height: 1.45;
+}
+
+.indeling button.verwijzing {
+	margin-left: 0.3rem;
+	padding: 0;
+	background: none;
+	border: 0;
+	border-radius: 0;
+	color: var(--tekst);
+	font: 500 0.72rem/1.4 var(--mono);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+	white-space: nowrap;
+}
+
+.indeling button.verwijzing:hover:not(:disabled) {
+	background: none;
+	color: var(--accent);
+}
+
+.vraag {
+	margin-top: 0.6rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+}
+
+.vraag summary {
+	color: var(--gedempt);
+	font: 500 0.7rem/1.4 var(--mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.vraag-open summary {
+	color: var(--tekst);
+	font-weight: 600;
+}
+
+.vraag[open] {
+	padding-left: 0.6rem;
+	border-left: 2px solid var(--tekst);
+}
+
+.vraag dt {
+	font: 500 0.65rem/1.4 var(--mono);
+	letter-spacing: 0.06em;
+}
+
+.regelsschakelaar {
+	margin-top: 1.5rem;
+	font-size: 0.875rem;
+}
+
+/* ---------- Zijpaneel ---------- */
+
+.zijpaneel {
+	padding: 1.25rem 1.5rem 2rem;
+	border-left: 1px solid var(--tekst);
+}
+
+.zijpaneel h2 {
+	font: 700 1.5rem/1.1 var(--tool);
+}
+
+.sectietitel {
+	margin: 1rem 0 0.5rem;
+	font: 600 1.0625rem/1.3 var(--tool);
+}
+
+.markdown blockquote {
+	border-left: 2px solid var(--tekst);
+}
+
+.zijpaneel table {
+	font-size: 0.8125rem;
+}
+
+.zijpaneel th,
+.zijpaneel td {
+	border: 0;
+	border-bottom: 1px solid var(--rand);
+}
+
+.zijpaneel th {
+	border-bottom-color: var(--tekst);
+	font: 500 0.68rem/1.3 var(--mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+/* ---------- Begrippen: tabbladen als gewone koppen met een streep onder de actieve ---------- */
+
+.begrippen {
+	padding: 1.5rem 2rem 3rem;
+}
+
+.begrippen h1 {
+	margin: 0 0 1rem;
+	font: 700 2.25rem/1.1 var(--tool);
+	letter-spacing: -0.015em;
+}
+
+.tabbladen {
+	gap: 1.75rem;
+	margin-bottom: 1.5rem;
+	border-bottom: 1px solid var(--tekst);
+}
+
+.tabbladen a {
+	padding: 0.5rem 0 0.55rem;
+	border: 0;
+	border-bottom: 3px solid transparent;
+	border-radius: 0;
+	margin-bottom: -1px;
+	color: var(--gedempt);
+	font: 500 1.0625rem/1.3 var(--tool);
+}
+
+.tabbladen a:hover {
+	color: var(--tekst);
+}
+
+.tabbladen a[aria-current='page'] {
+	background: none;
+	border-color: transparent;
+	border-bottom-color: var(--accent);
+	color: var(--tekst);
+	font-weight: 700;
+}
+
+.begrippen h2,
+.begrippen h3 {
+	font-family: var(--tool);
+	font-weight: 600;
+}
+
+.begrippen h2 {
+	margin-top: 2rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--tekst);
+	font-size: 1.125rem;
+}
+
+.uitleg,
+.besloten-samenvatting,
+.vervangen-samenvatting,
+.vertaalvragen .aantal,
+.filterbalk .aantal {
+	color: var(--gedempt);
+}
+
+.gevonden .uitleg,
+.vervangen .uitleg {
+	max-width: 46rem;
+}
+
+.verslinks a {
+	text-decoration-color: #999;
+}
+
+/* Tabellen */
+.besloten-tabel,
+.gevonden table {
+	font-size: 0.9375rem;
+}
+
+.besloten-tabel thead th,
+.gevonden thead th {
+	padding: 0.5rem 0.6rem;
+	background: #fff;
+	border-bottom: 1px solid var(--tekst);
+	color: var(--gedempt);
+	font: 500 0.68rem/1.3 var(--mono);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.besloten-tabel th,
+.besloten-tabel td,
+.gevonden th,
+.gevonden td {
+	padding: 0.55rem 0.6rem;
+	border-bottom: 1px solid var(--rand);
+}
+
+.besloten-tabel .aantal,
+.gevonden .getal {
+	font-family: var(--mono);
+	font-size: 0.875rem;
+}
+
+.besloten-tabel .nog-oud {
+	background: var(--gekozen);
+	border-left: 3px solid var(--tekst);
+}
+
+.vertaling.bijzonder {
+	font-style: normal;
+}
+
+/* Vertaalvragen: lijst met dunne lijnen, status als gewone woorden */
+.vertaalvragen .vragenlijst {
+	gap: 0;
+	border-top: 1px solid var(--rand);
+}
+
+.vertaalvragen .registervraag,
+.vertaalvragen details {
+	padding: 0;
+	border: 0;
+	border-bottom: 1px solid var(--rand);
+	border-radius: 0;
+}
+
+.vertaalvragen .registervraag {
+	padding: 0.6rem 0.75rem 0.8rem;
+}
+
+.vertaalvragen summary {
+	padding: 0.6rem 0.75rem;
+}
+
+.vertaalvragen .vraagtekst {
+	padding: 0 0.75rem 0.75rem 1.5rem;
+	border-top: 0;
+}
+
+.vertaalvragen .kwestie {
+	font-weight: 600;
+}
+
+.vertaalvragen .versjes {
+	font: 400 0.75rem/1.4 var(--mono);
+}
+
+.vertaalvragen dt {
+	font: 500 0.68rem/1.6 var(--mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.vertaalvragen .status {
+	padding: 0;
+	background: none;
+	border: 0;
+	border-radius: 0;
+	color: var(--gedempt);
+	font: 500 0.68rem/1.4 var(--mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.vertaalvragen .status-open {
+	background: none;
+	color: var(--tekst);
+	font-weight: 700;
+}
+
+.vertaalvragen .status-voorlopig-besloten {
+	background: none;
+	color: var(--tekst);
+}
+
+.vertaalvragen .status-besloten {
+	background: none;
+	color: #8a8a8a;
+}
+
+.vertaalvragen .volgens-tekst {
+	font-style: normal;
+}
+
+/* Vervangen */
+.vervangen-formulier {
+	gap: 0.75rem 1rem;
+}
+
+.vervangen-formulier input {
+	min-width: 18rem;
+}
+
+.vervangen .vondst {
+	padding: 0.5rem 0;
+	border-bottom: 1px solid var(--rand);
+}
+
+.vervangen .vondst .context {
+	font-family: var(--bijbel);
+	font-size: 1.0625rem;
+	line-height: 1.55;
+}
+
+.vervangen .vondst a {
+	font: 500 0.8rem/1.4 var(--mono);
+}
+
+.vervangen del {
+	background: #e4e4e4;
+	color: inherit;
+	text-decoration: line-through;
+	text-decoration-thickness: 1px;
+}
+
+.vervangen ins {
+	background: none;
+	font-weight: 700;
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.18em;
+}
+
+.vervangen mark {
+	background: #e4e4e4;
+	color: inherit;
+	font-weight: 600;
+}
+
+.vervangen .toepassen {
+	margin-top: 1.25rem;
+}
+
+.toegepaste-keuzes li {
+	border-bottom: 1px solid var(--rand);
+}
+
+.indeling .verslinks .meer {
+	padding: 0;
+	background: none;
+	border: 0;
+	color: var(--gedempt);
+	font: 500 0.72rem/1.4 var(--mono);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.indeling .verslinks .meer:hover:not(:disabled) {
+	background: none;
+	color: var(--accent);
+}
