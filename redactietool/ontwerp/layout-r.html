@@ -1,0 +1,109 @@
+<!doctype html><html lang="nl"><meta charset="utf-8"><title>Layout van de leespagina: r1 tot r4 en p1 tot p3</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:2rem;color:#000;max-width:132rem}
+h1{font-size:1.6rem}
+h2{font-size:1.3rem;margin-top:3.5rem;border-top:1px solid #000;padding-top:1rem}
+h3{font-size:1.05rem;margin:2.2rem 0 .2rem}
+nav a{margin-right:.75rem;color:#a61816}
+.uitleg{margin:.1rem 0 .6rem;max-width:62rem}
+.rij{display:grid;gap:1.25rem}
+.k2{grid-template-columns:repeat(2,1fr)}
+.k3{grid-template-columns:repeat(3,1fr)}
+figure{margin:0}
+figcaption{font-weight:600;margin-bottom:.25rem;font-size:13px}
+img{width:100%;border:1px solid #ccc;display:block}
+table{border-collapse:collapse;font-size:13px;margin:.5rem 0 1rem}
+th,td{border-bottom:1px solid #ccc;padding:.4rem .8rem .4rem 0;text-align:left;vertical-align:top}
+.toel{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;font-size:13px;margin:.75rem 0}
+.toel div{border-top:2px solid #000;padding-top:.4rem}
+.toel h4{margin:0 0 .3rem;font-size:14px}
+.toel p{margin:.3rem 0}
+code{font-size:13px}
+</style>
+<h1>Layout van de leespagina: r1 tot r4 en p1 tot p3</h1>
+<p>De leespagina werd te breed, zeker met de naslag (het precedentenpaneel) open. Hier staan zeven werkende proeven naast de huidige tool. Alle zeven hebben een maximale leesbreedte voor bron en vereenvoudiging (ongeveer 65 tekens per regel) en een tabel met een maximale breedte; de rest van de pagina is wit. Overal heten de regels hier "Vertaalregels".</p>
+<p>Proberen in de echte tool: voeg <code>?layout=r1</code> tot <code>?layout=r4</code> of <code>?layout=p1</code> tot <code>?layout=p3</code> toe aan het adres, bijvoorbeeld <code>http://localhost:5173/?layout=r2#/lukas/4</code>. Rechtsonder staat een kleine keuzestrook om te wisselen (<code>nu</code> is de huidige tool). Zonder parameter verandert er niets. Klik op een afbeelding voor de volle grootte.</p>
+<nav><a href="#r">r1 tot r4: waar staan de vertaalregels</a><a href="#p">p1 tot p3: waar staat de naslag</a><a href="#tekens">Tekens per regel</a><a href="#noot">Wat nog ontbreekt</a></nav>
+
+<h2 id="r">r1 tot r4: waar staan de vertaalregels</h2>
+<p>Alleen de plek van de vertaalregels verschilt. Het precedentenpaneel blijft bij r1 tot r3 zoals nu (het duwt de pagina opzij), want met een kolom minder past dat. Bij r4 ligt het als lade over de pagina.</p>
+<div class="toel">
+<div><h4>r1, altijd onder het vers</h4>
+<p><b>Lost op:</b> geen kolom, dus bron en vereenvoudiging krijgen de breedte; alle vertaalregels staan altijd in beeld, in twee kolommen onder het vers. De vraag staat bij de regels.</p>
+<p><b>Kost:</b> de pagina wordt veel langer (elk vers krijgt een blok erbij), en bij verzen met veel regels staat de volgende vers ver weg. De regels staan onder in plaats van naast het werk.</p></div>
+<div><h4>r2, uitklappen</h4>
+<p><b>Lost op:</b> de pagina blijft kort. Ingeklapt zie je zonder klikken dat en welke regels er spelen: de eerste vertaalregel op één regel (afgekapt met &hellip;), de verwijzingen (&sect;7A, precedent) als kleine labels en het woord VRAAG. Een knop "Alle vertaalregels uitklappen" staat bij de kolomkoppen.</p>
+<p><b>Kost:</b> een klik per vers om alle regels te lezen. De samenvatting toont maar de eerste regel; de rest zie je pas na uitklappen. Uitgeklapt schuift de pagina open.</p></div>
+<div><h4>r3, bij aanwijzen</h4>
+<p><b>Lost op:</b> de compactste pagina: onder het vers staat dezelfde samenvatting als bij r2, en de volledige regels verschijnen in een zwevend vak (bij aanwijzen of toetsenbordfocus) zonder dat er iets verschuift. Klikken op de samenvatting zet het vak vast; Escape sluit het.</p>
+<p><b>Kost:</b> het vak ligt over het volgende vers. Op een aanraakscherm is er geen aanwijzen, dan blijft alleen vastzetten. Een vak dat alleen door aanwijzen openstaat kan nog niet met Escape dicht; alleen een vastgezet vak wel.</p></div>
+<div><h4>r4, naslag zwevend</h4>
+<p><b>Lost op:</b> de kolom Vertaalregels blijft naast het werk, en de naslag duwt de tabel niet meer smaller (precedenten als lade rechts, dunne rand, geen schaduw). Sluiten met de knop of Escape.</p>
+<p><b>Kost:</b> de tabel is het breedst van de vier (1287 px op 1920). Op 1440 px ligt de lade over het rechterdeel van Vereenvoudigd en over de hele kolom Vertaalregels; op 1920 px blijft de tabel bijna vrij.</p></div>
+</div>
+
+<h3 id="r-1440-dicht">Lukas 4, 1440 px, naslag dicht</h3>
+<p class="uitleg">Bij 1440 px is de tabel zonder naslag al bijna zo breed als nu (r4) of smaller (r1 tot r3); het grote verschil zit in de plek van de regels.</p>
+<div class="rij k3"><figure><figcaption>Huidige tool (zonder parameter)</figcaption><a href="layout-r/nu-1440-dicht.png"><img src="layout-r/nu-1440-dicht.png" alt="Huidige tool (zonder parameter), 1440 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r1, Vertaalregels altijd onder het vers</figcaption><a href="layout-r/r1-1440-dicht.png"><img src="layout-r/r1-1440-dicht.png" alt="r1, Vertaalregels altijd onder het vers, 1440 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r2, Vertaalregels uitklappen</figcaption><a href="layout-r/r2-1440-dicht.png"><img src="layout-r/r2-1440-dicht.png" alt="r2, Vertaalregels uitklappen, 1440 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r3, Vertaalregels bij aanwijzen</figcaption><a href="layout-r/r3-1440-dicht.png"><img src="layout-r/r3-1440-dicht.png" alt="r3, Vertaalregels bij aanwijzen, 1440 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r4, Naslag zwevend</figcaption><a href="layout-r/r4-1440-dicht.png"><img src="layout-r/r4-1440-dicht.png" alt="r4, Naslag zwevend, 1440 px breed, dicht" loading="lazy"></a></figure></div>
+<h3 id="r-1440-naslag">Lukas 4, 1440 px, naslag open (eerste verwijzing &quot;precedent&quot;)</h3>
+<p class="uitleg">Hier zie je het eigenlijke probleem. Bij r1 tot r3 duwt de naslag de tabel naar 868 px, maar de bron houdt 55 en de vereenvoudiging 63 tekens per regel (nu: 35 en 46). Bij r4 blijft de tabel 1219 px, maar de lade dekt rechts een deel af.</p>
+<div class="rij k3"><figure><figcaption>Huidige tool (zonder parameter)</figcaption><a href="layout-r/nu-1440-naslag.png"><img src="layout-r/nu-1440-naslag.png" alt="Huidige tool (zonder parameter), 1440 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r1, Vertaalregels altijd onder het vers</figcaption><a href="layout-r/r1-1440-naslag.png"><img src="layout-r/r1-1440-naslag.png" alt="r1, Vertaalregels altijd onder het vers, 1440 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r2, Vertaalregels uitklappen</figcaption><a href="layout-r/r2-1440-naslag.png"><img src="layout-r/r2-1440-naslag.png" alt="r2, Vertaalregels uitklappen, 1440 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r3, Vertaalregels bij aanwijzen</figcaption><a href="layout-r/r3-1440-naslag.png"><img src="layout-r/r3-1440-naslag.png" alt="r3, Vertaalregels bij aanwijzen, 1440 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r4, Naslag zwevend</figcaption><a href="layout-r/r4-1440-naslag.png"><img src="layout-r/r4-1440-naslag.png" alt="r4, Naslag zwevend, 1440 px breed, naslag" loading="lazy"></a></figure></div>
+<h3 id="r-1920-dicht">Lukas 4, 1920 px, naslag dicht</h3>
+<p class="uitleg">De tabel blijft binnen 975 px (r1 tot r3) of 1287 px (r4). De rest is wit; de huidige tool is 1699 px breed.</p>
+<div class="rij k3"><figure><figcaption>Huidige tool (zonder parameter)</figcaption><a href="layout-r/nu-1920-dicht.png"><img src="layout-r/nu-1920-dicht.png" alt="Huidige tool (zonder parameter), 1920 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r1, Vertaalregels altijd onder het vers</figcaption><a href="layout-r/r1-1920-dicht.png"><img src="layout-r/r1-1920-dicht.png" alt="r1, Vertaalregels altijd onder het vers, 1920 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r2, Vertaalregels uitklappen</figcaption><a href="layout-r/r2-1920-dicht.png"><img src="layout-r/r2-1920-dicht.png" alt="r2, Vertaalregels uitklappen, 1920 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r3, Vertaalregels bij aanwijzen</figcaption><a href="layout-r/r3-1920-dicht.png"><img src="layout-r/r3-1920-dicht.png" alt="r3, Vertaalregels bij aanwijzen, 1920 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>r4, Naslag zwevend</figcaption><a href="layout-r/r4-1920-dicht.png"><img src="layout-r/r4-1920-dicht.png" alt="r4, Naslag zwevend, 1920 px breed, dicht" loading="lazy"></a></figure></div>
+<h3 id="r-1920-naslag">Lukas 4, 1920 px, naslag open</h3>
+<p class="uitleg">Bij r1 tot r3 blijft de tabel 975 px, naast de naslag. Bij r4 ligt de lade in het witte deel rechts; de tabel wordt niet smaller en wordt nauwelijks bedekt.</p>
+<div class="rij k3"><figure><figcaption>Huidige tool (zonder parameter)</figcaption><a href="layout-r/nu-1920-naslag.png"><img src="layout-r/nu-1920-naslag.png" alt="Huidige tool (zonder parameter), 1920 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r1, Vertaalregels altijd onder het vers</figcaption><a href="layout-r/r1-1920-naslag.png"><img src="layout-r/r1-1920-naslag.png" alt="r1, Vertaalregels altijd onder het vers, 1920 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r2, Vertaalregels uitklappen</figcaption><a href="layout-r/r2-1920-naslag.png"><img src="layout-r/r2-1920-naslag.png" alt="r2, Vertaalregels uitklappen, 1920 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r3, Vertaalregels bij aanwijzen</figcaption><a href="layout-r/r3-1920-naslag.png"><img src="layout-r/r3-1920-naslag.png" alt="r3, Vertaalregels bij aanwijzen, 1920 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>r4, Naslag zwevend</figcaption><a href="layout-r/r4-1920-naslag.png"><img src="layout-r/r4-1920-naslag.png" alt="r4, Naslag zwevend, 1920 px breed, naslag" loading="lazy"></a></figure></div>
+<h3 id="r2-uitgeklapt">r2: een paar vertaalregels uitgeklapt</h3>
+<p class="uitleg">Vers 3, 4 en 6 zijn uitgeklapt; de rest toont de samenvatting. "Alle vertaalregels uitklappen" staat rechts bij de kolomkop; op 1920 px en op 1440 px.</p>
+<div class="rij k3"><figure><figcaption>r2, 1440 px, een paar uitgeklapt</figcaption><a href="layout-r/r2-1440-uitgeklapt.png"><img src="layout-r/r2-1440-uitgeklapt.png" alt="r2, 1440 px, een paar uitgeklapt, 1440 px breed, uitgeklapt" loading="lazy"></a></figure><figure><figcaption>r2, 1920 px, een paar uitgeklapt</figcaption><a href="layout-r/r2-1920-uitgeklapt.png"><img src="layout-r/r2-1920-uitgeklapt.png" alt="r2, 1920 px, een paar uitgeklapt, 1920 px breed, uitgeklapt" loading="lazy"></a></figure><figure><figcaption>r2, 1920 px, alles uitgeklapt</figcaption><a href="layout-r/r2-1920-alles.png"><img src="layout-r/r2-1920-alles.png" alt="r2, 1920 px, alles uitgeklapt, 1920 px breed, alles" loading="lazy"></a></figure></div>
+<h3 id="r3-zwevend">r3: het zwevende vak</h3>
+<p class="uitleg">Eerste en derde afbeelding: aangewezen (vak onder het vers, het volgende vers deels bedekt). Tweede: vastgezet met een klik op de samenvatting, de muis staat elders.</p>
+<div class="rij k3"><figure><figcaption>r3, 1440 px, aangewezen</figcaption><a href="layout-r/r3-1440-zwevend.png"><img src="layout-r/r3-1440-zwevend.png" alt="r3, 1440 px, aangewezen, 1440 px breed, zwevend" loading="lazy"></a></figure><figure><figcaption>r3, 1440 px, vastgezet</figcaption><a href="layout-r/r3-1440-vastgezet.png"><img src="layout-r/r3-1440-vastgezet.png" alt="r3, 1440 px, vastgezet, 1440 px breed, vastgezet" loading="lazy"></a></figure><figure><figcaption>r3, 1920 px, aangewezen</figcaption><a href="layout-r/r3-1920-zwevend.png"><img src="layout-r/r3-1920-zwevend.png" alt="r3, 1920 px, aangewezen, 1920 px breed, zwevend" loading="lazy"></a></figure></div>
+
+<h2 id="p">p1 tot p3: waar staat de naslag</h2>
+<p>De huidige kolommen (bron, vereenvoudiging, vertaalregels naast elkaar) blijven, met de maximale leesbreedte. Alleen de naslag verschilt. In deze afbeeldingen is steeds de eerste verwijzing "precedent" aangeklikt.</p>
+<div class="toel">
+<div><h4>p1, lade over de pagina</h4>
+<p><b>Lost op:</b> de tabel wordt niet smaller of breder. Technisch gelijk aan r4: <code>?layout=p1</code> en <code>?layout=r4</code> geven dezelfde pagina.</p>
+<p><b>Kost:</b> zie r4: op 1440 px bedekt de lade het rechterdeel van het werk.</p></div>
+<div><h4>p2, in de plek van Vertaalregels</h4>
+<p><b>Lost op:</b> niets ligt over de tekst heen. De kolom Vertaalregels maakt plaats voor de naslag (kop "Naslag", knop "Terug naar vertaalregels"); de naslag blijft in beeld bij het scrollen.</p>
+<p><b>Kost:</b> de precedententabel heeft ruimte nodig, dus de kolom wordt 34 in plaats van 24 rem breed en de tabel groeit van 1287 naar 1417 px op 1920. Op 1440 px krijgen de bron 52 en de vereenvoudiging 61 tekens per regel. Zolang de naslag open is zie je de vertaalregels niet, terwijl je die net bij de verwijzing wilt lezen.</p></div>
+<div><h4>p3, kaart onder het vers</h4>
+<p><b>Lost op:</b> de naslag opent bij de aangeklikte verwijzing, over de breedte van de tabel. De rijen die bij de logregel passen zijn gemarkeerd (balk links, lichte tint) en de rest staat ingeklapt achter "Alle 478 precedenten tonen". Een richtlijnparagraaf (&sect;7A) opent op dezelfde plek.</p>
+<p><b>Kost:</b> de kaart duwt de rest van de pagina omlaag en er is er maar een tegelijk. Welk precedent bij de regel hoort, wordt geraden: de verwijzing "precedent" in het log noemt geen regel uit de tabel. Het raden zoekt de bron of vereenvoudiging van het precedent in de logregel en mist of vindt er soms te veel. Betrouwbaar wordt het pas als het log naar een precedent verwijst.</p></div>
+</div>
+<h3 id="p-1440-naslag">Lukas 4, 1440 px, naslag open</h3>
+<p class="uitleg">p1 bedekt het rechterdeel van het werk. p2 houdt alles zichtbaar maar de kolommen worden smaller. p3 houdt de kolommen en toont de naslag onder vers 2.</p>
+<div class="rij k2"><figure><figcaption>Huidige tool (zonder parameter)</figcaption><a href="layout-r/nu-1440-naslag.png"><img src="layout-r/nu-1440-naslag.png" alt="Huidige tool (zonder parameter), 1440 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>p1, Naslag als lade over de pagina</figcaption><a href="layout-r/p1-1440-naslag.png"><img src="layout-r/p1-1440-naslag.png" alt="p1, Naslag als lade over de pagina, 1440 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>p2, Naslag in de plek van Vertaalregels</figcaption><a href="layout-r/p2-1440-naslag.png"><img src="layout-r/p2-1440-naslag.png" alt="p2, Naslag in de plek van Vertaalregels, 1440 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>p3, Naslag als kaart onder het vers</figcaption><a href="layout-r/p3-1440-naslag.png"><img src="layout-r/p3-1440-naslag.png" alt="p3, Naslag als kaart onder het vers, 1440 px breed, naslag" loading="lazy"></a></figure></div>
+<h3 id="p-1920-naslag">Lukas 4, 1920 px, naslag open</h3>
+<p class="uitleg">Op 1920 px past alles: p1 ligt in het witte deel, p2 en p3 laten de kolommen vrijwel zoals ze zijn.</p>
+<div class="rij k2"><figure><figcaption>Huidige tool (zonder parameter)</figcaption><a href="layout-r/nu-1920-naslag.png"><img src="layout-r/nu-1920-naslag.png" alt="Huidige tool (zonder parameter), 1920 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>p1, Naslag als lade over de pagina</figcaption><a href="layout-r/p1-1920-naslag.png"><img src="layout-r/p1-1920-naslag.png" alt="p1, Naslag als lade over de pagina, 1920 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>p2, Naslag in de plek van Vertaalregels</figcaption><a href="layout-r/p2-1920-naslag.png"><img src="layout-r/p2-1920-naslag.png" alt="p2, Naslag in de plek van Vertaalregels, 1920 px breed, naslag" loading="lazy"></a></figure><figure><figcaption>p3, Naslag als kaart onder het vers</figcaption><a href="layout-r/p3-1920-naslag.png"><img src="layout-r/p3-1920-naslag.png" alt="p3, Naslag als kaart onder het vers, 1920 px breed, naslag" loading="lazy"></a></figure></div>
+<h3 id="p3-richtlijn">p3: een richtlijnparagraaf (§7A)</h3>
+<p class="uitleg">Dezelfde kaart voor een verwijzing naar de richtlijn: de sectie staat meteen bij het vers. Hier is niets te markeren.</p>
+<div class="rij k2"><figure><figcaption>p3, 1440 px, richtlijn</figcaption><a href="layout-r/p3-1440-naslag-richtlijn.png"><img src="layout-r/p3-1440-naslag-richtlijn.png" alt="p3, 1440 px, richtlijn, 1440 px breed, naslag-richtlijn" loading="lazy"></a></figure><figure><figcaption>p3, 1920 px, richtlijn</figcaption><a href="layout-r/p3-1920-naslag-richtlijn.png"><img src="layout-r/p3-1920-naslag-richtlijn.png" alt="p3, 1920 px, richtlijn, 1920 px breed, naslag-richtlijn" loading="lazy"></a></figure></div>
+<h3 id="p-1440-dicht">Lukas 4, 1440 px, naslag dicht</h3>
+<p class="uitleg">Zonder naslag zijn p1, p2 en p3 gelijk: de huidige kolommen met leesbreedte.</p>
+<div class="rij k2"><figure><figcaption>Huidige tool (zonder parameter)</figcaption><a href="layout-r/nu-1440-dicht.png"><img src="layout-r/nu-1440-dicht.png" alt="Huidige tool (zonder parameter), 1440 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>p1, Naslag als lade over de pagina</figcaption><a href="layout-r/p1-1440-dicht.png"><img src="layout-r/p1-1440-dicht.png" alt="p1, Naslag als lade over de pagina, 1440 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>p2, Naslag in de plek van Vertaalregels</figcaption><a href="layout-r/p2-1440-dicht.png"><img src="layout-r/p2-1440-dicht.png" alt="p2, Naslag in de plek van Vertaalregels, 1440 px breed, dicht" loading="lazy"></a></figure><figure><figcaption>p3, Naslag als kaart onder het vers</figcaption><a href="layout-r/p3-1440-dicht.png"><img src="layout-r/p3-1440-dicht.png" alt="p3, Naslag als kaart onder het vers, 1440 px breed, dicht" loading="lazy"></a></figure></div>
+
+<h2 id="tekens">Tekens per regel</h2>
+<p>Gemeten op Lukas 4 over alle alinea's van drie regels of meer (gemiddeld aantal tekens per volle regel; tussen haakjes de breedte van de tabel).</p>
+<table><thead><tr><th>Situatie</th><th>Bron</th><th>Vereenvoudigd</th></tr></thead><tbody>
+<tr><td>Nu, 1920 px, naslag dicht (1699 px)</td><td>70</td><td>78</td></tr>
+<tr><td>Nu, 1920 px, naslag open (1348 px)</td><td>59</td><td>71</td></tr>
+<tr><td>Nu, 1440 px, naslag open (868 px)</td><td>35</td><td>46</td></tr>
+<tr><td>r1 tot r3, 1920 px (975 px), naslag dicht of open</td><td>64</td><td>68</td></tr>
+<tr><td>r1 tot r3, 1440 px, naslag open (868 px)</td><td>55</td><td>63</td></tr>
+<tr><td>r4 en p1 en p3, 1920 px (1287 px)</td><td>66</td><td>68</td></tr>
+<tr><td>r4 en p1 en p3, 1440 px (1219 px)</td><td>61</td><td>66</td></tr>
+<tr><td>p2, 1920 px, naslag open (1417 px)</td><td>64</td><td>68</td></tr>
+<tr><td>p2, 1440 px, naslag open (1219 px)</td><td>52</td><td>61</td></tr>
+</tbody></table>
+
+<h2 id="noot">Wat nog ontbreekt</h2>
+<ul>
+<li>Het woord "Vertaalregels" staat alleen in deze proeven (kolomkop, knoppen, melding "Geen vertaalregels in het log"). Als de eigenaar het overal wil, moet het ook in de zijbalk, de tooltips en de documentatie.</li>
+<li>De knop "Regels altijd tonen" (kolom of eronder) verdwijnt bij r1 tot r3 en p2; bij r4, p1 en p3 blijft hij.</li>
+<li>De opmaak van de Bijbeltekst is ongewijzigd: de opmaakcontrole tegen Word geeft in alle zeven proeven 0 afwijkingen. Rood staat nergens in of rond de tekstkolommen; het rood in de afbeeldingen is de kleur van de Bijbeltekst uit het Word-sjabloon.</li>
+</ul>

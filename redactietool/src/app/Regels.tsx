@@ -13,6 +13,7 @@ type Props = {
 	vragen: readonly OpenVraag[];
 	/** In de smalle kolom: na de eerste regels staat de rest achter "nog N regels". */
 	kapAf: boolean;
+	/** Hoe de knoppen en meldingen de regels noemen. */
 	onOpenNaslag: (naslag: Naslag) => void;
 };
 
@@ -34,8 +35,8 @@ export function Regels({ logVerzen, vragen, kapAf, onOpenNaslag }: Props) {
 							<li>
 								<InlineMarkdown tekst={regel.tekst} />
 								{regel.verwijzingen.map((verwijzing) => (
-									<button type="button" class="verwijzing" onClick={() => onOpenNaslag(naarNaslag(verwijzing))}>
-										{verwijzing.soort === 'paragraaf' ? `§${verwijzing.paragraaf}` : 'precedent'}
+									<button type="button" class="verwijzing" onClick={() => onOpenNaslag(naarNaslag(verwijzing, regel.tekst))}>
+										{verwijzingsLabel(verwijzing)}
 									</button>
 								))}
 							</li>
@@ -55,16 +56,48 @@ export function Regels({ logVerzen, vragen, kapAf, onOpenNaslag }: Props) {
 	);
 }
 
+function verwijzingsLabel(verwijzing: Verwijzing): string {
+	return verwijzing.soort === 'paragraaf' ? `§${verwijzing.paragraaf}` : 'precedent';
+}
+
+/** Het aantal regels van een vers over alle logblokken. */
+export function aantalRegels(logVerzen: readonly LogVers[]): number {
+	return logVerzen.reduce((som, logVers) => som + logVers.wijzigingen.length, 0);
+}
+
+type SamenvattingProps = {
+	logVerzen: readonly LogVers[];
+};
+
+/** Voor een ingeklapt vers: de eerste regel op één regel (CSS kapt af) en de verwijzingen als kleine labels, zonder klik te zien welke regels spelen. */
+export function RegelsSamenvatting({ logVerzen }: SamenvattingProps) {
+	const regels = logVerzen.flatMap((logVers) => logVers.wijzigingen);
+	const labels = [...new Set(regels.flatMap((regel) => regel.verwijzingen.map(verwijzingsLabel)))];
+	const eerste = regels[0];
+	return (
+		<span class="regelsamenvatting">
+			{eerste !== undefined && (
+				<span class="regelsamenvatting-tekst">
+					<InlineMarkdown tekst={eerste.tekst} />
+				</span>
+			)}
+			{labels.map((label) => (
+				<span class="regelsamenvatting-label">{label}</span>
+			))}
+		</span>
+	);
+}
+
 function bereik(verzen: readonly number[]): string {
 	const eerste = verzen[0];
 	const laatste = verzen.at(-1);
 	return eerste === laatste ? String(eerste) : `${eerste}–${laatste}`;
 }
 
-function naarNaslag(verwijzing: Verwijzing): Naslag {
+function naarNaslag(verwijzing: Verwijzing, regel: string): Naslag {
 	return verwijzing.soort === 'paragraaf'
 		? { soort: 'richtlijn', paragraaf: verwijzing.paragraaf }
-		: { soort: 'precedenten' };
+		: { soort: 'precedenten', regel };
 }
 
 function Vraag({ vragen, logVragen }: { vragen: readonly OpenVraag[]; logVragen: readonly string[] }) {

@@ -6,6 +6,8 @@ import '@fontsource-variable/inter/wght.css';
 import './app.css';
 // Na app.css en de css van de schermen (die via App al geladen is), zodat de vormgeving wint bij gelijke specificiteit.
 import './vormgeving.css';
+// Tijdelijk: de lay-outproeven (?layout=...). Weg zodra de eigenaar een layout gekozen heeft.
+import './layoutProef.css';
 
 const wortel = document.getElementById('app');
 if (wortel === null) {

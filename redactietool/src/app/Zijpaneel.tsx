@@ -4,14 +4,18 @@ import { laadRichtlijn } from './gegevens';
 import { useLaden } from './hooks';
 import { InlineMarkdown, Markdownweergave } from './Markdownweergave';
 import type { Naslag } from './naslag';
+import { precedentenBijRegel } from './precedentenBijRegel';
 
 type Props = {
 	naslag: Naslag;
 	referentie: Referentie;
 	onSluit: () => void;
+	sluitLabel: string;
+	/** Bij precedenten: de bij de logregel horende rijen markeren en de rest inklappen (lay-outproef p3). */
+	markeerRegel: boolean;
 };
 
-export function Zijpaneel({ naslag, referentie, onSluit }: Props) {
+export function Zijpaneel({ naslag, referentie, onSluit, sluitLabel, markeerRegel }: Props) {
 	const kopRef = useRef<HTMLHeadingElement>(null);
 	useEffect(() => {
 		const opener = document.activeElement;
@@ -40,13 +44,13 @@ export function Zijpaneel({ naslag, referentie, onSluit }: Props) {
 					{titel}
 				</h2>
 				<button type="button" onClick={onSluit}>
-					Sluiten
+					{sluitLabel}
 				</button>
 			</header>
 			{naslag.soort === 'richtlijn' ? (
 				<RichtlijnInhoud paragraaf={naslag.paragraaf} />
 			) : (
-				<PrecedentenInhoud precedenten={referentie.precedenten} />
+				<PrecedentenInhoud precedenten={referentie.precedenten} regel={markeerRegel ? naslag.regel : null} />
 			)}
 		</aside>
 	);
@@ -76,22 +80,40 @@ function zoekSectie(secties: readonly RichtlijnSectie[], paragraaf: string): Ric
 	return secties.find((sectie) => sectie.paragraaf.toLowerCase() === paragraaf.toLowerCase()) ?? null;
 }
 
-function PrecedentenInhoud({ precedenten }: { precedenten: readonly Precedent[] }) {
+type PrecedentenProps = {
+	precedenten: readonly Precedent[];
+	/** De logregel waar de verwijzing in stond; `null` laat de tabel zoals hij is. */
+	regel: string | null;
+};
+
+function PrecedentenInhoud({ precedenten, regel }: PrecedentenProps) {
 	const [zoekterm, zetZoekterm] = useState('');
+	const [toonAlle, zetToonAlle] = useState(false);
 	const gezocht = zoekterm.trim().toLowerCase();
-	const gevonden = precedenten.filter((precedent) =>
-		[precedent.bron, precedent.vereenvoudigd, precedent.plaats, precedent.opmerking].some((veld) =>
-			veld.toLowerCase().includes(gezocht),
-		),
-	);
+	const herkend = regel === null ? [] : precedentenBijRegel(regel, precedenten);
+	const ingeklapt = herkend.length > 0 && !toonAlle && gezocht === '';
+	const zichtbaar = precedenten
+		.map((precedent, index) => ({ precedent, index }))
+		.filter(({ precedent, index }) =>
+			ingeklapt
+				? herkend.includes(index)
+				: [precedent.bron, precedent.vereenvoudigd, precedent.plaats, precedent.opmerking].some((veld) => veld.toLowerCase().includes(gezocht)),
+		);
 	return (
 		<>
+			{regel !== null && (
+				<p class="herkendmelding">
+					{herkend.length === 0
+						? 'Bij deze regel is geen precedent herkend; de hele tabel staat hieronder.'
+						: `Gemarkeerd: wat bij deze regel hoort (${herkend.length} van ${precedenten.length}).`}
+				</p>
+			)}
 			<label class="zoekveld">
 				Zoeken in de precedenten
 				<input type="search" value={zoekterm} onInput={(gebeurtenis) => zetZoekterm(gebeurtenis.currentTarget.value)} />
 			</label>
 			<p aria-live="polite">
-				{gevonden.length} van {precedenten.length} precedenten
+				{zichtbaar.length} van {precedenten.length} precedenten
 			</p>
 			<div class="tabelrand">
 				<table>
@@ -105,8 +127,8 @@ function PrecedentenInhoud({ precedenten }: { precedenten: readonly Precedent[] 
 						</tr>
 					</thead>
 					<tbody>
-						{gevonden.map((precedent) => (
-							<tr>
+						{zichtbaar.map(({ precedent, index }) => (
+							<tr class={herkend.includes(index) ? 'herkend' : undefined}>
 								<td>
 									<InlineMarkdown tekst={precedent.bron} />
 								</td>
@@ -123,6 +145,11 @@ function PrecedentenInhoud({ precedenten }: { precedenten: readonly Precedent[] 
 					</tbody>
 				</table>
 			</div>
+			{herkend.length > 0 && gezocht === '' && (
+				<button type="button" class="toonalle" aria-expanded={toonAlle} onClick={() => zetToonAlle(!toonAlle)}>
+					{toonAlle ? 'Alleen de gemarkeerde tonen' : `Alle ${precedenten.length} precedenten tonen`}
+				</button>
+			)}
 		</>
 	);
 }

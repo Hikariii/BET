@@ -3,7 +3,7 @@ import { pasTussenstandToe } from '../../bewerken/tussenstand';
 import type { BoekData, HoofdstukData, Referentie } from '../../data/types';
 import { useTussenstand } from '../bewerken/useTussenstand';
 import { groepeerPerVers } from '../groepeerPerVers';
-import { VersRij } from '../HoofdstukScherm';
+import { VersRij, versRegels } from '../HoofdstukScherm';
 
 /** Wat de galerij na het plaatsen met de rij doet om hem in een bepaalde toestand te krijgen. */
 export type NaPlaatsen = (tabel: HTMLTableElement) => void;
@@ -54,10 +54,16 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 				<VersRij
 					groep={groep}
 					boek={boek}
-					referentie={referentie}
 					hoofdstuk={hoofdstuk}
+					regels={versRegels(groep, hoofdstuk, referentie)}
 					geselecteerd={gekozen}
-					regelsAlsKolom
+					plek="kolom"
+					uitgeklapt={false}
+					onWisselUitklappen={() => {}}
+					vastgezet={false}
+					onWisselVastzetten={() => {}}
+					naslagKolom={{ soort: 'geen' }}
+					naslagKaart={null}
 					onOpenNaslag={() => {}}
 					bewerkt={tussenstand.verzen[vers] ?? null}
 					bewerken={bewerken}
