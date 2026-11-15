@@ -56,12 +56,12 @@ export function VersEditor({ inhoud, stijlen, label, onWijzig, onSluit }: Props)
 	useEffect(() => {
 		const doel = houder.current;
 		if (doel === null) return;
-		const document = versInhoudNaarDocument(inhoud);
+		const startDocument = versInhoudNaarDocument(inhoud);
 		const view = new EditorView(doel, {
 			state: EditorState.create({
-				doc: document,
+				doc: startDocument,
 				plugins: versEditorPlugins(() => laatsteOnSluit.current()),
-				selection: Selection.atEnd(document),
+				selection: Selection.atEnd(startDocument),
 			}),
 			nodeViews: { alinea: alineaView(stijlen) },
 			markViews: opmaakViews(stijlen),

@@ -1,8 +1,10 @@
-import { EditorState, TextSelection, type Command } from 'prosemirror-state';
+import { Fragment, Slice } from 'prosemirror-model';
+import { EditorState, TextSelection, type Command, type Plugin } from 'prosemirror-state';
 import { describe, expect, it } from 'vitest';
 import type { VersInhoud } from '../bewerken/types';
 import { documentNaarVersInhoud, versInhoudNaarDocument } from './versDocument';
-import { versEditorPlugins, versEditorToetsen } from './versEditorPlugins';
+import { schema } from './schema';
+import { alsPlatteTekst, versEditorPlugins, versEditorToetsen } from './versEditorPlugins';
 
 const EERSTE_TEKST = 'Eerste deel.';
 const TWEE_DELEN: VersInhoud = {
@@ -70,6 +72,46 @@ describe('de plugins van de vers-editor', () => {
 				TWEE_DELEN.delen[0],
 				{ stijl: 'jezus', stukken: [{ soort: 'tekst', tekst: 'nieuwe Tweede deel.', opmaak: ['onderwijs'] }] },
 			],
+		});
+	});
+
+	describe('plakken', () => {
+		function plakPlugin(state: EditorState): Plugin {
+			const plugin = state.plugins.find((kandidaat) => kandidaat.props.clipboardTextParser !== undefined);
+			if (plugin === undefined) throw new Error('geen plakplugin gevonden');
+			return plugin;
+		}
+		/** De plakfuncties gebruiken de view niet, en zonder DOM is er geen echte. */
+		const geenView = undefined as never;
+		const eersteTekst = (state: EditorState) => documentNaarVersInhoud(state.doc).delen[0]!.stukken[0]!.tekst;
+
+		it('regeleinden en opeenvolgende spaties worden één spatie', () => {
+			const slice = alsPlatteTekst('eerste\nde  tweede\r\n\n   derde');
+			expect(slice.content.textBetween(0, slice.content.size)).toBe('eerste de tweede derde');
+		});
+
+		it('een lege tekst geeft een lege slice', () => {
+			expect(alsPlatteTekst('').eq(Slice.empty)).toBe(true);
+		});
+
+		it("geplakte platte tekst met een regeleinde houdt evenveel alinea's", () => {
+			const state = metCursor(beginstand(), EIND_EERSTE_DEEL);
+			const plugin = plakPlugin(state);
+			const slice = plugin.props.clipboardTextParser!.call(plugin, 'plak\neen  tekst', state.selection.$from, false, geenView);
+			const na = state.apply(state.tr.replaceSelection(slice));
+			expect(na.doc.childCount).toBe(2);
+			expect(eersteTekst(na)).toBe(`${EERSTE_TEKST}plak een tekst`);
+		});
+
+		it("geplakte alinea's worden platte tekst in de alinea van de cursor", () => {
+			const alinea = (tekst: string) => schema.nodes['alinea']!.create(null, schema.text(tekst));
+			const geplakt = new Slice(Fragment.from([alinea('plak'), alinea('twee')]), 1, 1);
+			const state = metCursor(beginstand(), EIND_EERSTE_DEEL);
+			const plugin = plakPlugin(state);
+			const slice = plugin.props.transformPasted!.call(plugin, geplakt, geenView, false);
+			const na = state.apply(state.tr.replaceSelection(slice));
+			expect(na.doc.childCount).toBe(2);
+			expect(eersteTekst(na)).toBe(`${EERSTE_TEKST}plak twee`);
 		});
 	});
 });

@@ -37,7 +37,8 @@ export function versEditorToetsen(onSluit: () => void): Record<string, Command> 
 	};
 }
 
-function alsPlatteTekst(tekst: string): Slice {
+/** Regeleinden en opeenvolgende spaties worden één spatie; een lege uitkomst is een lege Slice. */
+export function alsPlatteTekst(tekst: string): Slice {
 	const opgeschoond = tekst.replace(/\s+/g, ' ');
 	return opgeschoond === '' ? Slice.empty : new Slice(Fragment.from(schema.text(opgeschoond)), 0, 0);
 }
