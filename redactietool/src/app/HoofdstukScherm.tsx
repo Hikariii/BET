@@ -1,11 +1,15 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData, HoofdstukInfo, Referentie } from '../data/types';
+import { pasTussenstandToe } from '../bewerken/tussenstand';
+import type { BewerktVers } from '../bewerken/types';
 import { versAdres } from './adres';
 import { groepeerPerVers, type VersGroep } from './groepeerPerVers';
 import type { Naslag } from './naslag';
 import { Regels } from './Regels';
 import { statusKlasse } from './Zijbalk';
 import { vragenBijVers } from './vertaalvragen';
+import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
+import { useTussenstand } from './bewerken/useTussenstand';
 import { VersTekst } from './VersTekst';
 
 const LABEL_GOEDGEKEURD = 'Goedgekeurd, referentie voor de rest van het boek. Wijzigingen gaan opnieuw langs de redactie.';
@@ -33,7 +37,10 @@ export function HoofdstukScherm({
 	onWisselRegels,
 	onOpenNaslag,
 }: Props) {
-	const groepen = groepeerPerVers(hoofdstuk.bron, hoofdstuk.vereenvoudigd);
+	const { tussenstand, herlees } = useTussenstand(boek.id, hoofdstuk.nummer);
+	const [bewerktAdres, zetBewerktAdres] = useState<string | null>(null);
+	const groepen = groepeerPerVers(hoofdstuk.bron, pasTussenstandToe(hoofdstuk.vereenvoudigd, tussenstand));
+	const adresVan = (nummer: number | null) => (nummer === null ? null : versAdres(boek.id, hoofdstuk.nummer, nummer));
 
 	return (
 		<article class="hoofdstuk">
@@ -68,6 +75,11 @@ export function HoofdstukScherm({
 								geselecteerd={geselecteerd}
 								regelsAlsKolom={regelsAltijdZichtbaar}
 								onOpenNaslag={onOpenNaslag}
+								bewerkt={groep.nummer === null ? null : (tussenstand.verzen[groep.nummer] ?? null)}
+								bewerken={bewerktAdres !== null && bewerktAdres === adresVan(groep.nummer)}
+								onBewerk={() => zetBewerktAdres(adresVan(groep.nummer))}
+								onSluit={() => zetBewerktAdres(null)}
+								onOpslagGewijzigd={herlees}
 							/>
 						);
 					})}
@@ -92,6 +104,12 @@ type VersRijProps = {
 	/** Regels in een eigen kolom; anders in een rij eronder, alleen voor het gekozen vers. */
 	regelsAlsKolom: boolean;
 	onOpenNaslag: (naslag: Naslag) => void;
+	/** De bewaarde bewerking van dit vers; `null` als het vers gelijk is aan de repo. */
+	bewerkt: BewerktVers | null;
+	bewerken: boolean;
+	onBewerk: () => void;
+	onSluit: () => void;
+	onOpslagGewijzigd: () => void;
 };
 
 function VersRij({
@@ -102,6 +120,11 @@ function VersRij({
 	geselecteerd,
 	regelsAlsKolom,
 	onOpenNaslag,
+	bewerkt,
+	bewerken,
+	onBewerk,
+	onSluit,
+	onOpslagGewijzigd,
 }: VersRijProps) {
 	const rijRef = useRef<HTMLTableRowElement>(null);
 	useEffect(() => {
@@ -118,7 +141,7 @@ function VersRij({
 	const regels = <Regels logVerzen={logVerzen} vragen={vragen} onOpenNaslag={onOpenNaslag} />;
 
 	const kiesVers = (gebeurtenis: MouseEvent) => {
-		const opInteractiefElement = (gebeurtenis.target as Element).closest('a, button, summary') !== null;
+		const opInteractiefElement = (gebeurtenis.target as Element).closest('a, button, summary, [contenteditable]') !== null;
 		if (adres !== null && !opInteractiefElement) {
 			window.location.hash = adres;
 		}
@@ -145,7 +168,21 @@ function VersRij({
 					<VersTekst delen={groep.bron} stijlen={boek.stijlen} />
 				</td>
 				<td>
-					<VersTekst delen={groep.vereenvoudigd} stijlen={boek.stijlen} />
+					{nummer === null ? (
+						<VersTekst delen={groep.vereenvoudigd} stijlen={boek.stijlen} />
+					) : (
+						<BewerkbaarVers
+							boek={boek}
+							hoofdstuk={hoofdstuk}
+							nummer={nummer}
+							delen={groep.vereenvoudigd}
+							bewerkt={bewerkt}
+							bewerken={bewerken}
+							onBewerk={onBewerk}
+							onSluit={onSluit}
+							onOpslagGewijzigd={onOpslagGewijzigd}
+						/>
+					)}
 				</td>
 				{regelsAlsKolom && <td class="regels">{regels}</td>}
 			</tr>

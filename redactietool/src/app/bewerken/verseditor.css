@@ -1,0 +1,57 @@
+.verseditor .ProseMirror {
+	padding: 0.25rem 0.5rem;
+	border: 2px solid var(--accent);
+	border-radius: 4px;
+	background: var(--achtergrond);
+	/* Spaties aan het begin en eind van een deel horen bij de repo-inhoud en blijven zichtbaar. */
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	outline: none;
+}
+
+.verseditor .ProseMirror:focus {
+	box-shadow: 0 0 0 3px var(--gekozen);
+}
+
+.verseditor .ProseMirror > p {
+	margin: 0;
+}
+
+.verseditor .ProseMirror > p + p {
+	margin-top: 0.5rem;
+}
+
+.verseditor-acties {
+	margin: 0.5rem 0 0;
+	font-size: 0.85rem;
+}
+
+.versacties {
+	margin: 0.5rem 0 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+	font-size: 0.85rem;
+}
+
+.versmarkering {
+	padding: 0 0.4rem;
+	border: 1px solid currentcolor;
+	border-radius: 4px;
+	font-size: 0.75rem;
+}
+
+.verswaarschuwingen,
+.versverouderd,
+.versopslagfout {
+	margin: 0.5rem 0 0;
+	padding: 0.4rem 0.6rem;
+	border-left: 3px solid var(--accent);
+	background: var(--vlak);
+	font-size: 0.85rem;
+}
+
+.verswaarschuwingen {
+	list-style: none;
+}
