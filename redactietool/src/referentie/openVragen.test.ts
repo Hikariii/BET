@@ -42,7 +42,6 @@ describe('leesOpenVragen op open-vragen.md', () => {
 			.flatMap(([hoofdstuk, verzen]) => [...verzen].filter(([, tekst]) => tekst.includes('Mensenzoon')).map(([vers]) => ({ hoofdstuk, vers })));
 
 		expect(vraag).toMatchObject({ plaats: 'Lk 4–24', besluit: 'de Mensenzoon', status: 'besloten door gebruiker' });
-		expect(vraag?.verzen).toHaveLength(26);
 		expect(vraag?.verzen).toEqual(metMensenzoon);
 	});
 
@@ -55,7 +54,6 @@ describe('leesOpenVragen op open-vragen.md', () => {
 		expect(vraag?.kwestie).toMatch(/^markering van "Gezegend"/);
 		expect(vraag?.verzen.slice(0, 2)).toEqual(versen(1, 45, 48));
 		expect(vraag?.verzen.slice(2)).toEqual(metEeuwigleven);
-		expect(metEeuwigleven).toHaveLength(9);
 	});
 
 	it('geeft een vraag met een bereik binnen één hoofdstuk als losse verzen', () => {

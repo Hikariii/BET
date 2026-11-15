@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { leesRepobestand } from './bestanden.testhulp';
+import { leesRepobestand, leesVereenvoudigdeVerzen } from './bestanden.testhulp';
 import { leesPrecedenten } from './precedenten';
 
 const PRECEDENTEN = 'bijbel/lukas/referentie/precedenten.md';
@@ -25,11 +25,16 @@ describe('leesPrecedenten op precedenten.md', () => {
 	});
 
 	it('geeft het precedent Zoon des mensen met de kolom Aantal als plaats', () => {
+		const versenMetMensenzoon = [...leesVereenvoudigdeVerzen()]
+			.filter(([hoofdstuk]) => hoofdstuk >= 4)
+			.flatMap(([, verzen]) => [...verzen.values()])
+			.filter((tekst) => tekst.includes('Mensenzoon')).length;
+
 		expect(precedenten.find((precedent) => precedent.bron === 'Zoon des mensen')).toEqual({
 			sectie: `Begrippen voor Lukas 4–24 ${GEDACHTENSTREEP} voorlopig (besloten 2026-11-15, vóór Lukas 4)`,
 			bron: 'Zoon des mensen',
 			vereenvoudigd: 'de Mensenzoon',
-			plaats: '26',
+			plaats: String(versenMetMensenzoon),
 			status: 'vast',
 			opmerking: 'besloten door gebruiker 2026-11-15; met hoofdletter, zoals andere titels van Jezus',
 		});

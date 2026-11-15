@@ -10,6 +10,16 @@ describe('leesAdres', () => {
 		expect(leesAdres('#/lukas/9')).toEqual({ boek: 'lukas', hoofdstuk: 9, vers: null });
 	});
 
+	it('leest een slash achteraan als dezelfde plek, ook zonder vers', () => {
+		expect(leesAdres('#/lukas/9/')).toEqual({ boek: 'lukas', hoofdstuk: 9, vers: null });
+		expect(leesAdres('#/lukas/9/22/')).toEqual({ boek: 'lukas', hoofdstuk: 9, vers: 22 });
+	});
+
+	it('geeft null voor een boeknaam met een ongeldige procentcodering', () => {
+		expect(leesAdres('#/%E0%A4%A/1')).toBeNull();
+		expect(leesAdres('#/%E0%A4%A/1/2')).toBeNull();
+	});
+
 	it('geeft null voor een leeg of onbegrijpelijk adres', () => {
 		expect(leesAdres('')).toBeNull();
 		expect(leesAdres('#/lukas')).toBeNull();

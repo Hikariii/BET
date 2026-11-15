@@ -17,7 +17,7 @@ export function leesPrototypeInvoer(): Hoofdstuk[] {
 	);
 }
 
-/** Variant A van het prototype (`maak_testpagina.py`, Python), zoals die op het klembord kwam. */
+/** Variant A van het prototype (`maak_testpagina.py`, Python; staat op de branch `fase-0-plakken-in-word` in `docs/prototype/plakken-in-word/`), zoals die op het klembord kwam. */
 export function leesPrototypeVariantA(): string {
 	return readFileSync(path.join(MAP, 'variant-a.html'), 'utf-8');
 }

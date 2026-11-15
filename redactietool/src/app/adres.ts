@@ -1,4 +1,4 @@
-/** Het adres in de browser: `#/lukas/9/22` is Lukas 9, vers 22. */
+/** Het adres in de browser: `#/lukas/9/22` is Lukas 9, vers 22. Een slash achteraan mag. */
 export type Adres = {
 	boek: string;
 	hoofdstuk: number;
@@ -6,7 +6,7 @@ export type Adres = {
 	vers: number | null;
 };
 
-const ADRES = /^#\/([^/]+)\/(\d+)(?:\/(\d+))?$/;
+const ADRES = /^#\/([^/]+)\/(\d+)(?:\/(\d+))?\/?$/;
 
 /** Geeft `null` voor een leeg of onbegrijpelijk adres. */
 export function leesAdres(hash: string): Adres | null {
@@ -15,8 +15,17 @@ export function leesAdres(hash: string): Adres | null {
 		return null;
 	}
 	const [, boek, hoofdstuk, vers] = gevonden;
+	let boekNaam: string;
+	try {
+		boekNaam = decodeURIComponent(boek ?? '');
+	} catch (fout) {
+		if (fout instanceof URIError) {
+			return null;
+		}
+		throw fout;
+	}
 	return {
-		boek: decodeURIComponent(boek ?? ''),
+		boek: boekNaam,
 		hoofdstuk: Number(hoofdstuk),
 		vers: vers === undefined ? null : Number(vers),
 	};
