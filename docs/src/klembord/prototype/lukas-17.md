@@ -1,0 +1,25 @@
+# Lukas 17
+
+[1] Hij zei tegen de discipelen (leerlingen):
+@jezus “Er zullen zeker struikelblokken komen, maar het zal slecht aflopen met degene door wie deze komen. [2] Het zou voor hem nuttiger zijn als hij met een molensteen (een steen waarmee graan gemalen wordt) om zijn hals in de zee werd gegooid, dan dat hij een van deze kleinen zou laten struikelen. [3] Wees op jullie hoede. Als je broeder tegen je {zonde}zondigt{/zonde}, spreek hem streng toe. En als hij zich {geloof}afkeert van slechte dingen en terugkeert naar God{/geloof}, {genade}vergeef{/genade} hem. [4] En als hij zeven keer per dag tegen je {zonde}zondigt{/zonde} en zeven keer per dag naar je terugkomt en zegt: ‘Ik heb {geloof}berouw{/geloof}’, dan moet je hem {genade}vergeven{/genade}.”
+
+[5] De apostelen zeiden tegen de Heer: “Maak ons {geloof}geloof{/geloof} groter.” [6] De Heer zei:
+@jezus “Als jullie {geloof}geloof{/geloof} hadden als een mosterdzaadje, zouden jullie tegen deze moerbeiboom zeggen: ‘Word met wortel en al uit de grond getrokken en in de zee geplant’, en de boom zou jullie gehoorzamen. [7] Stel dat een van jullie een dienaar heeft die ploegt of op de kudde past. Zal hij dan meteen, als de dienaar van de akker komt, tegen hem zeggen: ‘Kom maar en ga aan tafel zitten’? [8] Maar zal hij niet tegen de dienaar zeggen: ‘Maak alles klaar, zodat ik vanavond kan eten, bind je kleren op (klaar om aan het werk te gaan) en bedien mij, totdat ik gegeten en gedronken heb, en eet en drink zelf daarna’? [9] Hij bedankt die dienaar toch zeker niet, omdat de dienaar gedaan heeft wat hem opgedragen was? Ik denk het niet. [10] Zo moeten ook jullie, wanneer jullie alles gedaan hebben wat jullie opgedragen is, zeggen: ‘Wij zijn onnutte dienaren, want wij hebben maar gedaan wat wij moesten doen.’”
+[11] Toen Jezus naar Jeruzalem reisde, trok Hij dwars door Samaria en Galilea heen. [12] Toen Hij een dorp wilde binnengaan, kwamen tien melaatse mannen (mensen met een ernstige huidziekte) naar Hem toe. Zij bleven op een afstand staan. [13] Zij riepen luid: “Jezus, Meester, heb medelijden met ons.” [14] Toen Hij hen zag, zei Hij tegen hen:
+@jezus “Ga en laat jezelf aan de priesters zien.”
+Terwijl zij weggingen, werden zij rein gemaakt. [15] Toen een van hen zag dat hij genezen was, keerde hij terug, terwijl hij met luide stem God prees. [16] Hij viel met het gezicht op de grond voor Zijn voeten en dankte Hem. Deze man was een Samaritaan (iemand uit Samaria). [17] Toen antwoordde Jezus:
+@jezus “Zijn de tien niet rein gemaakt? Waar zijn dan de negen anderen? [18] Zijn er dan geen anderen gevonden die terugkeren om God de eer te geven behalve deze vreemdeling?”
+[19] Hij zei tegen hem:
+@jezus “Sta op en ga. Je {geloof}geloof{/geloof} heeft je {eeuwigleven}gered{/eeuwigleven}.”
+
+[20] Toen de Farizeeën (een groep strenge Joodse leiders) Hem vroegen wanneer {eeuwigleven}het Koninkrijk van God{/eeuwigleven} zou komen, antwoordde Hij hun:
+@jezus “{eeuwigleven}Het Koninkrijk van God{/eeuwigleven} komt niet wanneer mensen er goed op letten. [21] Mensen zullen niet zeggen: ‘Hier is het, of daar is het’, want {eeuwigleven}het Koninkrijk van God{/eeuwigleven} {cursief}komt{/cursief} in jullie midden.”
+
+[22] Hij zei tegen de discipelen:
+@jezus “Er zullen dagen komen dat jullie ernaar zullen verlangen om een van de dagen van de Mensenzoon te zien, en jullie zullen die niet zien. [23] Zij zullen tegen jullie zeggen: ‘Hier is Hij, of daar is Hij.’ Ga er niet heen en ga er niet achteraan. [24] Want zoals de bliksem flitst van de ene plaats onder de hemel en naar de andere plaats onder de hemel schijnt, zo zal ook de Mensenzoon zijn op {dag}Zijn Dag{/dag}. [25] Maar eerst moet Hij veel lijden en afgewezen worden door deze generatie.”
+
+@jezus [26] “Zoals het gebeurde in de dagen van Noach, zo zal het ook zijn in de dagen van de Mensenzoon. [27] Zij aten, zij dronken, zij trouwden tot op de dag waarop Noach de ark binnenging en de zondvloed (de grote overstroming) kwam en hen allen liet omkomen. [28] Op dezelfde manier gebeurde het ook in de dagen van Lot: zij aten, zij dronken, zij kochten, zij verkochten, zij plantten, zij bouwden. [29] Maar op de dag waarop Lot uit Sodom wegging, regende het vuur en zwavel uit de hemel en bracht hen allen om. [30] Net zo zal het zijn op de dag waarop de Mensenzoon aan het licht zal komen.”
+
+@jezus [31] “Wie op die dag op het dak zal zijn, met zijn spullen in huis, moet niet naar beneden gaan om ze mee te nemen. En wie op de akker is, moet ook niet terugkeren naar wat hij achterliet. [32] Denk aan de vrouw van Lot. [33] Wie zijn leven zal proberen te redden, zal het verliezen. En wie het zal verliezen, zal het redden. [34] Ik zeg jullie: In die nacht zullen er twee op één bed zijn. De één zal meegenomen en de ander zal achtergelaten worden. [35] Twee vrouwen zullen samen malen (graan fijnmaken). De één zal meegenomen en de ander zal achtergelaten worden. [36] Twee zullen er op de akker zijn. De één zal meegenomen en de ander zal achtergelaten worden.”
+[37] De discipelen antwoordden Hem: “Waar, Heer?” Hij zei tegen hen:
+@jezus “Waar het lichaam is, daar zullen de gieren zich verzamelen.”
