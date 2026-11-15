@@ -2,8 +2,19 @@ import type { Tekststuk } from '../formaat/types';
 import type { VersAlineadeel, VersInhoud } from '../bewerken/types';
 import type { HoofdstukVerzen, Vondst } from './types';
 
-/** Zoveel tekens platte tekst staan er maximaal voor en na een vondst. */
+/** Zoveel tekens platte tekst staan er ongeveer voor en na een vondst. */
 const CONTEXT = 40;
+
+/** Zoveel tekens meer of minder mag de context hebben om een woord heel te houden; een langer woord wordt afgekapt. */
+const CONTEXT_MARGE = 12;
+
+const WOORDTEKEN = /[\p{L}\p{N}]/u;
+const WITRUIMTE = /\s/u;
+const SLUITLEESTEKEN = /[,.;:!?)”’»]/u;
+
+function isWoordteken(teken: string | undefined): boolean {
+	return teken !== undefined && WOORDTEKEN.test(teken);
+}
 
 /** Waar een tekststuk begint en eindigt in de platte tekst van een deel. */
 type StukBereik = {
@@ -39,10 +50,46 @@ function ontsnapRegexTekens(tekst: string): string {
  * Begint of eindigt de zoekterm zelf met een ander teken, dan hoeft er aan die kant geen grens te zijn.
  */
 function zoekpatroon(zoekterm: string): RegExp {
-	const woordteken = /[\p{L}\p{N}]/u;
-	const begin = woordteken.test(zoekterm.at(0) ?? '') ? '(?<![\\p{L}\\p{N}])' : '';
-	const einde = woordteken.test(zoekterm.at(-1) ?? '') ? '(?![\\p{L}\\p{N}])' : '';
+	const begin = isWoordteken(zoekterm.at(0)) ? '(?<![\\p{L}\\p{N}])' : '';
+	const einde = isWoordteken(zoekterm.at(-1)) ? '(?![\\p{L}\\p{N}])' : '';
 	return new RegExp(`${begin}${ontsnapRegexTekens(zoekterm)}${einde}`, 'giu');
+}
+
+/**
+ * De plek het dichtst bij `doel` (hoogstens `CONTEXT_MARGE` ervandaan, tussen `laagst` en `hoogst`) waar `geldig` waar is.
+ * Bij gelijke afstand wint de kant van `liefstMeer` (-1: eerder in de tekst, 1: later).
+ * Geen enkele plek geldig, dan `doel` zelf.
+ */
+function dichtstbijzijndePlek(doel: number, liefstMeer: -1 | 1, laagst: number, hoogst: number, geldig: (plek: number) => boolean): number {
+	for (let afstand = 0; afstand <= CONTEXT_MARGE; afstand++) {
+		for (const plek of [doel + liefstMeer * afstand, doel - liefstMeer * afstand]) {
+			if (plek >= laagst && plek <= hoogst && geldig(plek)) return plek;
+		}
+	}
+	return Math.min(Math.max(doel, laagst), hoogst);
+}
+
+/** Midden in een woord is geen plek om de context af te knippen. */
+function middenInWoord(tekst: string, plek: number): boolean {
+	return isWoordteken(tekst[plek - 1]) && isWoordteken(tekst[plek]);
+}
+
+/**
+ * De tekst vóór de vondst, op een woordgrens afgekapt (ongeveer `CONTEXT` tekens), met "…" ervoor als er iets is weggelaten.
+ * Een afgekapte context begint met een woord of openingsteken, niet met witruimte of een sluitend leesteken.
+ */
+function contextErvoor(tekst: string, van: number): string {
+	const begin = dichtstbijzijndePlek(van - CONTEXT, -1, 0, van, (plek) => plek === 0 || (!middenInWoord(tekst, plek) && !WITRUIMTE.test(tekst[plek] ?? '') && !SLUITLEESTEKEN.test(tekst[plek] ?? '')));
+	return (begin > 0 ? '…' : '') + tekst.slice(begin, van);
+}
+
+/**
+ * De tekst na de vondst, op een woordgrens afgekapt (ongeveer `CONTEXT` tekens), met "…" erachter als er iets is weggelaten.
+ * Een afgekapte context eindigt op een woord of leesteken, niet op witruimte.
+ */
+function contextErna(tekst: string, tot: number): string {
+	const einde = dichtstbijzijndePlek(tot + CONTEXT, 1, tot, tekst.length, (plek) => plek === tekst.length || (!middenInWoord(tekst, plek) && !WITRUIMTE.test(tekst[plek - 1] ?? '')));
+	return tekst.slice(tot, einde) + (einde < tekst.length ? '…' : '');
 }
 
 /** Alle plekken van de zoekterm, hoofdletterongevoelig en op woordgrenzen, in volgorde van hoofdstuk, vers, deel en positie. */
@@ -68,8 +115,8 @@ export function zoekVondsten(hoofdstukken: readonly HoofdstukVerzen[], zoekterm:
 						van,
 						tot,
 						gevonden: treffer[0],
-						ervoor: tekst.slice(Math.max(0, van - CONTEXT), van),
-						erna: tekst.slice(tot, tot + CONTEXT),
+						ervoor: contextErvoor(tekst, van),
+						erna: contextErna(tekst, tot),
 						vervangbaar: bereik !== null && !heelGemarkeerdStuk,
 						goedgekeurd,
 					});

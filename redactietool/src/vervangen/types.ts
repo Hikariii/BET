@@ -11,7 +11,7 @@ export type Vondst = {
 	tot: number;
 	/** De gevonden tekst zoals hij er staat. */
 	gevonden: string;
-	/** Platte tekst rond de vondst, voor het voorbeeldvenster. */
+	/** Platte tekst rond de vondst, voor het voorbeeldvenster: op woordgrenzen afgekapt, met "…" waar iets is weggelaten. */
 	ervoor: string;
 	erna: string;
 	/** Onwaar als de vondst over een opmaakgrens loopt: dan alleen met de hand. */

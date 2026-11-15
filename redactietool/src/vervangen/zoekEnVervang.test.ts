@@ -53,13 +53,59 @@ describe('zoekVondsten', () => {
 		expect(zoek(inhoud, '  ')).toEqual([]);
 	});
 
-	it('geeft maximaal 40 tekens context voor en na de vondst, binnen het deel', () => {
-		const lang = `${'a'.repeat(30)} ${'b'.repeat(30)} doel ${'c'.repeat(30)} ${'d'.repeat(30)}`;
-		const [vondst] = zoek(vers(tekst(lang)), 'doel');
-		expect(vondst?.ervoor).toBe(`${'a'.repeat(8)} ${'b'.repeat(30)} `);
-		expect(vondst?.erna).toBe(` ${'c'.repeat(30)} ${'d'.repeat(8)}`);
-		const [kort] = zoek(vers(tekst('Voor doel na')), 'doel');
-		expect([kort?.ervoor, kort?.erna]).toEqual(['Voor ', ' na']);
+	describe('context rond de vondst', () => {
+		const contextVan = (tekstVers: string, zoekterm: string) => {
+			const [vondst] = zoek(vers(tekst(tekstVers)), zoekterm);
+			return { ervoor: vondst?.ervoor, erna: vondst?.erna };
+		};
+
+		it('knipt de context op een woordgrens af, met "…" waar iets is weggelaten', () => {
+			const lang = `${'a'.repeat(30)} ${'b'.repeat(30)} doel ${'c'.repeat(30)} ${'d'.repeat(30)}`;
+			expect(contextVan(lang, 'doel')).toEqual({
+				ervoor: `…${'b'.repeat(30)} `,
+				erna: ` ${'c'.repeat(30)}…`,
+			});
+		});
+
+		it('houdt een woord heel dat om de 40 tekens heen loopt, in beide richtingen', () => {
+			const voor = 'Zij zullen jullie naam slecht noemen en de hele wereld zal toch weten ';
+			const na = ' en dat ze zonden te vergeven hebben omdat niemand het zag gebeuren';
+			expect(contextVan(`${voor}doel${na}`, 'doel')).toEqual({
+				ervoor: '…noemen en de hele wereld zal toch weten ',
+				erna: ' en dat ze zonden te vergeven hebben omdat…',
+			});
+		});
+
+		it('telt een letter met accent bij het woord', () => {
+			const { ervoor } = contextVan(`${'x'.repeat(20)} ${'ë'.repeat(15)}ëëëëë ${'y'.repeat(15)} doel`, 'doel');
+			expect(ervoor).toBe(`…${'ë'.repeat(20)} ${'y'.repeat(15)} `);
+		});
+
+		it('begint een afgekapte context niet met een leesteken', () => {
+			const { ervoor } = contextVan(`${'a'.repeat(20)}, ${'b'.repeat(37)} doel`, 'doel');
+			expect(ervoor).toBe(`…${'b'.repeat(37)} `);
+		});
+
+		it('zet geen "…" aan het begin of eind van het deel', () => {
+			expect(contextVan('Voor doel na', 'doel')).toEqual({ ervoor: 'Voor ', erna: ' na' });
+			const net = `${'a'.repeat(39)} doel ${'b'.repeat(39)}`;
+			expect(contextVan(net, 'doel')).toEqual({ ervoor: `${'a'.repeat(39)} `, erna: ` ${'b'.repeat(39)}` });
+		});
+
+		it('laat de context van een deel niet buiten dat deel komen', () => {
+			const [vondst] = zoekVondsten(
+				[hoofdstuk([{ delen: [{ stijl: null, stukken: [tekst('Eerste deel doel.')] }, { stijl: null, stukken: [tekst('Tweede deel.')] }] }])],
+				'doel',
+			);
+			expect([vondst?.ervoor, vondst?.erna]).toEqual(['Eerste deel ', '.']);
+		});
+
+		it('kapt een heel lang woord wel midden in af', () => {
+			const woord = 'z'.repeat(100);
+			const { ervoor, erna } = contextVan(`${woord} doel ${woord}`, 'doel');
+			expect(ervoor).toBe(`…${'z'.repeat(39)} `);
+			expect(erna).toBe(` ${'z'.repeat(39)}…`);
+		});
 	});
 
 	it('zoekt in de platte tekst van het deel, over de stukken heen', () => {
