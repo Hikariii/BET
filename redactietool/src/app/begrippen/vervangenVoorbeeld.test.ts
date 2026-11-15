@@ -44,8 +44,15 @@ describe('bouwHoofdstukVerzen', () => {
 		);
 
 		expect(uitkomst).toEqual([
-			{ hoofdstuk: 1, goedgekeurd: true, verzen: [{ vers: 1, inhoud: inhoudVan('Eerste. ') }, { vers: 2, inhoud: inhoudVan('Tweede.') }] },
-			{ hoofdstuk: 2, goedgekeurd: false, verzen: [{ vers: 1, inhoud: inhoudVan('Derde.') }] },
+			{
+				hoofdstuk: 1,
+				goedgekeurd: true,
+				verzen: [
+					{ vers: 1, inhoud: inhoudVan('Eerste. '), repo: inhoudVan('Eerste. ') },
+					{ vers: 2, inhoud: inhoudVan('Tweede.'), repo: inhoudVan('Tweede.') },
+				],
+			},
+			{ hoofdstuk: 2, goedgekeurd: false, verzen: [{ vers: 1, inhoud: inhoudVan('Derde.'), repo: inhoudVan('Derde.') }] },
 		]);
 	});
 
@@ -69,6 +76,7 @@ describe('bouwHoofdstukVerzen', () => {
 		);
 
 		expect(uitkomst.map(({ verzen }) => verzen[0]?.inhoud)).toEqual([repo, bewerkt]);
+		expect(uitkomst.map(({ verzen }) => verzen[0]?.repo)).toEqual([repo, repo]);
 	});
 });
 

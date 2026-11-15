@@ -101,7 +101,7 @@ function nieuwId(nu: Date, bestaand: readonly StructureleKeuze[]): string {
 /**
  * Past de aangevinkte vondsten toe: per vers `vervangInVers` op de huidige inhoud (met tussenstand), bewaard in de
  * tussenstand met herkomst "structurele keuze" en het keuze-id, en de keuze zelf bewaard voor terugdraaien.
- * Een vers waarvan de bewaarde bewerking niet meer past, wordt overgeslagen met een melding. Een mislukte opslag
+ * Een vers waarvan de bewaarde bewerking niet meer past of bij een oudere repo-tekst hoort, wordt overgeslagen met een melding. Een mislukte opslag
  * geeft een melding per vers; alleen de verzen die lukten staan in de keuze.
  */
 export function pasKeuzeToe(
@@ -117,14 +117,15 @@ export function pasKeuzeToe(
 	const keuze: StructureleKeuze = { id: nieuwId(nu, bewaard), zoekterm, nieuw, toegepast: nu.toISOString(), verzen: [] };
 	const meldingen: string[] = [];
 	for (const groep of groepeerPerVers(aangevinkt)) {
-		const huidig = hoofdstukken.find((h) => h.hoofdstuk === groep.hoofdstuk)?.verzen.find((v) => v.vers === groep.vers)?.inhoud;
-		if (huidig === undefined) {
+		const gevonden = hoofdstukken.find((h) => h.hoofdstuk === groep.hoofdstuk)?.verzen.find((v) => v.vers === groep.vers);
+		if (gevonden === undefined) {
 			meldingen.push(`Vers ${versNaam(groep.hoofdstuk, groep.vers)} staat niet in het hoofdstuk en is overgeslagen.`);
 			continue;
 		}
+		const huidig = gevonden.inhoud;
 		const na = vervangInVers(huidig, groep.vondsten, nieuw);
 		if (zelfdeInhoud(na, huidig)) continue;
-		const uitkomst = bewaarKeuzeVers(opslag, boek, groep.hoofdstuk, groep.vers, na, huidig, keuze.id);
+		const uitkomst = bewaarKeuzeVers(opslag, boek, groep.hoofdstuk, groep.vers, na, gevonden.repo, keuze.id);
 		if (!uitkomst.gelukt) {
 			meldingen.push(uitkomst.melding);
 			continue;
@@ -146,17 +147,30 @@ export function leesKeuzes(opslag: Opslag, boek: string): StructureleKeuze[] {
  * Draait een keuze terug: alleen verzen waarvan de huidige inhoud nog gelijk is aan "na" (anders overgeslagen met melding,
  * want dan heeft de vertaler het vers daarna zelf bewerkt). Een vers waarvan "voor" gelijk is aan de basis van de
  * bewerking (de repo-inhoud) verdwijnt uit de tussenstand; anders komt "voor" terug als eigen bewerking.
- * Daarna is de keuze uit de lijst. Geeft de meldingen terug.
+ * Een vers dat een latere keuze nog bezit, blijft bij de keuze, zodat die later alsnog terug kan; zijn er zulke verzen niet, dan is de keuze uit de lijst.
+ * Geeft de meldingen terug.
  */
 export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): string[] {
 	const keuzes = leesOpVolgorde(opslag, boek);
 	const keuze = keuzes.find((k) => k.id === keuzeId);
 	if (keuze === undefined) return ['Deze keuze staat niet meer in de lijst.'];
 	const meldingen: string[] = [];
-	for (const { hoofdstuk, vers, voor, na } of keuze.verzen) {
+	const overgebleven: StructureleKeuze['verzen'] = [];
+	for (const keuzeVers of keuze.verzen) {
+		const { hoofdstuk, vers, voor, na } = keuzeVers;
 		const naam = versNaam(hoofdstuk, vers);
 		const bewerkt = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
-		if (bewerkt === undefined || !zelfdeInhoud(bewerkt.inhoud, na)) {
+		if (bewerkt === undefined) {
+			meldingen.push(`Vers ${naam} staat al weer op de repo-tekst.`);
+			continue;
+		}
+		const latereKeuze = keuzes.find((k) => k.id === bewerkt.keuzeId && k.id !== keuzeId);
+		if (latereKeuze !== undefined) {
+			meldingen.push(`Vers ${naam} is daarna veranderd door de keuze "${latereKeuze.zoekterm}"; draai die eerst terug.`);
+			overgebleven.push(keuzeVers);
+			continue;
+		}
+		if (!zelfdeInhoud(bewerkt.inhoud, na)) {
 			meldingen.push(`Vers ${naam} is na de keuze zelf bewerkt en blijft staan.`);
 			continue;
 		}
@@ -172,10 +186,10 @@ export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): 
 			meldingen.push(`Vers ${naam} kon niet worden teruggezet en blijft staan.`);
 		}
 	}
-	schrijfKeuzes(
-		opslag,
-		boek,
-		keuzes.filter((k) => k.id !== keuzeId),
-	);
+	const nieuweLijst = keuzes.flatMap((k) => {
+		if (k.id !== keuzeId) return [k];
+		return overgebleven.length === 0 ? [] : [{ ...k, verzen: overgebleven }];
+	});
+	schrijfKeuzes(opslag, boek, nieuweLijst);
 	return meldingen;
 }

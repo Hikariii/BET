@@ -227,7 +227,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 							<span>
 								"{keuze.zoekterm}" door "{keuze.nieuw}", {aantalVerzen(keuze)} aangepast op {toegepastOp(keuze)}
 							</span>
-							<button type="button" onClick={() => terugdraaien(keuze)}>
+							<button type="button" aria-label={`Keuze "${keuze.zoekterm}" door "${keuze.nieuw}" terugdraaien`} onClick={() => terugdraaien(keuze)}>
 								Terugdraaien
 							</button>
 						</li>

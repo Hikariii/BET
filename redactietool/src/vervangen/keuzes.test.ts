@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { bewaarOfWis, leesTussenstand } from '../bewerken/tussenstand';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
@@ -7,21 +7,7 @@ import { parseerHoofdstuk } from '../formaat/parseer';
 import { maakExport } from '../export/maakExport';
 import { draaiKeuzeTerug, leesKeuzes, pasKeuzeToe } from './keuzes';
 import type { HoofdstukVerzen, Vondst } from './types';
-
-// De echte vervanging wordt apart gebouwd en getest; hier een eenvoudige, voor verzen met één stuk per deel.
-vi.mock('./zoekEnVervang', () => ({
-	vervangInVers: (inhoud: VersInhoud, vondsten: readonly Vondst[], nieuw: string): VersInhoud => ({
-		delen: inhoud.delen.map((deel, nummer) => {
-			const stuk = deel.stukken[0];
-			if (stuk === undefined) return deel;
-			const tekst = [...vondsten]
-				.filter((vondst) => vondst.deel === nummer)
-				.sort((a, b) => b.van - a.van)
-				.reduce((rest, vondst) => rest.slice(0, vondst.van) + nieuw + rest.slice(vondst.tot), stuk.tekst);
-			return { ...deel, stukken: [{ ...stuk, tekst }] };
-		}),
-	}),
-}));
+import { zoekVondsten } from './zoekEnVervang';
 
 class GeheugenOpslag implements Opslag {
 	readonly items = new Map<string, string>();
@@ -66,12 +52,13 @@ function hoofdstukken(opslag: Opslag): HoofdstukVerzen[] {
 			verzen: Object.entries(REPO).map(([nummer, tekst]) => ({
 				vers: Number(nummer),
 				inhoud: tussenstand.verzen[Number(nummer)]?.inhoud ?? inhoud(tekst),
+				repo: inhoud(tekst),
 			})),
 		},
 	];
 }
 
-const VONDSTEN = [vondst(22, 'harde', VERS_22), vondst(23, 'harde', VERS_23)];
+const VONDSTEN = zoekVondsten(hoofdstukken(new GeheugenOpslag()), 'harde');
 const NU = new Date('2026-11-15T16:00:00.000Z');
 
 function pasToe(opslag: Opslag, nu: Date = NU) {
@@ -128,6 +115,18 @@ describe('pasKeuzeToe', () => {
 		expect(vers?.basis).toEqual(inhoud(VERS_22));
 	});
 
+	it('slaat een vers over waarvan de bewerking bij een oudere repo-tekst hoort, ook bij gelijk aantal delen', () => {
+		const eigen = ' Hij sprak harde, lange woorden.';
+		bewaarOfWis(opslag, 'lukas', 6, 22, inhoud(eigen), inhoud(' Een oudere repo-tekst.'));
+		expect(leesTussenstand(opslag, 'lukas', 6).verzen[22]?.basis).toEqual(inhoud(' Een oudere repo-tekst.'));
+
+		const { keuze, meldingen } = pasKeuzeToe(opslag, 'lukas', hoofdstukken(opslag), 'harde', 'scherpe', zoekVondsten(hoofdstukken(opslag), 'harde'), NU);
+
+		expect(meldingen).toEqual(['Vers 6:22 is overgeslagen: de bewerking hoort bij een oudere repo-tekst. Kijk het vers eerst na.']);
+		expect(keuze.verzen.map((vers) => vers.vers)).toEqual([23]);
+		expect(huidig(opslag, 22)).toEqual(inhoud(eigen));
+	});
+
 	it('slaat een vers over waarvan de bewaarde bewerking niet meer past, en gaat door met de rest', () => {
 		const anderAantalDelen: VersInhoud = { delen: [...inhoud(' a').delen, ...inhoud(' b').delen] };
 		opslag.setItem(
@@ -137,7 +136,7 @@ describe('pasKeuzeToe', () => {
 
 		const { keuze, meldingen } = pasToe(opslag);
 
-		expect(meldingen).toEqual(['Vers 6:22 past niet meer op de tussenstand en is overgeslagen.']);
+		expect(meldingen).toEqual(['Vers 6:22 is overgeslagen: de bewerking hoort bij een oudere repo-tekst. Kijk het vers eerst na.']);
 		expect(keuze.verzen.map((vers) => vers.vers)).toEqual([23]);
 		expect(huidig(opslag, 22)).toEqual(inhoud(VERS_22));
 		expect(huidig(opslag, 23)).toEqual(inhoud(' Daarna zweeg hij, scherpe man.'));
@@ -183,12 +182,45 @@ describe('pasKeuzeToe', () => {
 	});
 });
 
+describe('draaiKeuzeTerug met twee keuzes op hetzelfde vers', () => {
+	function tweeKeuzes() {
+		const eerste = pasToe(opslag).keuze;
+		const daarna = hoofdstukken(opslag);
+		const tweede = pasKeuzeToe(opslag, 'lukas', daarna, 'woorden', 'zinnen', zoekVondsten(daarna, 'woorden'), new Date('2026-11-15T16:05:00.000Z')).keuze;
+		return { eerste, tweede };
+	}
+
+	it('laat het vers en de oudere keuze staan zolang de latere keuze het vers nog bezit', () => {
+		const { eerste } = tweeKeuzes();
+		expect(huidig(opslag, 22)).toEqual(inhoud(' Hij sprak scherpe zinnen.'));
+
+		const meldingen = draaiKeuzeTerug(opslag, 'lukas', eerste.id);
+
+		expect(meldingen).toEqual(['Vers 6:22 is daarna veranderd door de keuze "woorden"; draai die eerst terug.']);
+		expect(huidig(opslag, 22)).toEqual(inhoud(' Hij sprak scherpe zinnen.'));
+		expect(huidig(opslag, 23)).toBeUndefined();
+		expect(leesKeuzes(opslag, 'lukas').find((k) => k.id === eerste.id)?.verzen.map((v) => v.vers)).toEqual([22]);
+	});
+
+	it('draait daarna in de omgekeerde volgorde alles terug', () => {
+		const { eerste, tweede } = tweeKeuzes();
+		draaiKeuzeTerug(opslag, 'lukas', eerste.id);
+
+		expect(draaiKeuzeTerug(opslag, 'lukas', tweede.id)).toEqual([]);
+		expect(draaiKeuzeTerug(opslag, 'lukas', eerste.id)).toEqual([]);
+
+		expect(leesTussenstand(opslag, 'lukas', 6).verzen).toEqual({});
+		expect(leesKeuzes(opslag, 'lukas')).toEqual([]);
+	});
+});
+
 describe('leesKeuzes', () => {
 	it('geeft de nieuwste keuze eerst', () => {
 		const eerste = pasToe(opslag, new Date('2026-11-15T16:00:00.000Z')).keuze;
-		const tweede = pasToe(opslag, new Date('2026-11-15T16:05:00.000Z')).keuze;
+		const daarna = hoofdstukken(opslag);
+		const tweede = pasKeuzeToe(opslag, 'lukas', daarna, 'woorden', 'zinnen', zoekVondsten(daarna, 'woorden'), new Date('2026-11-15T16:05:00.000Z')).keuze;
 
-		expect(eerste.id).not.toBe(tweede.id);
+		expect(tweede.verzen.map((vers) => vers.vers)).toEqual([22]);
 		expect(leesKeuzes(opslag, 'lukas').map((k) => k.id)).toEqual([tweede.id, eerste.id]);
 	});
 

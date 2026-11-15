@@ -24,5 +24,8 @@ export type Vondst = {
 export type HoofdstukVerzen = {
 	hoofdstuk: number;
 	goedgekeurd: boolean;
-	verzen: { vers: number; inhoud: VersInhoud }[];
+	verzen: VersMetRepo[];
 };
+
+/** Een vers zoals de vertaler het ziet (`inhoud`, met tussenstand) en zoals het in de repo staat (`repo`), om een verouderde bewerking te herkennen. */
+type VersMetRepo = { vers: number; inhoud: VersInhoud; repo: VersInhoud };

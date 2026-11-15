@@ -423,14 +423,14 @@ describe('bewaarKeuzeVers', () => {
 		expect(leesTussenstand(opslag, 'lukas', 3).verzen[1]?.basis).toEqual(inhoud(' repo'));
 	});
 
-	it('weigert met een melding als de bestaande basis een ander aantal delen heeft', () => {
+	it('weigert met een melding als de bestaande bewerking bij een oudere repo-tekst hoort', () => {
 		const opslag = new GeheugenOpslag();
 		const tweeDelen: VersInhoud = { delen: [...inhoud(' a').delen, ...inhoud(' b').delen] };
 		bewaarVers(opslag, 'lukas', 3, 1, inhoud(' eigen'), tweeDelen);
 
 		const uitkomst = bewaarKeuzeVers(opslag, 'lukas', 3, 1, inhoud(' nieuw'), inhoud(' eigen'), 'k1');
 
-		expect(uitkomst).toEqual({ gelukt: false, melding: expect.stringContaining('Vers 3:1 past niet meer') });
+		expect(uitkomst).toEqual({ gelukt: false, melding: expect.stringContaining('Vers 3:1 is overgeslagen') });
 		expect(leesTussenstand(opslag, 'lukas', 3).verzen[1]?.inhoud).toEqual(inhoud(' eigen'));
 	});
 });

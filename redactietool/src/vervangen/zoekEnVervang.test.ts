@@ -14,7 +14,7 @@ function vers(...stukken: Tekststuk[]): VersInhoud {
 }
 
 function hoofdstuk(inhoud: VersInhoud[], goedgekeurd = false, nummer = 1): HoofdstukVerzen {
-	return { hoofdstuk: nummer, goedgekeurd, verzen: inhoud.map((versInhoud, index) => ({ vers: index + 1, inhoud: versInhoud })) };
+	return { hoofdstuk: nummer, goedgekeurd, verzen: inhoud.map((versInhoud, index) => ({ vers: index + 1, inhoud: versInhoud, repo: versInhoud })) };
 }
 
 function zoek(inhoud: VersInhoud, zoekterm: string) {
@@ -135,7 +135,7 @@ describe('vervangInVers', () => {
 		const vondsten = zoek(inhoud, 'zoon');
 		expect(vondsten).toHaveLength(3);
 		expect(vervangInVers(inhoud, vondsten, 'kind van God')).toEqual(
-			vers(tekst('Kind van God en kind van God. '), tekst('Nog een Kind van God.', ['vet'])),
+			vers(tekst('Kind van God en kind van God. '), tekst('Nog een kind van God.', ['vet'])),
 		);
 	});
 
@@ -154,12 +154,16 @@ describe('vervangInVers', () => {
 		});
 	});
 
-	it('geeft de nieuwe tekst een hoofdletter waar de gevonden tekst er een had, en laat hem verder letterlijk', () => {
-		const inhoud = vers(tekst('De Mensenzoon kwam. Zo kwam de Mensenzoon.'));
-		expect(inhoud.delen[0]?.stukken[0]).toMatchObject({ tekst: 'De Mensenzoon kwam. Zo kwam de Mensenzoon.' });
+	it('geeft de nieuwe tekst een hoofdletter aan het begin van een zin, en laat hem verder letterlijk', () => {
+		const inhoud = vers(tekst('De Mensenzoon kwam. Zo kwam de Mensenzoon. “De Mensenzoon!”'));
 		expect(vervangInVers(inhoud, zoek(inhoud, 'de mensenzoon'), 'de Zoon van de mens')).toEqual(
-			vers(tekst('De Zoon van de mens kwam. Zo kwam de Zoon van de mens.')),
+			vers(tekst('De Zoon van de mens kwam. Zo kwam de Zoon van de mens. “De Zoon van de mens!”')),
 		);
+	});
+
+	it('houdt de kleine letter van de nieuwe tekst midden in een zin, ook als de vondst een hoofdletter had', () => {
+		const inhoud = vers(tekst('Zij dankten God voor alles.'));
+		expect(vervangInVers(inhoud, zoek(inhoud, 'god'), 'de Heer')).toEqual(vers(tekst('Zij dankten de Heer voor alles.')));
 	});
 
 	it('laat vondsten die niet vervangbaar zijn staan', () => {
@@ -217,7 +221,7 @@ describe('op de vereenvoudiging van Lukas', () => {
 			);
 			const verzen = [...new Set(nummers)].flatMap((nummer) => {
 				const inhoud = knipVers(geparseerd, nummer);
-				return inhoud === null ? [] : [{ vers: nummer, inhoud }];
+				return inhoud === null ? [] : [{ vers: nummer, inhoud, repo: inhoud }];
 			});
 			return { hoofdstuk: Number(/(\d+)\.md$/u.exec(bestand.naam)?.[1]), goedgekeurd: false, verzen };
 		});

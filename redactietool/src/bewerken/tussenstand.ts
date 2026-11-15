@@ -136,14 +136,17 @@ export function bewaarKeuzeVers(
 	hoofdstuk: number,
 	vers: number,
 	nieuw: VersInhoud,
-	huidig: VersInhoud,
+	repo: VersInhoud,
 	keuzeId: string,
 ): BewaarUitkomst {
 	const bestaand = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
-	if (bestaand !== undefined && bestaand.basis.delen.length !== huidig.delen.length) {
-		return { gelukt: false, melding: `Vers ${hoofdstuk}:${vers} past niet meer op de tussenstand en is overgeslagen.` };
+	if (bestaand !== undefined && (!pastOpRepo(repo, bestaand) || isVerouderd(repo, bestaand.basis))) {
+		return {
+			gelukt: false,
+			melding: `Vers ${hoofdstuk}:${vers} is overgeslagen: de bewerking hoort bij een oudere repo-tekst. Kijk het vers eerst na.`,
+		};
 	}
-	const basis = bestaand === undefined ? huidig : bestaand.basis;
+	const basis = bestaand === undefined ? repo : bestaand.basis;
 	return schrijfVers(opslag, boek, hoofdstuk, vers, {
 		inhoud: nieuw,
 		basis,

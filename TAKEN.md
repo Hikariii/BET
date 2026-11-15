@@ -13,7 +13,8 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 
 ## Open
 - [ ] Redactietool, plan in `redactietool/PLAN.md` (v2, vastgesteld). Volgorde: fase 0 → 1 → 2 → 3 → 5 → 4.
-  - [~] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. **Open: test op Windows in Edge en Chrome** (geleende laptop of UTM), met `docs/prototype/plakken-in-word/LEESMIJ.md` op die branch.
+  - [x] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. Geen aparte Windows-test: de redacteur test in het gebruik.
+  - [ ] Bij de redacteur nagaan of Kopiëren naar Word op Windows (Edge of Chrome) de stijlen goed overneemt; zo niet: knop Download als Word (zie `redactietool/PLAN.md`, fase 5).
   - [x] **Fase 1** (lezen) gebouwd op branch `fase-1-lezen`, met voorwerk voor fase 2, 3 en 5; twee onafhankelijke reviews en een critical judge verwerkt.
   - [x] **Fase 2** (begrippen en vragen) gebouwd op branch `fase-2-begrippen` met /autopilot: tabbladen Besloten, Gevonden en Vertaalvragen; review en critical judge verwerkt.
   - [ ] Vertaalvragen: de kolom Plaats van het register tonen (`Vertaalvraag` heeft er nog geen veld voor).
@@ -25,6 +26,13 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] Bewerken: waarschuwing alleen bij opmaak die de repo-versie nog had (nu t.o.v. de bron, dus een bewust ontbrekende tag geeft steeds een waarschuwing).
   - [ ] Bewerken: kleine punten uit de review: `wisVers` vangt opslagfouten niet af (anders dan `bewaarVers`); `BewerkbaarVers.tsx` heeft geen componenttest; onleesbare verzen in de opslag verdwijnen stil bij de volgende bewaring; dubbele samenvoeglogica in `tussenstand.ts` en `versknip.ts`; focus na Terug naar de repo; waarschuwingen als live region.
   - [x] **Fase 5** (naar Word en Claude) gebouwd op branch `fase-5-naar-word` met /autopilot: Kopiëren naar Word (eigen copy-handler, Chromium getest), Safari-waarschuwing, Export voor Claude als JSON per hoofdstuk; review en critical judge verwerkt.
+  - [x] **Fase 4** (structurele keuzes) gebouwd op branch `fase-4-structureel` met /autopilot: tabblad Vervangen met voorbeeldvenster en vinkjes per plek, toepassen via de tussenstand met behoud van opmaak, terugdraaien in één keer, herkomst "structurele keuze" in tussenstand en export.
+  - [ ] Vervangen: een vondst over een opmaakgrens kan alleen met de hand; overwegen of de tool die ook kan vervangen (met keuze welke opmaak blijft).
+  - [ ] Vervangen: de toegepaste keuzes gaan nog niet mee in de export (`structureleKeuzes` blijft leeg); alleen de herkomst per vers.
+  - [ ] Vervangen: een lege "Vervang door" verwijdert tekst zonder waarschuwing (wel terug te draaien); bevestiging of waarschuwing in het voorbeeld.
+  - [ ] Vervangen, toegankelijkheid: "vervangen door" voor schermlezers bij `del`/`ins`; focus na toepassen naar de samenvatting; `.alleen-lezers` naar een gedeeld CSS-bestand (nu in `besloten.css`).
+  - [ ] Vervangen: woordgrenzen bij een apostrof ("zo" in "zo'n", "m" in "m'n"); aansluitende stukken met gelijke opmaak samenvoegen voordat een vondst "met de hand" wordt (alleen als dat in de data voorkomt).
+  - [ ] Vervangen: de test op echte data telt met bijna dezelfde regex als de code; liever een vaste verwachting (bv. 26 plekken voor "de Mensenzoon").
   - [ ] Naar Word: in een echte Safari controleren dat de waarschuwing verschijnt; nagaan of `navigator.clipboard.write` de `mso-`stijlen ook behoudt (dan kan `execCommand` weg).
   - [ ] Export: veld `basis` (de repo-tekst waarop de vertaler begon) bij verouderde verzen; melding "voordat je kopieert" verduidelijken voor bewerkingen die niet toegepast worden.
   - [ ] Toegankelijkheid hoofdstukacties: focus naar het tekstveld bij openen, `aria-controls`, melding na downloaden.

@@ -80,17 +80,20 @@ export function zoekVondsten(hoofdstukken: readonly HoofdstukVerzen[], zoekterm:
 	return vondsten;
 }
 
-function metHoofdletterVan(gevonden: string, nieuw: string): string {
+/** Vóór de vondst alleen witruimte en openingstekens, na het begin van het deel of een zinseinde. */
+const ZINSBEGIN = /(?:^|[.?!:])[\s"'“‘(]*$/u;
+
+function metHoofdletterAanZinsbegin(tekstErvoor: string, gevonden: string, nieuw: string): string {
 	const eerste = gevonden.charAt(0);
-	const begintMetHoofdletter = eerste !== eerste.toLowerCase();
-	return begintMetHoofdletter ? nieuw.charAt(0).toUpperCase() + nieuw.slice(1) : nieuw;
+	const hoofdletterAanZinsbegin = eerste !== eerste.toLowerCase() && ZINSBEGIN.test(tekstErvoor);
+	return hoofdletterAanZinsbegin ? nieuw.charAt(0).toUpperCase() + nieuw.slice(1) : nieuw;
 }
 
 /**
  * Vervangt in een vers de vondsten (alleen vervangbare, binnen één opmaak) door `nieuw`, met de opmaak van de vervangen tekst.
- * Een vondst hoort bij het vers als deel, positie en gevonden tekst kloppen met de inhoud; andere vondsten
- * (ander vers, of een vers dat sinds het zoeken veranderde) worden genegeerd.
- * Begint de gevonden tekst met een hoofdletter (zoals aan het begin van een zin), dan krijgt de nieuwe tekst die ook; verder komt hij letterlijk in het vers.
+ * De aanroeper geeft alleen de vondsten van dit vers mee; een vondst waarvan deel, positie of tekst niet meer klopt
+ * (het vers veranderde sinds het zoeken), wordt overgeslagen.
+ * Staat de vondst aan het begin van een zin met een hoofdletter, dan krijgt de nieuwe tekst die ook; verder komt hij letterlijk in het vers.
  */
 export function vervangInVers(inhoud: VersInhoud, vondsten: readonly Vondst[], nieuw: string): VersInhoud {
 	const delen = inhoud.delen.map((deel, nummerDeel): VersAlineadeel => {
@@ -106,7 +109,7 @@ export function vervangInVers(inhoud: VersInhoud, vondsten: readonly Vondst[], n
 			const bereik = stukVanPlek(bereiken, vondst.van, vondst.tot);
 			const stuk = bereik === null ? undefined : stukken[bereiken.indexOf(bereik)];
 			if (bereik === null || stuk === undefined) continue;
-			stuk.tekst = stuk.tekst.slice(0, vondst.van - bereik.van) + metHoofdletterVan(vondst.gevonden, nieuw) + stuk.tekst.slice(vondst.tot - bereik.van);
+			stuk.tekst = stuk.tekst.slice(0, vondst.van - bereik.van) + metHoofdletterAanZinsbegin(tekst.slice(0, vondst.van), vondst.gevonden, nieuw) + stuk.tekst.slice(vondst.tot - bereik.van);
 			vorigeVan = vondst.van;
 		}
 		return { stijl: deel.stijl, stukken };

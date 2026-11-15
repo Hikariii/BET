@@ -25,7 +25,8 @@ export function bouwHoofdstukVerzen(
 		const metTussenstand = pasTussenstandToe(vereenvoudigd, leesTussenstandVan(nummer));
 		const verzen = versnummers(metTussenstand).flatMap((vers) => {
 			const inhoud = knipVers(metTussenstand, vers);
-			return inhoud === null ? [] : [{ vers, inhoud }];
+			const repo = knipVers(vereenvoudigd, vers);
+			return inhoud === null || repo === null ? [] : [{ vers, inhoud, repo }];
 		});
 		const status = boek.hoofdstukken.find((info) => info.nummer === nummer)?.status;
 		return { hoofdstuk: nummer, goedgekeurd: status === 'goedgekeurd', verzen };
