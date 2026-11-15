@@ -1,6 +1,6 @@
 # Redactietool
 
-De broncode van de tool. Het plan staat in [`PLAN.md`](PLAN.md). Nu kan de tool lezen: een hoofdstuk per scherm met bron, vereenvoudiging en regels naast elkaar, en een zijbalk met alle hoofdstukken. Bewerken en de rest van het plan volgen.
+De broncode van de tool. Het plan staat in [`stap1-plan.md`](stap1-plan.md) (afgesloten: uitgangspunten, architectuur, fase 0 tot 5) en [`stap2-plan.md`](stap2-plan.md) (wat nog moet). De tool kan lezen, begrippen en vertaalvragen tonen, per vers bewerken, zoeken en vervangen over het boek, en het resultaat naar Word en naar Claude brengen. Hij staat op https://hikariii.github.io/BET/.
 
 | Map | Inhoud |
 |---|---|

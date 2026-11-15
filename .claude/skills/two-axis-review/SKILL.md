@@ -10,7 +10,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings. Start every sub-agent with a fresh context window.
 
-This repo has no issue tracker. The spec is usually `redactietool/PLAN.md` (for the web tool) or `WERKPLAN.md` / `FORMAAT.md` (for scripts); the standards are `CLAUDE.md`, `FORMAAT.md` and `README.md`.
+This repo has no issue tracker. The spec is usually `redactietool/stap2-plan.md` (for the web tool) or `WERKPLAN.md` / `FORMAAT.md` (for scripts); the standards are `CLAUDE.md`, `FORMAAT.md` and `README.md`.
 
 ## Process
 

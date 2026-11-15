@@ -1,17 +1,17 @@
 ---
 description: Leg vast waar deze branch voor is (doel, criteria, wat er niet in komt) voordat het werk begint.
-argument-hint: "[fase uit redactietool/PLAN.md of een regel over het werk]"
+argument-hint: "[fase uit redactietool/stap2-plan.md of een regel over het werk]"
 ---
 
 # Intentie vastleggen
 
-Invoer: $ARGUMENTS: een fase of onderdeel uit `redactietool/PLAN.md`, een regel over het werk, of niets (vraag dan waar de branch voor is).
+Invoer: $ARGUMENTS: een fase of onderdeel uit `redactietool/stap2-plan.md`, een regel over het werk, of niets (vraag dan waar de branch voor is).
 
 Het bestand is `.plan/intent-<branch>.md`, met `/` in de branchnaam vervangen door `-`. `.plan/` staat in `.gitignore`. Bestaat het bestand al, werk het dan bij.
 
 ## Stappen
 
-1. Fase of onderdeel uit `redactietool/PLAN.md` genoemd, of af te leiden uit de branchnaam: neem de "klaar als" van die fase en de besluiten die erbij horen als uitgangspunt. Een mechanisme dat het plan noemt is een voorstel, geen eis. Schrijf nooit terug in `redactietool/PLAN.md` zonder dat te zeggen.
+1. Fase of onderdeel uit `redactietool/stap2-plan.md` genoemd, of af te leiden uit de branchnaam: neem de "klaar als" van die fase en de besluiten die erbij horen als uitgangspunt. Een mechanisme dat het plan noemt is een voorstel, geen eis. Schrijf nooit terug in het plan zonder dat te zeggen.
 2. Schrijf het bestand in deze vorm, in gewone woorden volgens de [writing-skill](../skills/writing/SKILL.md):
    ```markdown
    # <doel in één regel>
@@ -26,7 +26,7 @@ Het bestand is `.plan/intent-<branch>.md`, met `/` in de branchnaam vervangen do
 
    Open vraag: <een beslissing die de eigenaar nog moet nemen>, of "geen".
 
-   Plan: redactietool/PLAN.md, fase <n>
+   Plan: redactietool/stap2-plan.md, fase <n>
    ```
    2 tot 5 criteria, geschreven als uitkomst, niet als implementatie ("een opgeslagen keuze staat na herladen nog in de editor", niet "IndexedDB toevoegen").
 3. Toon het bestand; goedkeuring is niet nodig.

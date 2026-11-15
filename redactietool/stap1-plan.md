@@ -1,6 +1,8 @@
-# Plan: redactietool (v2)
+# Plan: redactietool, stap 1
 
-Status: **vastgesteld** na de review-sessie van 2026-11-15. **Stand van de bouw (2026-11-15):** fase 1 (lezen), 2 (begrippen en vragen), 3 (bewerken per vers, tussenstand in de browser), 4 (zoeken en vervangen als structurele keuze, met terugdraaien) en 5 (Kopiëren naar Word, Export voor Claude) gebouwd. Fase 0: Mac geslaagd; een aparte Windows-test vervalt, de redacteur test in het gebruik.
+Status: **afgesloten** op 2026-11-15. Dit was stap 1 van de bouw; wat nog niet gebouwd is, staat in [`stap2-plan.md`](stap2-plan.md). De uitgangspunten, de architectuur en het terugvoeren hieronder gelden nog steeds.
+
+**Stand bij afsluiten:** fase 0, 1, 2, 3 en 5 gebouwd (met openstaande onderdelen, zie stap 2). Fase 4 deels: zoeken en vervangen met voorbeeldvenster, terugdraaien per keuze en herkomst in de export. Fase 0: Mac geslaagd; een aparte Windows-test vervalt, de redacteur test in het gebruik.
 
 ## Doel
 

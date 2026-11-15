@@ -12,7 +12,7 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 | `sjablonen/` | Sjablonen, zoals het wijzigingslog. | - |
 | `scripts/` | Omzetten uit Word, controles, terugzetten naar Word. Werken voor elk boek (`--boek`). | - |
 | `.claude/` | Configuratie voor Claude Code: skills, `/intent` en `/pr`, rules en een hook tegen em-dashes. Zie [`.claude/README.md`](.claude/README.md). | - |
-| `redactietool/` | Web-tool om vertalingen te lezen, te redigeren en naast het origineel te vergelijken (broncode; de build gaat via GitHub Actions naar Pages). Plan: `redactietool/PLAN.md`. | - |
+| `redactietool/` | Web-tool om vertalingen te lezen, te redigeren en naast het origineel te vergelijken (broncode; de build gaat via GitHub Actions naar Pages). Plan: `redactietool/stap1-plan.md` (afgesloten) en `redactietool/stap2-plan.md`. | - |
 | `bijbel/<boek>/` | Alles van één Bijbelboek, zie hieronder. | |
 | `FORMAAT.md` | Het Markdown-formaat met opmaak-tags: de gedeelde specificatie voor de scripts en de web-tool. | - |
 | `WERKPLAN.md` | De stappen per hoofdstuk (en de autonome modus). | - |

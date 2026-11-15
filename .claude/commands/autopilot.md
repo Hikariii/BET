@@ -1,6 +1,6 @@
 ---
-description: Voer een fase uit redactietool/PLAN.md zonder toezicht uit, van onderzoek tot een gecommitte branch op main (zonder push).
-argument-hint: "[fase uit redactietool/PLAN.md, bv. 'fase 2']"
+description: Voer een fase uit redactietool/stap2-plan.md zonder toezicht uit, van onderzoek tot een gecommitte branch op main (zonder push).
+argument-hint: "[fase uit redactietool/stap2-plan.md, bv. 'fase 7']"
 ---
 
 Fase: $ARGUMENTS. Geen fase genoemd: vraag welke en stop.
@@ -11,13 +11,13 @@ Leg elke beslissing vast in het intentiebestand onder `## Beslissingen zonder to
 
 Volg de stappen als taken:
 
-1. **Start.** Branch vanaf een actuele `main` (`fase-N-<kort>`). Draai [/intent](intent.md) met de fase. Lees `CLAUDE.md`, `redactietool/PLAN.md`, `FORMAAT.md` en de rules in `.claude/rules/`.
+1. **Start.** Branch vanaf een actuele `main` (`fase-N-<kort>`). Draai [/intent](intent.md) met de fase. Lees `CLAUDE.md`, `redactietool/stap2-plan.md` (en `redactietool/stap1-plan.md` voor uitgangspunten en architectuur), `FORMAAT.md` en de rules in `.claude/rules/`.
 2. **Onderzoek.** Zoek de gaten waar de fase op leunt: een aanname, een bewering zonder `bestand:regel`, gegevens die nog niet bestaan, een randgeval in de data van `bijbel/`. Sluit elk gat met één subagent per vraag (alleen lezen) en zet de antwoorden in het intentiebestand.
 3. **Plan en contract.** Verdeel het werk in onderdelen die los te bouwen zijn. Leg eerst het gedeelde contract vast (types, vaste plekken voor functies met een lege invulling, wie welk bestand bezit) en commit dat. Alleen wat echt rendeert krijgt een eigen subagent: een onderdeel dat los te bouwen en te testen is, met eigen bestanden.
 4. **Bouwen.** Start de subagents tegelijk, elk met `isolation: worktree`, in één bericht. `.plan/` en `node_modules/` staan in `.gitignore` en zijn in een worktree niet aanwezig: geef het absolute pad van het intentiebestand mee en laat elke subagent eerst `mise x node@26.13.1 -- npm ci` in `redactietool/` draaien. Geef elk: wat te lezen, de taak, de bestanden die van hem zijn en die niet van hem zijn, de regels (Nederlands, geen em-dashes, strikte types, testen volgens `.claude/rules/testen.md` inclusief één keer bewust breken), committen in de eigen worktree-branch zonder push, en wat het rapport moet bevatten. Neem hun werk over met `git cherry-pick` (geen merge-commits); los botsingen op in het voordeel van de echte invulling boven de lege. Ruim daarna alleen de worktrees en branches op die deze run zelf maakte; laat andere worktrees (bv. van de Orchestrator of een andere sessie) staan.
 5. **Geheel controleren.** In `redactietool/`: typecheck, alle tests, build. Bekijk de gebouwde site met Playwright (`/tmp/pw`, of installeer daar opnieuw) en controleer dat er geen consolefouten zijn; stop de preview-server daarna. Raakt de fase de scripts in `scripts/`: draai de heen-en-terugtest en de controles uit `CLAUDE.md`.
 6. **Review.** Werk eerst het intentiebestand bij met wat er feitelijk gebouwd is. Start dan een onafhankelijke reviewer (frisse `general-purpose`-subagent, alleen lezen) die `.claude/skills/two-axis-review/SKILL.md` volgt met het intentiebestand als spec; geef hem geen eigen conclusies. Start daarna een **critical judge** (frisse subagent) die elke bevinding toetst aan de code: terecht, overdreven of fout, met een advies per bevinding. Verwerk wat de judge aanraadt, draai stap 5 opnieuw, en laat bij grote wijzigingen nog één review op alleen die wijzigingen doen.
-7. **Afronden.** Werk `TAKEN.md` en de status van de fase in `redactietool/PLAN.md` bij (en noem elke wijziging aan `PLAN.md` in het eindverslag). Commit op de branch (Nederlandse boodschap, attributieregels volgens de omgeving). Neem de branch op `main` over zonder merge-commit en zonder bestaande commits op `main` te herschrijven:
+7. **Afronden.** Werk `TAKEN.md` en de stand van de fase in `redactietool/stap2-plan.md` bij (en noem elke wijziging aan het plan in het eindverslag). Commit op de branch (Nederlandse boodschap, attributieregels volgens de omgeving). Neem de branch op `main` over zonder merge-commit en zonder bestaande commits op `main` te herschrijven:
    ```bash
    git status --short          # moet leeg zijn; anders stoppen en melden
    git rebase main <branch>    # de branch bovenop main zetten

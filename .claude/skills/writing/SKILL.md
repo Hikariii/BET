@@ -36,7 +36,7 @@ De vereenvoudigde tekst in `bijbel/*/vereenvoudigd/` volgt de redactierichtlijn,
 - **Schrijf woorden voluit.** Afkortingen als `ID`, `URL`, `PR`, `JSON` mogen; verder voluit.
 - **Houd samengestelde domeintermen heel**: "redactiekeuze", niet "keuze", als dat het onderwerp is.
 - **Nooit afbreken op een vaste breedte**, in chat, tekst of comments: alleen na een zin of lijstitem.
-- **Geen documentjargon in code.** Labels uit `.claude/`, `redactietool/PLAN.md` of `WERKPLAN.md` (B1, O7, "fase 3") horen niet in comments of testnamen; beschrijf het gedrag in de woorden van de code.
+- **Geen documentjargon in code.** Labels uit `.claude/`, `redactietool/stap2-plan.md` of `WERKPLAN.md` (B1, O7, "fase 3") horen niet in comments of testnamen; beschrijf het gedrag in de woorden van de code.
 
 ```
 Slecht: Deze PR introduceert een robuuste en uitgebreide oplossing die naadloos
