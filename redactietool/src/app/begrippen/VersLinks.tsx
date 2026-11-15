@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import type { VersRef } from '../../data/types';
 import { versAdres } from '../adres';
+import { VersLinkMetVoorproef } from './VersVoorproefVak';
 
 type Props = {
 	boek: string;
@@ -11,7 +12,7 @@ type Props = {
 
 const STANDAARD_ZICHTBAAR = 12;
 
-/** Een lijst verzen als links ("4:18, 4:20 …"), met een knop voor de rest als het er veel zijn. */
+/** Een lijst verzen als links ("4:18, 4:20 …"), met een knop voor de rest als het er veel zijn; bij aanwijzen het vers zelf (zie `VoorproefContext`). */
 export function VersLinks({ boek, verzen, zichtbaar = STANDAARD_ZICHTBAAR }: Props) {
 	const [alles, zetAlles] = useState(false);
 	if (verzen.length === 0) {
@@ -23,9 +24,7 @@ export function VersLinks({ boek, verzen, zichtbaar = STANDAARD_ZICHTBAAR }: Pro
 			{getoond.map(({ hoofdstuk, vers }, index) => (
 				<>
 					{index > 0 && ', '}
-					<a href={versAdres(boek, hoofdstuk, vers)}>
-						{hoofdstuk}:{vers}
-					</a>
+					<VersLinkMetVoorproef adres={versAdres(boek, hoofdstuk, vers)} hoofdstuk={hoofdstuk} vers={vers} />
 				</>
 			))}
 			{verzen.length > getoond.length && (

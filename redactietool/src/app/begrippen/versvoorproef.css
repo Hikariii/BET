@@ -1,0 +1,61 @@
+/* Het vak met het vers bij aanwijzen. De Bijbeltekst houdt de opmaak uit het Word-sjabloon (inline); hier alleen letter, grootte en ruimte. */
+.versvoorproef {
+	position: fixed;
+	z-index: 50;
+	width: min(520px, calc(100vw - 16px));
+	max-height: 60vh;
+	overflow: hidden;
+	padding: 0.75rem 1rem 0.85rem;
+	background: #fff;
+	border: 1px solid var(--rand-donker);
+	border-radius: 3px;
+	color: var(--tekst);
+	font-family: var(--tool);
+	font-size: 0.8125rem;
+	pointer-events: none;
+}
+
+.versvoorproef p {
+	margin: 0;
+}
+
+.versvoorproef .versvoorproef-kop {
+	margin-bottom: 0.4rem;
+	font-weight: 600;
+}
+
+.versvoorproef-bewerkt {
+	color: var(--gedempt);
+	font-weight: 400;
+}
+
+.versvoorproef-tekst {
+	color: #000;
+	font-family: var(--boek);
+	font-size: 1.15rem;
+	line-height: 1.5;
+}
+
+.versvoorproef-tekst p + p,
+.versvoorproef-bron p + p {
+	margin-top: 0.35rem;
+}
+
+.versvoorproef-bron {
+	margin-top: 0.6rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--rand);
+	color: #000;
+	font-family: var(--boek);
+	font-size: 0.95rem;
+	line-height: 1.45;
+}
+
+.versvoorproef .versvoorproef-label {
+	margin-bottom: 0.2rem;
+	color: var(--gedempt);
+	font-family: var(--tool);
+	font-size: 0.75rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
