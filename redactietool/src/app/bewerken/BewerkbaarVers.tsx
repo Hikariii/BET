@@ -53,7 +53,8 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 
 	const bewerkingPastNiet = bewerkt !== null && repo !== null && !pastOpRepo(repo, bewerkt);
 	const startInhoud = bewerkt === null || bewerkingPastNiet ? repo : bewerkt.inhoud;
-	const waarschuwingen = bewerkt === null || bron === null ? [] : waarschuwingenVoorVers(bron, bewerkt.inhoud);
+	// Een bewerking die niet past, staat niet op het scherm; waarschuwingen erover zouden verwarren.
+	const waarschuwingen = bewerkt === null || bron === null || bewerkingPastNiet ? [] : waarschuwingenVoorVers(bron, bewerkt.inhoud);
 	const verouderd = bewerkt !== null && repo !== null && !bewerkingPastNiet && isVerouderd(repo, bewerkt.basis);
 
 	return (
@@ -82,10 +83,16 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 					</button>
 				)}
 			</div>
-			{bewerkingPastNiet && (
-				<p class="versverouderd" role="status">
-					Deze bewerking kan niet worden toegepast: de indeling in alinea's is in de repo veranderd. Kies Terug naar de repo of bewerk het vers opnieuw.
-				</p>
+			{bewerkingPastNiet && bewerkt !== null && (
+				<div class="versverouderd" role="status">
+					<p>
+						Deze bewerking kan niet worden toegepast: de indeling in alinea's is in de repo veranderd. Je eerdere tekst staat hieronder; kopieer
+						hem als je hem wilt houden, want opnieuw bewerken of Terug naar de repo overschrijft hem.
+					</p>
+					{bewerkt.inhoud.delen.map((deel) => (
+						<p class="eerdere-tekst">{deel.stukken.map((stuk) => stuk.tekst).join('').trim()}</p>
+					))}
+				</div>
 			)}
 			{verouderd && (
 				<p class="versverouderd" role="status">

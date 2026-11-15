@@ -23,7 +23,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] Bewerken: verschil t.o.v. de repo zichtbaar maken; terug per hoofdstuk; knop of sneltoets om opmaak te zetten.
   - [ ] Bewerken: waarschuwingen voor oude vormen en vaste begrippen, met de lijst uit `controleer_hoofdstuk.py` als gedeelde JSON voor Python en TypeScript.
   - [ ] Bewerken: waarschuwing alleen bij opmaak die de repo-versie nog had (nu t.o.v. de bron, dus een bewust ontbrekende tag geeft steeds een waarschuwing).
-  - [ ] Bewerken: kleine punten uit de review: onleesbare verzen in de opslag verdwijnen stil bij de volgende bewaring; dubbele samenvoeglogica in `tussenstand.ts` en `versknip.ts`; focus na Terug naar de repo; waarschuwingen als live region.
+  - [ ] Bewerken: kleine punten uit de review: `wisVers` vangt opslagfouten niet af (anders dan `bewaarVers`); `BewerkbaarVers.tsx` heeft geen componenttest; onleesbare verzen in de opslag verdwijnen stil bij de volgende bewaring; dubbele samenvoeglogica in `tussenstand.ts` en `versknip.ts`; focus na Terug naar de repo; waarschuwingen als live region.
   - [ ] Rooktest van het leesscherm (render met DOM of Playwright op `dist/`), nu alleen handmatig gecontroleerd.
   - [ ] "precedent" in de kolom Regels koppelen aan de bijbehorende regel in `precedenten.md` (nu opent de doorzoekbare tabel).
   - [ ] `redactietool/src/klembord/chromiumKlembord.mjs` (alleen macOS, gebruikt rolldown van Vite en Playwright uit `/tmp/pw`) opnemen in de tests of vervangen.

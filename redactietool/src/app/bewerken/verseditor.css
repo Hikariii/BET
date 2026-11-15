@@ -55,3 +55,11 @@
 .verswaarschuwingen {
 	list-style: none;
 }
+
+.versverouderd .eerdere-tekst {
+	user-select: text;
+	white-space: pre-wrap;
+	border-left: 3px solid var(--rand, #d0d7de);
+	padding-left: .5rem;
+	margin: .25rem 0;
+}
