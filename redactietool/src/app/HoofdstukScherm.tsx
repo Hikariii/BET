@@ -116,7 +116,7 @@ type VersRijProps = {
 	onOpslagGewijzigd: () => void;
 };
 
-function VersRij({
+export function VersRij({
 	groep,
 	boek,
 	referentie,

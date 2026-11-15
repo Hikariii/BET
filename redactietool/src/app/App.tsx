@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'preact/hooks';
 import type { BoekData, BoekLijst, Referentie } from '../data/types';
-import { versAdres, type Adres } from './adres';
+import { versAdres, type BoekAdres } from './adres';
 import { laadBoek, laadBoeken, laadHoofdstuk, laadReferentie } from './gegevens';
 import { BegrippenScherm } from './begrippen/BegrippenScherm';
+import { Galerij } from './galerij/Galerij';
 import { HoofdstukScherm } from './HoofdstukScherm';
 import { useAdres, useLaden } from './hooks';
 import type { Naslag } from './naslag';
@@ -19,6 +20,9 @@ export function App() {
 	const boeken = useLaden(laadBoeken, []);
 	const adres = useAdres();
 
+	if (adres?.soort === 'galerij') {
+		return <Galerij />;
+	}
 	if (boeken.soort === 'laden') {
 		return <p class="melding">De boeken worden geladen.</p>;
 	}
@@ -37,12 +41,12 @@ export function App() {
 	return <BoekScherm adres={huidig} boeken={boeken.waarde} />;
 }
 
-function standaardAdres(boeken: BoekLijst): Adres | null {
+function standaardAdres(boeken: BoekLijst): BoekAdres | null {
 	const eerste = boeken[0];
 	return eerste === undefined ? null : { soort: 'hoofdstuk', boek: eerste.id, hoofdstuk: 1, vers: null };
 }
 
-function BoekScherm({ adres, boeken }: { adres: Adres; boeken: BoekLijst }) {
+function BoekScherm({ adres, boeken }: { adres: BoekAdres; boeken: BoekLijst }) {
 	const [naslag, zetNaslag] = useState<Naslag | null>(null);
 	const [regelsAltijdZichtbaar, zetRegelsAltijdZichtbaar] = useState(true);
 	const sluitNaslag = useCallback(() => zetNaslag(null), []);

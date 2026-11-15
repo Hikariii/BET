@@ -21,6 +21,15 @@ describe('leesAdres', () => {
 		expect(leesAdres('#/lukas/begrippen/vragen/')).toEqual({ soort: 'begrippen', boek: 'lukas', tabblad: 'vragen' });
 	});
 
+	it('leest de galerij, ook met een slash achteraan', () => {
+		expect(leesAdres('#/galerij')).toEqual({ soort: 'galerij' });
+		expect(leesAdres('#/galerij/')).toEqual({ soort: 'galerij' });
+	});
+
+	it('leest een boek dat galerij heet nog steeds als boek', () => {
+		expect(leesAdres('#/galerij/9')).toEqual({ soort: 'hoofdstuk', boek: 'galerij', hoofdstuk: 9, vers: null });
+	});
+
 	it('geeft null voor een onbekend tabblad', () => {
 		expect(leesAdres('#/lukas/begrippen/onbekend')).toBeNull();
 	});
@@ -42,6 +51,7 @@ describe('leesAdres', () => {
 		const adressen: Adres[] = [
 			{ soort: 'hoofdstuk', boek: 'het boek', hoofdstuk: 4, vers: 18 },
 			{ soort: 'begrippen', boek: 'het boek', tabblad: 'vragen' },
+			{ soort: 'galerij' },
 		];
 		for (const adres of adressen) expect(leesAdres(maakAdres(adres))).toEqual(adres);
 	});
@@ -52,5 +62,6 @@ describe('maakAdres', () => {
 		expect(maakAdres({ soort: 'hoofdstuk', boek: 'lukas', hoofdstuk: 9, vers: 22 })).toBe('#/lukas/9/22');
 		expect(maakAdres({ soort: 'hoofdstuk', boek: 'lukas', hoofdstuk: 9, vers: null })).toBe('#/lukas/9');
 		expect(maakAdres({ soort: 'begrippen', boek: 'lukas', tabblad: 'gevonden' })).toBe('#/lukas/begrippen/gevonden');
+		expect(maakAdres({ soort: 'galerij' })).toBe('#/galerij');
 	});
 });

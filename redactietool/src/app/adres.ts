@@ -4,9 +4,12 @@ export type Tabblad = (typeof TABBLADEN)[number];
 
 /**
  * Het adres in de browser.
- * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden. Een slash achteraan mag.
+ * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden; `#/galerij` is de galerij met de componenten. Een slash achteraan mag.
  */
-export type Adres =
+export type Adres = BoekAdres | { soort: 'galerij' };
+
+/** Een adres binnen een boek. */
+export type BoekAdres =
 	| {
 			soort: 'hoofdstuk';
 			boek: string;
@@ -18,9 +21,11 @@ export type Adres =
 
 const HOOFDSTUK = /^#\/([^/]+)\/(\d+)(?:\/(\d+))?\/?$/;
 const BEGRIPPEN = /^#\/([^/]+)\/begrippen(?:\/([a-z]+))?\/?$/;
+const GALERIJ = /^#\/galerij\/?$/;
 
 /** Geeft `null` voor een leeg of onbegrijpelijk adres. */
 export function leesAdres(hash: string): Adres | null {
+	if (GALERIJ.test(hash)) return { soort: 'galerij' };
 	const hoofdstuk = HOOFDSTUK.exec(hash);
 	if (hoofdstuk !== null) {
 		const [, boek, nummer, vers] = hoofdstuk;
@@ -40,6 +45,7 @@ export function leesAdres(hash: string): Adres | null {
 }
 
 export function maakAdres(adres: Adres): string {
+	if (adres.soort === 'galerij') return '#/galerij';
 	const boek = `#/${encodeURIComponent(adres.boek)}`;
 	if (adres.soort === 'begrippen') {
 		return `${boek}/begrippen/${adres.tabblad}`;
