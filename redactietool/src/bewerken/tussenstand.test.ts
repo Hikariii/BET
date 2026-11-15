@@ -242,10 +242,7 @@ describe('pasTussenstandToe', () => {
 		expect(pasTussenstandToe(hoofdstuk, { verzen: {} })).toEqual(kleinHoofdstuk());
 	});
 
-	// Hangt af van knipVers en vervangVers uit versknip.ts; zolang die leeg zijn, slaat dit blok over.
-	const versknipIsIngevuld = knipVers(kleinHoofdstuk(), 1) !== null;
-
-	describe.skipIf(!versknipIsIngevuld)('met de verzen uit het hoofdstuk', () => {
+	describe('met de verzen uit het hoofdstuk', () => {
 		it('zet een bewerkt vers in het hoofdstuk en laat de rest gelijk', () => {
 			const hoofdstuk = kleinHoofdstuk();
 			const nieuw = pasTussenstandToe(hoofdstuk, tussenstandMet({ 3: inhoud(' aangepast', 'genade') }));
