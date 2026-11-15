@@ -24,6 +24,7 @@ function isAlineastijl(waarde: unknown): waarde is Alineastijl {
 
 function alsTekststuk(waarde: unknown): Tekststuk | null {
 	if (!isObject(waarde) || waarde['soort'] !== 'tekst' || typeof waarde['tekst'] !== 'string') return null;
+	if (waarde['tekst'].includes('\n')) return null;
 	const opmaak = waarde['opmaak'];
 	if (!Array.isArray(opmaak) || !opmaak.every(isOpmaak)) return null;
 	return { soort: 'tekst', tekst: waarde['tekst'], opmaak };
@@ -112,9 +113,38 @@ export function bewaarVers(
 	} catch {
 		return {
 			gelukt: false,
-			melding: `Vers ${vers} kon niet in de browser worden bewaard, waarschijnlijk is de opslag vol. Je wijziging staat nog op het scherm, maar is na herladen weg.`,
+			melding: `Vers ${vers} kon niet in de browser worden bewaard, waarschijnlijk is de opslag vol. Kopieer je tekst voordat je op Klaar drukt.`,
 		};
 	}
+}
+
+/** Of een bewaarde bewerking dezelfde indeling in alinea's heeft als het vers in de repo; zo niet, dan kan ze er niet in worden gezet. */
+export function pastOpRepo(repo: VersInhoud, bewerkt: BewerktVers): boolean {
+	return repo.delen.length === bewerkt.inhoud.delen.length;
+}
+
+/**
+ * Bewaart de bewerking, of wist haar als het vers weer gelijk is aan de repo.
+ * Een bestaande bewerking houdt haar oude basis, zodat een verouderde bewerking verouderd blijft;
+ * past de bestaande bewerking niet meer op de repo (ander aantal delen), dan is de repo de nieuwe basis.
+ * Een vers zonder repo-inhoud (`repo` is `null`) laat de opslag ongemoeid.
+ */
+export function bewaarOfWis(
+	opslag: Opslag,
+	boek: string,
+	hoofdstuk: number,
+	vers: number,
+	inhoud: VersInhoud,
+	repo: VersInhoud | null,
+): BewaarUitkomst {
+	if (repo === null) return { gelukt: true };
+	const bestaand = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
+	const basis = bestaand !== undefined && pastOpRepo(repo, bestaand) ? bestaand.basis : repo;
+	if (zelfdeInhoud(inhoud, repo) && zelfdeInhoud(basis, repo)) {
+		wisVers(opslag, boek, hoofdstuk, vers);
+		return { gelukt: true };
+	}
+	return bewaarVers(opslag, boek, hoofdstuk, vers, inhoud, basis);
 }
 
 /** Haalt één vers uit de tussenstand (terug naar de versie uit de repo). */
@@ -179,7 +209,7 @@ export function pasTussenstandToe(hoofdstuk: Hoofdstuk, tussenstand: Tussenstand
 	for (const [nummerTekst, bewerkt] of Object.entries(tussenstand.verzen)) {
 		const nummer = Number(nummerTekst);
 		const huidig = knipVers(resultaat, nummer);
-		if (huidig === null || huidig.delen.length !== bewerkt.inhoud.delen.length) continue;
+		if (huidig === null || !pastOpRepo(huidig, bewerkt)) continue;
 		resultaat = vervangVers(resultaat, nummer, bewerkt.inhoud);
 	}
 	return resultaat;

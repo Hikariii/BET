@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Hoofdstuk, Tekstalinea } from '../formaat/types';
-import { bewaarVers, isVerouderd, leesTussenstand, pasTussenstandToe, wisVers } from './tussenstand';
+import { bewaarOfWis, bewaarVers, isVerouderd, leesTussenstand, pasTussenstandToe, wisVers } from './tussenstand';
 import type { Opslag } from './tussenstand';
 import type { Tussenstand, VersInhoud } from './types';
 import { knipVers } from './versknip';
@@ -17,6 +17,18 @@ class GeheugenOpslag implements Opslag {
 	}
 	removeItem(sleutel: string): void {
 		this.items.delete(sleutel);
+	}
+}
+
+class TellendeOpslag extends GeheugenOpslag {
+	schrijfacties = 0;
+	override setItem(sleutel: string, waarde: string): void {
+		this.schrijfacties++;
+		super.setItem(sleutel, waarde);
+	}
+	override removeItem(sleutel: string): void {
+		this.schrijfacties++;
+		super.removeItem(sleutel);
 	}
 }
 
@@ -84,6 +96,13 @@ describe('leesTussenstand', () => {
 		expect(Object.keys(leesTussenstand(opslag, 'lukas', 3).verzen)).toEqual(['2']);
 	});
 
+	it('laat een vers met een regeleinde in de tekst weg', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarVers(opslag, 'lukas', 3, 2, inhoud(' goed'), inhoud(' oud'));
+		bewaarVers(opslag, 'lukas', 3, 5, inhoud(' eerste\ntweede'), inhoud(' oud'));
+		expect(Object.keys(leesTussenstand(opslag, 'lukas', 3).verzen)).toEqual(['2']);
+	});
+
 	it('is leeg als de opslag zelf een fout geeft', () => {
 		const kapot: Opslag = {
 			getItem() {
@@ -127,6 +146,79 @@ describe('bewaarVers', () => {
 			gelukt: false,
 			melding: expect.stringContaining('Vers 7 kon niet in de browser worden bewaard'),
 		});
+		expect(uitkomst.gelukt ? '' : uitkomst.melding).not.toContain('Je wijziging is niet bewaard');
+		expect(uitkomst.gelukt ? '' : uitkomst.melding).toContain('Kopieer je tekst voordat je op Klaar drukt.');
+	});
+});
+
+describe('bewaarOfWis', () => {
+	const repo = inhoud(' repo');
+
+	it('bewaart een wijziging met de repo als basis', () => {
+		const opslag = new GeheugenOpslag();
+		expect(bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' anders'), repo)).toEqual({ gelukt: true });
+		const bewaard = leesTussenstand(opslag, 'lukas', 3).verzen[2];
+		expect(bewaard?.inhoud).toEqual(inhoud(' anders'));
+		expect(bewaard?.basis).toEqual(repo);
+	});
+
+	it('wist de bewerking als de inhoud weer gelijk is aan de repo', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' anders'), repo);
+		expect(Object.keys(leesTussenstand(opslag, 'lukas', 3).verzen)).toEqual(['2']);
+		bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' repo'), repo);
+		expect(opslag.items.size).toBe(0);
+	});
+
+	it('telt een anders verdeelde inhoud met dezelfde tekst en opmaak als gelijk aan de repo', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' anders'), repo);
+		const verdeeld: VersInhoud = {
+			delen: [
+				{
+					stijl: null,
+					stukken: [
+						{ soort: 'tekst', tekst: ' re', opmaak: [] },
+						{ soort: 'tekst', tekst: '', opmaak: ['genade'] },
+						{ soort: 'tekst', tekst: 'po', opmaak: [] },
+					],
+				},
+			],
+		};
+		bewaarOfWis(opslag, 'lukas', 3, 2, verdeeld, repo);
+		expect(opslag.items.size).toBe(0);
+	});
+
+	it('houdt de oude basis bij een tweede wijziging en wist niet als de repo sindsdien veranderd is', () => {
+		const opslag = new GeheugenOpslag();
+		const oudeRepo = inhoud(' oude repo');
+		bewaarVers(opslag, 'lukas', 3, 2, inhoud(' anders'), oudeRepo);
+		bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' nog anders'), repo);
+		expect(leesTussenstand(opslag, 'lukas', 3).verzen[2]?.basis).toEqual(oudeRepo);
+		bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' repo'), repo);
+		const bewaard = leesTussenstand(opslag, 'lukas', 3).verzen[2];
+		expect(bewaard?.inhoud).toEqual(inhoud(' repo'));
+		expect(bewaard?.basis).toEqual(oudeRepo);
+	});
+
+	it('neemt de repo als basis als de bewaarde bewerking een andere indeling heeft', () => {
+		const opslag = new GeheugenOpslag();
+		const tweeDelen: VersInhoud = { delen: [...inhoud(' a').delen, ...inhoud(' b').delen] };
+		bewaarVers(opslag, 'lukas', 3, 2, tweeDelen, tweeDelen);
+		bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' anders'), repo);
+		expect(leesTussenstand(opslag, 'lukas', 3).verzen[2]?.basis).toEqual(repo);
+	});
+
+	it('doet niets met de opslag voor een vers zonder repo-inhoud', () => {
+		const opslag = new TellendeOpslag();
+		expect(bewaarOfWis(opslag, 'lukas', 3, 2, inhoud(' anders'), null)).toEqual({ gelukt: true });
+		expect(opslag.schrijfacties).toBe(0);
+		expect(opslag.items.size).toBe(0);
+	});
+
+	it('meldt een volle opslag', () => {
+		const uitkomst = bewaarOfWis(new VolleOpslag(), 'lukas', 3, 7, inhoud(' anders'), repo);
+		expect(uitkomst.gelukt).toBe(false);
 	});
 });
 
@@ -150,8 +242,11 @@ describe('wisVers', () => {
 		const opslag = new GeheugenOpslag();
 		bewaarVers(opslag, 'lukas', 3, 1, inhoud(' een'), inhoud(' oud een'));
 		const voor = opslag.getItem(SLEUTEL);
-		wisVers(opslag, 'lukas', 3, 9);
-		expect(opslag.getItem(SLEUTEL)).toBe(voor);
+		const teller = new TellendeOpslag();
+		teller.items.set(SLEUTEL, voor ?? '');
+		wisVers(teller, 'lukas', 3, 9);
+		expect(teller.schrijfacties).toBe(0);
+		expect(teller.getItem(SLEUTEL)).toBe(voor);
 	});
 });
 

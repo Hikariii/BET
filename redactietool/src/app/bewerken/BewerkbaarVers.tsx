@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData } from '../../data/types';
-import { bewaarVers, isVerouderd, wisVers } from '../../bewerken/tussenstand';
+import { bewaarOfWis, isVerouderd, pastOpRepo, wisVers } from '../../bewerken/tussenstand';
 import type { BewerktVers, VersInhoud } from '../../bewerken/types';
 import { knipVers } from '../../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../../bewerken/waarschuwingen';
@@ -24,10 +24,6 @@ type Props = {
 	onOpslagGewijzigd: () => void;
 };
 
-function isGelijk(eerste: VersInhoud, tweede: VersInhoud): boolean {
-	return JSON.stringify(eerste) === JSON.stringify(tweede);
-}
-
 /** De cel "vereenvoudigd" van een vers: de tekst of de editor, met markering, melding en waarschuwingen. */
 export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerken, onBewerk, onSluit, onOpslagGewijzigd }: Props) {
 	const [opslagmelding, zetOpslagmelding] = useState<string | null>(null);
@@ -43,16 +39,8 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 	const opslag = browseropslag();
 
 	const bewaar = (inhoud: VersInhoud) => {
-		if (repo === null) return;
-		const basis = bewerkt?.basis ?? repo;
-		// Een bewerking die terug is bij de repo-inhoud is geen wijziging meer; een verouderde bewerking houdt haar oude basis.
-		if (isGelijk(inhoud, repo) && isGelijk(basis, repo)) {
-			wisVers(opslag, boek.id, hoofdstuk.nummer, nummer);
-			zetOpslagmelding(null);
-		} else {
-			const uitkomst = bewaarVers(opslag, boek.id, hoofdstuk.nummer, nummer, inhoud, basis);
-			zetOpslagmelding(uitkomst.gelukt ? null : uitkomst.melding);
-		}
+		const uitkomst = bewaarOfWis(opslag, boek.id, hoofdstuk.nummer, nummer, inhoud, repo);
+		zetOpslagmelding(uitkomst.gelukt ? null : uitkomst.melding);
 		onOpslagGewijzigd();
 	};
 
@@ -63,9 +51,10 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 		onSluit();
 	};
 
-	const startInhoud = bewerkt?.inhoud ?? repo;
+	const bewerkingPastNiet = bewerkt !== null && repo !== null && !pastOpRepo(repo, bewerkt);
+	const startInhoud = bewerkt === null || bewerkingPastNiet ? repo : bewerkt.inhoud;
 	const waarschuwingen = bewerkt === null || bron === null ? [] : waarschuwingenVoorVers(bron, bewerkt.inhoud);
-	const verouderd = bewerkt !== null && repo !== null && isVerouderd(repo, bewerkt.basis);
+	const verouderd = bewerkt !== null && repo !== null && !bewerkingPastNiet && isVerouderd(repo, bewerkt.basis);
 
 	return (
 		<>
@@ -82,17 +71,22 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 			)}
 			<div class="versacties">
 				{!bewerken && repo !== null && (
-					<button type="button" ref={bewerkKnop} onClick={onBewerk} aria-label={`Bewerk vers ${nummer}`}>
+					<button type="button" ref={bewerkKnop} onClick={onBewerk} aria-label={`Bewerken, vers ${nummer}`}>
 						Bewerken
 					</button>
 				)}
 				{bewerkt !== null && <span class="versmarkering">gewijzigd</span>}
 				{bewerkt !== null && (
-					<button type="button" onClick={terugNaarRepo}>
+					<button type="button" onClick={terugNaarRepo} aria-label={`Terug naar de repo, vers ${nummer}`}>
 						Terug naar de repo
 					</button>
 				)}
 			</div>
+			{bewerkingPastNiet && (
+				<p class="versverouderd" role="status">
+					Deze bewerking kan niet worden toegepast: de indeling in alinea's is in de repo veranderd. Kies Terug naar de repo of bewerk het vers opnieuw.
+				</p>
+			)}
 			{verouderd && (
 				<p class="versverouderd" role="status">
 					De repo is veranderd sinds je dit vers bewerkte. Je wijziging bouwt op de oude versie; controleer hem voor je hem gebruikt.
@@ -100,7 +94,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 			)}
 			{opslagmelding !== null && (
 				<p class="versopslagfout" role="alert">
-					Je wijziging is niet bewaard: {opslagmelding}
+					{opslagmelding}
 				</p>
 			)}
 			{waarschuwingen.length > 0 && (
