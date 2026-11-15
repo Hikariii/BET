@@ -1,0 +1,144 @@
+.vertaalvragen h2 {
+	font-size: 1.15rem;
+	margin: 1.5rem 0 .5rem;
+}
+
+.vertaalvragen h3 {
+	font-size: 1rem;
+	margin: 1rem 0 .4rem;
+}
+
+.vertaalvragen .filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .75rem 1rem;
+	align-items: end;
+}
+
+.vertaalvragen .filters label {
+	display: flex;
+	flex-direction: column;
+	gap: .2rem;
+	font-size: .9rem;
+}
+
+.vertaalvragen .filters .zoeken {
+	flex: 1 1 14rem;
+}
+
+.vertaalvragen .filters select,
+.vertaalvragen .filters input {
+	font: inherit;
+	padding: .3rem .4rem;
+}
+
+.vertaalvragen .aantal {
+	color: var(--gedempt);
+	margin: .75rem 0 0;
+}
+
+.vertaalvragen .vragenlijst {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: .4rem;
+}
+
+.vertaalvragen .registervraag {
+	border: 1px solid var(--rand);
+	border-radius: .4rem;
+	padding: .5rem .75rem .75rem;
+}
+
+.vertaalvragen .registervraag h3 {
+	display: inline;
+	margin-right: .5rem;
+}
+
+.vertaalvragen dl {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: .2rem 1rem;
+	margin: .5rem 0 0;
+}
+
+.vertaalvragen dt {
+	color: var(--gedempt);
+}
+
+.vertaalvragen dd {
+	margin: 0;
+}
+
+.vertaalvragen details {
+	border: 1px solid var(--rand);
+	border-radius: .4rem;
+}
+
+.vertaalvragen summary {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: .25rem .75rem;
+	padding: .4rem .75rem;
+	cursor: pointer;
+}
+
+.vertaalvragen summary:hover {
+	background: var(--vlak);
+}
+
+.vertaalvragen .kwestie {
+	font-weight: 600;
+}
+
+.vertaalvragen .versjes {
+	color: var(--gedempt);
+	font-size: .9rem;
+	margin-left: auto;
+}
+
+.vertaalvragen .vraagtekst {
+	padding: 0 .75rem .5rem;
+	border-top: 1px solid var(--rand);
+}
+
+.vertaalvragen .statuslabel {
+	display: inline-flex;
+	gap: .4rem;
+	align-items: baseline;
+}
+
+.vertaalvragen .status {
+	padding: 0 .5rem;
+	border-radius: 1rem;
+	font-size: .8rem;
+	background: var(--vlak);
+	border: 1px solid var(--rand);
+}
+
+.vertaalvragen .status-open {
+	background: #ffebe9;
+	border-color: #ff8182;
+	color: #82071e;
+}
+
+.vertaalvragen .status-voorlopig-besloten {
+	background: var(--gekozen);
+	border-color: #d4a72c;
+	color: #633c01;
+}
+
+.vertaalvragen .status-besloten {
+	background: #dafbe1;
+	border-color: #4ac26b;
+	color: #0f5323;
+}
+
+.vertaalvragen .volgens-tekst {
+	color: var(--gedempt);
+	font-size: .8rem;
+	font-style: italic;
+}
