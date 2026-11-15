@@ -9,6 +9,7 @@ Gebruik (draai met `python3 -I`, vanuit de hoofdmap):
 
 De JSON gaat naar stdout. Per bestand (`bron/lukas-01.md`, `vereenvoudigd/lukas-01.md`):
 de alinea's zoals parse_md ze geeft, aangevuld met `stijl` (de @tag in plaats van de Word-stijl).
+`stijlkoppeling` geeft per @tag en per {tag} de Word-stijl (styleId) waar de export hem op zet.
 Bestanden die niet bestaan worden overgeslagen.
 """
 
@@ -56,6 +57,10 @@ def main(argv=None):
         "domeinen": list(md_naar_docx.CHAR_STYLES),
         "directe_opmaak": sorted(md_naar_docx.DIRECT),
         "onderwijs": md_naar_docx.RED,
+        "stijlkoppeling": {
+            "alineastijlen": md_naar_docx.PARA_STYLES,
+            "domeinen": md_naar_docx.CHAR_STYLES,
+        },
         "bestanden": bestanden,
     }
     json.dump(uitvoer, sys.stdout, ensure_ascii=False)
