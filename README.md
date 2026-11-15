@@ -12,12 +12,12 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 | `sjablonen/` | Sjablonen, zoals het wijzigingslog. | — |
 | `scripts/` | Omzetten uit Word, controles, terugzetten naar Word. Werken voor elk boek (`--boek`). | — |
 | `docs/` | Web-tool om vertalingen te redigeren en naast het origineel te vergelijken (gepland). | — |
-| `boeken/<boek>/` | Alles van één Bijbelboek, zie hieronder. | |
+| `bijbel/<boek>/` | Alles van één Bijbelboek, zie hieronder. | |
 | `FORMAAT.md` | Het Markdown-formaat met opmaak-tags: de gedeelde specificatie voor de scripts en de web-tool. | — |
 | `WERKPLAN.md` | De stappen per hoofdstuk (en de autonome modus). | — |
 | `TAKEN.md` | Openstaande taken voor het gereedschap. Taken per boek staan in het boek. | — |
 
-### Per boek: `boeken/<boek>/`
+### Per boek: `bijbel/<boek>/`
 
 | Map / bestand | Inhoud | Wie schrijft erin |
 |---|---|---|
@@ -33,7 +33,7 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 | `referentie/` | Precedenten, open vragen en andere afgeleide besluiten voor dit boek (§25). | redactie / hoofdsessie |
 | `export/` | Gegenereerde Word-bestanden. Niet in git; altijd opnieuw te maken. | `scripts/` |
 
-Boeken nu: [`boeken/lukas/`](boeken/lukas/).
+Boeken nu: [`bijbel/lukas/`](bijbel/lukas/).
 
 Versies houden we bij met git (commits en tags), niet met versienummers in bestandsnamen. Git-tags per boek en hoofdstuk: `lukas-04-v1.0`.
 
@@ -42,7 +42,7 @@ Versies houden we bij met git (commits en tags), niet met versienummers in besta
 Draai vanuit de hoofdmap, met `python3 -I`. Alleen de standaardbibliotheek is nodig. `--boek lukas` mag weg zolang er maar één boek is.
 
 ```sh
-B=boeken/lukas
+B=bijbel/lukas
 
 # Word -> bron/ (zonder argumenten: het sjabloon uit boek.json naar $B/bron/)
 python3 -I scripts/docx_naar_md.py --boek lukas
@@ -63,8 +63,8 @@ python3 -I scripts/md_naar_docx.py --boek lukas doc $B/bron/lukas-*.md -o $B/exp
 
 ## Een nieuw boek toevoegen
 
-1. Maak `boeken/<boek>/` met `origineel/` (het aangeleverde Word-bestand) en `export/.gitkeep`.
-2. Schrijf `boek.json` (kijk naar `boeken/lukas/boek.json`). Het Word-bestand moet dezelfde stijlnamen gebruiken als in `FORMAAT.md` (Jezuswoorden, GodsStem, Bblhfdstk, …). Zo niet: eerst de scripts uitbreiden, niets zelf verzinnen.
+1. Maak `bijbel/<boek>/` met `origineel/` (het aangeleverde Word-bestand) en `export/.gitkeep`.
+2. Schrijf `boek.json` (kijk naar `bijbel/lukas/boek.json`). Het Word-bestand moet dezelfde stijlnamen gebruiken als in `FORMAAT.md` (Jezuswoorden, GodsStem, Bblhfdstk, …). Zo niet: eerst de scripts uitbreiden, niets zelf verzinnen.
 3. `python3 -I scripts/docx_naar_md.py --boek <boek>` en daarna `controleer_docx_md.py` en de heen-en-terugtest.
 4. Maak `STATUS.md`, `TAKEN.md`, `CLAUDE.md` en `referentie/` aan, en laat de redactie beslissen welke referentiehoofdstukken en precedenten voor dit boek gelden (richtlijn §25A, §26).
 5. Daarna per hoofdstuk volgens `WERKPLAN.md`.

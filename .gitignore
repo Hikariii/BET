@@ -3,5 +3,8 @@
 __pycache__/
 
 # Gegenereerde Word-bestanden: altijd opnieuw te maken met scripts/
-boeken/*/export/*
-!boeken/*/export/.gitkeep
+bijbel/*/export/*
+!bijbel/*/export/.gitkeep
+
+# Lokale worktrees van Claude/Orchestrator
+.claude/worktrees/

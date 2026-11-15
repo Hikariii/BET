@@ -4,7 +4,7 @@
 Gebruik:
     python3 -I scripts/controleer_docx_md.py [--boek lukas] [<docx> <mdmap>] [--vergelijk-met <andere mdmap>]
 
-Zonder <docx> en <mdmap>: het sjabloon uit boek.json tegen boeken/<boek>/bron/.
+Zonder <docx> en <mdmap>: het sjabloon uit boek.json tegen bijbel/<boek>/bron/.
 
 Controles:
   1. tekst: md zonder tags (met [n] -> n) tegenover platte tekst uit het docx (textutil indien
@@ -145,9 +145,9 @@ def docx_plain(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('docx', nargs='?', help='standaard: het sjabloon uit boek.json')
-    ap.add_argument('mdmap', nargs='?', help='standaard: boeken/<boek>/bron')
+    ap.add_argument('mdmap', nargs='?', help='standaard: bijbel/<boek>/bron')
     ap.add_argument('--vergelijk-met')
-    ap.add_argument('--boek', help='map in boeken/ (mag weg als er maar één boek is)')
+    ap.add_argument('--boek', help='map in bijbel/ (mag weg als er maar één boek is)')
     a = ap.parse_args()
     try:
         boek = boekmod.laad(a.boek)

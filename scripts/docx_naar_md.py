@@ -4,7 +4,7 @@
 Gebruik:
     python3 -I scripts/docx_naar_md.py [--boek lukas] [<docx> <uitvoermap>] [--max-hoofdstuk N]
 
-Zonder <docx> en <uitvoermap>: het sjabloon uit boek.json naar boeken/<boek>/bron/.
+Zonder <docx> en <uitvoermap>: het sjabloon uit boek.json naar bijbel/<boek>/bron/.
 Schrijft <uitvoermap>/<prefix>-NN.md per hoofdstuk (bv. lukas-01.md). Alleen standaardbibliotheek.
 
 Hoe de Word-opmaak wordt gelezen (zie ook FORMAAT.md):
@@ -439,8 +439,8 @@ def convert_chapter(num, paras, ctx):
 def main(argv=None):
     ap = argparse.ArgumentParser(description='Word (.docx) -> Markdown met opmaak-tags')
     ap.add_argument('docx', nargs='?', help='standaard: het sjabloon uit boek.json')
-    ap.add_argument('uitvoermap', nargs='?', help='standaard: boeken/<boek>/bron')
-    ap.add_argument('--boek', help='map in boeken/ (mag weg als er maar één boek is)')
+    ap.add_argument('uitvoermap', nargs='?', help='standaard: bijbel/<boek>/bron')
+    ap.add_argument('--boek', help='map in bijbel/ (mag weg als er maar één boek is)')
     ap.add_argument('--max-hoofdstuk', type=int, default=None,
                     help='schrijf alleen hoofdstukken t/m dit nummer')
     args = ap.parse_args(argv)

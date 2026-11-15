@@ -12,9 +12,9 @@ Markering in dit document:
 - **[v1.4 gewijzigd]** – regel uit v1.3.1 aangepast aan de vertaling
 - **[v1.4 open]** – de vertaling is hier niet eenduidig; er is een keuze gemaakt, maar die is nog niet bevestigd
 
-Bronnen: `richtlijn/origineel/Redactierichtlijn v1.3.1 Full.docx` en `boeken/lukas/origineel/Lukas Jezus' woorden en highlights hoofdstuk 1 - eenvoudiger 0.9.docx`. De onderbouwing per vers staat in `boeken/lukas/referentie/afwijkingen-h1-3.md`.
+Bronnen: `richtlijn/origineel/Redactierichtlijn v1.3.1 Full.docx` en `bijbel/lukas/origineel/Lukas Jezus' woorden en highlights hoofdstuk 1 - eenvoudiger 0.9.docx`. De onderbouwing per vers staat in `bijbel/lukas/referentie/afwijkingen-h1-3.md`.
 
-**Meerdere boeken.** Deze richtlijn geldt voor alle boeken in `boeken/`. Versverwijzingen zonder boeknaam (bv. 2:23) verwijzen naar Lukas. Precedenten en open vragen staan per boek in `boeken/<boek>/referentie/`. Welke referentiehoofdstukken bij een volgend boek voorrang hebben (§25A, §26), beslist de redactie bij de start van dat boek.
+**Meerdere boeken.** Deze richtlijn geldt voor alle boeken in `bijbel/`. Versverwijzingen zonder boeknaam (bv. 2:23) verwijzen naar Lukas. Precedenten en open vragen staan per boek in `bijbel/<boek>/referentie/`. Welke referentiehoofdstukken bij een volgend boek voorrang hebben (§25A, §26), beslist de redactie bij de start van dat boek.
 
 ---
 
@@ -433,7 +433,7 @@ Als meerdere oplossingen mogelijk zijn: volg de keuze uit de eerder goedgekeurde
 1. Vastgelegde tekst van Lukas 1–3
 2. Redactierichtlijn v1.4
 3. Later goedgekeurde hoofdstukken (4 en verder), in volgorde
-4. Begrippenlijst / precedenten (`boeken/<boek>/referentie/precedenten.md`)
+4. Begrippenlijst / precedenten (`bijbel/<boek>/referentie/precedenten.md`)
 5. Overige aannames
 6. Andere vertalingen
 
@@ -455,4 +455,4 @@ Als meerdere oplossingen mogelijk zijn: volg de keuze uit de eerder goedgekeurde
 ## Bijlage: wat nog moet gebeuren
 
 - Punten gemarkeerd met **[v1.4 open]** bevestigen: welbehagen (§11), onderwijscluster (§13A), Messias/Christus (§17B).
-- Kleurmarkeringsfouten in Lukas 1–3 herstellen (zie `boeken/lukas/referentie/afwijkingen-h1-3.md`, §8). Dat zijn geen vertaalkeuzes maar opmaakfouten; de tekst zelf verandert niet.
+- Kleurmarkeringsfouten in Lukas 1–3 herstellen (zie `bijbel/lukas/referentie/afwijkingen-h1-3.md`, §8). Dat zijn geen vertaalkeuzes maar opmaakfouten; de tekst zelf verandert niet.

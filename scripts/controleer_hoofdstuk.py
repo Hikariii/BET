@@ -2,9 +2,9 @@
 """Controleer een vereenvoudigd hoofdstuk tegen de bron (WERKPLAN stap 3, automatisch deel).
 
 Gebruik:
-    python3 -I scripts/controleer_hoofdstuk.py 4                # boeken/<boek>/bron/… vs vereenvoudigd/…
+    python3 -I scripts/controleer_hoofdstuk.py 4                # bijbel/<boek>/bron/… vs vereenvoudigd/…
     python3 -I scripts/controleer_hoofdstuk.py 1-3 --boek lukas
-    (--boek mag weg zolang er maar één boek in boeken/ staat)
+    (--boek mag weg zolang er maar één boek in bijbel/ staat)
 
 Meldt:
   FOUT         versnummers ontbreken/dubbel/volgorde, tags niet in balans,
@@ -27,7 +27,7 @@ VERS_RE = re.compile(r"\[(\d+)\]")
 PSTIJL_RE = re.compile(r"^@([a-z-]+) ")
 
 # Oude/ongewenste vormen in de vereenvoudiging (regex, paragraaf, uitleg), uit de richtlijn.
-# Vormen uit de precedenten van een boek staan in boeken/<boek>/controle.json.
+# Vormen uit de precedenten van een boek staan in bijbel/<boek>/controle.json.
 OUDE_VORMEN = [
     (r"\bHeere\b", "§11", "Heere → Heer"),
     (r"\bgeschiedde\b|\bgeschieden\b", "§11", "geschiedde → gebeurde"),
@@ -191,7 +191,7 @@ def controleer(boek, h):
 def main():
     ap = argparse.ArgumentParser(description="Controleer vereenvoudigde hoofdstukken tegen de bron.")
     ap.add_argument("hoofdstukken", help="bv. 4, 1-3 of 1,4,5")
-    ap.add_argument("--boek", help="map in boeken/ (mag weg als er maar één boek is)")
+    ap.add_argument("--boek", help="map in bijbel/ (mag weg als er maar één boek is)")
     args = ap.parse_args()
     try:
         boek = boekmod.laad(args.boek)

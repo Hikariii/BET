@@ -1,6 +1,6 @@
 # Formaat: Markdown met opmaak-tags
 
-Het werkformaat van `boeken/<boek>/bron/` en `boeken/<boek>/vereenvoudigd/`. Eén bestand per hoofdstuk: `<prefix>-NN.md` (prefix uit `boek.json`, bv. `lukas-01.md`).
+Het werkformaat van `bijbel/<boek>/bron/` en `bijbel/<boek>/vereenvoudigd/`. Eén bestand per hoofdstuk: `<prefix>-NN.md` (prefix uit `boek.json`, bv. `lukas-01.md`).
 
 Dit is de gedeelde specificatie voor **alle** gereedschap: de Python-scripts in `scripts/` en de web-tool in `docs/`. Wie het formaat verandert, past beide aan en draait de heen-en-terugtest (zie `CLAUDE.md`).
 

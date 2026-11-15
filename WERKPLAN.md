@@ -3,7 +3,7 @@
 Dit plan beschrijft hoe één hoofdstuk van de brontekst naar een goedgekeurde vereenvoudigde versie gaat.
 Inhoudelijke regels: de redactierichtlijn. Mappen: `README.md`. Tags: `FORMAAT.md`.
 
-**Paden.** Het plan geldt voor elk boek. Paden als `bron/`, `vereenvoudigd/`, `wijzigingslog/`, `referentie/`, `export/` en `STATUS.md` zijn relatief aan de boekmap `boeken/<boek>/`. `richtlijn/`, `sjablonen/` en `scripts/` staan in de hoofdmap. De voorbeelden gebruiken Lukas (`boeken/lukas/`, prefix `lukas`).
+**Paden.** Het plan geldt voor elk boek. Paden als `bron/`, `vereenvoudigd/`, `wijzigingslog/`, `referentie/`, `export/` en `STATUS.md` zijn relatief aan de boekmap `bijbel/<boek>/`. `richtlijn/`, `sjablonen/` en `scripts/` staan in de hoofdmap. De voorbeelden gebruiken Lukas (`bijbel/lukas/`, prefix `lukas`).
 
 Rollen:
 - **Claude** maakt het concept, het wijzigingslog en voert de controles uit.
@@ -17,7 +17,7 @@ Deze stappen gebeuren één keer per boek. Zolang ze niet af zijn, begint geen e
 
 | # | Stap | Resultaat | Klaar als |
 |---|---|---|---|
-| A1 | Boek aanmaken: `boek.json` + aangeleverd Word-bestand in `origineel/` (zie `README.md`, "Een nieuw boek toevoegen") | `boeken/<boek>/` | stijlnamen in het Word-bestand passen bij `FORMAAT.md` |
+| A1 | Boek aanmaken: `boek.json` + aangeleverd Word-bestand in `origineel/` (zie `README.md`, "Een nieuw boek toevoegen") | `bijbel/<boek>/` | stijlnamen in het Word-bestand passen bij `FORMAAT.md` |
 | A2 | Omzetten Word → Markdown (`scripts/docx_naar_md.py`) | `bron/<prefix>-01.md` … | alle hoofdstukken, versnummers doorlopend; `scripts/controleer_docx_md.py` zonder onverklaarde afwijkingen |
 | A3 | Heen-en-terugtest: origineel → md → docx zonder wijzigingen | `export/heen-en-terug.docx` | redactie ziet geen verschil met het origineel (tekst, kleuren, stijlen) |
 | A4 | Eventuele al goedgekeurde hoofdstukken omzetten (bij Lukas: 1–3) | `vereenvoudigd/<prefix>-NN.md` | tags per vers gelijk aan de bron |
@@ -29,7 +29,7 @@ Deze stappen gebeuren één keer per boek. Zolang ze niet af zijn, begint geen e
 
 ## B. Per hoofdstuk
 
-Voorbeeld: Lukas 4 (`boeken/lukas/`).
+Voorbeeld: Lukas 4 (`bijbel/lukas/`).
 
 ### Stap 1 – Voorbereiden (Claude)
 
@@ -149,7 +149,7 @@ Zo blijft elke keuze terug te vinden en terug te draaien (§2), en kan de redact
 
 ### Opdracht aan een vertaal-agent (sjabloon)
 
-> Vereenvoudig Lukas NN volgens `WERKPLAN.md` deel B, stap 1–3. Lees `CLAUDE.md`, `README.md`, `FORMAAT.md`, `richtlijn/redactierichtlijn.md`, `boeken/lukas/CLAUDE.md`, `boeken/lukas/referentie/precedenten.md` en `boeken/lukas/referentie/open-vragen.md` (eerdere voorlopige besluiten gelden als precedent). Werk alleen vanuit `boeken/lukas/bron/lukas-NN.md`. Lever `boeken/lukas/vereenvoudigd/lukas-NN.md` en `boeken/lukas/wijzigingslog/lukas-NN.md`. Kies bij twijfel de optie die het dichtst bij de bron blijft en registreer de vraag in het log (niet in `referentie/open-vragen.md`). Wacht niet op antwoorden. Draai het controlescript en het exportscript (review). Wijzig de richtlijn, precedenten en andere hoofdstukken niet. Rapporteer: aantal gewijzigde verzen, open vragen, en controleresultaat.
+> Vereenvoudig Lukas NN volgens `WERKPLAN.md` deel B, stap 1–3. Lees `CLAUDE.md`, `README.md`, `FORMAAT.md`, `richtlijn/redactierichtlijn.md`, `bijbel/lukas/CLAUDE.md`, `bijbel/lukas/referentie/precedenten.md` en `bijbel/lukas/referentie/open-vragen.md` (eerdere voorlopige besluiten gelden als precedent). Werk alleen vanuit `bijbel/lukas/bron/lukas-NN.md`. Lever `bijbel/lukas/vereenvoudigd/lukas-NN.md` en `bijbel/lukas/wijzigingslog/lukas-NN.md`. Kies bij twijfel de optie die het dichtst bij de bron blijft en registreer de vraag in het log (niet in `referentie/open-vragen.md`). Wacht niet op antwoorden. Draai het controlescript en het exportscript (review). Wijzig de richtlijn, precedenten en andere hoofdstukken niet. Rapporteer: aantal gewijzigde verzen, open vragen, en controleresultaat.
 
 ### Wat de hoofdsessie bijhoudt
 - `referentie/open-vragen.md`: alle vragen, met status `open` / `voorlopig besloten` / `besloten door redactie`.

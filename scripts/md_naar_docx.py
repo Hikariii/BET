@@ -5,7 +5,7 @@ Het originele Word-document is het stijlsjabloon: alle onderdelen van dat
 .docx (styles, theme, header/footer, numbering, settings, ...) worden
 ongewijzigd overgenomen; alleen word/document.xml wordt vervangen.
 
-Gebruik (draai met `python3 -I`, vanuit de hoofdmap; B = boeken/lukas):
+Gebruik (draai met `python3 -I`, vanuit de hoofdmap; B = bijbel/lukas):
 
   python3 -I scripts/md_naar_docx.py doc $B/bron/lukas-01.md [meer.md ...] -o $B/export/lukas-01.docx
 
@@ -16,8 +16,8 @@ Gebruik (draai met `python3 -I`, vanuit de hoofdmap; B = boeken/lukas):
   # meerdere hoofdstukken: herhaal --bron/--nieuw/--log, of gebruik een bereik
   python3 -I scripts/md_naar_docx.py review --hoofdstuk 1-3 -o $B/export/lukas-01-03-review.docx
 
-Het boek (sjabloon, naam, mappen) komt uit boeken/<boek>/boek.json. Geef `--boek lukas`
-vóór het subcommando op; het mag weg zolang er maar één boek in boeken/ staat.
+Het boek (sjabloon, naam, mappen) komt uit bijbel/<boek>/boek.json. Geef `--boek lukas`
+vóór het subcommando op; het mag weg zolang er maar één boek in bijbel/ staat.
 
 Invoerformaat: zie FORMAAT.md.
 """
@@ -739,7 +739,7 @@ def cmd_review(args):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description="Markdown met opmaak-tags -> Word (.docx)")
-    p.add_argument("--boek", help="map in boeken/ (mag weg als er maar één boek is)")
+    p.add_argument("--boek", help="map in bijbel/ (mag weg als er maar één boek is)")
     sub = p.add_subparsers(dest="cmd", required=True)
     d = sub.add_parser("doc", help="doorlopend document zoals het origineel")
     d.add_argument("md", nargs="+", help="md-bestand(en), in volgorde")

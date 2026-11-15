@@ -1,6 +1,6 @@
 """Gedeelde boekinstellingen voor de scripts.
 
-Elk boek staat in `boeken/<id>/` met een `boek.json`:
+Elk boek staat in `bijbel/<id>/` met een `boek.json`:
 
     {
       "naam": "Lukas",                       # zoals in de kop: "# Lukas 1"
@@ -19,7 +19,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BOEKEN = os.path.join(ROOT, "boeken")
+BIJBEL = os.path.join(ROOT, "bijbel")
 
 
 class BoekFout(Exception):
@@ -27,15 +27,15 @@ class BoekFout(Exception):
 
 
 def beschikbare_boeken():
-    if not os.path.isdir(BOEKEN):
+    if not os.path.isdir(BIJBEL):
         return []
-    return sorted(d for d in os.listdir(BOEKEN) if os.path.isfile(os.path.join(BOEKEN, d, "boek.json")))
+    return sorted(d for d in os.listdir(BIJBEL) if os.path.isfile(os.path.join(BIJBEL, d, "boek.json")))
 
 
 class Boek:
     def __init__(self, boek_id):
         self.id = boek_id
-        self.map = os.path.join(BOEKEN, boek_id)
+        self.map = os.path.join(BIJBEL, boek_id)
         pad = os.path.join(self.map, "boek.json")
         if not os.path.isfile(pad):
             raise BoekFout(f"boek '{boek_id}' niet gevonden ({pad}); beschikbaar: {', '.join(beschikbare_boeken()) or 'geen'}")
@@ -67,7 +67,7 @@ class Boek:
 
 
 def laad(boek_id=None):
-    """Zonder boek_id: het enige boek in boeken/, anders een fout."""
+    """Zonder boek_id: het enige boek in bijbel/, anders een fout."""
     if boek_id is None:
         ids = beschikbare_boeken()
         if len(ids) != 1:
