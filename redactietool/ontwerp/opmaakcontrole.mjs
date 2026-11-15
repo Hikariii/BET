@@ -1,32 +1,22 @@
 import { chromium } from 'playwright';
-const POORT = process.env.POORT ?? 4200;
-const hoofdstukken = [1, 4, 22];
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-async function meet(variant, h) {
-  await page.goto(`http://localhost:${POORT}${process.env.PAD ?? '/BET/'}${variant === 'huidig' ? '' : '?ontwerp=' + variant}#/lukas/${h}`);
+for (const h of [1, 4, 22]) {
+  await page.goto(`http://localhost:${process.env.POORT ?? 4200}${process.env.PAD ?? '/BET/'}#/lukas/${h}`);
   await page.waitForTimeout(800);
-  return page.evaluate(() => [...document.querySelectorAll('table.verzen tr.vers > td:nth-child(2) :is(p, p span), table.verzen tr.vers > td:nth-child(3) :is(p, p span)')].map((el) => {
-    const s = getComputedStyle(el);
-    return [el.textContent.slice(0, 30), s.color, s.backgroundColor, s.fontWeight >= 600 ? 'vet' : 'normaal', s.fontStyle, s.textDecorationLine].join(' | ');
-  }));
-}
-for (const h of hoofdstukken) {
-  const basis = await meet('huidig', h);
-  for (const v of (process.env.VARIANTEN ?? 'a,b,c').split(',')) {
-    const ander = await meet(v, h);
-    const wordZwart = (r) => r.replace('rgb(31, 35, 40)', 'rgb(0, 0, 0)');
-    const verschil = basis.map((r, i) => (wordZwart(r) === ander[i] ? null : `${r}\n    ${v}: ${ander[i]}`)).filter(Boolean);
-    console.log(`Lukas ${h}, ${v}: ${basis.length} stukken, ${verschil.length} verschillen`);
-    for (const d of verschil.slice(0, 3)) console.log('  ' + d);
-  }
-}
-for (const v of ['huidig', ...(process.env.VARIANTEN ?? 'a,b,c').split(',')]) {
-  await page.goto(`http://localhost:${POORT}${process.env.PAD ?? '/BET/'}${v === 'huidig' ? '' : '?ontwerp=' + v}#/lukas/22/12`);
-  await page.waitForTimeout(800);
-  await page.getByRole('button', { name: /^Bewerken, vers 12$/ }).click();
-  await page.waitForTimeout(300);
-  const r = await page.evaluate(() => [...document.querySelectorAll('.ProseMirror p, .ProseMirror p span')].map((el) => { const s = getComputedStyle(el); return [el.textContent.slice(0, 25), s.color, s.backgroundColor, s.fontWeight, s.fontStyle, s.textDecorationLine].join(' | '); }));
-  console.log('editor 22:12', v, JSON.stringify(r).slice(0, 300));
+  const r = await page.evaluate(() => {
+    const fout = [];
+    let n = 0;
+    for (const el of document.querySelectorAll('table.verzen tr.vers > td:not(.regels) :is(p, p span)')) {
+      n++;
+      const s = getComputedStyle(el);
+      let eigen = el; let verwacht = 'rgb(0, 0, 0)';
+      while (eigen && eigen.tagName !== 'TD') { if (eigen.style.color) { const t = document.createElement('span'); t.style.color = eigen.style.color; document.body.append(t); verwacht = getComputedStyle(t).color; t.remove(); break; } eigen = eigen.parentElement; }
+      if (s.color !== verwacht) fout.push(`${el.textContent.slice(0, 20)}: ${s.color} i.p.v. ${verwacht}`);
+      if (s.backgroundColor !== 'rgba(0, 0, 0, 0)' && !el.style.backgroundColor) fout.push(`${el.textContent.slice(0, 20)}: achtergrond ${s.backgroundColor} niet uit Word`);
+    }
+    return { n, fout: fout.slice(0, 5), aantalFout: fout.length };
+  });
+  console.log(`Lukas ${h}: ${r.n} stukken, ${r.aantalFout} afwijkingen`, r.fout.join(' | '));
 }
 await browser.close();

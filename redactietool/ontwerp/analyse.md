@@ -1,5 +1,7 @@
 # Ontwerp, stap 1: analyse van de huidige tool
 
+**Afgerond 2026-11-15.** Gekozen: layout e met Atkinson Hyperlegible Next (tekst) en Inter in `#6b4f4b` (tool); nu de opmaak van de tool in `src/app/vormgeving.css`. De proef-CSS van de varianten a tot f en de keuzestrook zijn daarna uit de code gehaald; ze staan in commit `33dc464`. De schermafbeeldingen en toelichtingen hier blijven als geschiedenis. `opmaakcontrole.mjs` controleert nu de echte tool: elke kleur in de Bijbeltekst komt uit het Word-sjabloon, de rest is zwart.
+
 Stand 2026-11-15, schermafbeeldingen in `schermen/*-huidig.png` (1440 × 900, Chrome). Ontwerpbasis: `../stap2-plan.md`, fase 7.
 
 ## Wat werkt
