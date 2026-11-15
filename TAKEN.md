@@ -19,6 +19,11 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] Vertaalvragen: de kolom Plaats van het register tonen (`Vertaalvraag` heeft er nog geen veld voor).
   - [ ] Vertaalvragen: status "onbeslist" betekent "geen statuswoord in de tekst"; overwegen of de logs een vast statusveld krijgen, zodat het filter "open" volledig is.
   - [ ] Begrippen: de heuristieken voor werkregels en verschijnselen (`src/begrippen/precedentVormen.ts`) en de statuswoorden (`verzamelVragen.ts`) zijn op Lukas afgesteld; bij een tweede boek uit `boek.json` halen.
+  - [x] **Fase 3** (bewerken) gebouwd op branch `fase-3-bewerken` met /autopilot: vers-editor, tussenstand in localStorage (wijkt af van het plan: geen IndexedDB), opmaakwaarschuwing, terug naar de repo per vers; review en critical judge verwerkt.
+  - [ ] Bewerken: verschil t.o.v. de repo zichtbaar maken; terug per hoofdstuk; knop of sneltoets om opmaak te zetten.
+  - [ ] Bewerken: waarschuwingen voor oude vormen en vaste begrippen, met de lijst uit `controleer_hoofdstuk.py` als gedeelde JSON voor Python en TypeScript.
+  - [ ] Bewerken: waarschuwing alleen bij opmaak die de repo-versie nog had (nu t.o.v. de bron, dus een bewust ontbrekende tag geeft steeds een waarschuwing).
+  - [ ] Bewerken: kleine punten uit de review: onleesbare verzen in de opslag verdwijnen stil bij de volgende bewaring; dubbele samenvoeglogica in `tussenstand.ts` en `versknip.ts`; focus na Terug naar de repo; waarschuwingen als live region.
   - [ ] Rooktest van het leesscherm (render met DOM of Playwright op `dist/`), nu alleen handmatig gecontroleerd.
   - [ ] "precedent" in de kolom Regels koppelen aan de bijbehorende regel in `precedenten.md` (nu opent de doorzoekbare tabel).
   - [ ] `redactietool/src/klembord/chromiumKlembord.mjs` (alleen macOS, gebruikt rolldown van Vite en Playwright uit `/tmp/pw`) opnemen in de tests of vervangen.
