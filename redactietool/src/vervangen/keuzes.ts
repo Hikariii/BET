@@ -179,11 +179,13 @@ export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): 
 				wisVers(opslag, boek, hoofdstuk, vers);
 			} catch {
 				meldingen.push(`Vers ${naam} kon niet worden teruggezet en blijft staan.`);
+				overgebleven.push(keuzeVers);
 			}
 			continue;
 		}
 		if (!bewaarVers(opslag, boek, hoofdstuk, vers, voor, bewerkt.basis).gelukt) {
 			meldingen.push(`Vers ${naam} kon niet worden teruggezet en blijft staan.`);
+			overgebleven.push(keuzeVers);
 		}
 	}
 	const nieuweLijst = keuzes.flatMap((k) => {

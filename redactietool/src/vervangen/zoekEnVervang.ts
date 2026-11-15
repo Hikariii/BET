@@ -80,8 +80,11 @@ export function zoekVondsten(hoofdstukken: readonly HoofdstukVerzen[], zoekterm:
 	return vondsten;
 }
 
-/** Vóór de vondst alleen witruimte en openingstekens, na het begin van het deel of een zinseinde. */
-const ZINSBEGIN = /(?:^|[.?!:])[\s"'“‘(]*$/u;
+/**
+ * Vóór de vondst alleen witruimte en openingstekens, na het begin van het deel of een zinseinde (eventueel met sluitende aanhalingstekens).
+ * Een dubbele punt telt als zinseinde, voor directe rede; na een opsomming met een dubbele punt geeft dat soms ten onrechte een hoofdletter.
+ */
+const ZINSBEGIN = /(?:^|[.?!:…][”’"»)]*)[\s"'“‘„«(]*$/u;
 
 function metHoofdletterAanZinsbegin(tekstErvoor: string, gevonden: string, nieuw: string): string {
 	const eerste = gevonden.charAt(0);

@@ -214,6 +214,31 @@ describe('draaiKeuzeTerug met twee keuzes op hetzelfde vers', () => {
 	});
 });
 
+describe('draaiKeuzeTerug als de tussenstand niet te schrijven is', () => {
+	class TussenstandVast extends GeheugenOpslag {
+		vast = false;
+		override setItem(sleutel: string, waarde: string): void {
+			if (this.vast && sleutel.startsWith('bet-tussenstand/')) throw new DOMException('De opslag is vol', 'QuotaExceededError');
+			super.setItem(sleutel, waarde);
+		}
+		override removeItem(sleutel: string): void {
+			if (this.vast && sleutel.startsWith('bet-tussenstand/')) throw new DOMException('Geweigerd', 'SecurityError');
+			super.removeItem(sleutel);
+		}
+	}
+
+	it('houdt de verzen die niet terug konden bij de keuze, zodat terugdraaien later nog kan', () => {
+		const vastOpslag = new TussenstandVast();
+		const { keuze } = pasToe(vastOpslag);
+		vastOpslag.vast = true;
+
+		const meldingen = draaiKeuzeTerug(vastOpslag, 'lukas', keuze.id);
+
+		expect(meldingen).toEqual(['Vers 6:22 kon niet worden teruggezet en blijft staan.', 'Vers 6:23 kon niet worden teruggezet en blijft staan.']);
+		expect(leesKeuzes(vastOpslag, 'lukas').map((k) => k.verzen.map((v) => v.vers))).toEqual([[22, 23]]);
+	});
+});
+
 describe('leesKeuzes', () => {
 	it('geeft de nieuwste keuze eerst', () => {
 		const eerste = pasToe(opslag, new Date('2026-11-15T16:00:00.000Z')).keuze;

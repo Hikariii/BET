@@ -155,9 +155,9 @@ describe('vervangInVers', () => {
 	});
 
 	it('geeft de nieuwe tekst een hoofdletter aan het begin van een zin, en laat hem verder letterlijk', () => {
-		const inhoud = vers(tekst('De Mensenzoon kwam. Zo kwam de Mensenzoon. “De Mensenzoon!”'));
+		const inhoud = vers(tekst('De Mensenzoon kwam. Zo kwam de Mensenzoon. “De Mensenzoon!” ‘Hij kwam.’ De Mensenzoon ging.'));
 		expect(vervangInVers(inhoud, zoek(inhoud, 'de mensenzoon'), 'de Zoon van de mens')).toEqual(
-			vers(tekst('De Zoon van de mens kwam. Zo kwam de Zoon van de mens. “De Zoon van de mens!”')),
+			vers(tekst('De Zoon van de mens kwam. Zo kwam de Zoon van de mens. “De Zoon van de mens!” ‘Hij kwam.’ De Zoon van de mens ging.')),
 		);
 	});
 
