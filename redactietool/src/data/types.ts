@@ -1,5 +1,5 @@
-// Gegevenscontract van de redactietool (fase 1). Het bouwscript schrijft deze vormen als JSON;
-// de schermen lezen ze. Wijzig dit alleen in overleg: meerdere onderdelen bouwen erop.
+// Gegevenscontract van de redactietool. Het bouwscript schrijft deze vormen als JSON;
+// de schermen lezen ze.
 //
 // Bestanden die het bouwscript maakt (onder redactietool/public/data/, niet in git):
 //   boeken.json                      BoekLijst

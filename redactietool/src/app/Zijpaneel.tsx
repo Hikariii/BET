@@ -14,6 +14,14 @@ type Props = {
 export function Zijpaneel({ naslag, referentie, onSluit }: Props) {
 	const kopRef = useRef<HTMLHeadingElement>(null);
 	useEffect(() => {
+		const opener = document.activeElement;
+		return () => {
+			if (opener instanceof HTMLElement && opener.isConnected) {
+				opener.focus();
+			}
+		};
+	}, []);
+	useEffect(() => {
 		kopRef.current?.focus();
 		const bijToets = (gebeurtenis: KeyboardEvent) => {
 			if (gebeurtenis.key === 'Escape') {
@@ -53,7 +61,7 @@ function RichtlijnInhoud({ paragraaf }: { paragraaf: string }) {
 		return <p role="alert">De richtlijn kon niet geladen worden: {richtlijn.melding}</p>;
 	}
 	const sectie = zoekSectie(richtlijn.waarde, paragraaf);
-	if (sectie === undefined) {
+	if (sectie === null) {
 		return <p>§{paragraaf} staat niet in de richtlijn.</p>;
 	}
 	return (
@@ -64,8 +72,8 @@ function RichtlijnInhoud({ paragraaf }: { paragraaf: string }) {
 	);
 }
 
-function zoekSectie(secties: readonly RichtlijnSectie[], paragraaf: string): RichtlijnSectie | undefined {
-	return secties.find((sectie) => sectie.paragraaf.toLowerCase() === paragraaf.toLowerCase());
+function zoekSectie(secties: readonly RichtlijnSectie[], paragraaf: string): RichtlijnSectie | null {
+	return secties.find((sectie) => sectie.paragraaf.toLowerCase() === paragraaf.toLowerCase()) ?? null;
 }
 
 function PrecedentenInhoud({ precedenten }: { precedenten: readonly Precedent[] }) {

@@ -17,8 +17,8 @@ export type Opmaakstijl = {
 };
 
 /** Kleur, vet en cursief van een stijl uit het Word-sjabloon. */
-function opmaakstijlVan(stijl: WordStijl | undefined): Opmaakstijl {
-	if (stijl === undefined) {
+function opmaakstijlVan(stijl: WordStijl | null): Opmaakstijl {
+	if (stijl === null) {
 		return {};
 	}
 	return {
@@ -28,8 +28,8 @@ function opmaakstijlVan(stijl: WordStijl | undefined): Opmaakstijl {
 	};
 }
 
-function zoekStijl(stijlen: readonly WordStijl[], id: string): WordStijl | undefined {
-	return stijlen.find((stijl) => stijl.id === id);
+function zoekStijl(stijlen: readonly WordStijl[], id: string): WordStijl | null {
+	return stijlen.find((stijl) => stijl.id === id) ?? null;
 }
 
 export function alineaOpmaakstijl(stijl: Alineastijl | null, stijlen: readonly WordStijl[]): Opmaakstijl {

@@ -8,8 +8,9 @@ import { statusKlasse } from './Zijbalk';
 import { vragenBijVers } from './vertaalvragen';
 import { VersTekst } from './VersTekst';
 
-/** Uit redactietool/PLAN.md, onderdeel Bewerken. */
 const LABEL_GOEDGEKEURD = 'Goedgekeurd, referentie voor de rest van het boek. Wijzigingen gaan opnieuw langs de redactie.';
+
+const KOLOMMEN_ZONDER_REGELS = 3;
 
 type Props = {
 	boek: BoekData;
@@ -33,7 +34,6 @@ export function HoofdstukScherm({
 	onOpenNaslag,
 }: Props) {
 	const groepen = groepeerPerVers(hoofdstuk.bron, hoofdstuk.vereenvoudigd);
-	const kolommen = regelsAltijdZichtbaar ? 4 : 3;
 
 	return (
 		<article class="hoofdstuk">
@@ -66,9 +66,7 @@ export function HoofdstukScherm({
 								referentie={referentie}
 								hoofdstuk={hoofdstuk}
 								geselecteerd={geselecteerd}
-								regelsZichtbaar={regelsAltijdZichtbaar || geselecteerd}
 								regelsAlsKolom={regelsAltijdZichtbaar}
-								kolommen={kolommen}
 								onOpenNaslag={onOpenNaslag}
 							/>
 						);
@@ -77,7 +75,7 @@ export function HoofdstukScherm({
 			</table>
 			<p class="regelsschakelaar">
 				<button type="button" aria-pressed={regelsAltijdZichtbaar} onClick={onWisselRegels}>
-					{regelsAltijdZichtbaar ? 'Regels inklappen' : 'Regels altijd tonen'}
+					Regels altijd tonen
 				</button>
 				{!regelsAltijdZichtbaar && <span> Klik op een vers om de regels erbij te zien.</span>}
 			</p>
@@ -91,10 +89,8 @@ type VersRijProps = {
 	referentie: Referentie;
 	hoofdstuk: HoofdstukData;
 	geselecteerd: boolean;
-	regelsZichtbaar: boolean;
 	/** Regels in een eigen kolom; anders in een rij eronder, alleen voor het gekozen vers. */
 	regelsAlsKolom: boolean;
-	kolommen: number;
 	onOpenNaslag: (naslag: Naslag) => void;
 };
 
@@ -104,9 +100,7 @@ function VersRij({
 	referentie,
 	hoofdstuk,
 	geselecteerd,
-	regelsZichtbaar,
 	regelsAlsKolom,
-	kolommen,
 	onOpenNaslag,
 }: VersRijProps) {
 	const rijRef = useRef<HTMLTableRowElement>(null);
@@ -155,9 +149,9 @@ function VersRij({
 				</td>
 				{regelsAlsKolom && <td class="regels">{regels}</td>}
 			</tr>
-			{regelsZichtbaar && !regelsAlsKolom && (
+			{geselecteerd && !regelsAlsKolom && (
 				<tr class="regels-onder">
-					<td colSpan={kolommen}>{regels}</td>
+					<td colSpan={KOLOMMEN_ZONDER_REGELS}>{regels}</td>
 				</tr>
 			)}
 		</>
