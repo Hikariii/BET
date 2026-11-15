@@ -66,7 +66,7 @@ function downloadAlsBestand(bestandsnaam: string, uitvoer: RedactieExport): void
 	URL.revokeObjectURL(adres);
 }
 
-/** Knoppen bovenaan het hoofdstuk: Kopiëren naar Word (met de waarschuwing in Safari) en Export voor Claude. */
+/** Knoppen bovenaan het hoofdstuk: Hoofdstuktekst kopiëren voor Word (met de waarschuwing in Safari) en Export voor Claude. */
 export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
 	const [kopie, zetKopie] = useState<KopieUitkomst | null>(null);
 	const [exportOpen, zetExportOpen] = useState(false);
@@ -89,14 +89,14 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
 		<section class="hoofdstukacties" aria-label="Acties voor dit hoofdstuk">
 			<div class="hoofdstukacties-knoppen">
 				<button type="button" onClick={kopieer}>
-					Kopiëren naar Word
+					Hoofdstuktekst kopiëren voor Word
 				</button>
 				<button type="button" aria-expanded={exportOpen} onClick={() => zetExportOpen(!exportOpen)}>
 					Export voor Claude
 				</button>
 				<span class="hoofdstukacties-aantal">{meervoud(aantalBewerkt, 'vers bewerkt', 'verzen bewerkt')}</span>
 			</div>
-			{isSafari() && <p class="hoofdstukacties-safari">Kopiëren naar Word werkt in Chrome of Edge.</p>}
+			{isSafari() && <p class="hoofdstukacties-safari">Hoofdstuktekst kopiëren voor Word werkt in Chrome of Edge.</p>}
 			<div role="status" class="hoofdstukacties-status">
 				{kopie?.soort === 'gekopieerd' && kopie.van === tussenstand && 'Gekopieerd'}
 				{kopie?.soort === 'mislukt' && `Kopiëren mislukt: ${kopie.melding}`}

@@ -14,7 +14,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 ## Open
 - [ ] Redactietool. Stap 1 (`redactietool/stap1-plan.md`, fase 0 tot 5) is afgesloten; het werk dat nog moet staat in `redactietool/stap2-plan.md` (fase 6 tot 9, concept).
   - [x] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. Geen aparte Windows-test: de redacteur test in het gebruik.
-  - [ ] Bij de redacteur nagaan of Kopiëren naar Word op Windows (Edge of Chrome) de stijlen goed overneemt; zo niet: knop Download als Word (zie `redactietool/stap1-plan.md`, fase 5).
+  - [ ] Bij de redacteur nagaan of Hoofdstuktekst kopiëren voor Word op Windows (Edge of Chrome) de stijlen goed overneemt; zo niet: knop Download als Word (zie `redactietool/stap1-plan.md`, fase 5).
   - [x] **Fase 1** (lezen) gebouwd op branch `fase-1-lezen`, met voorwerk voor fase 2, 3 en 5; twee onafhankelijke reviews en een critical judge verwerkt.
   - [x] **Fase 2** (begrippen en vragen) gebouwd op branch `fase-2-begrippen` met /autopilot: tabbladen Besloten, Gevonden en Vertaalvragen; review en critical judge verwerkt.
   - [ ] Vertaalvragen: de kolom Plaats van het register tonen (`Vertaalvraag` heeft er nog geen veld voor).
