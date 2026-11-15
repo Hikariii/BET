@@ -16,3 +16,13 @@ table.verzen td .versklik:focus-visible {
 	outline: 2px solid var(--tekst);
 	outline-offset: 0;
 }
+
+/* De alinea's staan nu in de houder in plaats van direct in de cel; dezelfde afstand als in app.css (`table.verzen td > p`); de houder heeft nog een div voor aria-describedby, zodat bron en vereenvoudiging op één lijn beginnen. */
+table.verzen td .versklik > div > p {
+	margin: 0;
+	hyphens: manual;
+}
+
+table.verzen td .versklik > div > p + p {
+	margin-top: 0.5rem;
+}

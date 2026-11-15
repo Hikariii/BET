@@ -17,7 +17,7 @@ async function foto(naam, hash, actie) {
 }
 await foto('1-lezen', '#/lukas/22');
 await foto('2-lezen-vers', '#/lukas/22/14');
-await foto('3-bewerken', '#/lukas/22/14', async () => { await page.getByRole('button', { name: /^Bewerken, vers 14$/ }).click({ timeout: 3000 }); });
+await foto('3-bewerken', '#/lukas/22/14', async () => { await page.getByRole('button', { name: /^Vers 14 bewerken$/ }).click({ timeout: 3000 }); });
 await foto('4-naslag', '#/lukas/4/18', async () => { await page.locator('button.verwijzing').first().click({ timeout: 3000 }); });
 await foto('5-besloten', '#/lukas/begrippen/besloten');
 await foto('6-vragen', '#/lukas/begrippen/vragen');
