@@ -1,0 +1,31 @@
+# Lukas 2
+
+[1] In die tijd gaf keizer Augustus opdracht om alle mensen in te schrijven. [2] Deze eerste inschrijving vond plaats toen Cyrenius bestuurder van Syrië was. [3] Iedereen ging op weg om zich te laten inschrijven, ieder naar zijn eigen stad. [4] Ook Jozef ging op weg. Hij reisde vanuit Nazareth in Galilea naar Judea, naar de stad van David, die Bethlehem heet. Dat deed hij omdat hij uit het nageslacht van David kwam. [5] Hij ging daarheen om zich te laten inschrijven, samen met Maria, zijn verloofde vrouw, die zwanger was. [6] Terwijl zij daar waren, kwam de tijd dat Maria haar kind zou krijgen. [7] Zij bracht haar eerstgeboren Zoon ter wereld, wikkelde Hem in doeken en legde Hem in een kribbe, omdat er voor hen geen plaats was in de herberg.
+
+[8] In diezelfde streek waren herders die buiten in het veld verbleven. 's Nachts hielden zij de wacht bij hun kudde. [9] Toen stond er een engel van de Heer bij hen en de stralende schoonheid
+
+van de Heer scheen om hen heen. Zij werden erg bang. [10] De engel zei tegen hen:
+@engel "Wees niet bang, want ik vertel jullie iets waar heel het volk blij om zal zijn. [11] Vandaag is in de stad van David de {eeuwigleven}Redder{/eeuwigleven} voor jullie geboren. Hij is {vet}Christus{/vet}, Heer. [12] Dit zal voor jullie het teken zijn: jullie zullen een Kind vinden dat in doeken gewikkeld is en in een kribbe ligt."
+[13] Plotseling was er bij de engel een grote groep engelen uit de hemel. Zij prezen God en zeiden:
+@engel [14] "Eer aan God in de hoogste hemelen, en vrede op aarde voor de mensen in wie Hij vreugde vindt."
+
+[15] Toen de engelen van hen waren weggegaan naar de hemel, zeiden de herders tegen elkaar: "Laten we naar Bethlehem gaan om te zien wat er gebeurd is en wat de Heer ons heeft verteld." [16] Zij gingen snel op weg en vonden Maria en Jozef, en het Kindje dat in de kribbe lag. [17] Toen zij Hem hadden gezien, vertelden zij overal wat hun over dit Kind was gezegd. [18] Iedereen die het hoorde, was onder de indruk van wat de herders vertelden. [19] Maar Maria bewaarde al deze woorden in haar hart en dacht erover na. [20] Daarna gingen de herders terug. Zij prezen God voor alles wat zij hadden gehoord en gezien. Alles was precies zoals het hun verteld was.
+
+
+[21] Toen acht dagen voorbij waren en het Kind besneden moest worden, kreeg Hij de naam Jezus. Dat was de naam die de engel al had genoemd voordat Hij in de buik van Zijn moeder ontvangen was. [22] Toen de dagen van haar reiniging volgens {torah}de Torah van Mozes{/torah} voorbij waren, brachten zij Hem naar Jeruzalem om Hem aan de Heer voor te stellen. [23] Zoals geschreven staat in {torah}de Torah van de Heer{/torah}:
+@citaat-ot "Elk eerstgeboren jongetje zal heilig voor de Heer genoemd worden."
+[24] Ook brachten zij een offer volgens wat in de Torah van de Heer staat: een paar tortelduiven of twee jonge duiven.
+
+
+[25] In Jeruzalem woonde een man die Simeon heette. Deze man was {rechtvaardig}rechtvaardig (leefde zoals God het wil){/rechtvaardig} en had ontzag voor God. Hij verwachtte {eeuwigleven}de troost van Israël{/eeuwigleven} en {genade}de Heilige Geest{/genade} was op hem. [26] God had hem door {genade}de Heilige Geest{/genade} duidelijk gemaakt dat hij niet zou sterven voordat hij {vet}de Messias{/vet} van de Heer had gezien. [27] Door {genade}de Geest{/genade} geleid kwam hij naar de tempel. Toen de ouders het Kind Jezus naar binnen brachten om met Hem te doen {torah}wat de Torah voorschreef{/torah}, [28] nam Simeon Hem in zijn armen, prees God en zei: [29] "Nu laat U, Heer, Uw dienaar in vrede sterven, zoals U hebt gezegd. [30] Want mijn ogen hebben Uw {eeuwigleven}redding{/eeuwigleven} gezien, [31] die U voor alle volken hebt klaargemaakt. [32] Een licht om de niet-Joodse volken te verlichten en tot eer van Uw volk Israël." [33] Jozef en Zijn moeder waren onder de indruk van wat er over Hem werd gezegd. [34] Simeon zegende hen en zei tegen Maria, Zijn moeder: "Dit Kind is bestemd voor de {oordeel}val{/oordeel} en de {eeuwigleven}opstanding{/eeuwigleven} van velen in Israël. Hij zal een teken zijn dat wordt tegengesproken. [35] Ook door jouw eigen ziel zal een zwaard gaan. Zo zullen de gedachten van veel harten zichtbaar worden."
+
+[36] Er was ook een profetes, Anna, een dochter van Fanuel, uit de stam van Aser. Zij was al op hoge leeftijd. Na haar trouwdag had zij zeven jaar met haar man geleefd. [37] Daarna was zij weduwe geworden. Zij was ongeveer vierentachtig jaar oud. Zij verliet de tempel niet en diende God dag en nacht met vasten en bidden. [38] Op dat moment kwam ook zij erbij staan. Zij erkende de Heer en sprak over Hem tegen iedereen die de {eeuwigleven}verlossing{/eeuwigleven} van Jeruzalem verwachtte.
+
+[39] Toen zij alles hadden gedaan wat zij volgens {torah}de Torah van de Heer{/torah} moesten doen, gingen zij terug naar Galilea, naar hun stad Nazareth. [40] Het Kind groeide op en werd sterk in Zijn geest. Hij werd vervuld met wijsheid en de {genade}gunst{/genade} van God was op Hem.
+
+
+[41] Zijn ouders gingen ieder jaar voor het Pesachfeest naar Jeruzalem. [42] Toen Jezus twaalf jaar was, gingen zij volgens de gewoonte van het feest naar Jeruzalem. [43] Nadat de feestdagen voorbij waren, gingen zij terug naar huis. Maar Jezus bleef in Jeruzalem achter zonder dat Zijn ouders dat wisten. [44] Zij dachten dat Hij bij het reisgezelschap was en reisden een dag verder. Daarna gingen zij Hem zoeken bij familieleden en bekenden. [45] Toen zij Hem niet vonden, gingen zij terug naar Jeruzalem om Hem te zoeken.
+
+[46] Na drie dagen vonden zij Hem in de tempel. Hij zat tussen de rabbi's, luisterde naar hen en stelde hun vragen. [47] Iedereen die Hem hoorde, stond versteld van Zijn verstand en van Zijn antwoorden. [48] Toen Zijn ouders Hem zagen, stonden ook zij versteld. Zijn moeder zei tegen Hem: "Kind, waarom heb Je ons dit aangedaan? Je vader en ik hebben Je met veel zorgen gezocht." [49] Hij zei tegen hen:
+@jezus "Waarom hebben jullie Mij gezocht? Wisten jullie niet dat Ik bezig moet zijn met de dingen van Mijn Vader?"
+[50] Maar zij begrepen niet wat Hij daarmee bedoelde. [51] Toen ging Hij met hen mee naar Nazareth en was hun gehoorzaam. Zijn moeder bewaarde al deze dingen in haar hart. [52] Jezus groeide verder in wijsheid en in grootte. Ook groeide Hij in {genade}gunst{/genade} bij God en de mensen.

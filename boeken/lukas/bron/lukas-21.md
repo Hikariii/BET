@@ -1,0 +1,25 @@
+# Lukas 21
+
+[1] En toen Hij opkeek, zag Hij de rijken hun gaven in de schatkist werpen, [2] en Hij zag ook een zekere arme weduwe twee kleine munten daarin werpen. [3] En Hij zei:
+@jezus Werkelijk, Ik zeg jullie dat deze arme weduwe er meer dan allen in geworpen heeft. [4] Want die allen hebben van hun overvloed daarin geworpen als offergave aan God, maar zij heeft van haar armoede alles wat ze voor haar levensonderhoud had, daarin geworpen.
+
+[5] En toen sommigen over de tempel zeiden dat hij met prachtige stenen en aan God gewijde geschenken versierd was, zei Hij:
+@jezus [6] Wat betreft deze dingen waarnaar jullie kijken: Er zullen dagen komen waarin niet één steen op de andere steen gelaten zal worden die niet afgebroken zal worden.
+[7] En zij vroegen Hem: “Meester, wanneer zal dat dan zijn en wat is het teken dat deze dingen zullen gebeuren?” [8] En Hij zei:
+@jezus Pas op dat jullie niet misleid worden, want velen zullen komen onder Mijn Naam en zeggen: Ik ben {vet}de Christus{/vet}, en: De tijd is nabijgekomen. Ga hen dan niet achterna. [9] En wanneer jullie zullen horen van oorlogen en allerlei oproer, wees dan niet verschrikt. Want deze dingen moeten eerst geschieden, maar dat betekent niet meteen het einde.
+[10] Toen zei Hij tegen hen:
+@jezus Het ene volk zal tegen het andere volk opstaan en het ene koninkrijk tegen het andere koninkrijk; [11] en er zullen grote aardbevingen zijn in verschillende plaatsen, hongersnoden en besmettelijke ziekten. Er zullen ook verschrikkelijke dingen en grote tekenen vanuit de hemel plaatsvinden. [12] Maar vóór dit alles zullen ze de handen aan jullie slaan en jullie vervolgen, door jullie over te leveren in de synagogen en gevangenissen, en jullie zullen voor koningen en stadhouders geleid worden omwille van Mijn Naam. [13] En dit zal jullie overkomen, opdat jullie zullen getuigen. [14] Neem jullie dan in je hart voor niet van tevoren te bedenken hoe jullie jezelf moeten verdedigen. [15] Want Ik zal jullie mond en wijsheid geven die al jullie tegenstanders niet zullen kunnen weerspreken of weerstaan.
+
+@jezus [16] En jullie zullen ook door ouders, broers, familieleden en vrienden overgeleverd worden, en zij zullen sommigen van jullie doden. [17] En jullie zullen omwille van Mijn Naam door allen gehaat worden. [18] Maar er zal beslist geen haar van uw hoofd verloren gaan. [19] Door jullie {geloof}volharding{/geloof} zullen jullie je {eeuwigleven}leven{/eeuwigleven} verkrijgen.
+
+@jezus [20] Wanneer jullie zullen zien dat Jeruzalem door legers omringd wordt, weet dan dat zijn verwoesting nabij is. [21] Laten dan wie in Judea zijn, vluchten naar de bergen en wie in het midden van Jeruzalem zijn, daaruit wegtrekken en wie op de velden zijn, er niet in gaan. [22] Want dit zijn dagen van wraak, opdat al wat geschreven staat, vervuld wordt. [23] Maar wee de zwangeren en de zogenden in die dagen, want er zal grote nood zijn in het land en toorn over dit volk. [24] En zij zullen vallen door de scherpte van het zwaard en in gevangenschap weggevoerd worden onder alle heidenen. En Jeruzalem zal door de heidenen vertrapt worden, totdat de tijden van de heidenen vervuld zullen zijn.
+
+@jezus [25] En er zullen tekenen zijn in zon, maan en sterren, en op de aarde benauwdheid onder de volken, in radeloosheid vanwege het bulderen van zee en golven. [26] En het hart van de mensen zal bezwijken van vrees en verwachting van de dingen die de wereld zullen overkomen, want de krachten van de hemelen zullen heftig bewogen worden. [27] En dan zullen zij de Zoon des mensen zien komen in een wolk, met grote kracht en heerlijkheid.
+
+@jezus [28] Wanneer nu deze dingen beginnen te geschieden, kijk dan omhoog en hef jullie hoofd op, omdat jullie {eeuwigleven}verlossing{/eeuwigleven} nabij is.
+[29] En Hij sprak tot hen een gelijkenis:
+@jezus Kijk naar de vijgenboom en naar alle bomen. [30] Zodra ze uitlopen en jullie dat zien, weten jullie uit jezelf dat de zomer al nabij is. [31] Zo ook jullie, wanneer jullie deze dingen zullen zien geschieden, weet dan dat {eeuwigleven}het Koninkrijk van God{/eeuwigleven} nabij is. [32] Voorwaar, Ik zeg jullie dat deze generatie zeker niet voorbij zal gaan, totdat alles geschied is. [33] De hemel en de aarde zullen voorbijgaan, maar Mijn woorden zullen beslist niet voorbijgaan.
+
+@jezus [34] Wees op jullie hoede dat jullie hart niet op enig moment bezwaard wordt door roes en dronkenschap en door zorgen over de alledaagse dingen, en dat die dag jullie niet onverwachts overkomt. [35] Want als een strik zal hij komen over allen die op het hele aardoppervlak wonen. [36] Waak dan te allen tijde biddend dat jullie waardig geacht zullen worden om al die dingen die gebeuren zullen, te ontvluchten, en om te mogen staan voor de Zoon des mensen.
+
+[37] Overdag nu {onderwijs}gaf Hij onderwijs{/onderwijs} in de tempel, maar 's nachts ging Hij de stad uit en overnachtte op de berg die de Olijfberg heet. [38] En al het volk kwam 's morgens vroeg naar Hem toe in de tempel om Hem te horen.

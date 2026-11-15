@@ -1,0 +1,31 @@
+# Lukas 4
+
+[1] Jezus, vol van {genade}de Heilige Geest{/genade}, keerde terug van de Jordaan en werd door {genade}de Geest{/genade} naar de woestijn geleid, [2] waar Hij veertig dagen verzocht werd door de duivel. En Hij at niets in die dagen en ten slotte, toen die voorbij waren, kreeg Hij honger. [3] En de duivel zei tegen Hem: “Als Jij Gods Zoon bent, zeg dan tegen deze steen dat hij brood wordt.” [4] Maar Jezus antwoordde hem:
+@jezus Er staat geschreven dat de mens van brood alleen niet zal leven, maar van elk woord van God.
+
+[5] En daarna bracht de duivel Hem op een hoge berg en liet Hem in een ogenblik tijd al de koninkrijken van de wereld zien. [6] En de duivel zei tegen Hem: “Ik zal Je al deze macht en de heerlijkheid van deze koninkrijken geven, want die is aan mij overgegeven en ik geef die aan wie ik maar wil; [7] dus, als Je mij zult aanbidden, zal het allemaal van Jouw zijn.” [8] Maar Jezus antwoordde en zei tegen hem:
+@jezus Ga weg van Mij, satan, want er staat geschreven: Je zult de Heere, je God, aanbidden en Hem alleen dienen.
+
+[9] En hij bracht Hem naar Jeruzalem en zette Hem op het hoogste gedeelte van de tempel, en hij zei tegen Hem: “Als Jij de Zoon van God bent, werp jezelf dan vanhier naar beneden, [10] want er staat geschreven dat Hij Zijn engelen voor Jou bevel zal geven om Je te bewaren, [11] en dat zij Je op de handen dragen zullen, opdat Je Je voet niet misschien aan een steen stoot.” [12] Maar Jezus antwoordde en zei tegen hem:
+@jezus Er is gezegd: Je zult de Heere, je God, niet verzoeken.
+[13] En toen de duivel alle verzoeking beëindigd had, verliet hij Hem tot een bepaalde tijd.
+
+[14] En Jezus keerde door de kracht van {genade}de Geest{/genade} terug naar Galilea, en het gerucht over Hem verspreidde zich door heel de omgeving. [15] En Hij {onderwijs}gaf onderwijs{/onderwijs} in hun synagogen en werd door allen geprezen. [16] En Hij kwam in Nazareth, waar Hij opgevoed was, en ging naar Zijn gewoonte op de dag van de {torah}sabbat{/torah} naar de synagoge, en Hij stond op om te lezen. [17] En aan Hem werd het boek van de profeet Jesaja gegeven, en toen Hij het boek opengedaan had, vond Hij de plaats waar geschreven stond:
+@citaat-ot [18] De Geest van de Heere is op Mij, omdat Hij Mij gezalfd heeft; Hij heeft Mij gezonden om aan armen {onderstreept}{vet}het Evangelie{/vet}{/onderstreept} te verkondigen, om te genezen wie gebroken van hart zijn, [19] om aan gevangenen vrijlating te prediken en aan blinden het gezichtsvermogen, om verslagenen weg te zenden in vrijheid, om het jaar van het welbehagen van de Heere te prediken.
+
+[20] En toen Hij het boek dichtgedaan en aan de dienaar teruggegeven had, ging Hij zitten, en de ogen van allen in de synagoge waren op Hem gevestigd. [21] Hij begon tegen hen te zeggen:
+@jezus Heden is deze Schrift in jullie oren in vervulling gegaan.
+[22] En zij betuigden Hem allen hun instemming en verwonderden zich over de woorden van {genade}genade{/genade} die uit Zijn mond kwamen, en zij zeiden: “Is Híj niet de Zoon van Jozef?” [23] Maar Hij zei tegen hen:
+@jezus Jullie zullen Mij ongetwijfeld dit spreekwoord voorhouden: Dokter, genees jezelf; alles waarvan wij gehoord hebben dat het in Kapernaüm gebeurd is, doe dat ook hier in Je vaderstad.
+[24] Hij zei:
+@jezus Voorwaar, Ik zeg jullie dat geen profeet welgevallig is in zijn vaderstad. [25] Maar Ik zeg jullie naar waarheid: Er waren veel weduwen in Israël in de dagen van Elia, toen de hemel drie jaar en zes maanden gesloten was, zodat er grote hongersnood kwam over heel het land, [26] en naar geen van hen werd Elia gezonden, maar wel naar Zarfath bij Sidon, naar een vrouw, een weduwe. [27] Ook waren er veel melaatsen in Israël in de tijd van de profeet Elisa, en geen van hen werd gereinigd, maar wel Naäman, de Syriër.
+[28] En allen in de synagoge werden met woede vervuld toen zij dit hoorden, [29] en zij stonden op, dreven Hem de stad uit en brachten Hem op de top van de berg waarop hun stad gebouwd was, om Hem van de steilte af te werpen. [30] Maar Hij liep midden tussen hen door en ging weg.
+
+
+[31] En Hij daalde af naar Kapernaüm, een stad in Galilea, en {onderwijs}onderwees{/onderwijs} hen op de {torah}sabbatdagen{/torah}. [32] En zij stonden versteld van {onderwijs}Zijn onderricht{/onderwijs}, want Zijn boodschap was met gezag. [33] En in de synagoge was een man die een geest van een onreine demon had, en die riep met luide stem: [34] “Ga weg! Wat hebben wij met Jou te maken, Jezus de Nazarener? Ben Je gekomen om ons te gronde te richten? Ik weet Wie Je bent, namelijk de Heilige van God.” [35] Maar Jezus bestrafte hem en zei:
+@jezus Zwijg! Ga uit hem weg!
+En de demon ging uit hem weg, nadat hij hem in het midden geworpen had, zonder hem in enig opzicht letsel te bezorgen. [36] En zij werden allen erg verbaasd. Zij spraken met elkaar en zeiden: “Wat is dit voor boodschap, dat Hij met gezag en kracht de onreine geesten bevel geeft en zij weggaan?” [37] En de roep over Hem verspreidde zich naar elke plaats in de omgeving.
+
+[38] Nadat Jezus opgestaan en uit de synagoge vertrokken was, ging Hij naar het huis van Simon. De schoonmoeder van Simon had hoge koorts en ze vroegen Hem om hulp voor haar. [39] En Hij boog Zich over haar heen en bestrafte de koorts en die verliet haar. Zij stond onmiddellijk op en diende hen. [40] Toen de zon onderging, brachten allen die zieken hadden, door allerlei kwalen gekweld, deze zieken bij Hem; en Hij legde ieder van hen de handen op en genas hen. [41] Ook gingen er van velen demonen uit, die schreeuwden en zeiden: “Jij bent {vet}de Christus{/vet}, de Zoon van God!” Maar Hij bestrafte hen en liet hun niet toe te spreken, omdat zij wisten dat Hij {vet}de Christus{/vet} was. [42] Toen het dag geworden was, ging Hij naar buiten en begaf Zich naar een eenzame plaats. De menigten zochten Hem en kwamen bij Hem en probeerden Hem tegen te houden, opdat Hij niet van hen weg zou gaan. [43] Maar Hij zei tegen hen:
+@jezus Ik moet ook andere steden {onderstreept}{vet}het Evangelie van{/vet} {eeuwigleven}het Koninkrijk van God{/eeuwigleven}{/onderstreept} verkondigen, want daarvoor ben Ik uitgezonden.
+[44] En {onderwijs}Hij predikte{/onderwijs} in de synagogen van Galilea.

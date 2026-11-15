@@ -1,0 +1,31 @@
+# Lukas 20
+
+[1] Op een van die dagen, toen Hij in de tempel het volk onderwees en {onderstreept}{vet}het Goede Nieuws{/vet}{/onderstreept} verkondigde, kwamen de overpriesters (de belangrijkste priesters) en de schriftgeleerden (kenners van de Torah) met de oudsten (leiders van het volk) erbij staan. [2] Zij zeiden tegen Hem: “Zeg ons met welk gezag U deze dingen doet, of wie het is die U dit gezag heeft gegeven.” [3] Hij antwoordde hun:
+@jezus “Ik zal jullie ook één vraag stellen. Zeg Mij eens: [4] Het onderdompelen door Johannes, was dat uit de hemel of uit de mensen?”
+[5] Zij overlegden onder elkaar en zeiden: “Als wij zeggen: ‘Uit de hemel’, dan zal Hij zeggen: ‘Waarom hebt u hem dan niet {geloof}geloofd{/geloof}?’ [6] Maar als wij zeggen: ‘Uit de mensen’, dan zal het hele volk ons stenigen, want het is ervan overtuigd dat Johannes een profeet was.” [7] Zij antwoordden dat zij niet wisten waar hij vandaan kwam. [8] Daarop zei Jezus tegen hen:
+@jezus “Dan zeg Ik jullie ook niet met welk gezag Ik deze dingen doe.”
+
+[9] Hij begon het volk deze gelijkenis (een verhaal met een les) te vertellen:
+@jezus “Iemand plantte een wijngaard en verhuurde die aan landbouwers en ging een tijd lang naar het buitenland. [10] Toen het de tijd was, stuurde hij een dienaar naar de landbouwers, zodat zij hem een deel van de opbrengst van de wijngaard zouden geven. Maar de landbouwers sloegen de dienaar en stuurden hem met lege handen weg. [11] Hij stuurde nog een andere dienaar, maar zij sloegen ook hem, behandelden hem schandelijk en stuurden hem met lege handen weg. [12] Daarna stuurde hij nog een derde dienaar, maar zij verwondden ook hem en gooiden hem eruit. [13] De heer van de wijngaard zei: ‘Wat zal ik doen? Ik zal mijn geliefde zoon sturen. Als zij hem zien, zullen zij misschien ontzag voor hem hebben.’ [14] Maar toen de landbouwers hem zagen, overlegden zij onder elkaar en zeiden: ‘Dit is de erfgenaam. Kom, laten we hem doden, zodat de erfenis van ons wordt.’ [15] Toen zij hem buiten de wijngaard gegooid hadden, doodden zij hem. Wat zal dan de heer van de wijngaard met hen doen? [16] Hij zal komen en die landbouwers ombrengen en zal de wijngaard aan anderen geven.”
+Toen de mensen dit hoorden, zeiden zij: “Dat nooit.” [17] Maar Hij keek hen aan en zei:
+@jezus “Wat betekent dan dit wat geschreven staat:”
+@citaat-ot “De steen die de bouwers afgewezen hebben, is tot een hoeksteen geworden? [18] Ieder
+@citaat-ot die op die steen valt, zal verpletterd worden en op wie hij valt, die zal hij verpletteren.”
+
+[19] De overpriesters en schriftgeleerden probeerden op datzelfde moment Hem vast te pakken. Maar zij waren bang voor het volk, want zij begrepen dat Hij deze gelijkenis over hen verteld had. [20] Zij hielden Hem scherp in het oog en stuurden spionnen die deden alsof zij leefden zoals God het wil, met de bedoeling Hem op een woord te vangen en Hem dan uit te leveren aan de overheid en aan de macht van de bestuurder. [21] De spionnen stelden Hem een vraag: “Rabbi, wij weten dat U goed spreekt en onderwijs geeft en niemand voortrekt, maar de weg van God volgens de waarheid onderwijst. [22] Is het ons toegestaan om de keizer belasting te betalen of niet?” [23] Hij merkte hun sluwheid en zei tegen hen:
+@jezus “Waarom stellen jullie Mij op de proef? [24] Laat Mij een penning (munt) zien. Van wie is het beeld en opschrift?”
+Zij antwoordden: “Van de keizer.” [25] Hij zei tegen hen:
+@jezus “Geef dan aan de keizer wat van de keizer is en aan God wat van God is.”
+[26] Zij konden Hem tegenover het volk op Zijn woord niet vangen en zij waren onder de indruk van Zijn antwoord en zwegen.
+
+[27] Sommigen van de Sadduceeën, die ontkennen dat er een {eeuwigleven}opstanding{/eeuwigleven} is, kwamen naar Hem toe en vroegen Hem: [28] “Rabbi, {torah}Mozes{/torah} heeft ons geschreven: ‘Als iemands broer die een vrouw heeft, kinderloos sterft, laat dan zijn broer met de vrouw trouwen. Laat hem nageslacht krijgen voor zijn broer.’ [29] Er waren zeven broers. De eerste trouwde met een vrouw en stierf kinderloos. [30] Toen trouwde de tweede met de vrouw en ook hij stierf kinderloos. [31] Ook de derde trouwde met haar. Zo ging het met alle zeven. Zij lieten geen van allen kinderen achter en zijn gestorven. [32] Ten slotte stierf na allen ook de vrouw. [33] In de {eeuwigleven}opstanding{/eeuwigleven}, van wie van hen zal zij dan de vrouw zijn? Want die zeven hebben haar als vrouw gehad.” [34] Jezus antwoordde hun:
+@jezus “De kinderen van dit tijdperk trouwen, [35] maar zij die het waard gevonden zijn om {eeuwigleven}dat toekomstige tijdperk{/eeuwigleven} te krijgen, en {eeuwigleven}de opstanding uit de doden{/eeuwigleven}, zullen niet trouwen. [36] Want zij kunnen niet meer sterven, omdat zij zijn zoals engelen. Zij zijn kinderen van God, omdat zij kinderen van {eeuwigleven}de opstanding{/eeuwigleven} zijn. [37] Dat {eeuwigleven}de doden weer levend gemaakt{/eeuwigleven} zullen worden, heeft ook {torah}Mozes{/torah} duidelijk gemaakt bij de doornstruik, toen hij de Heer ‘de God van Abraham, de God van Izak en de God van Jakob’ noemde. [38] God is niet een God van de doden, maar van de levenden, want voor Hem leven zij allen.”
+
+[39] Sommigen van de schriftgeleerden antwoordden: “Rabbi, dat hebt U goed gezegd.” [40] Zij durfden Hem verder niets meer te vragen. [41] Hij zei tegen hen:
+“{onderwijs}Hoe kunnen mensen zeggen dat {vet}de Messias{/vet} (Christus) een Zoon van David is?{/onderwijs} [42] {onderwijs}David zelf zegt namelijk in het boek van de psalmen:{/onderwijs}”
+@citaat-ot “De Heer heeft gezegd tegen mijn Heer: ‘Zit aan Mijn rechterhand, [43] totdat Ik Je
+@citaat-ot vijanden neergelegd heb als een voetbank voor Je voeten.’”
+[44] “{onderwijs}David noemt de Messias dus ‘Heer’. Hoe kan de Messias dan de Zoon van David zijn?{/onderwijs}”
+
+[45] Terwijl het hele volk het hoorde, zei Jezus tegen Zijn discipelen (leerlingen):
+@jezus [46] “Wees op jullie hoede voor de schriftgeleerden, die in lange gewaden (kledingstukken) rond willen lopen en erg gesteld zijn op begroetingen op de markten, de voorste plaatsen in de synagogen en de ereplaatsen (de beste plaatsen) tijdens de maaltijden, [47] die de huizen van de weduwen afpakken en lange gebeden doen om indruk te maken. Zij zullen een zwaarder {oordeel}oordeel{/oordeel} ontvangen.”
