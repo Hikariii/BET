@@ -12,8 +12,8 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 - [x] Repository geschikt voor meerdere boeken: `bijbel/<boek>/` met `boek.json`; scripts met `--boek`; formaat apart in `FORMAAT.md` (uitvoer van alle scripts voor Lukas gelijk gebleven)
 
 ## Open
-- [~] Web-tool in `docs/` om vertalingen te redigeren en naast het origineel te vergelijken. Plan in `docs/PLAN.md` (concept, ter review)
-  - Leest het formaat uit `FORMAAT.md`; zorg dat de JavaScript-parser en `scripts/` hetzelfde opleveren (bv. een gedeelde set testbestanden).
-  - Publicatie via GitHub Actions, die de boeken bij het bouwen naar JSON omzet (PLAN O7).
+- [ ] Redactietool, plan in `docs/PLAN.md` (v2, vastgesteld). Volgorde: fase 0 → 1 → 2 → 3 → 5 → 4.
+  - [ ] **Fase 0, eerstvolgende taak**: prototype kopiëren en plakken in Word met de echte stijlen; testen op Windows in Edge en Chrome; resultaat door `docx_naar_md.py`. Uitkomst bepaalt of er een Word-download in fase 5 komt.
+- [ ] `WERKPLAN.md` deel D (aangeleverd Word terugvoeren) een keer doorlopen met het eerstvolgende aangeleverde hoofdstuk, en bijstellen waar nodig
 - [ ] Gedeelde begrippenlijst voor alle boeken: zodra de redactie precedenten `vast` maakt, de boekoverstijgende begrippen (Mensenzoon, discipel, Farizeeën …) uit `bijbel/lukas/referentie/precedenten.md` naar een gedeelde lijst verhuizen
 - [ ] Bekende afwijking in `controleer_docx_md.py`: Lukas 8 onderstreept, md 2 tegen docx 1 (bestond al; uitzoeken of het aan de omzetting of aan de telling ligt)

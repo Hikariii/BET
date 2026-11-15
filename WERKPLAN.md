@@ -155,3 +155,36 @@ Zo blijft elke keuze terug te vinden en terug te draaien (§2), en kan de redact
 - `referentie/open-vragen.md`: alle vragen, met status `open` / `voorlopig besloten` / `besloten door redactie`.
 - `referentie/precedenten.md`: besluiten, met status `voorlopig` of `vast`.
 - `STATUS.md`: per hoofdstuk.
+
+---
+
+## D. Aangeleverd Word terugvoeren
+
+De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `docs/PLAN.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst.
+
+Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: meestal `bij editor`.
+
+### Stap D1: tekst (Claude)
+
+1. Het Word-bestand komt naast de andere aanleveringen in `origineel/`. Nooit een bestaand bestand overschrijven.
+2. Omzetten met `scripts/docx_naar_md.py` naar een tijdelijke map; het hoofdstuk daarna naar `vereenvoudigd/<prefix>-NN.md`.
+3. Wijzigingslog bijwerken: per vers het verschil tussen Claudes concept en de aangeleverde tekst, met de herkomst uit de export als die er is.
+4. Controlescript draaien.
+5. Status `verwerkt`, met datum en bestandsnaam in de kolom Herkomst.
+
+### Stap D2: lessen (Claude stelt voor, eigenaar beslist)
+
+1. Elke keuze van de vertaler die afwijkt van de richtlijn of de precedenten wordt een voorstel: precedent naar `vast`, nieuw precedent, of richtlijn aanpassen. In een lijst in `referentie/` (zoals `afwijkingen-h1-3.md`).
+2. Structurele keuzes uit de export worden direct precedentvoorstellen. Overgeslagen plekken zijn bewust anders en worden niet "gerepareerd".
+3. Wijkt de tekst in de export af van Word: Word volgen en het verschil melden.
+4. Pas na akkoord: in `precedenten.md` en `controle.json` zetten, en toepassen op hoofdstukken met status `review`. Nooit op hoofdstukken met `bij editor`.
+
+### Stap D3: opmaak (Claude stelt voor, eigenaar beslist)
+
+1. Markeringen uit de bron die in de aangeleverde tekst ontbreken (het controlescript meldt ze).
+2. Woorden ongewijzigd: in één lijst voorstellen om de markering terug te zetten op dezelfde woorden; in één keer goed te keuren.
+3. Woorden herschreven: per stuk een vraag, met bron en nieuwe tekst naast elkaar.
+
+### Stap D4: afronden
+
+Na akkoord op D2 en D3: status `goedgekeurd`, git-tag `<prefix>-NN-v1.0` (of een hogere versie bij een eerder goedgekeurd hoofdstuk), en het hoofdstuk telt als referentie (§25).
