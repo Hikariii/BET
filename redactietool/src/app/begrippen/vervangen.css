@@ -1,0 +1,106 @@
+.vervangen .uitleg {
+	max-width: 50rem;
+}
+
+.vervangen-formulier {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .75rem 1rem;
+	align-items: end;
+	margin: .75rem 0;
+}
+
+.vervangen-formulier label {
+	display: flex;
+	flex-direction: column;
+	gap: .2rem;
+	font-size: .9rem;
+}
+
+.vervangen-formulier input {
+	min-width: 16rem;
+	padding: .4rem;
+	font: inherit;
+}
+
+.vervangen button {
+	padding: .4rem .9rem;
+	font: inherit;
+	cursor: pointer;
+}
+
+.vervangen-samenvatting {
+	margin: .5rem 0;
+	color: var(--gedempt, #59636e);
+	font-size: .9rem;
+}
+
+.vervangen h2 {
+	font-size: 1.15rem;
+	margin: 1.5rem 0 .5rem;
+}
+
+.vervangen h3 {
+	font-size: 1rem;
+	margin: 1rem 0 .4rem;
+}
+
+.vervangen .vondsten {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.vervangen .vondst {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	gap: .5rem;
+	align-items: baseline;
+	padding: .35rem 0;
+	border-bottom: 1px solid var(--rand, #d1d9e0);
+}
+
+.vervangen .vondst.met-de-hand {
+	grid-template-columns: auto minmax(0, 1fr);
+}
+
+.vervangen del {
+	background: #ffebe9;
+	color: #82071e;
+}
+
+.vervangen ins {
+	background: var(--gekozen, #fff8c5);
+	text-decoration: none;
+}
+
+.vervangen mark {
+	background: var(--gekozen, #fff8c5);
+}
+
+.vervangen .toepassen {
+	margin-top: 1rem;
+}
+
+.vervangen .toepassen:disabled {
+	cursor: not-allowed;
+}
+
+.vervangen-meldingen p {
+	margin: .25rem 0;
+}
+
+.toegepaste-keuzes ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.toegepaste-keuzes li {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem 1rem;
+	align-items: baseline;
+	padding: .35rem 0;
+	border-bottom: 1px solid var(--rand, #d1d9e0);
+}
