@@ -1,5 +1,5 @@
 import type { BoekData, Referentie } from '../data/types';
-import { maakAdres } from './adres';
+import { maakAdres, versAdres } from './adres';
 import { aantalOpenVragen } from './vertaalvragen';
 
 type Props = {
@@ -24,7 +24,7 @@ export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen }: Pr
 					return (
 						<li>
 							<a
-								href={maakAdres({ soort: 'hoofdstuk', boek: boek.id, hoofdstuk: hoofdstuk.nummer, vers: null })}
+								href={versAdres(boek.id, hoofdstuk.nummer)}
 								aria-current={hoofdstuk.nummer === huidigHoofdstuk ? 'page' : undefined}
 							>
 								<span class="hoofdstuknummer">{hoofdstuk.nummer}</span>

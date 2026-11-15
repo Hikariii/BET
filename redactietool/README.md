@@ -9,6 +9,7 @@ De broncode van de tool. Het plan staat in [`PLAN.md`](PLAN.md). Nu kan de tool 
 | `src/app/` | de Preact-app die die JSON toont |
 | `src/data/` | het gegevenscontract (types) tussen bouwscript en app |
 | `src/log/`, `src/referentie/`, `src/sjabloon/` | de lezers voor wijzigingslogs, referentiebestanden, `STATUS.md`, richtlijn en Word-stijlen |
+| `src/begrippen/` | rekenfuncties voor het scherm Begrippen: precedenten tellen (`telPrecedenten`) en vertaalvragen verzamelen (`verzamelVragen`) |
 | `src/uitlijning/` | woorduitlijning bron ↔ vereenvoudigd per vers en "Gevonden": hoe bronwoorden vertaald zijn (voor het begrippenoverzicht) |
 | `src/editor/` | ProseMirror-schema en omzetting voor de editor (nog zonder scherm) |
 | `src/klembord/` | Word-HTML voor kopiëren naar Word met de echte stijlnamen, en de copy-handler (nog zonder knop) |
@@ -29,7 +30,7 @@ mise x -- npm run data      # alleen de data opnieuw bouwen
 
 Een hoofdstuk zonder `vereenvoudigd/`- of logbestand toont de bron met lege kolommen. Een hoofdstuk zonder rij in `STATUS.md` heeft de status `nog niet begonnen`.
 
-Adressen: `#/lukas/9` is hoofdstuk 9, `#/lukas/9/22` vers 22 (dat vers wordt gekozen en in beeld gebracht).
+Adressen: `#/lukas/9` is hoofdstuk 9, `#/lukas/9/22` vers 22 (dat vers wordt gekozen en in beeld gebracht). `#/lukas/begrippen` opent het scherm Begrippen en vragen (tabblad Besloten); `#/lukas/begrippen/gevonden` en `#/lukas/begrippen/vragen` de andere tabbladen. Dat scherm laadt alle hoofdstukken en rekent in de browser.
 
 De site gaat via GitHub Actions (`../.github/workflows/pages.yml`) naar Pages. Eenmalig in de repo-instellingen: Pages, bron "GitHub Actions". Het basispad `/BET/` staat in `vite.config.ts`.
 

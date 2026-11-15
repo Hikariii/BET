@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'preact/hooks';
 import type { BoekData, BoekLijst, Referentie } from '../data/types';
-import { maakAdres, type Adres } from './adres';
+import { versAdres, type Adres } from './adres';
 import { laadBoek, laadBoeken, laadHoofdstuk, laadReferentie } from './gegevens';
 import { BegrippenScherm } from './begrippen/BegrippenScherm';
 import { HoofdstukScherm } from './HoofdstukScherm';
@@ -120,7 +120,7 @@ function OnbekendAdres({ boeken, reden }: { boeken: BoekLijst; reden: string }) 
 	return (
 		<p class="melding">
 			{reden}{' '}
-			{eerste !== undefined && <a href={maakAdres({ soort: 'hoofdstuk', boek: eerste.id, hoofdstuk: 1, vers: null })}>Naar {eerste.naam} 1</a>}
+			{eerste !== undefined && <a href={versAdres(eerste.id, 1)}>Naar {eerste.naam} 1</a>}
 		</p>
 	);
 }

@@ -15,6 +15,10 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 - [ ] Redactietool, plan in `redactietool/PLAN.md` (v2, vastgesteld). Volgorde: fase 0 → 1 → 2 → 3 → 5 → 4.
   - [~] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. **Open: test op Windows in Edge en Chrome** (geleende laptop of UTM), met `docs/prototype/plakken-in-word/LEESMIJ.md` op die branch.
   - [x] **Fase 1** (lezen) gebouwd op branch `fase-1-lezen`, met voorwerk voor fase 2, 3 en 5; twee onafhankelijke reviews en een critical judge verwerkt.
+  - [x] **Fase 2** (begrippen en vragen) gebouwd op branch `fase-2-begrippen` met /autopilot: tabbladen Besloten, Gevonden en Vertaalvragen; review en critical judge verwerkt.
+  - [ ] Vertaalvragen: de kolom Plaats van het register tonen (`Vertaalvraag` heeft er nog geen veld voor).
+  - [ ] Vertaalvragen: status "onbeslist" betekent "geen statuswoord in de tekst"; overwegen of de logs een vast statusveld krijgen, zodat het filter "open" volledig is.
+  - [ ] Begrippen: de heuristieken voor werkregels en verschijnselen (`src/begrippen/precedentVormen.ts`) en de statuswoorden (`verzamelVragen.ts`) zijn op Lukas afgesteld; bij een tweede boek uit `boek.json` halen.
   - [ ] Rooktest van het leesscherm (render met DOM of Playwright op `dist/`), nu alleen handmatig gecontroleerd.
   - [ ] "precedent" in de kolom Regels koppelen aan de bijbehorende regel in `precedenten.md` (nu opent de doorzoekbare tabel).
   - [ ] `redactietool/src/klembord/chromiumKlembord.mjs` (alleen macOS, gebruikt rolldown van Vite en Playwright uit `/tmp/pw`) opnemen in de tests of vervangen.

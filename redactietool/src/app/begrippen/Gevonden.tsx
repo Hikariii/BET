@@ -26,13 +26,19 @@ export function Gevonden({ boek, hoofdstukken }: TabbladProps) {
 			</p>
 			<div class="filterbalk">
 				<label>
-					Zoeken <input type="search" value={zoekterm} onInput={(gebeurtenis) => zetZoekterm(gebeurtenis.currentTarget.value)} />
+					Zoeken <input type="search" value={zoekterm} onInput={(gebeurtenis) => {
+							zetZoekterm(gebeurtenis.currentTarget.value);
+							zetAantalRijen(RIJEN_PER_KEER);
+						}} />
 				</label>
 				<label>
 					<input
 						type="checkbox"
 						checked={alleenVerschillend}
-						onChange={(gebeurtenis) => zetAlleenVerschillend(gebeurtenis.currentTarget.checked)}
+						onChange={(gebeurtenis) => {
+							zetAlleenVerschillend(gebeurtenis.currentTarget.checked);
+							zetAantalRijen(RIJEN_PER_KEER);
+						}}
 					/>{' '}
 					Alleen woorden die verschillend vertaald zijn ({verschillend.length}; bij zoeken altijd alle)
 				</label>

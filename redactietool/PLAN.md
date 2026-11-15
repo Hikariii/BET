@@ -1,6 +1,6 @@
 # Plan: redactietool (v2)
 
-Status: **vastgesteld** na de review-sessie van 2026-11-15. **Stand van de bouw (2026-11-15):** fase 1 (lezen) gebouwd; voorwerk voor fase 2 (uitlijning en Gevonden), fase 3 (ProseMirror-schema met heen-en-terug) en fase 5 (Word-HTML, byte-gelijk aan het prototype) staat er als rekenmodules, nog zonder schermen. Fase 0 wacht op de Windows-test. Het eerste plan (met opslag in Google Drive) staat in git, commit `2ca102d`; het is volledig vervangen door dit plan.
+Status: **vastgesteld** na de review-sessie van 2026-11-15. **Stand van de bouw (2026-11-15):** fase 1 (lezen) en fase 2 (begrippen en vragen) gebouwd; voorwerk voor fase 3 (ProseMirror-schema met heen-en-terug) en fase 5 (Word-HTML, byte-gelijk aan het prototype) staat er als rekenmodules, nog zonder schermen. Fase 0 wacht op de Windows-test.
 
 ## Doel
 
