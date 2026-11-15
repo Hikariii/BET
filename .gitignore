@@ -16,5 +16,5 @@ bijbel/*/export/*
 node_modules/
 
 # Gegenereerde data en build van de tool
-docs/public/data/
-docs/dist/
+redactietool/public/data/
+redactietool/dist/

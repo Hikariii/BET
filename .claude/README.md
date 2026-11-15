@@ -1,6 +1,6 @@
 # Claude Code-configuratie voor deze repository
 
-Claude Code laadt dit automatisch voor iedereen die in deze repo werkt. Het meeste is bedoeld voor het bouwen van de redactietool (`docs/PLAN.md`). Voor het vertalen zelf gelden `CLAUDE.md`, `WERKPLAN.md` en de richtlijn.
+Claude Code laadt dit automatisch voor iedereen die in deze repo werkt. Het meeste is bedoeld voor het bouwen van de redactietool (`redactietool/PLAN.md`). Voor het vertalen zelf gelden `CLAUDE.md`, `WERKPLAN.md` en de richtlijn.
 
 | Map / bestand | Inhoud |
 |---|---|
@@ -16,14 +16,14 @@ Claude Code laadt dit automatisch voor iedereen die in deze repo werkt. Het mees
 
 | Onderdeel | Bron | Waarvoor hier |
 |---|---|---|
-| `grilling` | [mattpocock/skills](https://github.com/mattpocock/skills) @ `5863806` | Plan of ontwerp doorvragen tot alles beslist is (review van `docs/PLAN.md`) |
+| `grilling` | [mattpocock/skills](https://github.com/mattpocock/skills) @ `5863806` | Plan of ontwerp doorvragen tot alles beslist is (review van `redactietool/PLAN.md`) |
 | `grill-with-docs` | idem | Zelfde als `grilling`, maar legt besluiten meteen vast (ADR's en `GLOSSARY.md`); alleen handmatig te starten |
 | `domain-modeling` | idem | Begrippenlijst (`GLOSSARY.md`) en ADR's voor de code van de tool; nodig voor `grill-with-docs` |
 | `codebase-design` | idem | Woordenschat voor modules en grenzen; gebruikt door `tdd` |
 | `tdd` | idem | Test-first, o.a. voor de pariteitstest JS ↔ Python en md → editor → md |
 | `prototype` | idem | Wegwerpprototype, bv. van de keuzemenu-UX in de stijl van DeepL |
 | `diagnosing-bugs` | idem | Systematisch fouten opsporen |
-| `two-axis-review` | idem (`code-review`) | Review van een branch op twee assen: standaarden en spec (de spec is meestal het intentiebestand of `docs/PLAN.md`) |
+| `two-axis-review` | idem (`code-review`) | Review van een branch op twee assen: standaarden en spec (de spec is meestal het intentiebestand of `redactietool/PLAN.md`) |
 | `frontend-ui-engineering` | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) @ `39b723c` | Toegankelijke, responsieve interface |
 | `performance-optimization` | idem | Prestaties (1.100+ verzen in één editor) |
 | `browser-testing-with-devtools` | idem | De tool testen in een echte browser; **vereist de Chrome DevTools MCP-server** (zie de skill) |

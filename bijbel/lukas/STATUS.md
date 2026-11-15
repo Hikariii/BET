@@ -1,6 +1,6 @@
 # Status per hoofdstuk
 
-Statussen (zie `docs/PLAN.md`, "Status per hoofdstuk"): `-` (nog niet begonnen) · `concept` · `review` · `bij editor` · `verwerkt` · `goedgekeurd`. Bij `verwerkt` en `goedgekeurd` staan in **Herkomst** de datum en het aangeleverde Word-bestand. Met de hand bijgewerkt.
+Statussen (zie `redactietool/PLAN.md`, "Status per hoofdstuk"): `-` (nog niet begonnen) · `concept` · `review` · `bij editor` · `verwerkt` · `goedgekeurd`. Bij `verwerkt` en `goedgekeurd` staan in **Herkomst** de datum en het aangeleverde Word-bestand. Met de hand bijgewerkt.
 
 | Hoofdstuk | Bron | Status | Versie | Herkomst | Opmerking |
 | --- | --- | --- | --- | --- | --- |

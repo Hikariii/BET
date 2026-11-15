@@ -3,10 +3,10 @@ name: code-kwaliteit
 description: Regels voor het schrijven en reviewen van code: bestaande functionaliteit eerst, onderdrukken van waarschuwingen, zelfreview, en waar comments wel en niet horen.
 paths:
   - "scripts/**"
-  - "docs/**/*.ts"
-  - "docs/**/*.tsx"
-  - "docs/**/*.js"
-  - "docs/**/*.css"
+  - "redactietool/**/*.ts"
+  - "redactietool/**/*.tsx"
+  - "redactietool/**/*.js"
+  - "redactietool/**/*.css"
   - ".claude/hooks/**"
 ---
 

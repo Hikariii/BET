@@ -12,8 +12,8 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 - [x] Repository geschikt voor meerdere boeken: `bijbel/<boek>/` met `boek.json`; scripts met `--boek`; formaat apart in `FORMAAT.md` (uitvoer van alle scripts voor Lukas gelijk gebleven)
 
 ## Open
-- [ ] Redactietool, plan in `docs/PLAN.md` (v2, vastgesteld). Volgorde: fase 0 → 1 → 2 → 3 → 5 → 4.
-  - [~] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. **Open: test op Windows in Edge en Chrome** (geleende laptop of UTM), met `docs/prototype/plakken-in-word/LEESMIJ.md`.
+- [ ] Redactietool, plan in `redactietool/PLAN.md` (v2, vastgesteld). Volgorde: fase 0 → 1 → 2 → 3 → 5 → 4.
+  - [~] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. **Open: test op Windows in Edge en Chrome** (geleende laptop of UTM), met `redactietool/prototype/plakken-in-word/LEESMIJ.md`.
 - [ ] Kolom **Verzen** toevoegen aan `bijbel/lukas/referentie/open-vragen.md` (vaste lijst per vraag, nodig voor de vertaalvragen in de tool, fase 1)
 - [ ] `WERKPLAN.md` deel D (aangeleverd Word terugvoeren) een keer doorlopen met het eerstvolgende aangeleverde hoofdstuk, en bijstellen waar nodig
 - [ ] Gedeelde begrippenlijst voor alle boeken: zodra de redactie precedenten `vast` maakt, de boekoverstijgende begrippen (Mensenzoon, discipel, Farizeeën …) uit `bijbel/lukas/referentie/precedenten.md` naar een gedeelde lijst verhuizen

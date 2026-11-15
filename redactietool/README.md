@@ -1,4 +1,4 @@
-# Redactietool (docs/)
+# Redactietool
 
 De broncode van de tool. Het plan staat in [`PLAN.md`](PLAN.md). Nu kan de tool lezen: een hoofdstuk per scherm met bron, vereenvoudiging en regels naast elkaar, en een zijbalk met alle hoofdstukken. Bewerken en de rest van het plan volgen.
 
@@ -12,7 +12,7 @@ De broncode van de tool. Het plan staat in [`PLAN.md`](PLAN.md). Nu kan de tool 
 
 ## Draaien
 
-Node staat vast in `../mise.toml`. Vanuit `docs/`:
+Node staat vast in `../mise.toml`. Vanuit `redactietool/`:
 
 ```sh
 mise x -- npm ci            # eenmalig
@@ -35,9 +35,9 @@ De site gaat via GitHub Actions (`../.github/workflows/pages.yml`) naar Pages. E
 Node staat vast in `../mise.toml`. Vanuit de hoofdmap van de repo:
 
 ```sh
-mise x -- npm --prefix docs ci        # eenmalig
-mise x -- npm --prefix docs test      # alle tests
-mise x -- npm --prefix docs run typecheck
+mise x -- npm --prefix redactietool ci        # eenmalig
+mise x -- npm --prefix redactietool test      # alle tests
+mise x -- npm --prefix redactietool run typecheck
 ```
 
 De tests hebben `python3` nodig (alleen de standaardbibliotheek).

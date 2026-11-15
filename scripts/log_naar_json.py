@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Geeft voor elk hoofdstuk de uitvoer van parse_log (md_naar_docx.py) als JSON.
 
-De parser in docs/src/log/ wordt met deze uitvoer vergeleken (pariteitstest).
+De parser in redactietool/src/log/ wordt met deze uitvoer vergeleken (pariteitstest).
 
 Gebruik (draai met `python3 -I`, vanuit de hoofdmap):
 

@@ -160,7 +160,7 @@ Zo blijft elke keuze terug te vinden en terug te draaien (§2), en kan de redact
 
 ## D. Aangeleverd Word terugvoeren
 
-De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `docs/PLAN.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst.
+De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `redactietool/PLAN.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst.
 
 Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: meestal `bij editor`.
 

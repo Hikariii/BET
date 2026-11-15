@@ -1,6 +1,6 @@
 # Instructies voor Claude
 
-Deze repository bevat vereenvoudigde Bijbelboeken (`bijbel/<boek>/`) en het gereedschap daarvoor (`scripts/`, en straks een web-tool in `docs/`).
+Deze repository bevat vereenvoudigde Bijbelboeken (`bijbel/<boek>/`) en het gereedschap daarvoor (`scripts/`, en de redactietool in `redactietool/`).
 
 Lees eerst:
 - `README.md`: mappen, scripts, een nieuw boek toevoegen;

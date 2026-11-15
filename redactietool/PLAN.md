@@ -158,7 +158,7 @@ Na akkoord op lessen en opmaak: status `goedgekeurd`.
 ## Architectuur
 
 ```
-docs/                       broncode van de tool
+redactietool/                       broncode van de tool
   src/formaat/              parser en serializer volgens FORMAAT.md
   src/editor/               ProseMirror: domeinen, onderwijs, highlight, vet, onderstreept
                             en cursief als marks; alineastijl als eigenschap van de alinea;

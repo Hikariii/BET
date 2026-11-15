@@ -1,6 +1,6 @@
 ---
 name: typescript
-description: TypeScript-regels voor de redactietool in docs/.
+description: TypeScript-regels voor de redactietool in redactietool/.
 paths:
   - "**/*.ts"
   - "**/*.tsx"

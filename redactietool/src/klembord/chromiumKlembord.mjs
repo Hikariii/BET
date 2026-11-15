@@ -2,7 +2,7 @@
 // klembord van macOS. Controleert dat de HTML met `mso-style-name` er ongewijzigd op staat. Plakt niet in Word.
 //
 // Alleen op macOS, met een zichtbaar browservenster (het klembord van het systeem werkt niet zonder).
-// Playwright is geen afhankelijkheid van docs/; geef de map van een installatie mee:
+// Playwright is geen afhankelijkheid van redactietool/; geef de map van een installatie mee:
 //   PLAYWRIGHT_MAP=/tmp/pw/node_modules/playwright mise x node@26.13.1 -- node src/klembord/chromiumKlembord.mjs
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';

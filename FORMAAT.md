@@ -2,7 +2,7 @@
 
 Het werkformaat van `bijbel/<boek>/bron/` en `bijbel/<boek>/vereenvoudigd/`. Eén bestand per hoofdstuk: `<prefix>-NN.md` (prefix uit `boek.json`, bv. `lukas-01.md`).
 
-Dit is de gedeelde specificatie voor **alle** gereedschap: de Python-scripts in `scripts/` en de web-tool in `docs/`. Wie het formaat verandert, past beide aan en draait de heen-en-terugtest (zie `CLAUDE.md`).
+Dit is de gedeelde specificatie voor **alle** gereedschap: de Python-scripts in `scripts/` en de web-tool in `redactietool/`. Wie het formaat verandert, past beide aan en draait de heen-en-terugtest (zie `CLAUDE.md`).
 
 De betekenis zit deels in de Word-opmaak. Die wordt als tags in de tekst bewaard, zodat hij de vereenvoudiging overleeft en terug naar Word kan.
 

@@ -12,7 +12,7 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 | `sjablonen/` | Sjablonen, zoals het wijzigingslog. | - |
 | `scripts/` | Omzetten uit Word, controles, terugzetten naar Word. Werken voor elk boek (`--boek`). | - |
 | `.claude/` | Configuratie voor Claude Code: skills, `/intent` en `/pr`, rules en een hook tegen em-dashes. Zie [`.claude/README.md`](.claude/README.md). | - |
-| `docs/` | Web-tool om vertalingen te redigeren en naast het origineel te vergelijken (gepland). | - |
+| `redactietool/` | Web-tool om vertalingen te lezen, te redigeren en naast het origineel te vergelijken (broncode; de build gaat via GitHub Actions naar Pages). Plan: `redactietool/PLAN.md`. | - |
 | `bijbel/<boek>/` | Alles van één Bijbelboek, zie hieronder. | |
 | `FORMAAT.md` | Het Markdown-formaat met opmaak-tags: de gedeelde specificatie voor de scripts en de web-tool. | - |
 | `WERKPLAN.md` | De stappen per hoofdstuk (en de autonome modus). | - |
@@ -58,7 +58,7 @@ python3 -I scripts/controleer_hoofdstuk.py 4-24 --boek lukas
 python3 -I scripts/md_naar_docx.py --boek lukas review --hoofdstuk 4 -o $B/export/lukas-04-review.docx
 python3 -I scripts/md_naar_docx.py --boek lukas doc $B/vereenvoudigd/lukas-*.md -o $B/export/lukas-vereenvoudigd.docx
 
-# parse_md-uitvoer als JSON (voor de pariteitstest van de tool, zie docs/README.md)
+# parse_md-uitvoer als JSON (voor de pariteitstest van de tool, zie redactietool/README.md)
 python3 -I scripts/formaat_naar_json.py --boek lukas
 
 # Heen-en-terugtest: bron zonder vereenvoudiging terug naar Word

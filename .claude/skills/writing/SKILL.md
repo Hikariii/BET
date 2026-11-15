@@ -5,7 +5,7 @@ description: Gebruik bij het schrijven van tekst voor mensen (commitberichten, P
 
 # Schrijfstijl
 
-Voor alles wat een mens leest: chat, commits, PR's, comments, `README`, `WERKPLAN`, `docs/`. Taal: Nederlands (ook in code-comments en PR's). Begrippen uit het domein in het Nederlands (vers, hoofdstuk, redactiekeuze, herkomst); gangbare Engelse vaktermen blijven Engels (branch, commit, build, parser).
+Voor alles wat een mens leest: chat, commits, PR's, comments, `README`, `WERKPLAN`, `redactietool/`. Taal: Nederlands (ook in code-comments en PR's). Begrippen uit het domein in het Nederlands (vers, hoofdstuk, redactiekeuze, herkomst); gangbare Engelse vaktermen blijven Engels (branch, commit, build, parser).
 
 De vereenvoudigde tekst in `bijbel/*/vereenvoudigd/` volgt de redactierichtlijn, niet deze skill. Alleen de em-dash-regel geldt daar ook.
 
@@ -36,7 +36,7 @@ De vereenvoudigde tekst in `bijbel/*/vereenvoudigd/` volgt de redactierichtlijn,
 - **Schrijf woorden voluit.** Afkortingen als `ID`, `URL`, `PR`, `JSON` mogen; verder voluit.
 - **Houd samengestelde domeintermen heel**: "redactiekeuze", niet "keuze", als dat het onderwerp is.
 - **Nooit afbreken op een vaste breedte**, in chat, tekst of comments: alleen na een zin of lijstitem.
-- **Geen documentjargon in code.** Labels uit `.claude/`, `docs/PLAN.md` of `WERKPLAN.md` (B1, O7, "fase 3") horen niet in comments of testnamen; beschrijf het gedrag in de woorden van de code.
+- **Geen documentjargon in code.** Labels uit `.claude/`, `redactietool/PLAN.md` of `WERKPLAN.md` (B1, O7, "fase 3") horen niet in comments of testnamen; beschrijf het gedrag in de woorden van de code.
 
 ```
 Slecht: Deze PR introduceert een robuuste en uitgebreide oplossing die naadloos

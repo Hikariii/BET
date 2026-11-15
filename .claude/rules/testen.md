@@ -2,7 +2,7 @@
 name: testen
 description: Algemene regels voor tests: opbouw, asserties, en een test laten falen om te bewijzen dat hij werkt. Geldt voor de tool en voor tests van de scripts.
 paths:
-  - "docs/**"
+  - "redactietool/**"
   - "scripts/**"
   - "**/*.test.*"
   - "**/tests/**"

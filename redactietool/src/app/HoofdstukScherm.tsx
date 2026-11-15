@@ -8,7 +8,7 @@ import { statusKlasse } from './Zijbalk';
 import { vragenBijVers } from './vertaalvragen';
 import { VersTekst } from './VersTekst';
 
-/** Uit docs/PLAN.md, onderdeel Bewerken. */
+/** Uit redactietool/PLAN.md, onderdeel Bewerken. */
 const LABEL_GOEDGEKEURD = 'Goedgekeurd, referentie voor de rest van het boek. Wijzigingen gaan opnieuw langs de redactie.';
 
 type Props = {
