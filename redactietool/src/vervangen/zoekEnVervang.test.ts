@@ -135,7 +135,7 @@ describe('vervangInVers', () => {
 		const vondsten = zoek(inhoud, 'zoon');
 		expect(vondsten).toHaveLength(3);
 		expect(vervangInVers(inhoud, vondsten, 'kind van God')).toEqual(
-			vers(tekst('kind van God en kind van God. '), tekst('Nog een kind van God.', ['vet'])),
+			vers(tekst('Kind van God en kind van God. '), tekst('Nog een Kind van God.', ['vet'])),
 		);
 	});
 
@@ -154,9 +154,12 @@ describe('vervangInVers', () => {
 		});
 	});
 
-	it('neemt de nieuwe tekst letterlijk, zonder hoofdletter van de oude tekst over', () => {
-		const inhoud = vers(tekst('De Mensenzoon kwam.'));
-		expect(vervangInVers(inhoud, zoek(inhoud, 'de mensenzoon'), 'de Zoon van de mens')).toEqual(vers(tekst('de Zoon van de mens kwam.')));
+	it('geeft de nieuwe tekst een hoofdletter waar de gevonden tekst er een had, en laat hem verder letterlijk', () => {
+		const inhoud = vers(tekst('De Mensenzoon kwam. Zo kwam de Mensenzoon.'));
+		expect(inhoud.delen[0]?.stukken[0]).toMatchObject({ tekst: 'De Mensenzoon kwam. Zo kwam de Mensenzoon.' });
+		expect(vervangInVers(inhoud, zoek(inhoud, 'de mensenzoon'), 'de Zoon van de mens')).toEqual(
+			vers(tekst('De Zoon van de mens kwam. Zo kwam de Zoon van de mens.')),
+		);
 	});
 
 	it('laat vondsten die niet vervangbaar zijn staan', () => {

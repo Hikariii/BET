@@ -80,11 +80,17 @@ export function zoekVondsten(hoofdstukken: readonly HoofdstukVerzen[], zoekterm:
 	return vondsten;
 }
 
+function metHoofdletterVan(gevonden: string, nieuw: string): string {
+	const eerste = gevonden.charAt(0);
+	const begintMetHoofdletter = eerste !== eerste.toLowerCase();
+	return begintMetHoofdletter ? nieuw.charAt(0).toUpperCase() + nieuw.slice(1) : nieuw;
+}
+
 /**
  * Vervangt in een vers de vondsten (alleen vervangbare, binnen één opmaak) door `nieuw`, met de opmaak van de vervangen tekst.
  * Een vondst hoort bij het vers als deel, positie en gevonden tekst kloppen met de inhoud; andere vondsten
  * (ander vers, of een vers dat sinds het zoeken veranderde) worden genegeerd.
- * De nieuwe tekst komt letterlijk in het vers, zonder hoofdletterwijziging.
+ * Begint de gevonden tekst met een hoofdletter (zoals aan het begin van een zin), dan krijgt de nieuwe tekst die ook; verder komt hij letterlijk in het vers.
  */
 export function vervangInVers(inhoud: VersInhoud, vondsten: readonly Vondst[], nieuw: string): VersInhoud {
 	const delen = inhoud.delen.map((deel, nummerDeel): VersAlineadeel => {
@@ -100,7 +106,7 @@ export function vervangInVers(inhoud: VersInhoud, vondsten: readonly Vondst[], n
 			const bereik = stukVanPlek(bereiken, vondst.van, vondst.tot);
 			const stuk = bereik === null ? undefined : stukken[bereiken.indexOf(bereik)];
 			if (bereik === null || stuk === undefined) continue;
-			stuk.tekst = stuk.tekst.slice(0, vondst.van - bereik.van) + nieuw + stuk.tekst.slice(vondst.tot - bereik.van);
+			stuk.tekst = stuk.tekst.slice(0, vondst.van - bereik.van) + metHoofdletterVan(vondst.gevonden, nieuw) + stuk.tekst.slice(vondst.tot - bereik.van);
 			vorigeVan = vondst.van;
 		}
 		return { stijl: deel.stijl, stukken };
