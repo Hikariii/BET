@@ -11,3 +11,6 @@ bijbel/*/export/*
 
 # Intentiebestanden per branch (/intent), alleen lokaal
 .plan/
+
+# Node-afhankelijkheden van de tool
+node_modules/

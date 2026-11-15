@@ -58,6 +58,9 @@ python3 -I scripts/controleer_hoofdstuk.py 4-24 --boek lukas
 python3 -I scripts/md_naar_docx.py --boek lukas review --hoofdstuk 4 -o $B/export/lukas-04-review.docx
 python3 -I scripts/md_naar_docx.py --boek lukas doc $B/vereenvoudigd/lukas-*.md -o $B/export/lukas-vereenvoudigd.docx
 
+# parse_md-uitvoer als JSON (voor de pariteitstest van de tool, zie docs/README.md)
+python3 -I scripts/formaat_naar_json.py --boek lukas
+
 # Heen-en-terugtest: bron zonder vereenvoudiging terug naar Word
 python3 -I scripts/md_naar_docx.py --boek lukas doc $B/bron/lukas-*.md -o $B/export/heen-en-terug.docx
 ```
