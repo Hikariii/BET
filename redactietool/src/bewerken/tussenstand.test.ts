@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Hoofdstuk, Tekstalinea } from '../formaat/types';
-import { bewaarOfWis, bewaarVers, isVerouderd, leesTussenstand, pasTussenstandToe, wisVers } from './tussenstand';
+import { bewaarKeuzeVers, bewaarOfWis, bewaarVers, isVerouderd, leesTussenstand, pasTussenstandToe, wisVers } from './tussenstand';
 import type { Opslag } from './tussenstand';
 import type { Tussenstand, VersInhoud } from './types';
 import { knipVers } from './versknip';
@@ -365,5 +365,72 @@ describe('pasTussenstandToe', () => {
 			const nieuw = pasTussenstandToe(hoofdstuk, tussenstandMet({ 2: inhoud(' maar een deel') }));
 			expect(nieuw).toEqual(hoofdstuk);
 		});
+	});
+});
+
+describe('herkomst in de tussenstand', () => {
+	function bewaardMet(velden: Record<string, unknown>): GeheugenOpslag {
+		const opslag = new GeheugenOpslag();
+		opslag.setItem(SLEUTEL, JSON.stringify({ verzen: { 1: { inhoud: inhoud(' nieuw'), basis: inhoud(' oud'), bewaard: '2026-11-15T15:00:00.000Z', ...velden } } }));
+		return opslag;
+	}
+
+	it('leest herkomst en keuze-id van een structurele keuze', () => {
+		const vers = leesTussenstand(bewaardMet({ herkomst: 'structurele keuze', keuzeId: '17' }), 'lukas', 3).verzen[1];
+		expect(vers?.herkomst).toBe('structurele keuze');
+		expect(vers?.keuzeId).toBe('17');
+	});
+
+	it('laat herkomst weg bij opslag van voor de herkomst bestond, en bij een onbekende waarde', () => {
+		expect(leesTussenstand(bewaardMet({}), 'lukas', 3).verzen[1]?.herkomst).toBeUndefined();
+		const onbekend = leesTussenstand(bewaardMet({ herkomst: 'door een robot', keuzeId: '17' }), 'lukas', 3).verzen[1];
+		expect(onbekend?.herkomst).toBeUndefined();
+		expect(onbekend?.keuzeId).toBeUndefined();
+	});
+
+	it('negeert een structurele keuze zonder keuze-id', () => {
+		const vers = leesTussenstand(bewaardMet({ herkomst: 'structurele keuze' }), 'lukas', 3).verzen[1];
+		expect(vers?.herkomst).toBeUndefined();
+	});
+
+	it('zet bewaarVers op zelf getypt', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarVers(opslag, 'lukas', 3, 1, inhoud(' nieuw'), inhoud(' oud'));
+		expect(leesTussenstand(opslag, 'lukas', 3).verzen[1]?.herkomst).toBe('zelf getypt');
+	});
+});
+
+describe('bewaarKeuzeVers', () => {
+	it('neemt de inhoud van vóór de vervanging als basis bij een vers zonder bewerking', () => {
+		const opslag = new GeheugenOpslag();
+
+		expect(bewaarKeuzeVers(opslag, 'lukas', 3, 1, inhoud(' nieuw'), inhoud(' oud'), 'k1')).toEqual({ gelukt: true });
+
+		expect(leesTussenstand(opslag, 'lukas', 3).verzen[1]).toMatchObject({
+			inhoud: inhoud(' nieuw'),
+			basis: inhoud(' oud'),
+			herkomst: 'structurele keuze',
+			keuzeId: 'k1',
+		});
+	});
+
+	it('houdt de bestaande basis van een bewerkt vers', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarVers(opslag, 'lukas', 3, 1, inhoud(' eigen'), inhoud(' repo'));
+
+		bewaarKeuzeVers(opslag, 'lukas', 3, 1, inhoud(' eigen nieuw'), inhoud(' eigen'), 'k1');
+
+		expect(leesTussenstand(opslag, 'lukas', 3).verzen[1]?.basis).toEqual(inhoud(' repo'));
+	});
+
+	it('weigert met een melding als de bestaande basis een ander aantal delen heeft', () => {
+		const opslag = new GeheugenOpslag();
+		const tweeDelen: VersInhoud = { delen: [...inhoud(' a').delen, ...inhoud(' b').delen] };
+		bewaarVers(opslag, 'lukas', 3, 1, inhoud(' eigen'), tweeDelen);
+
+		const uitkomst = bewaarKeuzeVers(opslag, 'lukas', 3, 1, inhoud(' nieuw'), inhoud(' eigen'), 'k1');
+
+		expect(uitkomst).toEqual({ gelukt: false, melding: expect.stringContaining('Vers 3:1 past niet meer') });
+		expect(leesTussenstand(opslag, 'lukas', 3).verzen[1]?.inhoud).toEqual(inhoud(' eigen'));
 	});
 });

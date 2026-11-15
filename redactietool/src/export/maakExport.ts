@@ -35,7 +35,7 @@ function gewijzigdVers(nummer: number, invoer: ExportInvoer): GewijzigdVers | nu
 		vers: nummer,
 		repo: repo === null ? [] : opFormaatRegels(repo),
 		bewerkt: opFormaatRegels(bewerkt.inhoud),
-		herkomst: 'zelf getypt',
+		herkomst: bewerkt.herkomst ?? 'zelf getypt',
 		waarschuwingen: bron === null ? [] : waarschuwingenVoorVers(bron, bewerkt.inhoud).map((waarschuwing) => waarschuwing.tekst),
 		verouderd,
 	};

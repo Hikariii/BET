@@ -45,7 +45,8 @@ function alsDeel(waarde: unknown): VersAlineadeel | null {
 	return { stijl, stukken: tekststukken };
 }
 
-function alsInhoud(waarde: unknown): VersInhoud | null {
+/** Leest een VersInhoud uit opgeslagen JSON; `null` bij een onbruikbare vorm. */
+export function alsInhoud(waarde: unknown): VersInhoud | null {
 	if (!isObject(waarde) || !Array.isArray(waarde['delen'])) return null;
 	const delen: VersAlineadeel[] = [];
 	for (const deel of waarde['delen']) {
@@ -61,7 +62,13 @@ function alsBewerktVers(waarde: unknown): BewerktVers | null {
 	const inhoud = alsInhoud(waarde['inhoud']);
 	const basis = alsInhoud(waarde['basis']);
 	if (inhoud === null || basis === null) return null;
-	return { inhoud, basis, bewaard: waarde['bewaard'] };
+	const vers: BewerktVers = { inhoud, basis, bewaard: waarde['bewaard'] };
+	// Een onbekende herkomst telt als niet gezet: dan geldt 'zelf getypt'.
+	if (waarde['herkomst'] === 'zelf getypt') return { ...vers, herkomst: 'zelf getypt' };
+	if (waarde['herkomst'] === 'structurele keuze' && typeof waarde['keuzeId'] === 'string') {
+		return { ...vers, herkomst: 'structurele keuze', keuzeId: waarde['keuzeId'] };
+	}
+	return vers;
 }
 
 /** Leest de tussenstand van een hoofdstuk; leeg als er niets bewaard is of de opslag onleesbaar is. Een vers met een onbruikbare vorm valt weg. */
@@ -92,21 +99,9 @@ export function leesTussenstand(opslag: Opslag, boek: string, hoofdstuk: number)
 
 export type BewaarUitkomst = { gelukt: true } | { gelukt: false; melding: string };
 
-/** Bewaart de bewerkte inhoud van één vers met de repo-inhoud waarop hij begon; een volle opslag geeft een melding. */
-export function bewaarVers(
-	opslag: Opslag,
-	boek: string,
-	hoofdstuk: number,
-	vers: number,
-	inhoud: VersInhoud,
-	basis: VersInhoud,
-): BewaarUitkomst {
+function schrijfVers(opslag: Opslag, boek: string, hoofdstuk: number, vers: number, bewerkt: BewerktVers): BewaarUitkomst {
 	const tussenstand = leesTussenstand(opslag, boek, hoofdstuk);
-	tussenstand.verzen[vers] = {
-		inhoud,
-		basis,
-		bewaard: new Date().toISOString(),
-	};
+	tussenstand.verzen[vers] = bewerkt;
 	try {
 		opslag.setItem(sleutel(boek, hoofdstuk), JSON.stringify(tussenstand));
 		return { gelukt: true };
@@ -116,6 +111,46 @@ export function bewaarVers(
 			melding: `Vers ${vers} kon niet in de browser worden bewaard, waarschijnlijk is de opslag vol. Kopieer je tekst voordat je op Klaar drukt.`,
 		};
 	}
+}
+
+/** Bewaart de bewerkte inhoud van één vers met de repo-inhoud waarop hij begon (herkomst 'zelf getypt'); een volle opslag geeft een melding. */
+export function bewaarVers(
+	opslag: Opslag,
+	boek: string,
+	hoofdstuk: number,
+	vers: number,
+	inhoud: VersInhoud,
+	basis: VersInhoud,
+): BewaarUitkomst {
+	return schrijfVers(opslag, boek, hoofdstuk, vers, { inhoud, basis, bewaard: new Date().toISOString(), herkomst: 'zelf getypt' });
+}
+
+/**
+ * Bewaart een vers dat een structurele keuze veranderde, met herkomst 'structurele keuze' en het keuze-id.
+ * `huidig` is de inhoud vóór de vervanging: een vers zonder bewerking krijgt die als basis (de repo-inhoud),
+ * een bewerkt vers houdt zijn oude basis. Past die basis niet meer op `huidig` (ander aantal delen), dan geeft dat een melding.
+ */
+export function bewaarKeuzeVers(
+	opslag: Opslag,
+	boek: string,
+	hoofdstuk: number,
+	vers: number,
+	nieuw: VersInhoud,
+	huidig: VersInhoud,
+	keuzeId: string,
+): BewaarUitkomst {
+	const bestaand = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
+	if (bestaand !== undefined && bestaand.basis.delen.length !== huidig.delen.length) {
+		return { gelukt: false, melding: `Vers ${hoofdstuk}:${vers} past niet meer op de tussenstand en is overgeslagen.` };
+	}
+	const basis = bestaand === undefined ? huidig : bestaand.basis;
+	return schrijfVers(opslag, boek, hoofdstuk, vers, {
+		inhoud: nieuw,
+		basis,
+		bewaard: new Date().toISOString(),
+		herkomst: 'structurele keuze',
+		keuzeId,
+	});
 }
 
 /** Of een bewaarde bewerking dezelfde indeling in alinea's heeft als het vers in de repo; zo niet, dan kan ze er niet in worden gezet. */
@@ -181,7 +216,8 @@ function samengevoegd(stukken: readonly Tekststuk[]): Tekststuk[] {
 	return uitkomst;
 }
 
-function zelfdeInhoud(a: VersInhoud, b: VersInhoud): boolean {
+/** Of twee inhouden hetzelfde zeggen: gelijke stijl, tekst en opmaak per deel, ongeacht hoe de stukken verdeeld zijn. */
+export function zelfdeInhoud(a: VersInhoud, b: VersInhoud): boolean {
 	if (a.delen.length !== b.delen.length) return false;
 	return a.delen.every((deel, plek) => {
 		const ander = b.delen[plek];

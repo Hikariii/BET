@@ -22,8 +22,8 @@ export type GewijzigdVers = {
 	repo: string[];
 	/** De bewerkte tekst, één regel per deel, in FORMAAT-notatie. */
 	bewerkt: string[];
-	/** Nu altijd "zelf getypt"; menu en structurele keuzes komen in fase 4. */
-	herkomst: 'zelf getypt';
+	/** Hoe de bewerking ontstond; een vers zonder bewaarde herkomst geldt als "zelf getypt". */
+	herkomst: 'zelf getypt' | 'structurele keuze';
 	/** De waarschuwingen die bij het vers stonden toen de export gemaakt werd. */
 	waarschuwingen: string[];
 	/** Of de repo sinds de bewerking veranderd is. */
