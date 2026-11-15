@@ -4,7 +4,7 @@ export type RedactieExport = {
 	versie: 1;
 	boek: string;
 	hoofdstuk: number;
-	/** De commit van de repo waarop de tool gebouwd is; `null` als die bij het bouwen niet bekend was. */
+	/** De commit van de build (`GITHUB_SHA` via Vite `define`); `null` bij een lokale build zonder die variabele. */
 	repoCommit: string | null;
 	/** ISO-tijd van het maken van de export. */
 	gemaakt: string;
@@ -28,10 +28,4 @@ export type GewijzigdVers = {
 	waarschuwingen: string[];
 	/** Of de repo sinds de bewerking veranderd is. */
 	verouderd: boolean;
-};
-
-/** Wat het bouwscript over de build vastlegt (`data/bouwinfo.json`). */
-export type Bouwinfo = {
-	repoCommit: string | null;
-	gebouwd: string;
 };
