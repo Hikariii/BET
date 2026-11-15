@@ -35,5 +35,43 @@
     ["\\bwaardig geacht", "precedent", "waardig geacht → het waard gevonden"],
     ["\\bverkrijgen\\b", "precedent", "verkrijgen → krijgen"],
     ["\\b(ge)?worpen\\b|\\bwierp(en)?\\b", "precedent", "werpen → gooien"]
+  ],
+  "_uitleg_geaccepteerd": "Bewuste keuzes van de vertaler (aangeleverd Word is leidend) die afwijken van de bron. scripts/controleer_hoofdstuk.py meldt ze als GEACCEPTEERD in plaats van als fout of waarschuwing. Per regel: vers, soort (tag of vast begrip) en reden.",
+  "geaccepteerd": [
+    {
+      "vers": "1:16",
+      "soort": "geloof",
+      "reden": "vertaler herschreef 'bekeren' tot een omschrijving, zonder markering (0.9-docx)"
+    },
+    {
+      "vers": "1:45",
+      "soort": "eeuwigleven",
+      "reden": "vertaler gaf 'Gezegend' (bron: zalig) de markering genade in plaats van eeuwigleven"
+    },
+    {
+      "vers": "1:45",
+      "soort": "genade",
+      "reden": "idem"
+    },
+    {
+      "vers": "1:48",
+      "soort": "eeuwigleven",
+      "reden": "idem als 1:45"
+    },
+    {
+      "vers": "1:48",
+      "soort": "genade",
+      "reden": "idem als 1:45"
+    },
+    {
+      "vers": "2:26",
+      "soort": "cursief",
+      "reden": "vertaler liet de uitleg '(de Christus)' weg"
+    },
+    {
+      "vers": "2:26",
+      "soort": "Christus",
+      "reden": "idem: met de uitleg verdween ook het vaste begrip uit dit vers"
+    }
   ]
 }

@@ -11,6 +11,7 @@ Meldt:
                een opmaaksoort uit de bron ontbreekt in het vers
   WAARSCHUWING aantal tags per vers verschilt, oude vormen (§11 e.a.),
                vaste begrippen (§15) verdwenen, vers niet in het wijzigingslog
+  GEACCEPTEERD bewuste afwijking van de bron, vastgelegd in controle.json (telt niet als fout)
 Exitcode 1 bij een FOUT.
 """
 import argparse
@@ -188,6 +189,19 @@ def controleer(boek, h):
     return fouten, waarsch
 
 
+def scheid_geaccepteerd(meldingen, geaccepteerd):
+    """Splits meldingen in (open, [(melding, reden)]) volgens de geaccepteerde afwijkingen uit controle.json."""
+    open_, ok = [], []
+    for m in meldingen:
+        reden = next((r for vers, soort, r in geaccepteerd
+                      if m.startswith(vers + " ") and (f"'{soort}'" in m or f"/{soort}/" in m)), None)
+        if reden is None:
+            open_.append(m)
+        else:
+            ok.append((m, reden))
+    return open_, ok
+
+
 def main():
     ap = argparse.ArgumentParser(description="Controleer vereenvoudigde hoofdstukken tegen de bron.")
     ap.add_argument("hoofdstukken", help="bv. 4, 1-3 of 1,4,5")
@@ -205,14 +219,19 @@ def main():
             hoofdstukken.extend(range(int(a), int(b) + 1))
         else:
             hoofdstukken.append(int(deel))
+    geaccepteerd = boek.geaccepteerd()
     totaal_fout = 0
     for h in hoofdstukken:
         fouten, waarsch = controleer(boek, h)
+        fouten, ok1 = scheid_geaccepteerd(fouten, geaccepteerd)
+        waarsch, ok2 = scheid_geaccepteerd(waarsch, geaccepteerd)
         print(f"== {boek.kop(h)}: {len(fouten)} fouten, {len(waarsch)} waarschuwingen")
         for x in fouten:
             print("  FOUT        ", x)
         for x in waarsch:
             print("  WAARSCHUWING", x)
+        for x, reden in ok1 + ok2:
+            print("  GEACCEPTEERD", x, f"({reden})")
         totaal_fout += len(fouten)
     sys.exit(1 if totaal_fout else 0)
 

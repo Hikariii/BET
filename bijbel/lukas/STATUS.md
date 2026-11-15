@@ -4,8 +4,8 @@ Statussen (zie `docs/PLAN.md`, "Status per hoofdstuk"): `-` (nog niet begonnen) 
 
 | Hoofdstuk | Bron | Status | Versie | Herkomst | Opmerking |
 | --- | --- | --- | --- | --- | --- |
-| Lukas 1 | ✓ | goedgekeurd | v1.0 | aangeleverd (datum onbekend): `origineel/Lukas Jezus' woorden en highlights hoofdstuk 1 - eenvoudiger 0.9.docx` | Omgezet naar md; reviewdocument export/lukas-01-03-review.docx; 6 opmaakfouten (controlescript). Was: nog over te zetten uit `origineel/…hoofdstuk 1 - eenvoudiger 0.9.docx`; bestandsnaam zegt 0.9, richtlijn zegt v1.0 |
-| Lukas 2 | ✓ | goedgekeurd | v1.0 | aangeleverd (datum onbekend): `origineel/Lukas Jezus' woorden en highlights hoofdstuk 1 - eenvoudiger 0.9.docx` | omgezet; 2 opmaakfouten |
+| Lukas 1 | ✓ | goedgekeurd | v1.0 | aangeleverd (datum onbekend): `origineel/Lukas Jezus' woorden en highlights hoofdstuk 1 - eenvoudiger 0.9.docx` | Omgezet naar md; reviewdocument export/lukas-01-03-review.docx; opmaak hersteld of geaccepteerd 2026-11-15 (zie wijzigingslog), 0 fouten. Was: nog over te zetten uit `origineel/…hoofdstuk 1 - eenvoudiger 0.9.docx`; bestandsnaam zegt 0.9, richtlijn zegt v1.0 |
+| Lukas 2 | ✓ | goedgekeurd | v1.0 | aangeleverd (datum onbekend): `origineel/Lukas Jezus' woorden en highlights hoofdstuk 1 - eenvoudiger 0.9.docx` | omgezet; opmaak hersteld of geaccepteerd 2026-11-15, 0 fouten |
 | Lukas 3 | ✓ | goedgekeurd | v1.0 | aangeleverd (datum onbekend): `origineel/Lukas Jezus' woorden en highlights hoofdstuk 1 - eenvoudiger 0.9.docx` | omgezet; geen fouten |
 | Lukas 4 | ✓ | review | |  | 41/44 verzen gewijzigd; onafhankelijke controle verwerkt; 10 vragen; export/lukas-04-review.docx |
 | Lukas 5 | ✓ | review | |  | 38/39 gewijzigd; onafhankelijke controle verwerkt; 11 vragen; export/lukas-05-review.docx |

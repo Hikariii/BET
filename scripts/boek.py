@@ -10,7 +10,8 @@ Elk boek staat in `bijbel/<id>/` met een `boek.json`:
     }
 
 Optioneel `controle.json`: extra oude vormen uit de precedenten van dit boek,
-als lijst van [regex, paragraaf, uitleg] (zie controleer_hoofdstuk.py).
+als lijst van [regex, paragraaf, uitleg], en geaccepteerde afwijkingen van de bron
+(zie controleer_hoofdstuk.py).
 
 Scripts worden met `python3 -I` gedraaid; die voegen deze map zelf aan sys.path toe.
 """
@@ -57,6 +58,14 @@ class Boek:
 
     def kop(self, hoofdstuk):
         return f"{self.naam} {hoofdstuk}"
+
+    def geaccepteerd(self):
+        """Bewuste afwijkingen van de bron uit controle.json: [(vers, soort, reden)]."""
+        pad = os.path.join(self.map, "controle.json")
+        if not os.path.isfile(pad):
+            return []
+        with open(pad, encoding="utf-8") as f:
+            return [(g["vers"], g["soort"], g["reden"]) for g in json.load(f).get("geaccepteerd", [])]
 
     def extra_oude_vormen(self):
         pad = os.path.join(self.map, "controle.json")

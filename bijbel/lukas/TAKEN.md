@@ -18,7 +18,7 @@ Taken voor het gereedschap staan in `TAKEN.md` in de hoofdmap. Bijgehouden door 
 
 ## Voor de gebruiker / redactie
 - [ ] Reviewdocument Lukas 1–3 bekijken: werkt het formaat?
-- [ ] Opmaakfouten Lukas 1–3 herstellen? (1:16, 1:35, 1:45, 1:48, 1:77, 2:24, 2:26). De tekst verandert niet
+- [x] Opmaakfouten Lukas 1–3: 1:35, 1:77, 2:24 hersteld; 1:16, 1:45, 1:48, 2:26 geaccepteerd als keuze van de vertaler (`controle.json`). Open: les over "Gezegend" (`referentie/open-vragen.md`) en de waarschuwingen 1:6, 1:42, 3:17
 - [ ] Aanvullingen richtlijn uit de logs van 1–3 (algemene woordmodernisering, "En" aan zinsbegin, voorzetsels, hoofdletters bij God/Jezus, punctuatie, foutieve verwijzingen in v1.4). Wijzigen alleen na akkoord
 - [ ] Voorlopige begrippenbesluiten bevestigen (`referentie/precedenten.md`)
 - [ ] 8 open vragen beslissen (`referentie/open-vragen.md`, status `open`): 4:18–19, 5:32, 6:9, 9:22 (opgewekt, raakt ook 18:33 en 24), 11:4 (Onze Vader, raakt ook 22:40/46), 12:5, 15:30, 23:46

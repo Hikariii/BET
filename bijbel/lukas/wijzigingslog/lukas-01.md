@@ -746,3 +746,11 @@ Vergelijking van Lukas 1 in de brontekst (`Lukas Jezus' woorden en highlights 1.
   - "gesterkt in de geest" → "sterk in zijn geest" — geen vaste regel (lijdende vorm vervalt, §21; "de" → "zijn")
   - ", en het verbleef" → ". Hij woonde" — §7A (zin opgesplitst); "verbleef" → "woonde" — geen vaste regel
   - "van zijn verschijning aan Israël" → "waarop hij zich aan Israël liet zien" — §7 (zinsconstructie; "verschijning" wordt een werkwoordsvorm)
+
+## Opmaakherstel 2026-11-15
+
+Na vergelijking met het aangeleverde Word-bestand (`origineel/…eenvoudiger 0.9.docx`). Tekst ongewijzigd, alleen markeringen; zie WERKPLAN deel D3.
+
+- 1:35: markering genade terug op "Heilige Geest" (in het Word-bestand per ongeluk weggevallen; elders markeert de vertaler het wel)
+- 1:77: markering genade terug op "vergeving" en zonde op "zonden" (idem)
+- 1:16, 1:45, 1:48: geaccepteerd als keuze van de vertaler, vastgelegd in `controle.json`

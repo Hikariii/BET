@@ -479,3 +479,10 @@ Vergelijking van Lukas 2 in de brontekst (`Lukas Jezus' woorden en highlights 1.
 - **Wijzigingen:**
   - "En Jezus nam toe" → "Jezus groeide verder" — §7A (En weggelaten); "nam toe" → "groeide verder" — geen vaste regel
   - "en in genade" → ". Ook groeide Hij in gunst" — §7A (zin opgesplitst); "genade" → "gunst" — §17 (2:52)
+
+## Opmaakherstel 2026-11-15
+
+Na vergelijking met het aangeleverde Word-bestand (`origineel/…eenvoudiger 0.9.docx`). Tekst ongewijzigd, alleen markeringen; zie WERKPLAN deel D3.
+
+- 2:24: markering torah terug op "de Torah van de Heer" (per ongeluk weggevallen; in 2:23 en 2:39 markeert de vertaler het wel)
+- 2:26: geaccepteerd als keuze van de vertaler (uitleg "(de Christus)" weggelaten), vastgelegd in `controle.json`
