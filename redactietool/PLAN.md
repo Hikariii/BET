@@ -1,6 +1,6 @@
 # Plan: redactietool (v2)
 
-Status: **vastgesteld** na de review-sessie van 2026-11-15. **Stand van de bouw (2026-11-15):** fase 1 (lezen), fase 2 (begrippen en vragen) en fase 3 (bewerken per vers, tussenstand in de browser) gebouwd; voorwerk voor fase 5 (Word-HTML, byte-gelijk aan het prototype) staat er als rekenmodule, nog zonder knop. Fase 0 wacht op de Windows-test.
+Status: **vastgesteld** na de review-sessie van 2026-11-15. **Stand van de bouw (2026-11-15):** fase 1 (lezen), 2 (begrippen en vragen), 3 (bewerken per vers, tussenstand in de browser) en 5 (Kopiëren naar Word, Export voor Claude) gebouwd. Fase 4 (structurele keuzes) nog niet. Fase 0 wacht op de Windows-test.
 
 ## Doel
 

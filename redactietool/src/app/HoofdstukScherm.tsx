@@ -55,7 +55,7 @@ export function HoofdstukScherm({
 					{info.versie !== '' && <span class="versie">{info.versie}</span>}
 				</p>
 				{info.status === 'goedgekeurd' && <p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>}
-				<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} />
+				<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} tussenstand={tussenstand} />
 			</header>
 			<table class="verzen">
 				<thead>

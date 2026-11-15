@@ -1,11 +1,10 @@
-import { useState } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData } from '../../data/types';
-import { leesTussenstand } from '../../bewerken/tussenstand';
+import type { Tussenstand } from '../../bewerken/types';
 import { exportBestandsnaam, maakExport } from '../../export/maakExport';
 import type { RedactieExport } from '../../export/types';
 import type { Hoofdstuk } from '../../formaat/types';
 import { maakKlembordInhoud, vulKopieerGebeurtenis } from '../../klembord/kopieer';
-import { browseropslag } from '../bewerken/useTussenstand';
 import './hoofdstukacties.css';
 
 type Props = {
@@ -14,9 +13,12 @@ type Props = {
 	repo: HoofdstukData;
 	/** Het hoofdstuk zoals in de tool, met de tussenstand toegepast; dit gaat naar Word. */
 	weergave: Hoofdstuk;
+	/** Dezelfde tussenstand waaruit `weergave` gemaakt is, zodat teller, export en klembord gelijk lopen. */
+	tussenstand: Tussenstand;
 };
 
-type KopieUitkomst = { soort: 'gekopieerd' } | { soort: 'mislukt'; melding: string };
+/** `van`: de tussenstand op het moment van kopiëren; is die veranderd, dan is het klembord verouderd. */
+type KopieUitkomst = { soort: 'gekopieerd'; van: Tussenstand } | { soort: 'mislukt'; melding: string };
 
 /** Safari herkend aan de user agent; een hint, want de user agent is niet betrouwbaar (iPadOS). */
 const SAFARI = /Safari/;
@@ -31,7 +33,7 @@ function meervoud(aantal: number, enkelvoud: string, meervoudsvorm: string): str
 }
 
 /** Zet het hoofdstuk op het klembord via een eigen `copy`-handler; de standaardkopie van de browser laat de Word-stijlnamen weg. */
-function kopieerNaarKlembord(weergave: Hoofdstuk, boek: BoekData): KopieUitkomst {
+function kopieerNaarKlembord(weergave: Hoofdstuk, boek: BoekData, tussenstand: Tussenstand): KopieUitkomst {
 	const inhoud = maakKlembordInhoud([weergave], boek.stijlen);
 	let melding: string | null = 'De browser startte de kopieeractie niet.';
 	const bijKopie = (gebeurtenis: ClipboardEvent) => {
@@ -44,12 +46,12 @@ function kopieerNaarKlembord(weergave: Hoofdstuk, boek: BoekData): KopieUitkomst
 	};
 	document.addEventListener('copy', bijKopie);
 	try {
-		// execCommand is verouderd maar de enige weg naar een copy-gebeurtenis na een klik, waarvan de handler de clipboardData vult; zonder selectie werkt dat in Chromium.
+		// Bewuste uitzondering op de regel tegen @deprecated (typescript.md): zie klembord/kopieer.ts; alleen een copy-gebeurtenis laat de handler de Word-stijlnamen op het klembord zetten.
 		document.execCommand('copy');
 	} finally {
 		document.removeEventListener('copy', bijKopie);
 	}
-	return melding === null ? { soort: 'gekopieerd' } : { soort: 'mislukt', melding };
+	return melding === null ? { soort: 'gekopieerd', van: tussenstand } : { soort: 'mislukt', melding };
 }
 
 function downloadAlsBestand(bestandsnaam: string, uitvoer: RedactieExport): void {
@@ -65,25 +67,19 @@ function downloadAlsBestand(bestandsnaam: string, uitvoer: RedactieExport): void
 }
 
 /** Knoppen bovenaan het hoofdstuk: Kopiëren naar Word (met de waarschuwing in Safari) en Export voor Claude. */
-export function Hoofdstukacties({ boek, repo, weergave }: Props) {
+export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
 	const [kopie, zetKopie] = useState<KopieUitkomst | null>(null);
 	const [exportOpen, zetExportOpen] = useState(false);
 	const [toelichting, zetToelichting] = useState('');
 
 	const bouwExport = (tekst: string) =>
-		maakExport({
-			boek: boek.id,
-			hoofdstuk: repo,
-			tussenstand: leesTussenstand(browseropslag(), boek.id, repo.nummer),
-			repoCommit: __REPO_COMMIT__,
-			toelichting: tekst,
-			nu: new Date(),
-		});
-	const huidigeExport = bouwExport('');
-	const aantalBewerkt = huidigeExport.verzen.length;
-	const aantalVerouderd = huidigeExport.verzen.filter((vers) => vers.verouderd).length;
+		maakExport({ boek: boek.id, hoofdstuk: repo, tussenstand, repoCommit: __REPO_COMMIT__, toelichting: tekst, nu: new Date() });
+	const { aantalBewerkt, aantalVerouderd } = useMemo(() => {
+		const verzen = bouwExport('').verzen;
+		return { aantalBewerkt: verzen.length, aantalVerouderd: verzen.filter((vers) => vers.verouderd).length };
+	}, [boek.id, repo, tussenstand]);
 
-	const kopieer = () => zetKopie(kopieerNaarKlembord(weergave, boek));
+	const kopieer = () => zetKopie(kopieerNaarKlembord(weergave, boek, tussenstand));
 	const download = (gebeurtenis: SubmitEvent) => {
 		gebeurtenis.preventDefault();
 		downloadAlsBestand(exportBestandsnaam(boek.prefix, repo.nummer), bouwExport(toelichting));
@@ -102,7 +98,7 @@ export function Hoofdstukacties({ boek, repo, weergave }: Props) {
 			</div>
 			{isSafari() && <p class="hoofdstukacties-safari">Kopiëren naar Word werkt in Chrome of Edge.</p>}
 			<div role="status" class="hoofdstukacties-status">
-				{kopie?.soort === 'gekopieerd' && 'Gekopieerd'}
+				{kopie?.soort === 'gekopieerd' && kopie.van === tussenstand && 'Gekopieerd'}
 				{kopie?.soort === 'mislukt' && `Kopiëren mislukt: ${kopie.melding}`}
 			</div>
 			{aantalVerouderd > 0 && (
