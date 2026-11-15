@@ -178,7 +178,7 @@ def controleer(boek, h):
             for m in re.finditer(patroon, v["tekst"]):
                 if re.search(patroon, b["tekst"]) is None:
                     continue  # komt alleen voor als het ook in de bron stond (dus niet nieuw ingevoerd)
-                waarsch.append(f"{h}:{n} oude vorm '{m.group(0).strip()}' — {par}: {uitleg}")
+                waarsch.append(f"{h}:{n} oude vorm '{m.group(0).strip()}' ({par}: {uitleg})")
                 break
         for patroon in VASTE_BEGRIPPEN:
             if re.search(patroon, b["tekst"]) and not re.search(patroon, v["tekst"]):

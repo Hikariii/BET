@@ -8,3 +8,6 @@ bijbel/*/export/*
 
 # Lokale worktrees van Claude/Orchestrator
 .claude/worktrees/
+
+# Intentiebestanden per branch (/intent), alleen lokaal
+.plan/

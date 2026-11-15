@@ -22,8 +22,8 @@ Deze stappen gebeuren één keer per boek. Zolang ze niet af zijn, begint geen e
 | A3 | Heen-en-terugtest: origineel → md → docx zonder wijzigingen | `export/heen-en-terug.docx` | redactie ziet geen verschil met het origineel (tekst, kleuren, stijlen) |
 | A4 | Eventuele al goedgekeurde hoofdstukken omzetten (bij Lukas: 1–3) | `vereenvoudigd/<prefix>-NN.md` | tags per vers gelijk aan de bron |
 | A5 | Referentiehoofdstukken en precedenten vaststellen (richtlijn §25A, §26) | `referentie/precedenten.md` | redactie heeft beslist welke hoofdstukken en precedenten gelden |
-| A6 | Controlescript draaien (zie stap 3) | — | slaagt op de goedgekeurde hoofdstukken (of meldt bekende afwijkingen) |
-| A7 | Openstaande punten van het boek beslissen | `TAKEN.md` van het boek | — |
+| A6 | Controlescript draaien (zie stap 3) | - | slaagt op de goedgekeurde hoofdstukken (of meldt bekende afwijkingen) |
+| A7 | Openstaande punten van het boek beslissen | `TAKEN.md` van het boek | - |
 
 ---
 

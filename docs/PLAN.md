@@ -55,7 +55,7 @@ De onderbouwing per besluit, met de afgewezen alternatieven, staat onderaan in *
 | Herkomst | Beschikbaar |
 |---|---|
 | De bron zelf (per stuk tekst) | ja, uit de woordvergelijking |
-| Wijzigingslog ("X → Y — §n") | ja |
+| Wijzigingslog ("X → Y: §n", in de logs met een em-dash als scheidingsteken) | ja |
 | Open vragen (kolommen *gekozen* en *alternatief*) | ja |
 | Elders in het boek (hoe hetzelfde bronwoord daar is vereenvoudigd) | ja, uit de vergelijking over alle hoofdstukken |
 | Precedenten / begrippenlijst | deels; moet machineleesbaar worden |
@@ -146,7 +146,7 @@ Later is hier een skill of script voor te maken, zodat dit één opdracht is.
 |---|---|---|
 | 1. Alleen lezen | Workflow en Pages, JSON uit de boeken, JS-parser, rijen per vers met opmaak uit het sjabloon, hover-koppeling | Lukas 1–24 leesbaar op Pages; pariteitstest met Python slaagt |
 | 2. Editor | ProseMirror, zelf typen, waarschuwingen, status per vers, opmerkingen; opslag lokaal + downloaden/openen | md → editor → md exact gelijk voor alle bronhoofdstukken; editor kan een hoofdstuk afmaken en downloaden |
-| 3. Alternatieven | Keuzemenu uit bron, log, open vragen en elders in het boek; overal toepassen | — |
+| 3. Alternatieven | Keuzemenu uit bron, log, open vragen en elders in het boek; overal toepassen | - |
 | 4. Google Drive | Inloggen, opslaan en laden, botsingscontrole, offline inhalen | Editor werkt een week zonder downloaden |
 | 5. Verwerking | Skill of script voor stap 6; `redactie/` in git | Eén hoofdstuk heen en terug verwerkt |
 | 6. Suggesties | `suggesties/*.json` van Claude in het keuzemenu | zie V1 |

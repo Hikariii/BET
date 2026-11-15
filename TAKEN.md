@@ -12,7 +12,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 - [x] Repository geschikt voor meerdere boeken: `bijbel/<boek>/` met `boek.json`; scripts met `--boek`; formaat apart in `FORMAAT.md` (uitvoer van alle scripts voor Lukas gelijk gebleven)
 
 ## Open
-- [~] Web-tool in `docs/` om vertalingen te redigeren en naast het origineel te vergelijken — plan in `docs/PLAN.md` (concept, ter review)
+- [~] Web-tool in `docs/` om vertalingen te redigeren en naast het origineel te vergelijken. Plan in `docs/PLAN.md` (concept, ter review)
   - Leest het formaat uit `FORMAAT.md`; zorg dat de JavaScript-parser en `scripts/` hetzelfde opleveren (bv. een gedeelde set testbestanden).
   - Publicatie via GitHub Actions, die de boeken bij het bouwen naar JSON omzet (PLAN O7).
 - [ ] Gedeelde begrippenlijst voor alle boeken: zodra de redactie precedenten `vast` maakt, de boekoverstijgende begrippen (Mensenzoon, discipel, Farizeeën …) uit `bijbel/lukas/referentie/precedenten.md` naar een gedeelde lijst verhuizen

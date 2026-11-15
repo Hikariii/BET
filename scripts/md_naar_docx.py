@@ -359,7 +359,7 @@ def parse_log(pad):
             continue
         if regel.startswith("#"):
             in_vragen = False
-        m = re.match(r"^##\s+Vers\s+(\d+)(?:\s*[-–—]\s*(\d+))?\s*:?\s*$", regel, re.I)
+        m = re.match(r"^##\s+Vers\s+(\d+)(?:\s*[-\u2013\u2014]\s*(\d+))?\s*:?\s*$", regel, re.I)
         if m:
             a = int(m.group(1))
             b = int(m.group(2)) if m.group(2) else a
@@ -398,7 +398,7 @@ def parse_log(pad):
                 else:
                     doel.append(regel.strip())
         vraag = [v for v in vraag if v.strip("() ").lower() not in
-                 ("", "optioneel", "geen", "nee", "n.v.t.", "nvt", "-", "—")]
+                 ("", "optioneel", "geen", "nee", "n.v.t.", "nvt", "-", "\u2014")]
         for k, n in enumerate(verzen):
             label = f"vers {verzen[0]}–{verzen[-1]}" if len(verzen) > 1 else ""
             if k == 0:
@@ -498,7 +498,7 @@ GRIJS = "E7E6E6"
 
 
 def maak_rij(hfd, n, volgnr, bron_stukken, nieuw_stukken, log, heeft_log):
-    label = f"{hfd}:{n}" if n else f"{hfd}:—"
+    label = f"{hfd}:{n}" if n else f"{hfd}:\u2014"
     if volgnr > 1:
         label += f" ({volgnr}e)"
     bron_mist = bron_stukken is None

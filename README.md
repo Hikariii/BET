@@ -9,21 +9,22 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 | Map / bestand | Inhoud | Wie schrijft erin |
 |---|---|---|
 | `richtlijn/` | Redactierichtlijn in Markdown (geldt voor alle boeken); `richtlijn/origineel/` bevat de aangeleverde Word-versie. **Origineel nooit wijzigen.** | redactie |
-| `sjablonen/` | Sjablonen, zoals het wijzigingslog. | — |
-| `scripts/` | Omzetten uit Word, controles, terugzetten naar Word. Werken voor elk boek (`--boek`). | — |
-| `docs/` | Web-tool om vertalingen te redigeren en naast het origineel te vergelijken (gepland). | — |
+| `sjablonen/` | Sjablonen, zoals het wijzigingslog. | - |
+| `scripts/` | Omzetten uit Word, controles, terugzetten naar Word. Werken voor elk boek (`--boek`). | - |
+| `.claude/` | Configuratie voor Claude Code: skills, `/intent` en `/pr`, rules en een hook tegen em-dashes. Zie [`.claude/README.md`](.claude/README.md). | - |
+| `docs/` | Web-tool om vertalingen te redigeren en naast het origineel te vergelijken (gepland). | - |
 | `bijbel/<boek>/` | Alles van één Bijbelboek, zie hieronder. | |
-| `FORMAAT.md` | Het Markdown-formaat met opmaak-tags: de gedeelde specificatie voor de scripts en de web-tool. | — |
-| `WERKPLAN.md` | De stappen per hoofdstuk (en de autonome modus). | — |
-| `TAKEN.md` | Openstaande taken voor het gereedschap. Taken per boek staan in het boek. | — |
+| `FORMAAT.md` | Het Markdown-formaat met opmaak-tags: de gedeelde specificatie voor de scripts en de web-tool. | - |
+| `WERKPLAN.md` | De stappen per hoofdstuk (en de autonome modus). | - |
+| `TAKEN.md` | Openstaande taken voor het gereedschap. Taken per boek staan in het boek. | - |
 
 ### Per boek: `bijbel/<boek>/`
 
 | Map / bestand | Inhoud | Wie schrijft erin |
 |---|---|---|
-| `boek.json` | Naam, bestandsprefix, Word-stijlsjabloon en versindeling (zie `scripts/boek.py`). | — |
+| `boek.json` | Naam, bestandsprefix, Word-stijlsjabloon en versindeling (zie `scripts/boek.py`). | - |
 | `controle.json` | Optioneel: extra oude vormen uit de precedenten van dit boek, voor het controlescript. | hoofdsessie |
-| `CLAUDE.md` | Wat specifiek voor dit boek geldt. | — |
+| `CLAUDE.md` | Wat specifiek voor dit boek geldt. | - |
 | `STATUS.md` | Per hoofdstuk: waar het staat. | hoofdsessie |
 | `TAKEN.md` | Openstaande taken en beslissingen voor dit boek. | hoofdsessie |
 | `origineel/` | De aangeleverde Word-bestanden. **Nooit wijzigen.** Nieuwe versies komen naast de oude. | alleen aanleveren |
