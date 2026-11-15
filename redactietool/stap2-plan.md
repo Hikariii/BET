@@ -61,6 +61,13 @@ Kleine punten (toegankelijkheid, componenttests, rooktest, woordgrenzen bij een 
 - *Een woord in de tekst omzetten* (zoals DeepL): A via selectie zonder vaste markering (een balkje met Zo vertaald, Vertaalkeuze, Bron, Overal aanpassen), B stippellijnen bij woorden met een keuze (als schakelaar), C rechtermuisknop of Alt+klik. Voorlopige voorkeur: A als basis, B als schakelaar. Let op: een klik in de vereenvoudiging opent nu de editor; de woordinteractie mag daar niet mee botsen.
 - Open: zegt "precedent" de redacteur iets; waar komen de alternatieven vandaan (Zo vertaald, vertaalkeuzes, bronvorm).
 
+**Opmaakwerkbalk in de vers-editor (eigenaar, 2026-11-15; hoort bij fase 9):** alleen wat `FORMAAT.md` kent, zodat alles terug kan naar Word en de repo. Geen vrije kleuren en geen losse cursief.
+- **B** (`{vet}`) en **U** (`{onderstreept}`), met Ctrl+B en Ctrl+U.
+- **Kleur ▾**: kies een stijl uit het sjabloon, de kleur komt mee: de begripsdomeinen (`{eeuwigleven}`, `{genade}`, `{geloof}`, `{oordeel}`, `{rechtvaardig}`, `{zonde}`, `{torah}`, `{dag}`), Onderwijs (`{onderwijs}`) en Highlight (`==`). Namen en kleuren komen uit `FORMAAT.md` en het Word-sjabloon (`boek.json`), niet uit de code.
+- **Alinea ▾**: gewone tekst, Jezuswoorden (`@jezus`), Stem van God (`@god`), Engel (`@engel`), Citaat OT (`@citaat-ot`).
+- **Wissen**: opmaak van de selectie halen.
+- Alleen zichtbaar tijdens het bewerken van een vers; samen ontwerpen met het selectiebalkje uit het ontwerpspoor "Ingangen vanuit de tekst" (één balk voor opmaak en vertaalkeuzes). De bestaande opmaakwaarschuwing blijft.
+
 **Werkwijze:**
 1. **Analyse.** Schermafbeeldingen van de huidige tool en de taken van de redacteur als verloop uitgeschreven (een vers aanpassen, een vertaalvraag beantwoorden, een hoofdstuk naar Word brengen). Wat werkt, wat schuurt, welke patronen ontbreken.
 2. **Richtingen met Claude Design.** Binnen de basis hierboven twee of drie typografische richtingen voor de schermen die het meest tellen: lezen en bewerken, het menu bij een woord, het voorbeeldvenster met varianten. Altijd met echte Lukas-tekst, ook uit een druk hoofdstuk. De eigenaar kiest, de redacteur reageert, daarna itereren.
