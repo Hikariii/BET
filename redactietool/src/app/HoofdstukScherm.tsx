@@ -10,6 +10,7 @@ import { statusKlasse } from './Zijbalk';
 import { vragenBijVers } from './vertaalvragen';
 import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
 import { useTussenstand } from './bewerken/useTussenstand';
+import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { VersTekst } from './VersTekst';
 
 const LABEL_GOEDGEKEURD = 'Goedgekeurd, referentie voor de rest van het boek. Wijzigingen gaan opnieuw langs de redactie.';
@@ -39,7 +40,8 @@ export function HoofdstukScherm({
 }: Props) {
 	const { tussenstand, herlees } = useTussenstand(boek.id, hoofdstuk.nummer);
 	const [bewerktAdres, zetBewerktAdres] = useState<string | null>(null);
-	const groepen = groepeerPerVers(hoofdstuk.bron, pasTussenstandToe(hoofdstuk.vereenvoudigd, tussenstand));
+	const weergave = pasTussenstandToe(hoofdstuk.vereenvoudigd, tussenstand);
+	const groepen = groepeerPerVers(hoofdstuk.bron, weergave);
 	const adresVan = (nummer: number | null) => (nummer === null ? null : versAdres(boek.id, hoofdstuk.nummer, nummer));
 
 	return (
@@ -53,6 +55,7 @@ export function HoofdstukScherm({
 					{info.versie !== '' && <span class="versie">{info.versie}</span>}
 				</p>
 				{info.status === 'goedgekeurd' && <p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>}
+				<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} />
 			</header>
 			<table class="verzen">
 				<thead>
