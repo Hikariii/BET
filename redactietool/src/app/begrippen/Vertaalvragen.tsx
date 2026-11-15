@@ -77,7 +77,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 
 			{register.length > 0 && (
 				<section aria-labelledby="register-titel">
-					<h2 id="register-titel">Register ({register.length})</h2>
+					<h2 id="register-titel">Register, niet open ({register.length})</h2>
 					<ul class="vragenlijst">
 						{register.map((vraag) => (
 							<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} />
@@ -138,6 +138,7 @@ function LogVraag({ boek, vraag, open }: { boek: string; vraag: Vertaalvraag; op
 		<li>
 			<details open={open}>
 				<summary>
+					{open && vraag.herkomst.soort !== 'register' && <span class="hoofdstuklabel">Hoofdstuk {vraag.herkomst.hoofdstuk}: </span>}
 					<span class="kwestie">{vraag.kwestie}</span>
 					<Status vraag={vraag} />
 					<span class="versjes">{kortVersoverzicht(vraag.verzen)}</span>

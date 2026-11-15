@@ -26,10 +26,15 @@ export function Gevonden({ boek, hoofdstukken }: TabbladProps) {
 			</p>
 			<div class="filterbalk">
 				<label>
-					Zoeken <input type="search" value={zoekterm} onInput={(gebeurtenis) => {
+					Zoeken{' '}
+					<input
+						type="search"
+						value={zoekterm}
+						onInput={(gebeurtenis) => {
 							zetZoekterm(gebeurtenis.currentTarget.value);
 							zetAantalRijen(RIJEN_PER_KEER);
-						}} />
+						}}
+					/>
 				</label>
 				<label>
 					<input
