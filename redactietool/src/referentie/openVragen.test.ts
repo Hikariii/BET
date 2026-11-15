@@ -51,6 +51,7 @@ describe('leesOpenVragen op open-vragen.md', () => {
 			.filter(([hoofdstuk]) => hoofdstuk >= 4)
 			.flatMap(([hoofdstuk, verzen]) => [...verzen].filter(([, tekst]) => /\{eeuwigleven\}gezegend/i.test(tekst)).map(([vers]) => ({ hoofdstuk, vers })));
 
+		expect(metEeuwigleven.length).toBeGreaterThan(0);
 		expect(vraag?.kwestie).toMatch(/^markering van "Gezegend"/);
 		expect(vraag?.verzen.slice(0, 2)).toEqual(versen(1, 45, 48));
 		expect(vraag?.verzen.slice(2)).toEqual(metEeuwigleven);
