@@ -1094,7 +1094,7 @@ h3,
 
 .hoofdstuk {
 	/* Ongeveer 65 tekens per regel in bron en vereenvoudiging, gemeten op Lukas 4; een rem is hier 13px. */
-	--tabel-breedte: 75rem;
+	--tabel-breedte: 62rem;
 	--vertaalregels-breedte: 24rem;
 	--inhoud-breedte: calc(var(--tabel-breedte) + var(--vertaalregels-breedte));
 }
