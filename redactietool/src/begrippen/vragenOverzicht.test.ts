@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Vertaalvraag, VraagStatus } from './types';
-import { filterVragen, GEEN_FILTER, groepeerLogVragen } from './vragenOverzicht';
+import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels } from './vragenOverzicht';
 
 function vraag(velden: Partial<Vertaalvraag> & Pick<Vertaalvraag, 'kwestie'>): Vertaalvraag {
 	return {
@@ -73,5 +73,51 @@ describe('groepeerLogVragen', () => {
 			[3, ['woestenij', 'bang']],
 			[5, ['En']],
 		]);
+	});
+});
+
+describe('splitsOpenVragen', () => {
+	const openRegister = vraag({ kwestie: 'onreine geest', herkomst: { soort: 'register' }, status: 'open' });
+	const alleMetOpen = [register, hoofdstukDrie, openRegister, versVraagVijf, hoofdstukDrieMetVersInVijf];
+
+	it('zet de open vragen uit register en logs samen in open, de rest in overig, in de oorspronkelijke volgorde', () => {
+		const { open, overig } = splitsOpenVragen(alleMetOpen);
+
+		expect(kwesties(open)).toEqual(['woestenij', 'onreine geest']);
+		expect(kwesties(overig)).toEqual(['Zoon des mensen', 'En', 'bang']);
+	});
+
+	it('houdt geen open vraag in overig en verliest geen vraag', () => {
+		const { open, overig } = splitsOpenVragen(alleMetOpen);
+
+		expect(open.length + overig.length).toBe(alleMetOpen.length);
+		expect(overig.some((gevonden) => gevonden.status === 'open')).toBe(false);
+	});
+});
+
+describe('vraagSleutels', () => {
+	const tweedeVersVraag = vraag({ kwestie: 'Ook', herkomst: { soort: 'vers', hoofdstuk: 5, vers: 2 }, tekst: 'Een tweede vraag bij hetzelfde vers.' });
+	const sleutels = vraagSleutels([register, hoofdstukDrie, versVraagVijf, tweedeVersVraag, hoofdstukDrieMetVersInVijf]);
+
+	function sleutel(gevonden: Vertaalvraag): string {
+		const waarde = sleutels.get(gevonden);
+		if (waarde === undefined) throw new Error(`geen sleutel voor '${gevonden.kwestie}'`);
+		return waarde;
+	}
+
+	it('leidt de sleutel af uit de herkomst', () => {
+		expect(sleutel(register)).toBe('register-Zoon des mensen-1');
+		expect(sleutel(hoofdstukDrie)).toBe('hoofdstuk-3-2-1');
+		expect(sleutel(hoofdstukDrieMetVersInVijf)).toBe('hoofdstuk-3-1-1');
+	});
+
+	it('geeft twee vragen bij hetzelfde vers een verschillend volgnummer', () => {
+		expect(sleutel(versVraagVijf)).toBe('vers-5-2-1');
+		expect(sleutel(tweedeVersVraag)).toBe('vers-5-2-2');
+	});
+
+	it('geeft elke vraag een andere sleutel', () => {
+		expect(new Set(sleutels.values()).size).toBe(sleutels.size);
+		expect(sleutels.size).toBe(5);
 	});
 });

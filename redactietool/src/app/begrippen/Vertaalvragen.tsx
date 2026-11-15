@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks';
-import { filterVragen, GEEN_FILTER, groepeerLogVragen, type VragenFilter } from '../../begrippen/vragenOverzicht';
+import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels, type VragenFilter } from '../../begrippen/vragenOverzicht';
 import { verzamelVragen } from '../../begrippen/verzamelVragen';
 import type { Vertaalvraag, VraagStatus } from '../../begrippen/types';
 import type { VersRef } from '../../data/types';
@@ -9,14 +9,18 @@ import './vertaalvragen.css';
 
 const STATUSSEN: readonly VraagStatus[] = ['open', 'onbeslist', 'voorlopig besloten', 'besloten'];
 const KORT_AANTAL_VERZEN = 3;
+const GEEN_VERS_IN_KOP = 'Geen vers in de kop';
 
 /** Tabblad Vertaalvragen: het register en de vragen uit de logs, met status, herkomst en verzen. */
 export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) {
 	const vragen = useMemo(() => verzamelVragen(referentie.openVragen, hoofdstukken), [referentie, hoofdstukken]);
 	const [filter, zetFilter] = useState<VragenFilter>(GEEN_FILTER);
+	const sleutels = useMemo(() => vraagSleutels(vragen), [vragen]);
 	const getoond = useMemo(() => filterVragen(vragen, filter), [vragen, filter]);
-	const register = getoond.filter((vraag) => vraag.herkomst.soort === 'register');
-	const perHoofdstuk = groepeerLogVragen(getoond);
+	const { open, overig } = splitsOpenVragen(getoond);
+	const register = overig.filter((vraag) => vraag.herkomst.soort === 'register');
+	const perHoofdstuk = groepeerLogVragen(overig);
+	const sleutel = (vraag: Vertaalvraag): string => sleutels.get(vraag) ?? '';
 
 	return (
 		<div class="vertaalvragen">
@@ -56,29 +60,27 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 				{getoond.length} van {vragen.length} vragen
 			</p>
 
+			{open.length > 0 && (
+				<section aria-labelledby="open-titel">
+					<h2 id="open-titel">Open vragen ({open.length})</h2>
+					<ul class="vragenlijst">
+						{open.map((vraag) =>
+							vraag.herkomst.soort === 'register' ? (
+								<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} />
+							) : (
+								<LogVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} open />
+							),
+						)}
+					</ul>
+				</section>
+			)}
+
 			{register.length > 0 && (
 				<section aria-labelledby="register-titel">
 					<h2 id="register-titel">Register ({register.length})</h2>
 					<ul class="vragenlijst">
 						{register.map((vraag) => (
-							<li class="registervraag">
-								<h3>{vraag.kwestie}</h3>
-								<Status vraag={vraag} />
-								<dl>
-									<dt>Gekozen in de tekst</dt>
-									<dd>{vraag.gekozen}</dd>
-									<dt>Alternatief</dt>
-									<dd>{vraag.alternatief}</dd>
-									{vraag.tekst !== '' && (
-										<>
-											<dt>Besluit</dt>
-											<dd>{vraag.tekst}</dd>
-										</>
-									)}
-									<dt>Verzen</dt>
-									<dd>{vraag.verzen.length === 0 ? <span class="geen-verzen">het hele boek</span> : <VersLinks boek={boek.id} verzen={vraag.verzen} />}</dd>
-								</dl>
-							</li>
+							<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} />
 						))}
 					</ul>
 				</section>
@@ -88,13 +90,13 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 				<section aria-labelledby="logs-titel">
 					<h2 id="logs-titel">Vragen uit de logs</h2>
 					{perHoofdstuk.map(({ hoofdstuk, vragen: hoofdstukVragen }) => (
-						<section aria-labelledby={`logs-hoofdstuk-${hoofdstuk}`}>
+						<section key={hoofdstuk} aria-labelledby={`logs-hoofdstuk-${hoofdstuk}`}>
 							<h3 id={`logs-hoofdstuk-${hoofdstuk}`}>
 								Hoofdstuk {hoofdstuk} ({hoofdstukVragen.length})
 							</h3>
 							<ul class="vragenlijst">
 								{hoofdstukVragen.map((vraag) => (
-									<LogVraag boek={boek.id} vraag={vraag} />
+									<LogVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} open={false} />
 								))}
 							</ul>
 						</section>
@@ -107,10 +109,34 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	);
 }
 
-function LogVraag({ boek, vraag }: { boek: string; vraag: Vertaalvraag }) {
+function RegisterVraag({ boek, vraag }: { boek: string; vraag: Vertaalvraag }) {
+	return (
+		<li class="registervraag">
+			<h3>{vraag.kwestie}</h3>
+			<Status vraag={vraag} />
+			<dl>
+				<dt>Gekozen in de tekst</dt>
+				<dd>{vraag.gekozen}</dd>
+				<dt>Alternatief</dt>
+				<dd>{vraag.alternatief}</dd>
+				{vraag.tekst !== '' && (
+					<>
+						<dt>Besluit</dt>
+						<dd>{vraag.tekst}</dd>
+					</>
+				)}
+				<dt>Verzen</dt>
+				<dd>{vraag.verzen.length === 0 ? <span class="geen-verzen">het hele boek</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}</dd>
+			</dl>
+		</li>
+	);
+}
+
+/** `open` bepaalt alleen de beginstand; daarna beslist de lezer. */
+function LogVraag({ boek, vraag, open }: { boek: string; vraag: Vertaalvraag; open: boolean }) {
 	return (
 		<li>
-			<details>
+			<details open={open}>
 				<summary>
 					<span class="kwestie">{vraag.kwestie}</span>
 					<Status vraag={vraag} />
@@ -121,7 +147,7 @@ function LogVraag({ boek, vraag }: { boek: string; vraag: Vertaalvraag }) {
 						<Opmaak tekst={vraag.tekst} />
 					</p>
 					<p>
-						{vraag.verzen.length === 0 ? <span class="geen-verzen">Heel hoofdstuk</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}
+						{vraag.verzen.length === 0 ? <span class="geen-verzen">{GEEN_VERS_IN_KOP}</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}
 					</p>
 				</div>
 			</details>
@@ -148,7 +174,7 @@ function Opmaak({ tekst }: { tekst: string }) {
 }
 
 function kortVersoverzicht(verzen: readonly VersRef[]): string {
-	if (verzen.length === 0) return 'Heel hoofdstuk';
+	if (verzen.length === 0) return GEEN_VERS_IN_KOP;
 	const eerste = verzen.slice(0, KORT_AANTAL_VERZEN).map(({ hoofdstuk, vers }) => `${hoofdstuk}:${vers}`);
 	return verzen.length > KORT_AANTAL_VERZEN ? `${eerste.join(', ')} en ${verzen.length - KORT_AANTAL_VERZEN} meer` : eerste.join(', ');
 }

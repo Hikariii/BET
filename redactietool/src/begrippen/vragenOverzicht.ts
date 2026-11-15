@@ -44,3 +44,35 @@ export function groepeerLogVragen(vragen: readonly Vertaalvraag[]): HoofdstukVra
 	}
 	return [...groepen].map(([hoofdstuk, groepVragen]) => ({ hoofdstuk, vragen: groepVragen })).sort((a, b) => a.hoofdstuk - b.hoofdstuk);
 }
+
+export type OpenEnOverig = { open: Vertaalvraag[]; overig: Vertaalvraag[] };
+
+/** Splitst in de open vragen (register en logs samen) en de rest; beide houden de volgorde van `vragen`, geen vraag staat in beide. */
+export function splitsOpenVragen(vragen: readonly Vertaalvraag[]): OpenEnOverig {
+	return {
+		open: vragen.filter((vraag) => vraag.status === 'open'),
+		overig: vragen.filter((vraag) => vraag.status !== 'open'),
+	};
+}
+
+function sleutelBasis({ herkomst, kwestie }: Vertaalvraag): string {
+	if (herkomst.soort === 'register') return `register-${kwestie}`;
+	if (herkomst.soort === 'hoofdstuk') return `hoofdstuk-${herkomst.hoofdstuk}-${herkomst.nummer}`;
+	return `vers-${herkomst.hoofdstuk}-${herkomst.vers}`;
+}
+
+/**
+ * Een vaste sleutel per vraag, afgeleid uit de herkomst, zodat de weergave van een vraag bij filteren dezelfde blijft.
+ * Hoort meer dan één vraag bij dezelfde basis (twee vragen bij één vers), dan telt een volgnummer in de volgorde van `vragen` mee.
+ */
+export function vraagSleutels(vragen: readonly Vertaalvraag[]): Map<Vertaalvraag, string> {
+	const gezien = new Map<string, number>();
+	const sleutels = new Map<Vertaalvraag, string>();
+	for (const vraag of vragen) {
+		const basis = sleutelBasis(vraag);
+		const volgnummer = (gezien.get(basis) ?? 0) + 1;
+		gezien.set(basis, volgnummer);
+		sleutels.set(vraag, `${basis}-${volgnummer}`);
+	}
+	return sleutels;
+}

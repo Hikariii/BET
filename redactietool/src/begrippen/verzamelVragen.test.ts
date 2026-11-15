@@ -184,10 +184,15 @@ describe('verzamelVragen op de logs en het register van Lukas', () => {
 	const vragen = verzamelVragen(register, hoofdstukken);
 	const vereenvoudigd = leesVereenvoudigdeVerzen();
 
-	it('geeft 36 registervragen, met status uit het register en niet afgeleid', () => {
+	it('geeft een registervraag per tabelrij in open-vragen.md, met status uit het register en niet afgeleid', () => {
 		const uitRegister = vragen.filter((vraag) => vraag.herkomst.soort === 'register');
+		const tabelregels = leesRepobestand('bijbel/lukas/referentie/open-vragen.md')
+			.split('\n')
+			.filter((regel) => regel.startsWith('|'));
+		const kopEnScheiding = 2;
 
-		expect(uitRegister).toHaveLength(36);
+		expect(tabelregels.length).toBeGreaterThan(kopEnScheiding);
+		expect(uitRegister).toHaveLength(tabelregels.length - kopEnScheiding);
 		expect(uitRegister.some((vraag) => vraag.statusAfgeleid)).toBe(false);
 		expect(uitRegister.some((vraag) => vraag.status === 'onbeslist')).toBe(false);
 		expect(vind(uitRegister, 'Zoon des mensen').status).toBe('besloten');
