@@ -84,12 +84,14 @@ type PrecedentenProps = {
 function PrecedentenInhoud({ precedenten, aantalInTabel, boekId }: PrecedentenProps) {
 	const alleKeuzes = <a href={maakAdres({ soort: 'begrippen', boek: boekId, tabblad: 'besloten' })}>tabblad Vertaalkeuzes</a>;
 	if (precedenten.length === 0) {
-		return <p class="naslagmelding">Bij deze regel is geen precedent gevonden. Alle precedenten staan op het {alleKeuzes}.</p>;
+		return <p class="naslagmelding">
+				Het log wijst niet aan welke vertaalkeuze bedoeld is, en op de woorden van deze regel is er geen gevonden. Bekijk alle vertaalkeuzes op het {alleKeuzes}.
+			</p>;
 	}
 	return (
 		<>
 			<p class="naslagmelding">
-				Bij deze regel horen {precedenten.length} van de {aantalInTabel} precedenten. De rest staat op het {alleKeuzes}.
+				Mogelijk horen {precedenten.length} van de {aantalInTabel} vertaalkeuzes bij deze regel: gevonden op de woorden van de regel, want het log wijst niet aan welke bedoeld is. De rest staat op het {alleKeuzes}.
 			</p>
 			<div class="tabelrand">
 				<table>

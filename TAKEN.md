@@ -43,6 +43,15 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] `redactietool/src/klembord/chromiumKlembord.mjs` (alleen macOS, gebruikt rolldown van Vite en Playwright uit `/tmp/pw`) opnemen in de tests of vervangen.
   - [ ] `document.title` per hoofdstuk zetten; Node-versie op één plek (nu `mise.toml` 26.13.1 en workflow `26`).
   - [ ] Pages aanzetten in de repo-instellingen (bron: GitHub Actions); daarna publiceert de workflow bij elke push naar `main`.
+- [ ] Redactietool, uit de review van fase 7 (ontwerp):
+  - [ ] Opmaakcontrole (`redactietool/ontwerp/opmaakcontrole.mjs`) uitbreiden: vet, cursief, onderstreept; vers-editor, naslagkaart, versvoorproef, Zoeken en vervangen; boek en hoofdstukken niet vast in het script; eventueel als test in de build.
+  - [ ] Bewerken door klikken: de Bijbeltekst gewone tekst laten (geen `role="button"`), met een knop "Vers N bewerken" die bij focus zichtbaar wordt; testen met een schermlezer.
+  - [ ] Versvoorproef in Keuzes en vragen: Escape ook voor muisgebruikers, vak aanwijsbaar (WCAG 1.4.13), meeschuiven bij scrollen.
+  - [ ] Zijbalk: "Status review" voor schermlezers weglaten waar de legenda het al zegt.
+  - [ ] Galerij: boek en verzen uit de data halen in plaats van vast `lukas` (bij een tweede boek); unieke ids per hoofdstuk.
+  - [ ] Richtlijntabellen in de naslagkaart: Bijbeltekst-kolommen herkenbaar maken in de markdown in plaats van op kolompositie.
+  - [ ] Oude namen in bestanden en commentaar (Besloten.tsx, Gevonden, regels.css) bijwerken naar Vertaalkeuzes, Zo vertaald, Vertaalregels.
+  - [ ] OFL-licentie van de letters (Atkinson Hyperlegible Next, Inter) vermelden in de README of met de site meeleveren.
 - [ ] Logformaat: bij een vertaalregel met "precedent" aanwijzen **welke** vertaalkeuze uit `precedenten.md` bedoeld is (bv. `precedent: nabij → dichtbij`), zodat de naslagkaart onder het vers exact de juiste vertaalkeuze toont in plaats van te raden (`redactietool/src/app/precedentenBijRegel.ts`). Stappen: vorm kiezen met de eigenaar; `sjablonen/wijzigingslog.md` en de logparser van de redactietool (en `FORMAAT.md`/Python als die het log lezen) aanpassen; bestaande logs in `bijbel/lukas/wijzigingslog/` bijwerken (alleen de verwijzing, geen inhoud); het raden vervangen door opzoeken, met een test op alle logs dat elke verwijzing een bestaande vertaalkeuze vindt.
 - [x] Kolom **Verzen** in `bijbel/lukas/referentie/open-vragen.md` (35 van 36 vragen; "aanhalingstekens" bewust leeg)
 - [ ] `WERKPLAN.md` deel D (aangeleverd Word terugvoeren) een keer doorlopen met het eerstvolgende aangeleverde hoofdstuk, en bijstellen waar nodig

@@ -10,8 +10,8 @@
 :root {
 	--toolkleur: #6b4f4b;
 	--tekst: var(--toolkleur);
-	/* Bijzaken (versnummers, status, labels) in een lichtere tint van dezelfde kleur. */
-	--gedempt: color-mix(in srgb, var(--toolkleur) 72%, #fff);
+	/* Bijzaken (versnummers, status, labels) in een lichtere tint van dezelfde kleur; 84% houdt het contrast op wit boven 4,5:1. */
+	--gedempt: color-mix(in srgb, var(--toolkleur) 84%, #fff);
 	--zacht: #6e6e6e;
 	--rand: #e6e6e6;
 	--rand-donker: #8c8c8c;
@@ -1003,7 +1003,6 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 }
 
 .vervangen .vondst .context {
-	color: var(--tekst);
 	font-size: 1rem;
 	line-height: 1.45;
 }

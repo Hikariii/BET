@@ -1,3 +1,7 @@
+// Controleert dat de Bijbeltekst in de leesrijen alleen kleuren en achtergronden uit het Word-sjabloon heeft (inline) en verder zwart is.
+// Ontwerpgereedschap: vereist Playwright, dat niet in package.json staat (bv. `npm i playwright` in /tmp/pw en het script daar draaien).
+// Draait tegen een lopende tool: POORT (standaard 4200, `vite preview`) en PAD (standaard /BET/; `/` voor `vite`).
+// Dekt nog niet: vet, cursief en onderstreept, de vers-editor, de naslagkaart, de versvoorproef en Zoeken en vervangen (zie TAKEN.md).
 import { chromium } from 'playwright';
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
