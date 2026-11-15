@@ -1,0 +1,22 @@
+/* "nog N regels": een tekstknop onder de regels, in de toolkleur-familie (zoals .verwijzing). */
+.logblok ~ .meerregels {
+	display: inline-block;
+	margin-top: 0.4rem;
+	padding: 0;
+	background: none;
+	border: 0;
+	color: var(--gedempt);
+	font-family: var(--tool);
+	font-size: 0.71875rem;
+	font-weight: 500;
+	text-decoration: underline;
+	text-decoration-color: var(--rand-donker);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+}
+
+.logblok ~ .meerregels:hover {
+	background: none;
+	color: var(--tekst);
+	text-decoration-color: var(--tekst);
+}

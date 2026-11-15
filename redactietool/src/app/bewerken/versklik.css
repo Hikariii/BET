@@ -1,0 +1,18 @@
+/* De vereenvoudigde tekst opent de editor bij een klik. Alleen de houder krijgt een tint; de tekst en zijn spans houden de opmaak uit het Word-sjabloon. */
+table.verzen td .versklik {
+	margin: -0.35rem -0.5rem;
+	padding: 0.35rem 0.5rem;
+	border-radius: 2px;
+	cursor: text;
+}
+
+table.verzen td .versklik:hover,
+table.verzen td .versklik:focus-visible {
+	background: color-mix(in srgb, var(--tekst) 8%, transparent);
+}
+
+/* Toolkleur in plaats van het rood van de gewone focus: rood hoort niet in of rond de tekstkolommen. */
+table.verzen td .versklik:focus-visible {
+	outline: 2px solid var(--tekst);
+	outline-offset: 0;
+}

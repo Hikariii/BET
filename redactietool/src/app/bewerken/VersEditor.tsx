@@ -1,4 +1,4 @@
-import { EditorState, Selection } from 'prosemirror-state';
+import { EditorState } from 'prosemirror-state';
 import { EditorView, type MarkViewConstructor, type NodeViewConstructor } from 'prosemirror-view';
 import { useEffect, useRef } from 'preact/hooks';
 import type { WordStijl } from '../../data/types';
@@ -7,6 +7,7 @@ import { documentNaarVersInhoud, versInhoudNaarDocument } from '../../editor/ver
 import { versEditorPlugins } from '../../editor/versEditorPlugins';
 import { OPMAAK_VOLGORDE, type Alineastijl } from '../../formaat/types';
 import { alineaOpmaakstijl, tekststukOpmaakstijl, type Opmaakstijl } from '../stijl';
+import { selectieBijPlek, type KlikPlek } from './klikPlek';
 import './verseditor.css';
 
 type Props = {
@@ -14,6 +15,8 @@ type Props = {
 	stijlen: readonly WordStijl[];
 	/** Naam voor schermlezers, bv. "Vereenvoudigde tekst van vers 18". */
 	label: string;
+	/** Waar de cursor begint; `null` is aan het eind. */
+	startPlek: KlikPlek | null;
 	/** Na elke wijziging; de inhoud houdt evenveel delen. */
 	onWijzig: (inhoud: VersInhoud) => void;
 	onSluit: () => void;
@@ -46,7 +49,7 @@ function opmaakViews(stijlen: readonly WordStijl[]): Record<string, MarkViewCons
 }
 
 /** ProseMirror-editor voor één vers, met een alinea per deel. */
-export function VersEditor({ inhoud, stijlen, label, onWijzig, onSluit }: Props) {
+export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSluit }: Props) {
 	const houder = useRef<HTMLDivElement>(null);
 	const laatsteOnWijzig = useRef(onWijzig);
 	const laatsteOnSluit = useRef(onSluit);
@@ -61,7 +64,7 @@ export function VersEditor({ inhoud, stijlen, label, onWijzig, onSluit }: Props)
 			state: EditorState.create({
 				doc: startDocument,
 				plugins: versEditorPlugins(() => laatsteOnSluit.current()),
-				selection: Selection.atEnd(startDocument),
+				selection: selectieBijPlek(startDocument, startPlek),
 			}),
 			nodeViews: { alinea: alineaView(stijlen) },
 			markViews: opmaakViews(stijlen),

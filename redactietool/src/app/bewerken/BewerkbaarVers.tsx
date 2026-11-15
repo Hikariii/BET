@@ -7,7 +7,9 @@ import { waarschuwingenVoorVers } from '../../bewerken/waarschuwingen';
 import type { VersDeel } from '../groepeerPerVers';
 import { VersTekst } from '../VersTekst';
 import { browseropslag } from './useTussenstand';
+import { plekVanKlik, type KlikPlek } from './klikPlek';
 import { VersEditor } from './VersEditor';
+import './versklik.css';
 
 type Props = {
 	boek: BoekData;
@@ -27,13 +29,34 @@ type Props = {
 /** De cel "vereenvoudigd" van een vers: de tekst of de editor, met markering, melding en waarschuwingen. */
 export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerken, onBewerk, onSluit, onOpslagGewijzigd }: Props) {
 	const [opslagmelding, zetOpslagmelding] = useState<string | null>(null);
-	const bewerkKnop = useRef<HTMLButtonElement>(null);
+	const klikbareTekst = useRef<HTMLDivElement>(null);
+	const tekstWeergave = useRef<HTMLDivElement>(null);
+	const startPlek = useRef<KlikPlek | null>(null);
 	const eerderBewerkt = useRef(false);
 	useEffect(() => {
-		if (eerderBewerkt.current && !bewerken) bewerkKnop.current?.focus();
+		if (eerderBewerkt.current && !bewerken) klikbareTekst.current?.focus();
 		eerderBewerkt.current = bewerken;
 	}, [bewerken]);
 
+	const beginBewerken = (plek: KlikPlek | null) => {
+		startPlek.current = plek;
+		onBewerk();
+	};
+
+	const klikInTekst = (gebeurtenis: MouseEvent) => {
+		const opKnopOfLink = (gebeurtenis.target as Element).closest('a, button, summary') !== null;
+		const tekstGeselecteerd = window.getSelection()?.isCollapsed === false;
+		if (opKnopOfLink || tekstGeselecteerd) return;
+		beginBewerken(tekstWeergave.current === null ? null : plekVanKlik(gebeurtenis, tekstWeergave.current));
+	};
+
+	const toetsOpTekst = (gebeurtenis: KeyboardEvent) => {
+		if (gebeurtenis.target !== gebeurtenis.currentTarget || (gebeurtenis.key !== 'Enter' && gebeurtenis.key !== ' ')) return;
+		gebeurtenis.preventDefault();
+		beginBewerken(null);
+	};
+
+	const tekstId = `vers-${nummer}-tekst`;
 	const repo = knipVers(hoofdstuk.vereenvoudigd, nummer);
 	const bron = knipVers(hoofdstuk.bron, nummer);
 	const opslag = browseropslag();
@@ -64,18 +87,29 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 					inhoud={startInhoud}
 					stijlen={boek.stijlen}
 					label={`Vereenvoudigde tekst van vers ${nummer}`}
+					startPlek={startPlek.current}
 					onWijzig={bewaar}
 					onSluit={onSluit}
 				/>
-			) : (
+			) : repo === null ? (
 				<VersTekst delen={delen} stijlen={boek.stijlen} />
+			) : (
+				<div
+					ref={klikbareTekst}
+					class="versklik"
+					role="button"
+					tabIndex={0}
+					aria-label={`Vers ${nummer} bewerken`}
+					aria-describedby={tekstId}
+					onClick={klikInTekst}
+					onKeyDown={toetsOpTekst}
+				>
+					<div ref={tekstWeergave} id={tekstId}>
+						<VersTekst delen={delen} stijlen={boek.stijlen} />
+					</div>
+				</div>
 			)}
 			<div class="versacties">
-				{!bewerken && repo !== null && (
-					<button type="button" ref={bewerkKnop} onClick={onBewerk} aria-label={`Bewerken, vers ${nummer}`}>
-						Bewerken
-					</button>
-				)}
 				{bewerkt !== null && <span class="versmarkering">gewijzigd</span>}
 				{bewerkt !== null && (
 					<button type="button" onClick={terugNaarRepo} aria-label={`Terug naar de repo, vers ${nummer}`}>

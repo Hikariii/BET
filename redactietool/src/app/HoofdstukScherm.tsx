@@ -92,6 +92,7 @@ export function HoofdstukScherm({
 				<button type="button" aria-pressed={regelsAltijdZichtbaar} onClick={onWisselRegels}>
 					Regels altijd tonen
 				</button>
+				<span> Klik in de vereenvoudigde tekst om een vers te bewerken.</span>
 				{!regelsAltijdZichtbaar && <span> Klik op een vers om de regels erbij te zien.</span>}
 			</p>
 		</article>
@@ -141,7 +142,7 @@ function VersRij({
 	const logVerzen = nummer === null ? [] : hoofdstuk.log.verzen.filter((logVers) => logVers.verzen.includes(nummer));
 	const vragen = nummer === null ? [] : vragenBijVers(referentie.openVragen, hoofdstuk.nummer, nummer);
 	const heeftVraag = vragen.length > 0 || logVerzen.some((logVers) => logVers.vragen.length > 0);
-	const regels = <Regels logVerzen={logVerzen} vragen={vragen} onOpenNaslag={onOpenNaslag} />;
+	const regels = (kapAf: boolean) => <Regels logVerzen={logVerzen} vragen={vragen} kapAf={kapAf} onOpenNaslag={onOpenNaslag} />;
 
 	const kiesVers = (gebeurtenis: MouseEvent) => {
 		const opInteractiefElement = (gebeurtenis.target as Element).closest('a, button, summary, [contenteditable]') !== null;
@@ -187,11 +188,11 @@ function VersRij({
 						/>
 					)}
 				</td>
-				{regelsAlsKolom && <td class="regels">{regels}</td>}
+				{regelsAlsKolom && <td class="regels">{regels(true)}</td>}
 			</tr>
 			{geselecteerd && !regelsAlsKolom && (
 				<tr class="regels-onder">
-					<td colSpan={KOLOMMEN_ZONDER_REGELS}>{regels}</td>
+					<td colSpan={KOLOMMEN_ZONDER_REGELS}>{regels(false)}</td>
 				</tr>
 			)}
 		</>

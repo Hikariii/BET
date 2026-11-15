@@ -1,26 +1,36 @@
+import { useState } from 'preact/hooks';
 import type { LogVers, OpenVraag, Verwijzing } from '../data/types';
+import { kapRegels } from './kapRegels';
 import { InlineMarkdown } from './Markdownweergave';
 import type { Naslag } from './naslag';
 import { isOpen } from './vertaalvragen';
+import './regels.css';
 
 type Props = {
 	/** De logblokken waar dit vers in valt. */
 	logVerzen: readonly LogVers[];
 	/** De vertaalvragen uit de referentie die aan dit vers hangen. */
 	vragen: readonly OpenVraag[];
+	/** In de smalle kolom: na de eerste regels staat de rest achter "nog N regels". */
+	kapAf: boolean;
 	onOpenNaslag: (naslag: Naslag) => void;
 };
 
-export function Regels({ logVerzen, vragen, onOpenNaslag }: Props) {
+export function Regels({ logVerzen, vragen, kapAf, onOpenNaslag }: Props) {
+	const [uitgeklapt, zetUitgeklapt] = useState(false);
+	const aantalPerBlok = logVerzen.map((logVers) => logVers.wijzigingen.length);
+	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || !kapAf);
+	const inklapbaar = kapAf ? kapRegels(aantalPerBlok, false).verborgen : 0;
 	const logVragen = logVerzen.flatMap((logVers) => logVers.vragen);
 	const heeftRegels = logVerzen.some((logVers) => logVers.wijzigingen.length > 0);
 	return (
 		<>
-			{logVerzen.map((logVers) => (
+			{logVerzen.map((logVers, blok) =>
+				zichtbaarPerBlok[blok] === 0 && logVers.wijzigingen.length > 0 ? null : (
 				<div class="logblok">
 					{logVers.verzen.length > 1 && <p class="logbereik">Vers {bereik(logVers.verzen)}</p>}
 					<ul>
-						{logVers.wijzigingen.map((regel) => (
+						{logVers.wijzigingen.slice(0, zichtbaarPerBlok[blok]).map((regel) => (
 							<li>
 								<InlineMarkdown tekst={regel.tekst} />
 								{regel.verwijzingen.map((verwijzing) => (
@@ -32,7 +42,13 @@ export function Regels({ logVerzen, vragen, onOpenNaslag }: Props) {
 						))}
 					</ul>
 				</div>
-			))}
+				),
+			)}
+			{inklapbaar > 0 && (
+				<button type="button" class="meerregels" aria-expanded={uitgeklapt} onClick={() => zetUitgeklapt(!uitgeklapt)}>
+					{uitgeklapt ? 'minder regels' : `nog ${inklapbaar} regels`}
+				</button>
+			)}
 			{!heeftRegels && <p class="geen-regels">Geen regels in het log.</p>}
 			{(vragen.length > 0 || logVragen.length > 0) && <Vraag vragen={vragen} logVragen={logVragen} />}
 		</>
