@@ -4,11 +4,11 @@
 import path from 'node:path';
 import { createServer } from 'vite';
 
-const docsmap = path.resolve(import.meta.dirname, '../..');
-const hoofdmap = path.resolve(docsmap, '..');
+const redactietoolmap = path.resolve(import.meta.dirname, '../..');
+const hoofdmap = path.resolve(redactietoolmap, '..');
 
 const server = await createServer({
-	root: docsmap,
+	root: redactietoolmap,
 	configFile: false,
 	appType: 'custom',
 	logLevel: 'warn',
@@ -17,7 +17,7 @@ const server = await createServer({
 });
 try {
 	const { bouwData } = (await server.ssrLoadModule('/src/bouw/bouw.ts')) as typeof import('./bouw');
-	bouwData({ hoofdmap, uitvoermap: path.join(docsmap, 'public', 'data') });
+	bouwData({ hoofdmap, uitvoermap: path.join(redactietoolmap, 'public', 'data') });
 } finally {
 	await server.close();
 }

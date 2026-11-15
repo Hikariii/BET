@@ -1,15 +1,17 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { hoofdstukJsonNaam, nummerMetNul } from '../data/bestandsnamen';
 import type {
 	BoekData,
 	BoekLijst,
 	HoofdstukData,
 	HoofdstukInfo,
 	Log,
+	OpenVraag,
 	Referentie,
 	RichtlijnSectie,
 } from '../data/types';
-import { FormaatFout, type Hoofdstuk } from '../formaat/types';
+import type { Hoofdstuk } from '../formaat/types';
 import { parseerHoofdstuk } from '../formaat/parseer';
 import { leesLog } from '../log/leesLog';
 import { leesOpenVragen } from '../referentie/openVragen';
@@ -58,7 +60,7 @@ export function bouwData({ hoofdmap, uitvoermap }: BouwOpties): void {
 	}
 	schrijfJson(path.join(uitvoermap, 'boeken.json'), boeken);
 
-	const richtlijn: RichtlijnSectie[] = leesRichtlijn(readFileSync(path.join(hoofdmap, RICHTLIJN_PAD), 'utf-8'));
+	const richtlijn: RichtlijnSectie[] = leesBestand(path.join(hoofdmap, RICHTLIJN_PAD), leesRichtlijn);
 	schrijfJson(path.join(uitvoermap, 'richtlijn.json'), richtlijn);
 }
 
@@ -97,7 +99,7 @@ function schrijfBoek(id: string, boekmap: string, boek: BoekBestand, uitvoermap:
 
 	const sjabloonPad = path.join(boekmap, boek.sjabloon);
 	const stijlen = leesStijlen(leesStylesXml(readFileSync(sjabloonPad), sjabloonPad));
-	const statusRijen = leesStatus(readFileSync(path.join(boekmap, 'STATUS.md'), 'utf-8'));
+	const statusRijen = leesBestand(path.join(boekmap, 'STATUS.md'), leesStatus);
 
 	const hoofdstukken: HoofdstukInfo[] = boek.verzen_per_hoofdstuk.map((_aantalVerzen, index) => {
 		const nummer = index + 1;
@@ -107,13 +109,15 @@ function schrijfBoek(id: string, boekmap: string, boek: BoekBestand, uitvoermap:
 	schrijfJson(path.join(uitvoermap, 'boek.json'), boekData);
 
 	for (const { nummer } of hoofdstukken) {
-		const bestand = path.join(uitvoermap, `hoofdstuk-${nummerMetNul(nummer)}.json`);
-		schrijfJson(bestand, leesHoofdstukData(boekmap, boek.bestandsprefix, nummer));
+		schrijfJson(path.join(uitvoermap, hoofdstukJsonNaam(nummer)), leesHoofdstukData(boekmap, boek.bestandsprefix, nummer));
 	}
 
+	const openVragenPad = path.join(boekmap, 'referentie', 'open-vragen.md');
+	const openVragen = leesOptioneleLijst(openVragenPad, leesOpenVragen);
+	controleerVerzen(openVragen, boek.verzen_per_hoofdstuk, openVragenPad);
 	const referentie: Referentie = {
-		precedenten: leesPrecedenten(leesOptioneleTekst(path.join(boekmap, 'referentie', 'precedenten.md'))),
-		openVragen: leesOpenVragen(leesOptioneleTekst(path.join(boekmap, 'referentie', 'open-vragen.md'))),
+		precedenten: leesOptioneleLijst(path.join(boekmap, 'referentie', 'precedenten.md'), leesPrecedenten),
+		openVragen,
 	};
 	schrijfJson(path.join(uitvoermap, 'referentie.json'), referentie);
 }
@@ -125,28 +129,49 @@ function leesHoofdstukData(boekmap: string, prefix: string, nummer: number): Hoo
 	const logPad = path.join(boekmap, 'wijzigingslog', bestandsnaam);
 
 	const vereenvoudigd: Hoofdstuk = existsSync(vereenvoudigdPad) ? parseerBestand(vereenvoudigdPad) : { alineas: [] };
-	const log: Log = existsSync(logPad) ? leesLog(readFileSync(logPad, 'utf-8')) : { verzen: [], algemeneVragen: [] };
+	const log: Log = existsSync(logPad) ? leesBestand(logPad, leesLog) : { verzen: [], algemeneVragen: [] };
 
 	return { nummer, bron: parseerBestand(path.join(boekmap, 'bron', bestandsnaam)), vereenvoudigd, log };
 }
 
 function parseerBestand(pad: string): Hoofdstuk {
+	return leesBestand(pad, parseerHoofdstuk);
+}
+
+/** Een fout van de parser krijgt het pad van het bestand erbij; de parsers kennen alleen een regelnummer. */
+function leesBestand<Uitkomst>(pad: string, parseer: (tekst: string) => Uitkomst): Uitkomst {
+	const tekst = readFileSync(pad, 'utf-8');
 	try {
-		return parseerHoofdstuk(readFileSync(pad, 'utf-8'));
+		return parseer(tekst);
 	} catch (fout) {
-		if (fout instanceof FormaatFout) {
+		if (fout instanceof Error) {
 			throw new Error(`${pad}: ${fout.message}`, { cause: fout });
 		}
 		throw fout;
 	}
 }
 
-function leesOptioneleTekst(pad: string): string {
-	return existsSync(pad) ? readFileSync(pad, 'utf-8') : '';
+/** Een referentiebestand dat niet bestaat is een lege lijst. */
+function leesOptioneleLijst<Rij>(pad: string, parseer: (tekst: string) => Rij[]): Rij[] {
+	return existsSync(pad) ? leesBestand(pad, parseer) : [];
 }
 
-function nummerMetNul(nummer: number): string {
-	return String(nummer).padStart(2, '0');
+/** Een open vraag mag alleen verwijzen naar een vers dat in `verzen_per_hoofdstuk` staat. */
+function controleerVerzen(openVragen: OpenVraag[], verzenPerHoofdstuk: number[], pad: string): void {
+	for (const vraag of openVragen) {
+		for (const { hoofdstuk, vers } of vraag.verzen) {
+			const aantalVerzen = verzenPerHoofdstuk[hoofdstuk - 1];
+			const reden =
+				aantalVerzen === undefined
+					? `hoofdstuk ${hoofdstuk} bestaat niet (het boek heeft ${verzenPerHoofdstuk.length} hoofdstukken)`
+					: vers > aantalVerzen
+						? `hoofdstuk ${hoofdstuk} heeft ${aantalVerzen} verzen`
+						: null;
+			if (reden !== null) {
+				throw new Error(`${pad}: vraag '${vraag.plaats}: ${vraag.kwestie}': vers ${hoofdstuk}:${vers} bestaat niet, ${reden}`);
+			}
+		}
+	}
 }
 
 function schrijfJson(pad: string, waarde: unknown): void {
