@@ -1,0 +1,52 @@
+.gevonden .uitleg {
+	max-width: 50rem;
+}
+
+.filterbalk {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+	margin: .75rem 0;
+}
+
+.filterbalk .aantal {
+	color: var(--gedempt, #59636e);
+}
+
+.gevonden table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.gevonden th,
+.gevonden td {
+	border-bottom: 1px solid var(--rand, #d0d7de);
+	padding: .4rem .6rem;
+	text-align: left;
+	vertical-align: top;
+}
+
+.gevonden tbody th {
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+.gevonden .getal {
+	font-variant-numeric: tabular-nums;
+}
+
+.vertalingen {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.vertalingen li + li {
+	margin-top: .2rem;
+}
+
+.vertaling.bijzonder {
+	font-style: italic;
+	color: var(--gedempt, #59636e);
+}
