@@ -352,3 +352,9 @@ tr.regels-onder td {
 		border-bottom: 1px solid var(--rand);
 	}
 }
+
+.zijbalk .naar-begrippen {
+	display: block;
+	margin: 0 0 .75rem;
+	font-weight: bold;
+}

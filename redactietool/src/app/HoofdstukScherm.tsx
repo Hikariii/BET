@@ -111,7 +111,7 @@ function VersRij({
 	}, [geselecteerd]);
 
 	const nummer = groep.nummer;
-	const adres = nummer === null ? null : maakAdres({ boek: boek.id, hoofdstuk: hoofdstuk.nummer, vers: nummer });
+	const adres = nummer === null ? null : maakAdres({ soort: 'hoofdstuk', boek: boek.id, hoofdstuk: hoofdstuk.nummer, vers: nummer });
 	const logVerzen = nummer === null ? [] : hoofdstuk.log.verzen.filter((logVers) => logVers.verzen.includes(nummer));
 	const vragen = nummer === null ? [] : vragenBijVers(referentie.openVragen, hoofdstuk.nummer, nummer);
 	const heeftVraag = vragen.length > 0 || logVerzen.some((logVers) => logVers.vragen.length > 0);

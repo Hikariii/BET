@@ -7,19 +7,24 @@ type Props = {
 	referentie: Referentie;
 	/** Het hoofdstuk dat open staat. */
 	huidigHoofdstuk: number | null;
+	/** Of het scherm Begrippen open staat. */
+	begrippenOpen: boolean;
 };
 
-export function Zijbalk({ boek, referentie, huidigHoofdstuk }: Props) {
+export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen }: Props) {
 	return (
 		<nav class="zijbalk" aria-label={`Hoofdstukken van ${boek.naam}`}>
 			<h2>{boek.naam}</h2>
+			<a class="naar-begrippen" href={maakAdres({ soort: 'begrippen', boek: boek.id, tabblad: 'besloten' })} aria-current={begrippenOpen ? 'page' : undefined}>
+				Begrippen en vragen
+			</a>
 			<ul>
 				{boek.hoofdstukken.map((hoofdstuk) => {
 					const openVragen = aantalOpenVragen(referentie.openVragen, hoofdstuk.nummer);
 					return (
 						<li>
 							<a
-								href={maakAdres({ boek: boek.id, hoofdstuk: hoofdstuk.nummer, vers: null })}
+								href={maakAdres({ soort: 'hoofdstuk', boek: boek.id, hoofdstuk: hoofdstuk.nummer, vers: null })}
 								aria-current={hoofdstuk.nummer === huidigHoofdstuk ? 'page' : undefined}
 							>
 								<span class="hoofdstuknummer">{hoofdstuk.nummer}</span>

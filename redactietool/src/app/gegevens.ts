@@ -28,6 +28,11 @@ export function laadHoofdstuk(boekId: string, nummer: number): Promise<Hoofdstuk
 	return laadJson(`${boekId}/${hoofdstukJsonNaam(nummer)}`);
 }
 
+/** Alle hoofdstukken van een boek, in volgorde; voor de overzichten over het hele boek. */
+export function laadAlleHoofdstukken(boek: BoekData): Promise<HoofdstukData[]> {
+	return Promise.all(boek.hoofdstukken.map(({ nummer }) => laadHoofdstuk(boek.id, nummer)));
+}
+
 export function laadRichtlijn(): Promise<RichtlijnSectie[]> {
 	return laadJson('richtlijn.json');
 }

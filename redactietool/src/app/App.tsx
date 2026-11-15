@@ -2,6 +2,7 @@ import { useCallback, useState } from 'preact/hooks';
 import type { BoekData, BoekLijst, Referentie } from '../data/types';
 import { maakAdres, type Adres } from './adres';
 import { laadBoek, laadBoeken, laadHoofdstuk, laadReferentie } from './gegevens';
+import { BegrippenScherm } from './begrippen/BegrippenScherm';
 import { HoofdstukScherm } from './HoofdstukScherm';
 import { useAdres, useLaden } from './hooks';
 import type { Naslag } from './naslag';
@@ -38,7 +39,7 @@ export function App() {
 
 function standaardAdres(boeken: BoekLijst): Adres | null {
 	const eerste = boeken[0];
-	return eerste === undefined ? null : { boek: eerste.id, hoofdstuk: 1, vers: null };
+	return eerste === undefined ? null : { soort: 'hoofdstuk', boek: eerste.id, hoofdstuk: 1, vers: null };
 }
 
 function BoekScherm({ adres, boeken }: { adres: Adres; boeken: BoekLijst }) {
@@ -61,11 +62,21 @@ function BoekScherm({ adres, boeken }: { adres: Adres; boeken: BoekLijst }) {
 		);
 	}
 	const { boek, referentie } = boekGegevens.waarde;
+	if (adres.soort === 'begrippen') {
+		return (
+			<div class="indeling">
+				<Zijbalk boek={boek} referentie={referentie} huidigHoofdstuk={null} begrippenOpen />
+				<main>
+					<BegrippenScherm boek={boek} referentie={referentie} tabblad={adres.tabblad} />
+				</main>
+			</div>
+		);
+	}
 	const info = boek.hoofdstukken.find((hoofdstuk) => hoofdstuk.nummer === adres.hoofdstuk);
 
 	return (
 		<div class={naslag === null ? 'indeling' : 'indeling met-paneel'}>
-			<Zijbalk boek={boek} referentie={referentie} huidigHoofdstuk={info === undefined ? null : adres.hoofdstuk} />
+			<Zijbalk boek={boek} referentie={referentie} huidigHoofdstuk={info === undefined ? null : adres.hoofdstuk} begrippenOpen={false} />
 			<main>
 				{info === undefined ? (
 					<OnbekendAdres boeken={boeken} reden={`${boek.naam} heeft geen hoofdstuk ${adres.hoofdstuk}.`} />
@@ -109,7 +120,7 @@ function OnbekendAdres({ boeken, reden }: { boeken: BoekLijst; reden: string }) 
 	return (
 		<p class="melding">
 			{reden}{' '}
-			{eerste !== undefined && <a href={maakAdres({ boek: eerste.id, hoofdstuk: 1, vers: null })}>Naar {eerste.naam} 1</a>}
+			{eerste !== undefined && <a href={maakAdres({ soort: 'hoofdstuk', boek: eerste.id, hoofdstuk: 1, vers: null })}>Naar {eerste.naam} 1</a>}
 		</p>
 	);
 }
