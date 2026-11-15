@@ -15,12 +15,12 @@ const TABEL = [
 
 describe('precedentenBijRegel', () => {
 	it('vindt het precedent waarvan de bron in de logregel staat', () => {
-		expect(precedentenBijRegel('"verzocht werd" wordt "op de proef gesteld werd": verzoeken wordt op de proef stellen', TABEL)).toEqual([1]);
+		expect(precedentenBijRegel('"verzocht werd" wordt "op de proef gesteld werd": verzoeken wordt op de proef stellen', TABEL)).toEqual([TABEL[1]]);
 	});
 
 	it('vindt een variant na een schuine streep en een stam zonder de uitgang tussen haakjes', () => {
-		expect(precedentenBijRegel('"gerucht" wordt "nieuws"', TABEL)).toEqual([2]);
-		expect(precedentenBijRegel('de discipelen volgden Hem', TABEL)).toEqual([0]);
+		expect(precedentenBijRegel('"gerucht" wordt "nieuws"', TABEL)).toEqual([TABEL[2]]);
+		expect(precedentenBijRegel('de discipelen volgden Hem', TABEL)).toEqual([TABEL[0]]);
 	});
 
 	it('vindt niets als alleen een korte term of het eind van een woord overeenkomt', () => {
@@ -33,6 +33,6 @@ describe('precedentenBijRegel', () => {
 	});
 
 	it('geeft meer precedenten terug op volgorde van de tabel', () => {
-		expect(precedentenBijRegel('Wee jullie: de discipelen zeggen verzoeken', TABEL)).toEqual([0, 1, 3]);
+		expect(precedentenBijRegel('Wee jullie: de discipelen zeggen verzoeken', TABEL)).toEqual([TABEL[0], TABEL[1], TABEL[3]]);
 	});
 });

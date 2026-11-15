@@ -1,16 +1,12 @@
-import { useCallback, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 import type { BoekData, BoekLijst, Referentie } from '../data/types';
 import { versAdres, type BoekAdres } from './adres';
 import { laadBoek, laadBoeken, laadHoofdstuk, laadReferentie } from './gegevens';
 import { BegrippenScherm } from './begrippen/BegrippenScherm';
 import { Galerij } from './galerij/Galerij';
 import { HoofdstukScherm } from './HoofdstukScherm';
-import { LayoutKeuze } from './LayoutKeuze';
-import { layoutUitZoekreeks, naslagPlek, zoekreeksMetLayout, type LayoutProef, type NaslagPlek } from './layoutProef';
 import { useAdres, useLaden } from './hooks';
-import type { Naslag } from './naslag';
 import { Zijbalk } from './Zijbalk';
-import { Zijpaneel } from './Zijpaneel';
 
 type BoekMetReferentie = { boek: BoekData; referentie: Referentie };
 
@@ -49,15 +45,7 @@ function standaardAdres(boeken: BoekLijst): BoekAdres | null {
 }
 
 function BoekScherm({ adres, boeken }: { adres: BoekAdres; boeken: BoekLijst }) {
-	const [naslag, zetNaslag] = useState<Naslag | null>(null);
 	const [regelsAltijdZichtbaar, zetRegelsAltijdZichtbaar] = useState(true);
-	const [layout, zetLayout] = useState(() => layoutUitZoekreeks(window.location.search));
-	const sluitNaslag = useCallback(() => zetNaslag(null), []);
-	const kiesLayout = (gekozen: LayoutProef) => {
-		const { pathname, search, hash } = window.location;
-		window.history.replaceState(null, '', `${pathname}${zoekreeksMetLayout(search, gekozen)}${hash}`);
-		zetLayout(gekozen);
-	};
 	const boekGegevens = useLaden(() => laadBoekMetReferentie(adres.boek), [adres.boek]);
 
 	if (!boeken.some((boek) => boek.id === adres.boek)) {
@@ -85,21 +73,9 @@ function BoekScherm({ adres, boeken }: { adres: BoekAdres; boeken: BoekLijst }) 
 		);
 	}
 	const info = boek.hoofdstukken.find((hoofdstuk) => hoofdstuk.nummer === adres.hoofdstuk);
-	const plekVanNaslag = naslagPlek(layout);
-	const paneel =
-		naslag === null ? null : (
-			<Zijpaneel
-				naslag={naslag}
-				referentie={referentie}
-				onSluit={sluitNaslag}
-				sluitLabel={plekVanNaslag === 'kolom' ? 'Terug naar vertaalregels' : 'Sluiten'}
-				markeerRegel={plekVanNaslag === 'kaart'}
-			/>
-		);
-	const paneelInTabel = plekVanNaslag === 'kolom' || plekVanNaslag === 'kaart';
 
 	return (
-		<div class={indelingKlassen(paneel !== null, plekVanNaslag, layout)} data-layout={layout ?? undefined}>
+		<div class="indeling">
 			<Zijbalk boek={boek} referentie={referentie} huidigHoofdstuk={info === undefined ? null : adres.hoofdstuk} begrippenOpen={false} />
 			<main>
 				{info === undefined ? (
@@ -111,22 +87,12 @@ function BoekScherm({ adres, boeken }: { adres: BoekAdres; boeken: BoekLijst }) 
 						info={info}
 						gekozenVers={adres.vers}
 						regelsAltijdZichtbaar={regelsAltijdZichtbaar}
-						layout={layout}
-						naslagPaneel={paneelInTabel ? paneel : null}
 						onWisselRegels={() => zetRegelsAltijdZichtbaar(!regelsAltijdZichtbaar)}
-						onOpenNaslag={zetNaslag}
 					/>
 				)}
 			</main>
-			{paneelInTabel ? null : paneel}
-			{layout !== null && <LayoutKeuze gekozen={layout} onKies={kiesLayout} />}
 		</div>
 	);
-}
-
-function indelingKlassen(naslagOpen: boolean, plekVanNaslag: NaslagPlek, layout: LayoutProef | null): string {
-	const proef = layout !== null && layout !== 'nu';
-	return ['indeling', naslagOpen && plekVanNaslag === 'rechts' ? 'met-paneel' : '', proef ? 'proef' : ''].filter((klasse) => klasse !== '').join(' ');
 }
 
 type HoofdstukLaderProps = Omit<Parameters<typeof HoofdstukScherm>[0], 'hoofdstuk'>;

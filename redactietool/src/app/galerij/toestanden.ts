@@ -1,4 +1,4 @@
-import { klapRegelsUit, openVraag, wijzigTekstInEditor } from './naPlaatsen';
+import { klapRegelsUit, openParagraaf, openPrecedent, openVraag, wijzigTekstInEditor } from './naPlaatsen';
 import type { NaPlaatsen } from './VersVoorbeeld';
 import { VERZEN, type Vers } from './voorbeelden';
 
@@ -44,6 +44,14 @@ export const VERSRIJ: VersOnderdeel = {
 		toestand('Met een open vraag', VERZEN.metOpenVraag, 'De vraag staat nog open en is uitgeklapt.', 'gewoon', openVraag),
 		toestand('Zonder regels', VERZEN.zonderRegels, 'Het log zegt niets over dit vers.'),
 		toestand('Gekozen vers', VERZEN.gekozen, 'Het vers uit het adres, zoals #/lukas/4/26.', 'gekozen'),
+	],
+};
+
+export const NASLAG: VersOnderdeel = {
+	titel: 'Naslagkaart onder een vers',
+	toestanden: [
+		toestand('Precedent', VERZEN.naslagPrecedent, 'Een klik op ‘precedent’ opent de bijbehorende vertaalkeuzes onder het vers.', 'gewoon', openPrecedent),
+		toestand('Richtlijnparagraaf', VERZEN.naslagParagraaf, 'Een klik op een § opent die paragraaf van de richtlijn onder het vers.', 'gewoon', openParagraaf),
 	],
 };
 

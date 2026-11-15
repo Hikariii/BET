@@ -8,7 +8,7 @@ import { useLaden } from '../hooks';
 import { Hoofdstukacties } from '../naarWord/Hoofdstukacties';
 import { Zijbalk } from '../Zijbalk';
 import { vervangBrowseropslag } from './geheugenopslag';
-import { BEWERKEN, BIJBELTEKST, VERSRIJ, type VersOnderdeel } from './toestanden';
+import { BEWERKEN, BIJBELTEKST, NASLAG, VERSRIJ, type VersOnderdeel } from './toestanden';
 import { VersVoorbeeld } from './VersVoorbeeld';
 import { GALERIJ_BOEK, HOOFDSTUK_MET_ACTIES, maakVoorbeeldopslag, VERZEN, ZOEKOPDRACHT } from './voorbeelden';
 import './galerij.css';
@@ -78,6 +78,7 @@ function Toestanden({ opslag, ...gegevens }: Gegevens & { opslag: Opslag }) {
 		<>
 			<VersOnderdeelWeergave {...gegevens} onderdeel={BIJBELTEKST} />
 			<VersOnderdeelWeergave {...gegevens} onderdeel={VERSRIJ} />
+			<VersOnderdeelWeergave {...gegevens} onderdeel={NASLAG} />
 			<VersOnderdeelWeergave {...gegevens} onderdeel={BEWERKEN} />
 			<ZijbalkItems boek={gegevens.boek} referentie={gegevens.referentie} />
 			<KnoppenEnMeldingen {...gegevens} opslag={opslag} />

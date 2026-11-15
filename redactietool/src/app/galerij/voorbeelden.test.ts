@@ -9,7 +9,7 @@ import { bouwData } from '../../bouw/bouw';
 import { hoofdstukJsonNaam } from '../../data/bestandsnamen';
 import type { BoekData, HoofdstukData } from '../../data/types';
 import { maakGeheugenopslag } from './geheugenopslag';
-import { BEWERKEN, BIJBELTEKST, VERSRIJ } from './toestanden';
+import { BEWERKEN, BIJBELTEKST, NASLAG, VERSRIJ } from './toestanden';
 import { GALERIJ_BOEK, maakVoorbeeldopslag, VERZEN } from './voorbeelden';
 
 const HOOFDMAP = path.resolve(import.meta.dirname, '../../../..');
@@ -46,11 +46,20 @@ function repoVan(hoofdstuk: number, vers: number) {
 
 describe('de verzen van de galerij', () => {
 	it('staan in de gegevens van het boek', () => {
-		const alle = [...BIJBELTEKST.toestanden, ...VERSRIJ.toestanden, ...BEWERKEN.toestanden];
+		const alle = [...BIJBELTEKST.toestanden, ...VERSRIJ.toestanden, ...NASLAG.toestanden, ...BEWERKEN.toestanden];
 		for (const { verwijzing } of alle) {
 			expect(knipVers(hoofdstukVan(verwijzing.hoofdstuk).vereenvoudigd, verwijzing.vers)).not.toBeNull();
 			expect(knipVers(hoofdstukVan(verwijzing.hoofdstuk).bron, verwijzing.vers)).not.toBeNull();
 		}
+	});
+
+	it('hebben voor de naslagkaart een logregel met een precedent en een logregel met een paragraaf', () => {
+		const soortenBij = ({ hoofdstuk, vers }: { hoofdstuk: number; vers: number }) =>
+			hoofdstukVan(hoofdstuk)
+				.log.verzen.filter((logVers) => logVers.verzen.includes(vers))
+				.flatMap((logVers) => logVers.wijzigingen.flatMap((regel) => regel.verwijzingen.map((verwijzing) => verwijzing.soort)));
+		expect(soortenBij(VERZEN.naslagPrecedent)).toContain('precedent');
+		expect(soortenBij(VERZEN.naslagParagraaf)).toContain('paragraaf');
 	});
 
 	it('tonen een vers met meer dan één alinea', () => {

@@ -24,9 +24,9 @@ function komtVoor(term: string, tekst: string): boolean {
  * De precedenten waar een logregel over gaat, op volgorde van de tabel.
  * De verwijzing "precedent" in het log noemt geen regel uit de tabel, dus dit raadt: de bron of de vereenvoudiging van het precedent komt aan het begin van een woord in de logregel voor.
  */
-export function precedentenBijRegel(regel: string, precedenten: readonly Precedent[]): number[] {
+export function precedentenBijRegel(regel: string, precedenten: readonly Precedent[]): Precedent[] {
 	const tekst = regel.toLowerCase();
-	return precedenten.flatMap((precedent, index) =>
-		[...zoektermen(precedent.bron, MINIMALE_LENGTE_BRON), ...zoektermen(precedent.vereenvoudigd, MINIMALE_LENGTE_VEREENVOUDIGD)].some((term) => komtVoor(term, tekst)) ? [index] : [],
+	return precedenten.filter((precedent) =>
+		[...zoektermen(precedent.bron, MINIMALE_LENGTE_BRON), ...zoektermen(precedent.vereenvoudigd, MINIMALE_LENGTE_VEREENVOUDIGD)].some((term) => komtVoor(term, tekst)),
 	);
 }

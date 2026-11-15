@@ -20,7 +20,6 @@
 	--gekozen: #ececec;
 	--rood: #a61816;
 	--zijbalk-breedte: 13.5rem;
-	--paneel-breedte: 27rem;
 	--boek: 'Atkinson Hyperlegible Next Variable', 'Aptos', 'Segoe UI', sans-serif;
 	--tool: 'Inter Variable', system-ui, sans-serif;
 	font-family: var(--tool);
@@ -58,10 +57,6 @@ a {
 .besloten-tabel tbody td:nth-child(2),
 .gevonden tbody th,
 .gevonden .vertaling,
-.zijpaneel .tabelrand:not(.markdown *) table td:nth-child(1),
-.zijpaneel .tabelrand:not(.markdown *) table td:nth-child(2),
-.zijpaneel .markdown table td:nth-child(2),
-.zijpaneel .markdown table td:nth-child(3),
 .vervangen-formulier input {
 	font-family: var(--boek);
 }
@@ -623,26 +618,40 @@ tr.regels-onder td {
 	border-left-color: var(--rand-donker);
 }
 
-/* ---------- Zijpaneel ---------- */
+/* ---------- Naslagkaart: onder het vers, over de breedte van de tabel ---------- */
 
-.zijpaneel {
-	padding: 1.75rem 1.5rem 3rem;
-	background: var(--vlak);
-	border-left: 0;
+table.verzen > tbody > tr.naslagrij > td {
+	padding: 0.25rem 0 1.5rem 3.25rem;
+	background: none;
+	font-family: var(--tool);
+}
+
+.naslagkaart {
+	max-height: 30rem;
+	padding: 1rem 1.25rem 1.25rem;
+	overflow-y: auto;
+	background: #fff;
+	border: 1px solid var(--tekst);
 	font-size: 0.8125rem;
 	line-height: 1.6;
 }
 
-.zijpaneel header {
+.naslagkaart header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
 	padding-bottom: 0.6rem;
 }
 
-.zijpaneel h2 {
+.naslagkaart h2 {
+	margin: 0;
 	font-size: 1rem;
 	font-weight: 600;
 }
 
-.zijpaneel header button {
+.naslagkaart header button {
 	padding: 0;
 	background: none;
 	border: 0;
@@ -651,13 +660,13 @@ tr.regels-onder td {
 	font-weight: 400;
 }
 
-.zijpaneel header button:hover:not(:disabled) {
+.naslagkaart header button:hover:not(:disabled) {
 	background: none;
 	border-bottom-color: var(--tekst);
 	color: var(--tekst);
 }
 
-.zijpaneel h2:focus-visible {
+.naslagkaart h2:focus-visible {
 	outline: none;
 }
 
@@ -667,14 +676,8 @@ tr.regels-onder td {
 	font-weight: 600;
 }
 
-.zoekveld {
-	margin-top: 0.75rem;
-}
-
-.zoekveld input {
-	width: 100%;
-	margin-top: 0.2rem;
-	background: #fff;
+.naslagmelding {
+	margin: 0.25rem 0 0.75rem;
 }
 
 .markdown blockquote {
@@ -682,19 +685,27 @@ tr.regels-onder td {
 	border-left: 2px solid #c4c4c4;
 }
 
-.zijpaneel table {
+/* De cellen van de versentabel eromheen mogen de tabellen in de kaart niet opmaken. */
+table.verzen .naslagkaart table {
 	width: 100%;
+	border-collapse: collapse;
 	font-size: 0.75rem;
 }
 
-.zijpaneel th,
-.zijpaneel td {
+table.verzen .naslagkaart td,
+table.verzen .naslagkaart th {
+	position: static;
+	width: auto;
 	padding: 0.45rem 0.75rem 0.45rem 0;
-	border: 0;
 	border-bottom: 1px solid #e0e0e0;
+	border-left: 0;
+	color: var(--toolkleur);
+	font-family: var(--tool);
+	font-size: 0.75rem;
+	line-height: 1.6;
 }
 
-.zijpaneel th {
+table.verzen .naslagkaart th {
 	border-bottom-color: #c4c4c4;
 	color: var(--gedempt);
 	font-size: 0.6875rem;
@@ -703,11 +714,39 @@ tr.regels-onder td {
 	text-transform: uppercase;
 }
 
-.zijpaneel .tabelrand:not(.markdown *) table td:nth-child(1),
-.zijpaneel .tabelrand:not(.markdown *) table td:nth-child(2),
-.zijpaneel .markdown table td:nth-child(2),
-.zijpaneel .markdown table td:nth-child(3) {
+table.verzen .naslagkaart tr.vers:hover td {
+	background: none;
+}
+
+/* Bijbeltekst in de kaart (bron en vereenvoudiging in de precedenten, de voorbeelden in de richtlijn): boekletter in Word-zwart. */
+table.verzen .naslagkaart .tabelrand:not(.markdown *) table td:nth-child(1),
+table.verzen .naslagkaart .tabelrand:not(.markdown *) table td:nth-child(2),
+table.verzen .naslagkaart .markdown table td:nth-child(2),
+table.verzen .naslagkaart .markdown table td:nth-child(3) {
+	color: #000;
+	font-family: var(--boek);
 	font-size: 0.875rem;
+}
+
+/* De precedententabel over de kaartbreedte: vaste kolombreedtes, zodat de rijen niet onnodig hoog worden. */
+.naslagkaart .tabelrand:not(.markdown *) table {
+	table-layout: fixed;
+}
+
+.naslagkaart .tabelrand:not(.markdown *) th:nth-child(1) {
+	width: 21%;
+}
+
+.naslagkaart .tabelrand:not(.markdown *) th:nth-child(2) {
+	width: 26%;
+}
+
+.naslagkaart .tabelrand:not(.markdown *) th:nth-child(3) {
+	width: 11%;
+}
+
+.naslagkaart .tabelrand:not(.markdown *) th:nth-child(4) {
+	width: 13%;
 }
 
 /* ---------- Keuzes en vragen ---------- */
@@ -1018,8 +1057,7 @@ tr.regels-onder td {
 }
 
 @media (max-width: 60rem) {
-	.zijbalk,
-	.zijpaneel {
+	.zijbalk {
 		border: 0;
 		border-bottom: 1px solid var(--rand);
 	}
@@ -1030,7 +1068,7 @@ tr.regels-onder td {
 :root,
 body,
 .zijbalk,
-.zijpaneel,
+.naslagkaart,
 h1,
 h2,
 h3,
@@ -1047,11 +1085,52 @@ h3,
 		.besloten-tabel tbody th,
 		.besloten-tabel tbody td:nth-child(2),
 		.gevonden tbody th,
-		.gevonden .vertaling,
-		.zijpaneel .tabelrand:not(.markdown *) table td:nth-child(1),
-		.zijpaneel .tabelrand:not(.markdown *) table td:nth-child(2),
-		.zijpaneel .markdown table td:nth-child(2),
-		.zijpaneel .markdown table td:nth-child(3)
+		.gevonden .vertaling
 	) {
 	color: #000;
+}
+
+/* ---------- Leesbreedte: tabel en kop houden een maximale breedte, de rest van de pagina is wit ---------- */
+
+.hoofdstuk {
+	/* Ongeveer 65 tekens per regel in bron en vereenvoudiging, gemeten op Lukas 4; een rem is hier 13px. */
+	--tabel-breedte: 75rem;
+	--vertaalregels-breedte: 24rem;
+	--inhoud-breedte: calc(var(--tabel-breedte) + var(--vertaalregels-breedte));
+}
+
+.hoofdstuk > header,
+.hoofdstuk .regelsschakelaar {
+	max-width: var(--inhoud-breedte);
+}
+
+.hoofdstuk table.verzen {
+	width: 100%;
+	max-width: var(--tabel-breedte);
+	table-layout: fixed;
+}
+
+.hoofdstuk table.verzen:has(> thead > tr > th:nth-child(4)) {
+	max-width: var(--inhoud-breedte);
+}
+
+.hoofdstuk table.verzen > thead > tr > th:nth-child(2) {
+	width: 38%;
+}
+
+.hoofdstuk table.verzen > thead > tr > th:nth-child(3) {
+	width: auto;
+}
+
+.hoofdstuk table.verzen:has(> thead > tr > th:nth-child(4)) > thead > tr > th:nth-child(2) {
+	width: 29%;
+}
+
+.hoofdstuk table.verzen:has(> thead > tr > th:nth-child(4)) > thead > tr > th:nth-child(3) {
+	width: 44%;
+}
+
+.hoofdstuk table.verzen > thead > tr > th:nth-child(4) {
+	width: auto;
+	padding-left: 1.25rem;
 }

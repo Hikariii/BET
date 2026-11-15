@@ -3,7 +3,8 @@ import { pasTussenstandToe } from '../../bewerken/tussenstand';
 import type { BoekData, HoofdstukData, Referentie } from '../../data/types';
 import { useTussenstand } from '../bewerken/useTussenstand';
 import { groepeerPerVers } from '../groepeerPerVers';
-import { VersRij, versRegels } from '../HoofdstukScherm';
+import { VersRij } from '../HoofdstukScherm';
+import { wisselNaslag, type OpenNaslag, type Naslag } from '../naslag';
 
 /** Wat de galerij na het plaatsen met de rij doet om hem in een bepaalde toestand te krijgen. */
 export type NaPlaatsen = (tabel: HTMLTableElement) => void;
@@ -24,6 +25,7 @@ type Props = {
 export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijStart, gekozen, naPlaatsen }: Props) {
 	const { tussenstand, herlees } = useTussenstand(boek.id, hoofdstuk.nummer);
 	const [bewerken, zetBewerken] = useState(bewerkenBijStart);
+	const [openNaslag, zetOpenNaslag] = useState<OpenNaslag | null>(null);
 	const tabel = useRef<HTMLTableElement>(null);
 
 	useEffect(() => {
@@ -55,16 +57,12 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 					groep={groep}
 					boek={boek}
 					hoofdstuk={hoofdstuk}
-					regels={versRegels(groep, hoofdstuk, referentie)}
+					referentie={referentie}
 					geselecteerd={gekozen}
-					plek="kolom"
-					uitgeklapt={false}
-					onWisselUitklappen={() => {}}
-					vastgezet={false}
-					onWisselVastzetten={() => {}}
-					naslagKolom={{ soort: 'geen' }}
-					naslagKaart={null}
-					onOpenNaslag={() => {}}
+					regelsInKolom
+					openNaslag={openNaslag?.naslag ?? null}
+					onOpenNaslag={(naslag: Naslag) => zetOpenNaslag(wisselNaslag(openNaslag, 0, naslag))}
+					onSluitNaslag={() => zetOpenNaslag(null)}
 					bewerkt={tussenstand.verzen[vers] ?? null}
 					bewerken={bewerken}
 					onBewerk={() => zetBewerken(true)}

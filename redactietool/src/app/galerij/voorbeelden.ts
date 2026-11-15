@@ -23,6 +23,8 @@ export const VERZEN = {
 	metOpenVraag: { hoofdstuk: 6, vers: 9 },
 	zonderRegels: { hoofdstuk: 4, vers: 30 },
 	gekozen: { hoofdstuk: 4, vers: 26 },
+	naslagPrecedent: { hoofdstuk: 4, vers: 14 },
+	naslagParagraaf: { hoofdstuk: 4, vers: 32 },
 	editorMetWaarschuwing: { hoofdstuk: 5, vers: 24 },
 	gewijzigd: { hoofdstuk: 4, vers: 44 },
 	verouderd: { hoofdstuk: 4, vers: 15 },

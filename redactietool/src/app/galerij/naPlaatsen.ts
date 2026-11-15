@@ -5,6 +5,18 @@ export const klapRegelsUit: NaPlaatsen = (tabel) => {
 	tabel.querySelector<HTMLButtonElement>('button.meerregels')?.click();
 };
 
+/** Klikt de eerste verwijzing met dit opschrift, zoals de redacteur doet om de naslagkaart te openen. */
+function klikVerwijzing(opschrift: (tekst: string) => boolean): NaPlaatsen {
+	return (tabel) => {
+		const knoppen = [...tabel.querySelectorAll<HTMLButtonElement>('button.verwijzing')];
+		knoppen.find((knop) => opschrift(knop.textContent))?.click();
+	};
+}
+
+export const openPrecedent = klikVerwijzing((tekst) => tekst === 'precedent');
+
+export const openParagraaf = klikVerwijzing((tekst) => tekst.startsWith('§'));
+
 /** Opent het blok met de vertaalvraag. */
 export const openVraag: NaPlaatsen = (tabel) => {
 	for (const vraag of tabel.querySelectorAll('details.vraag')) vraag.setAttribute('open', '');

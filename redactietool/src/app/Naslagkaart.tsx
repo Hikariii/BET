@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef } from 'preact/hooks';
 import type { Precedent, Referentie, RichtlijnSectie } from '../data/types';
+import { maakAdres } from './adres';
 import { laadRichtlijn } from './gegevens';
 import { useLaden } from './hooks';
 import { InlineMarkdown, Markdownweergave } from './Markdownweergave';
@@ -8,23 +9,16 @@ import { precedentenBijRegel } from './precedentenBijRegel';
 
 type Props = {
 	naslag: Naslag;
+	boekId: string;
 	referentie: Referentie;
+	/** Het element dat de verwijzing met `aria-controls` aanwijst. */
+	id: string;
 	onSluit: () => void;
-	sluitLabel: string;
-	/** Bij precedenten: de bij de logregel horende rijen markeren en de rest inklappen (lay-outproef p3). */
-	markeerRegel: boolean;
 };
 
-export function Zijpaneel({ naslag, referentie, onSluit, sluitLabel, markeerRegel }: Props) {
+/** De richtlijnparagraaf of de bij een logregel horende precedenten, onder het vers waar de verwijzing stond. */
+export function Naslagkaart({ naslag, boekId, referentie, id, onSluit }: Props) {
 	const kopRef = useRef<HTMLHeadingElement>(null);
-	useEffect(() => {
-		const opener = document.activeElement;
-		return () => {
-			if (opener instanceof HTMLElement && opener.isConnected) {
-				opener.focus();
-			}
-		};
-	}, []);
 	useEffect(() => {
 		kopRef.current?.focus();
 		const bijToets = (gebeurtenis: KeyboardEvent) => {
@@ -38,19 +32,19 @@ export function Zijpaneel({ naslag, referentie, onSluit, sluitLabel, markeerRege
 
 	const titel = naslag.soort === 'richtlijn' ? `Richtlijn §${naslag.paragraaf}` : 'Precedenten';
 	return (
-		<aside class="zijpaneel" aria-labelledby="zijpaneel-titel">
+		<aside class="naslagkaart" id={id} aria-labelledby={`${id}-titel`}>
 			<header>
-				<h2 id="zijpaneel-titel" tabIndex={-1} ref={kopRef}>
+				<h2 id={`${id}-titel`} tabIndex={-1} ref={kopRef}>
 					{titel}
 				</h2>
 				<button type="button" onClick={onSluit}>
-					{sluitLabel}
+					Sluiten
 				</button>
 			</header>
 			{naslag.soort === 'richtlijn' ? (
 				<RichtlijnInhoud paragraaf={naslag.paragraaf} />
 			) : (
-				<PrecedentenInhoud precedenten={referentie.precedenten} regel={markeerRegel ? naslag.regel : null} />
+				<PrecedentenInhoud precedenten={precedentenBijRegel(naslag.regel, referentie.precedenten)} aantalInTabel={referentie.precedenten.length} boekId={boekId} />
 			)}
 		</aside>
 	);
@@ -81,39 +75,21 @@ function zoekSectie(secties: readonly RichtlijnSectie[], paragraaf: string): Ric
 }
 
 type PrecedentenProps = {
+	/** De precedenten die bij de logregel horen. */
 	precedenten: readonly Precedent[];
-	/** De logregel waar de verwijzing in stond; `null` laat de tabel zoals hij is. */
-	regel: string | null;
+	aantalInTabel: number;
+	boekId: string;
 };
 
-function PrecedentenInhoud({ precedenten, regel }: PrecedentenProps) {
-	const [zoekterm, zetZoekterm] = useState('');
-	const [toonAlle, zetToonAlle] = useState(false);
-	const gezocht = zoekterm.trim().toLowerCase();
-	const herkend = regel === null ? [] : precedentenBijRegel(regel, precedenten);
-	const ingeklapt = herkend.length > 0 && !toonAlle && gezocht === '';
-	const zichtbaar = precedenten
-		.map((precedent, index) => ({ precedent, index }))
-		.filter(({ precedent, index }) =>
-			ingeklapt
-				? herkend.includes(index)
-				: [precedent.bron, precedent.vereenvoudigd, precedent.plaats, precedent.opmerking].some((veld) => veld.toLowerCase().includes(gezocht)),
-		);
+function PrecedentenInhoud({ precedenten, aantalInTabel, boekId }: PrecedentenProps) {
+	const alleKeuzes = <a href={maakAdres({ soort: 'begrippen', boek: boekId, tabblad: 'besloten' })}>tabblad Vertaalkeuzes</a>;
+	if (precedenten.length === 0) {
+		return <p class="naslagmelding">Bij deze regel is geen precedent gevonden. Alle precedenten staan op het {alleKeuzes}.</p>;
+	}
 	return (
 		<>
-			{regel !== null && (
-				<p class="herkendmelding">
-					{herkend.length === 0
-						? 'Bij deze regel is geen precedent herkend; de hele tabel staat hieronder.'
-						: `Gemarkeerd: wat bij deze regel hoort (${herkend.length} van ${precedenten.length}).`}
-				</p>
-			)}
-			<label class="zoekveld">
-				Zoeken in de precedenten
-				<input type="search" value={zoekterm} onInput={(gebeurtenis) => zetZoekterm(gebeurtenis.currentTarget.value)} />
-			</label>
-			<p aria-live="polite">
-				{zichtbaar.length} van {precedenten.length} precedenten
+			<p class="naslagmelding">
+				Bij deze regel horen {precedenten.length} van de {aantalInTabel} precedenten. De rest staat op het {alleKeuzes}.
 			</p>
 			<div class="tabelrand">
 				<table>
@@ -127,8 +103,8 @@ function PrecedentenInhoud({ precedenten, regel }: PrecedentenProps) {
 						</tr>
 					</thead>
 					<tbody>
-						{zichtbaar.map(({ precedent, index }) => (
-							<tr class={herkend.includes(index) ? 'herkend' : undefined}>
+						{precedenten.map((precedent) => (
+							<tr>
 								<td>
 									<InlineMarkdown tekst={precedent.bron} />
 								</td>
@@ -145,11 +121,6 @@ function PrecedentenInhoud({ precedenten, regel }: PrecedentenProps) {
 					</tbody>
 				</table>
 			</div>
-			{herkend.length > 0 && gezocht === '' && (
-				<button type="button" class="toonalle" aria-expanded={toonAlle} onClick={() => zetToonAlle(!toonAlle)}>
-					{toonAlle ? 'Alleen de gemarkeerde tonen' : `Alle ${precedenten.length} precedenten tonen`}
-				</button>
-			)}
 		</>
 	);
 }

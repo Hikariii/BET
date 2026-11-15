@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import type { LogVers, OpenVraag, Verwijzing } from '../data/types';
 import { kapRegels } from './kapRegels';
 import { InlineMarkdown } from './Markdownweergave';
-import type { Naslag } from './naslag';
+import { zelfdeNaslag, type Naslag } from './naslag';
 import { isOpen } from './vertaalvragen';
 import './regels.css';
 
@@ -13,11 +13,14 @@ type Props = {
 	vragen: readonly OpenVraag[];
 	/** In de smalle kolom: na de eerste regels staat de rest achter "nog N regels". */
 	kapAf: boolean;
-	/** Hoe de knoppen en meldingen de regels noemen. */
-	onOpenNaslag: (naslag: Naslag) => void;
+	/** De naslagkaart die onder dit vers open staat; die verwijzing meldt `aria-expanded`. */
+	openNaslag: Naslag | null;
+	/** Het element van de naslagkaart onder dit vers, voor `aria-controls`. */
+	kaartId: string;
+	onOpenNaslag: (naslag: Naslag, verwijzing: HTMLElement) => void;
 };
 
-export function Regels({ logVerzen, vragen, kapAf, onOpenNaslag }: Props) {
+export function Regels({ logVerzen, vragen, kapAf, openNaslag, kaartId, onOpenNaslag }: Props) {
 	const [uitgeklapt, zetUitgeklapt] = useState(false);
 	const aantalPerBlok = logVerzen.map((logVers) => logVers.wijzigingen.length);
 	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || !kapAf);
@@ -34,11 +37,20 @@ export function Regels({ logVerzen, vragen, kapAf, onOpenNaslag }: Props) {
 						{logVers.wijzigingen.slice(0, zichtbaarPerBlok[blok]).map((regel) => (
 							<li>
 								<InlineMarkdown tekst={regel.tekst} />
-								{regel.verwijzingen.map((verwijzing) => (
-									<button type="button" class="verwijzing" onClick={() => onOpenNaslag(naarNaslag(verwijzing, regel.tekst))}>
-										{verwijzingsLabel(verwijzing)}
-									</button>
-								))}
+								{regel.verwijzingen.map((verwijzing) => {
+									const naslag = naarNaslag(verwijzing, regel.tekst);
+									return (
+										<button
+											type="button"
+											class="verwijzing"
+											aria-expanded={openNaslag !== null && zelfdeNaslag(openNaslag, naslag)}
+											aria-controls={kaartId}
+											onClick={(gebeurtenis) => onOpenNaslag(naslag, gebeurtenis.currentTarget)}
+										>
+											{verwijzingsLabel(verwijzing)}
+										</button>
+									);
+								})}
 							</li>
 						))}
 					</ul>
@@ -58,34 +70,6 @@ export function Regels({ logVerzen, vragen, kapAf, onOpenNaslag }: Props) {
 
 function verwijzingsLabel(verwijzing: Verwijzing): string {
 	return verwijzing.soort === 'paragraaf' ? `§${verwijzing.paragraaf}` : 'precedent';
-}
-
-/** Het aantal regels van een vers over alle logblokken. */
-export function aantalRegels(logVerzen: readonly LogVers[]): number {
-	return logVerzen.reduce((som, logVers) => som + logVers.wijzigingen.length, 0);
-}
-
-type SamenvattingProps = {
-	logVerzen: readonly LogVers[];
-};
-
-/** Voor een ingeklapt vers: de eerste regel op één regel (CSS kapt af) en de verwijzingen als kleine labels, zonder klik te zien welke regels spelen. */
-export function RegelsSamenvatting({ logVerzen }: SamenvattingProps) {
-	const regels = logVerzen.flatMap((logVers) => logVers.wijzigingen);
-	const labels = [...new Set(regels.flatMap((regel) => regel.verwijzingen.map(verwijzingsLabel)))];
-	const eerste = regels[0];
-	return (
-		<span class="regelsamenvatting">
-			{eerste !== undefined && (
-				<span class="regelsamenvatting-tekst">
-					<InlineMarkdown tekst={eerste.tekst} />
-				</span>
-			)}
-			{labels.map((label) => (
-				<span class="regelsamenvatting-label">{label}</span>
-			))}
-		</span>
-	);
 }
 
 function bereik(verzen: readonly number[]): string {
