@@ -9,10 +9,10 @@ import { Vervangen } from './Vervangen';
 import './begrippen.css';
 
 const TITEL: Record<Tabblad, string> = {
-	besloten: 'Besloten',
-	gevonden: 'Gevonden',
+	besloten: 'Vertaalkeuzes',
+	gevonden: 'Zo vertaald',
 	vragen: 'Vertaalvragen',
-	vervangen: 'Vervangen',
+	vervangen: 'Zoeken en vervangen',
 };
 
 type Props = {
@@ -25,7 +25,7 @@ export function BegrippenScherm({ boek, referentie, tabblad }: Props) {
 	const hoofdstukken = useLaden(() => laadAlleHoofdstukken(boek), [boek.id]);
 	return (
 		<section class="begrippen" aria-labelledby="begrippen-titel">
-			<h1 id="begrippen-titel">Begrippen en vragen</h1>
+			<h1 id="begrippen-titel">Keuzes en vragen</h1>
 			<nav class="tabbladen" aria-label="Tabbladen">
 				{TABBLADEN.map((naam) => (
 					<a href={maakAdres({ soort: 'begrippen', boek: boek.id, tabblad: naam })} aria-current={naam === tabblad ? 'page' : undefined}>

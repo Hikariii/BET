@@ -48,7 +48,7 @@ export function staatZekerNogOud(telling: GetelPrecedent): boolean {
 export function beslotenSamenvatting(zichtbaar: readonly GetelPrecedent[], totaal: number): string {
 	const metBronvormNog = zichtbaar.filter((telling) => telling.nietToegepast.length > 0);
 	const waarvanOnzeker = metBronvormNog.filter(isOnzeker);
-	return `${zichtbaar.length} van ${totaal} precedenten, waarvan ${metBronvormNog.length} met een bronvorm die nog staat, waarvan ${waarvanOnzeker.length} met een onzekere telling.`;
+	return `${zichtbaar.length} van ${totaal} vertaalkeuzes, waarvan ${metBronvormNog.length} met een bronvorm die nog staat, waarvan ${waarvanOnzeker.length} met een onzekere telling.`;
 }
 
 /** Sleutel van een rij: bron en vereenvoudigd samen zijn uniek over alle precedenten. */

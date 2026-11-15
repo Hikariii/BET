@@ -53,6 +53,14 @@ Kleine punten (toegankelijkheid, componenttests, rooktest, woordgrenzen bij een 
 
 **Layout (2026-11-15):** de eigenaar kiest **e, A met lucht** (`ontwerp/variant-e.md`): de kolommen van a, geen lijnen tussen verzen, veel witruimte, grijze zijbalk en naslag zoals c, regels klein in de toolkleur. Bekend punt: een vers met veel regels wordt een hoge rij met wit onder de vereenvoudiging.
 
+**Namen (2026-11-15):** het scherm heet **Keuzes en vragen** (knop met ondertitel "voor heel <boek>"), met de tabbladen **Vertaalkeuzes** (was Besloten; de precedenten), **Zo vertaald** (was Gevonden), **Vertaalvragen** en **Zoeken en vervangen** (was Vervangen). De kolom per vers heet **Vertaalregels**. De adressen (`#/lukas/begrippen/besloten` enz.) blijven gelijk. In dit plan staan op oudere plekken nog de oude namen.
+
+**Open ontwerpspoor: ingangen vanuit de tekst** (eerst ontwerpen, met varianten naast elkaar):
+- *Ingangen vanuit de context* (prioriteit van de eigenaar): de markering vraag bij een vers opent die vraag; "N open vragen in dit hoofdstuk" bovenaan een hoofdstuk; "precedent" in de vertaalregels opent die vertaalkeuze; de hint na typen ("staat nog 25× in Lukas 4–24, overal aanpassen?").
+- *Duidelijke acties per regel*: bij een vertaalkeuze "12 plekken bekijken" en "Overal toepassen"; bij Zo vertaald met twee vertalingen "kies er één"; bij een vertaalvraag de opties als knoppen; elke actie via het voorbeeldvenster.
+- *Een woord in de tekst omzetten* (zoals DeepL): A via selectie zonder vaste markering (een balkje met Zo vertaald, Vertaalkeuze, Bron, Overal aanpassen), B stippellijnen bij woorden met een keuze (als schakelaar), C rechtermuisknop of Alt+klik. Voorlopige voorkeur: A als basis, B als schakelaar. Let op: een klik in de vereenvoudiging opent nu de editor; de woordinteractie mag daar niet mee botsen.
+- Open: zegt "precedent" de redacteur iets; waar komen de alternatieven vandaan (Zo vertaald, vertaalkeuzes, bronvorm).
+
 **Werkwijze:**
 1. **Analyse.** Schermafbeeldingen van de huidige tool en de taken van de redacteur als verloop uitgeschreven (een vers aanpassen, een vertaalvraag beantwoorden, een hoofdstuk naar Word brengen). Wat werkt, wat schuurt, welke patronen ontbreken.
 2. **Richtingen met Claude Design.** Binnen de basis hierboven twee of drie typografische richtingen voor de schermen die het meest tellen: lezen en bewerken, het menu bij een woord, het voorbeeldvenster met varianten. Altijd met echte Lukas-tekst, ook uit een druk hoofdstuk. De eigenaar kiest, de redacteur reageert, daarna itereren.

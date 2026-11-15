@@ -19,7 +19,8 @@ export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen }: Pr
 		<nav class="zijbalk" aria-label={`Hoofdstukken van ${boek.naam}`}>
 			<h2>{boek.naam}</h2>
 			<a class="naar-begrippen" href={maakAdres({ soort: 'begrippen', boek: boek.id, tabblad: 'besloten' })} aria-current={begrippenOpen ? 'page' : undefined}>
-				Begrippen en vragen
+				<span class="naar-begrippen-titel">Keuzes en vragen</span>
+				<span class="naar-begrippen-ondertitel">voor heel {boek.naam}</span>
 			</a>
 			{gewoneStatus !== null && (
 				<p class="status-legenda">

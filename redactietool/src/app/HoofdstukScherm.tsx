@@ -63,7 +63,7 @@ export function HoofdstukScherm({
 						<th scope="col">Vers</th>
 						<th scope="col">Bron</th>
 						<th scope="col">Vereenvoudigd</th>
-						{regelsAltijdZichtbaar && <th scope="col">Regels</th>}
+						{regelsAltijdZichtbaar && <th scope="col">Vertaalregels</th>}
 					</tr>
 				</thead>
 				<tbody>
@@ -90,10 +90,10 @@ export function HoofdstukScherm({
 			</table>
 			<p class="regelsschakelaar">
 				<button type="button" aria-pressed={regelsAltijdZichtbaar} onClick={onWisselRegels}>
-					Regels altijd tonen
+					Vertaalregels altijd tonen
 				</button>
 				<span> Klik in de vereenvoudigde tekst om een vers te bewerken.</span>
-				{!regelsAltijdZichtbaar && <span> Klik op een vers om de regels erbij te zien.</span>}
+				{!regelsAltijdZichtbaar && <span> Klik op een vers om de vertaalregels erbij te zien.</span>}
 			</p>
 		</article>
 	);

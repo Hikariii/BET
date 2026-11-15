@@ -49,7 +49,7 @@ export function Regels({ logVerzen, vragen, kapAf, onOpenNaslag }: Props) {
 					{uitgeklapt ? 'minder regels' : `nog ${inklapbaar} regels`}
 				</button>
 			)}
-			{!heeftRegels && <p class="geen-regels">Geen regels in het log.</p>}
+			{!heeftRegels && <p class="geen-regels">Geen vertaalregels in het log.</p>}
 			{(vragen.length > 0 || logVragen.length > 0) && <Vraag vragen={vragen} logVragen={logVragen} />}
 		</>
 	);

@@ -48,7 +48,7 @@ function TellingCellen({ boek, telling }: TellingCellenProps) {
 	);
 }
 
-/** Tabblad Besloten: de precedenten met per precedent het aantal plekken en links naar de verzen. */
+/** Tabblad Vertaalkeuzes: de precedenten met per precedent het aantal plekken en links naar de verzen. */
 export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 	const [zoekterm, zetZoekterm] = useState('');
 	const [statusfilter, zetStatusfilter] = useState<Statusfilter>('alle');
@@ -82,7 +82,7 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 			</p>
 			<div class="tabelrand">
 				<table class="besloten-tabel">
-					<caption class="alleen-lezers">Precedenten uit precedenten.md met het aantal plekken in het boek</caption>
+					<caption class="alleen-lezers">Vertaalkeuzes (precedenten) met het aantal plekken in het boek</caption>
 					<thead>
 						<tr>
 							<th scope="col">Bron</th>
@@ -111,7 +111,7 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 					</tbody>
 				</table>
 			</div>
-			{zichtbaar.length === 0 && <p class="melding">Geen precedenten gevonden.</p>}
+			{zichtbaar.length === 0 && <p class="melding">Geen vertaalkeuzes gevonden.</p>}
 		</div>
 	);
 }

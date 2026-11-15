@@ -101,7 +101,7 @@ nav.zijbalk .status-legenda {
 	font-size: 0.8125rem;
 }
 
-/* "Begrippen en vragen" als knop, in dezelfde stijl als de hoofdstuknummers: wit vlak, dunne rand; actief donkerrood. */
+/* "Keuzes en vragen" als knop, in dezelfde stijl als de hoofdstuknummers: wit vlak, dunne rand; actief donkerrood. */
 nav.zijbalk .naar-begrippen {
 	display: block;
 	margin: 0 1rem 1.25rem;
@@ -127,4 +127,20 @@ nav.zijbalk .naar-begrippen[aria-current='page'] {
 
 nav.zijbalk .status-legenda {
 	margin-top: -0.5rem;
+}
+
+/* Ondertitel in de knop: de keuzes en vragen gaan over het hele boek, niet over het open hoofdstuk. */
+nav.zijbalk .naar-begrippen-titel,
+nav.zijbalk .naar-begrippen-ondertitel {
+	display: block;
+}
+
+nav.zijbalk .naar-begrippen-ondertitel {
+	color: var(--gedempt);
+	font-size: 0.8125rem;
+	font-weight: 400;
+}
+
+nav.zijbalk .naar-begrippen[aria-current='page'] .naar-begrippen-ondertitel {
+	color: #fff;
 }

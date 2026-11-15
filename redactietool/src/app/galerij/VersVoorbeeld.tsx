@@ -47,7 +47,7 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 					<th scope="col">Vers</th>
 					<th scope="col">Bron</th>
 					<th scope="col">Vereenvoudigd</th>
-					<th scope="col">Regels</th>
+					<th scope="col">Vertaalregels</th>
 				</tr>
 			</thead>
 			<tbody>
