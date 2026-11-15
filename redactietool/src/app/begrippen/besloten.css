@@ -1,0 +1,83 @@
+.besloten-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: end;
+	margin-bottom: 0.5rem;
+}
+
+.besloten-filters label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	font-size: 0.9rem;
+}
+
+.besloten-filters input,
+.besloten-filters select {
+	padding: 0.4rem;
+	font: inherit;
+}
+
+.besloten-filters input {
+	min-width: 18rem;
+}
+
+.besloten-samenvatting {
+	margin: 0.5rem 0;
+	color: var(--gedempt, #59636e);
+	font-size: 0.9rem;
+}
+
+.besloten-tabel {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.9rem;
+}
+
+.besloten-tabel th,
+.besloten-tabel td {
+	padding: 0.4rem 0.6rem;
+	border-bottom: 1px solid var(--rand, #d1d9e0);
+	text-align: left;
+	vertical-align: top;
+}
+
+.besloten-tabel thead th {
+	background: var(--vlak, #f6f8fa);
+	position: sticky;
+	top: 0;
+}
+
+.besloten-tabel tbody th {
+	font-weight: 600;
+}
+
+.besloten-tabel .aantal {
+	font-weight: 600;
+}
+
+.besloten-tabel .uitleg,
+.besloten-tabel .niet-van-toepassing,
+.besloten-tabel .niet-telbaar {
+	color: var(--gedempt, #59636e);
+}
+
+.besloten-tabel .nog-oud {
+	background: var(--gekozen, #fff8c5);
+}
+
+.besloten-tabel .onzeker {
+	margin: 0.25rem 0 0;
+	color: var(--gedempt, #59636e);
+	font-size: 0.85em;
+}
+
+.alleen-lezers {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
