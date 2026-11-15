@@ -9,6 +9,9 @@ De broncode van de tool. Het plan staat in [`PLAN.md`](PLAN.md). Nu kan de tool 
 | `src/app/` | de Preact-app die die JSON toont |
 | `src/data/` | het gegevenscontract (types) tussen bouwscript en app |
 | `src/log/`, `src/referentie/`, `src/sjabloon/` | de lezers voor wijzigingslogs, referentiebestanden, `STATUS.md`, richtlijn en Word-stijlen |
+| `src/uitlijning/` | woorduitlijning bron ↔ vereenvoudigd per vers en "Gevonden": hoe bronwoorden vertaald zijn (voor het begrippenoverzicht) |
+| `src/editor/` | ProseMirror-schema en omzetting voor de editor (nog zonder scherm) |
+| `src/klembord/` | Word-HTML voor kopiëren naar Word met de echte stijlnamen, en de copy-handler (nog zonder knop) |
 
 ## Draaien
 
@@ -54,6 +57,12 @@ De tests hebben `python3` nodig (alleen de standaardbibliotheek).
 | `src/app/groepeerPerVers.test.ts` | Bron en vereenvoudiging per vers, ook voor een vers over meer alinea's |
 | `src/app/vertaalvragen.test.ts` | Welke vertaalvraag bij welk vers hoort, en het aantal open vragen per hoofdstuk |
 | `src/app/stijl.test.ts` | Opmaak naar CSS, met kleuren uit het sjabloon en `src/data/stijlkoppeling.ts` |
+| `src/log/*.test.ts` | Wijzigingslogs: verwijzingen naar § en precedent, randgevallen, en pariteit met `parse_log` over alle 24 logs |
+| `src/referentie/*.test.ts` | Precedenten, `STATUS.md`, richtlijn en open vragen op de echte bestanden; elk vers in de kolom Verzen bestaat |
+| `src/sjabloon/*.test.ts` | Stijlen uit `styles.xml` van het echte sjabloon (namen, kleuren, vet en cursief) |
+| `src/klembord/*.test.ts` | Word-HTML byte-gelijk aan het geslaagde prototype van fase 0 (Lukas 2, 3, 5, 17) |
+| `src/editor/*.test.ts` | md → ProseMirror → md byte-gelijk voor alle 48 bestanden; opmaak blijft bij bewerken; versnummers zonder opmaak |
+| `src/uitlijning/*.test.ts` | Uitlijning op kleine handgemaakte verzen en bekende vervangingen op Lukas (Heere → Heer, Zoon des mensen → Mensenzoon); rekentijd |
 
 De pariteitstest draait `scripts/formaat_naar_json.py --boek lukas`, dat de uitvoer van `parse_md` als JSON geeft. Dat script geeft ook de lijsten met alineastijlen, domeinen en directe opmaak, zodat de test controleert dat TypeScript dezelfde kent.
 

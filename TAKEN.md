@@ -13,8 +13,14 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 
 ## Open
 - [ ] Redactietool, plan in `redactietool/PLAN.md` (v2, vastgesteld). Volgorde: fase 0 → 1 → 2 → 3 → 5 → 4.
-  - [~] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. **Open: test op Windows in Edge en Chrome** (geleende laptop of UTM), met `redactietool/prototype/plakken-in-word/LEESMIJ.md`.
-- [ ] Kolom **Verzen** toevoegen aan `bijbel/lukas/referentie/open-vragen.md` (vaste lijst per vraag, nodig voor de vertaalvragen in de tool, fase 1)
+  - [~] **Fase 0**: prototype kopiëren en plakken in Word (branch `fase-0-plakken-in-word`). Mac in Chromium geslaagd; Safari valt af. **Open: test op Windows in Edge en Chrome** (geleende laptop of UTM), met `docs/prototype/plakken-in-word/LEESMIJ.md` op die branch.
+  - [x] **Fase 1** (lezen) gebouwd op branch `fase-1-lezen`, met voorwerk voor fase 2, 3 en 5; twee onafhankelijke reviews en een critical judge verwerkt.
+  - [ ] Rooktest van het leesscherm (render met DOM of Playwright op `dist/`), nu alleen handmatig gecontroleerd.
+  - [ ] "precedent" in de kolom Regels koppelen aan de bijbehorende regel in `precedenten.md` (nu opent de doorzoekbare tabel).
+  - [ ] `redactietool/src/klembord/chromiumKlembord.mjs` (alleen macOS, gebruikt rolldown van Vite en Playwright uit `/tmp/pw`) opnemen in de tests of vervangen.
+  - [ ] `document.title` per hoofdstuk zetten; Node-versie op één plek (nu `mise.toml` 26.13.1 en workflow `26`).
+  - [ ] Pages aanzetten in de repo-instellingen (bron: GitHub Actions); daarna publiceert de workflow bij elke push naar `main`.
+- [x] Kolom **Verzen** in `bijbel/lukas/referentie/open-vragen.md` (35 van 36 vragen; "aanhalingstekens" bewust leeg)
 - [ ] `WERKPLAN.md` deel D (aangeleverd Word terugvoeren) een keer doorlopen met het eerstvolgende aangeleverde hoofdstuk, en bijstellen waar nodig
 - [ ] Gedeelde begrippenlijst voor alle boeken: zodra de redactie precedenten `vast` maakt, de boekoverstijgende begrippen (Mensenzoon, discipel, Farizeeën …) uit `bijbel/lukas/referentie/precedenten.md` naar een gedeelde lijst verhuizen
 - [x] Afwijking in `controleer_docx_md.py` (Lukas 8 onderstreept, md 2 tegen docx 1) verklaard: in 8:1 is de onderstreping in Word één reeks; de md splitst hem rond een spatie die niet rood is. Tekst en opmaak per teken kloppen; geen actie

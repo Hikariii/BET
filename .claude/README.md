@@ -4,7 +4,7 @@ Claude Code laadt dit automatisch voor iedereen die in deze repo werkt. Het mees
 
 | Map / bestand | Inhoud |
 |---|---|
-| `commands/` | `/intent` en `/pr` |
+| `commands/` | `/intent`, `/pr` en `/autopilot` (een fase uit `redactietool/PLAN.md` zonder toezicht uitvoeren met subagents, review en critical judge; pusht niet) |
 | `skills/` | Skills, zie [Herkomst](#herkomst) |
 | `rules/` | Regels die laden bij bestanden in hun `paths`: `code-kwaliteit` (incl. comments), `testen`, `typescript` |
 | `hooks/check_em_dash.py` | Blokkeert em-dashes bij Write en Edit (zie `CLAUDE.md`, "Schrijfstijl") |
@@ -27,7 +27,7 @@ Claude Code laadt dit automatisch voor iedereen die in deze repo werkt. Het mees
 | `frontend-ui-engineering` | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) @ `39b723c` | Toegankelijke, responsieve interface |
 | `performance-optimization` | idem | Prestaties (1.100+ verzen in één editor) |
 | `browser-testing-with-devtools` | idem | De tool testen in een echte browser; **vereist de Chrome DevTools MCP-server** (zie de skill) |
-| `/intent`, `/pr`, `writing`, de rules en de hook | eigen bewerking van de Claude-configuratie van een ander project van de eigenaar | Nederlands, en aangepast aan deze repo: geen issue tracker, base `main`, geen fork |
+| `/intent`, `/pr`, `/autopilot`, `writing`, de rules en de hook | eigen bewerking van de Claude-configuratie van een ander project van de eigenaar | Nederlands, en aangepast aan deze repo: geen issue tracker, base `main`, geen fork |
 
 De licenties van de twee open-source bibliotheken (MIT) staan in `skills/_licenties/`.
 
