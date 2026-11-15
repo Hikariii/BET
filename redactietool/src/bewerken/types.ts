@@ -26,6 +26,13 @@ export type BewerktVers = {
 	basis: VersInhoud;
 	/** ISO-tijd van het laatste bewaren. */
 	bewaard: string;
+	/**
+	 * Waar de bewerking vandaan komt; ontbreekt in opslag van voor fase 4 (dan: zelf getypt).
+	 * Optioneel om oude opslag leesbaar te houden; zelf typen in het vers zet hem terug op 'zelf getypt'.
+	 */
+	herkomst?: 'zelf getypt' | 'structurele keuze';
+	/** Bij een structurele keuze: het id van die keuze, om hem in één keer terug te draaien. */
+	keuzeId?: string;
 };
 
 /** Een waarschuwing bij een bewerkt vers; blokkeert niets. */

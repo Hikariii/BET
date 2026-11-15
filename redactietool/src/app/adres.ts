@@ -1,5 +1,5 @@
 /** De tabbladen van het scherm Begrippen. */
-export const TABBLADEN = ['besloten', 'gevonden', 'vragen'] as const;
+export const TABBLADEN = ['besloten', 'gevonden', 'vragen', 'vervangen'] as const;
 export type Tabblad = (typeof TABBLADEN)[number];
 
 /**

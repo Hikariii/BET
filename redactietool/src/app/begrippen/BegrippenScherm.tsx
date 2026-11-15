@@ -5,12 +5,14 @@ import { useLaden } from '../hooks';
 import { Besloten } from './Besloten';
 import { Gevonden } from './Gevonden';
 import { Vertaalvragen } from './Vertaalvragen';
+import { Vervangen } from './Vervangen';
 import './begrippen.css';
 
 const TITEL: Record<Tabblad, string> = {
 	besloten: 'Besloten',
 	gevonden: 'Gevonden',
 	vragen: 'Vertaalvragen',
+	vervangen: 'Vervangen',
 };
 
 type Props = {
@@ -42,6 +44,7 @@ export function BegrippenScherm({ boek, referentie, tabblad }: Props) {
 					{tabblad === 'besloten' && <Besloten boek={boek} referentie={referentie} hoofdstukken={hoofdstukken.waarde} />}
 					{tabblad === 'gevonden' && <Gevonden boek={boek} referentie={referentie} hoofdstukken={hoofdstukken.waarde} />}
 					{tabblad === 'vragen' && <Vertaalvragen boek={boek} referentie={referentie} hoofdstukken={hoofdstukken.waarde} />}
+					{tabblad === 'vervangen' && <Vervangen boek={boek} referentie={referentie} hoofdstukken={hoofdstukken.waarde} />}
 				</>
 			)}
 		</section>
