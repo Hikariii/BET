@@ -73,12 +73,3 @@
 	color: var(--gedempt, #59636e);
 	font-size: 0.85em;
 }
-
-.alleen-lezers {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-	clip-path: inset(50%);
-	white-space: nowrap;
-}

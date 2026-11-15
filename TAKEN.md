@@ -31,7 +31,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] Vervangen: de toegepaste keuzes gaan nog niet mee in de export (`structureleKeuzes` blijft leeg); alleen de herkomst per vers.
   - [ ] Vervangen: de context in het voorbeeldvenster begint en eindigt midden in een woord ("n jullie naam"); knippen op woordgrenzen, met "…".
   - [ ] Vervangen: een lege "Vervang door" verwijdert tekst zonder waarschuwing (wel terug te draaien); bevestiging of waarschuwing in het voorbeeld.
-  - [ ] Vervangen, toegankelijkheid: "vervangen door" voor schermlezers bij `del`/`ins`; focus na toepassen naar de samenvatting; `.alleen-lezers` naar een gedeeld CSS-bestand (nu in `besloten.css`).
+  - [ ] Vervangen, toegankelijkheid: "vervangen door" voor schermlezers bij `del`/`ins`; focus na toepassen naar de samenvatting.
   - [ ] Vervangen: woordgrenzen bij een apostrof ("zo" in "zo'n", "m" in "m'n"); aansluitende stukken met gelijke opmaak samenvoegen voordat een vondst "met de hand" wordt (alleen als dat in de data voorkomt).
   - [ ] Vervangen: de test op echte data telt met bijna dezelfde regex als de code; liever een vaste verwachting (bv. 26 plekken voor "de Mensenzoon").
   - [ ] Naar Word: in een echte Safari controleren dat de waarschuwing verschijnt; nagaan of `navigator.clipboard.write` de `mso-`stijlen ook behoudt (dan kan `execCommand` weg).

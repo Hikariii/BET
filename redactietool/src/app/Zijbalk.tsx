@@ -37,7 +37,7 @@ export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen }: Pr
 							>
 								<span class="hoofdstuknummer">{hoofdstuk.nummer}</span>
 								{hoofdstuk.status === gewoneStatus ? (
-									<span class="alleen-schermlezer">Status {hoofdstuk.status}</span>
+									<span class="alleen-lezers">Status {hoofdstuk.status}</span>
 								) : (
 									<span class={`status status-${statusKlasse(hoofdstuk.status)}`}>{hoofdstuk.status}</span>
 								)}
