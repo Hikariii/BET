@@ -39,7 +39,9 @@ export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen }: Pr
 								{hoofdstuk.status === gewoneStatus ? (
 									<span class="alleen-lezers">Status {hoofdstuk.status}</span>
 								) : (
-									<span class={`status status-${statusKlasse(hoofdstuk.status)}`}>{hoofdstuk.status}</span>
+									<span class={`status status-${statusKlasse(hoofdstuk.status)}`} title={hoofdstuk.status}>
+										{hoofdstuk.status === 'goedgekeurd' ? <span class="alleen-lezers">{hoofdstuk.status}</span> : hoofdstuk.status}
+									</span>
 								)}
 								{openVragen > 0 && (
 									<span class="open-vragen" title="Open vertaalvragen in dit hoofdstuk">

@@ -27,3 +27,76 @@
 	grid-column: 3;
 }
 
+
+/*
+ * Ronde 2 van de eigenaar: grotere letter, status en vragen in twee even brede kolommen,
+ * goedgekeurd als vinkje (het woord blijft voor schermlezers en als tooltip), en het hoofdstuknummer in een vakje.
+ * Selectors met `nav.zijbalk` omdat vormgeving.css later laadt.
+ */
+nav.zijbalk {
+	font-size: 1rem;
+}
+
+nav.zijbalk ul a {
+	grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr);
+	align-items: center;
+	gap: 0 0.6rem;
+	padding-top: 0.2rem;
+	padding-bottom: 0.2rem;
+	border-left-color: transparent;
+}
+
+nav.zijbalk ul a:hover {
+	border-left-color: transparent;
+}
+
+nav.zijbalk ul a[aria-current='page'] {
+	border-left-color: transparent;
+}
+
+nav.zijbalk .hoofdstuknummer {
+	display: inline-grid;
+	place-items: center;
+	width: 2rem;
+	height: 1.5rem;
+	background: #fff;
+	border: 1px solid var(--rand);
+	border-radius: 3px;
+	font-weight: 500;
+}
+
+nav.zijbalk ul a:hover .hoofdstuknummer {
+	border-color: var(--rand-donker);
+}
+
+nav.zijbalk ul a[aria-current='page'] .hoofdstuknummer {
+	background: var(--rood);
+	border-color: var(--rood);
+	color: #fff;
+}
+
+nav.zijbalk .status,
+nav.zijbalk .open-vragen {
+	font-size: 0.8125rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+nav.zijbalk .status {
+	grid-column: 2;
+}
+
+nav.zijbalk .open-vragen {
+	grid-column: 3;
+	text-align: left;
+}
+
+nav.zijbalk .status-goedgekeurd::before {
+	content: '\2713';
+	font-weight: 700;
+}
+
+nav.zijbalk .status-legenda {
+	font-size: 0.8125rem;
+}
