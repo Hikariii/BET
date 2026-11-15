@@ -41,7 +41,8 @@ Een inzage- en keuze-instrument voor **de vertaler**: de persoon die de definiti
 - Opmaak zoals in Word (Jezuswoorden, domeinmarkeringen, onderwijs, highlights). Kleuren en stijlen komen uit het Word-sjabloon van het boek, niet zelf verzonnen.
 - Kolom **Regels**: de regels uit het wijzigingslog van dat vers. Een knop wisselt tussen altijd zichtbaar (standaard) en ingeklapt (zichtbaar bij klikken op een vers).
 - Klikken op een `§` opent die paragraaf van de richtlijn in een zijpaneel; klikken op "precedent" opent de regel uit `precedenten.md`.
-- Zijbalk: alle hoofdstukken met hun status en een stip als de vertaler er iets in gewijzigd heeft.
+- Zijbalk: alle hoofdstukken met hun status, het aantal open vertaalvragen, en een stip als de vertaler er iets in gewijzigd heeft.
+- Hoort een vers bij een vertaalvraag (zie [Vertaalvragen](#7-vertaalvragen)), dan staat in de kolom Regels de markering **vraag**; klikken toont de kwestie, de gekozen oplossing en de alternatieven.
 
 ### 2. Begrippenoverzicht
 
@@ -94,7 +95,8 @@ Vertaalkeuzes in één keer op meer plekken doorvoeren, met behoud van opmaak. Z
   - varianten (vervoegingen, meervoud, met of zonder lidwoord) als aparte groep met een eigen vervanging;
   - goedgekeurde hoofdstukken staan erin, maar standaard uit;
   - opmaak: valt een vondst binnen één opmaak, dan krijgt de nieuwe tekst die opmaak; bevat hij een hele markering of loopt hij over een grens, dan "met de hand";
-  - achteraf alles in één keer of per vers terug te draaien.
+  - achteraf alles in één keer of per vers terug te draaien;
+  - behalve tekst kan de functie ook alleen de **markering** op dezelfde woorden wisselen (bijvoorbeeld `eeuwigleven` → `genade`), voor keuzes zoals bij een [vertaalvraag](#7-vertaalvragen).
 
 ### 5. Naar Word en naar Claude
 
@@ -104,6 +106,7 @@ Vertaalkeuzes in één keer op meer plekken doorvoeren, met behoud van opmaak. Z
   - per gewijzigd vers de oude en de nieuwe tekst, met opmaak-tags volgens `FORMAAT.md`;
   - per wijziging de herkomst: *zelf getypt*, *menu: bronvorm / precedent / gevonden*, of *structurele keuze*;
   - de structurele keuzes, met de overgeslagen plekken;
+  - beantwoorde vertaalvragen: vraag, gekozen optie, verzen en overgeslagen plekken;
   - genegeerde waarschuwingen;
   - een vrij veld "Toelichting voor de verwerking".
 
@@ -122,6 +125,22 @@ Uit `bijbel/<boek>/STATUS.md`, met de hand bijgewerkt:
 | `goedgekeurd` | alles bevestigd; het hoofdstuk is referentie |
 
 Bij `verwerkt` en `goedgekeurd` staan de datum en het aangeleverde bestand (kolom **Herkomst**). Een wijziging aan een goedgekeurd hoofdstuk zet het terug naar `review`.
+
+### 7. Vertaalvragen
+
+Vertaaluitdagingen zichtbaar maken en laten beantwoorden waar ze spelen. Voorbeeld: de markering van "Gezegend" (uit "zalig"). De bron markeert zalig als `eeuwigleven` en gezegend als `genade`; de vertaler koos in 1:45 en 1:48 `genade`, Claude hield in 4–24 `eeuwigleven` (10×). Opties: a) `genade`, b) `eeuwigleven` houden, c) een ander woord voor "zalig".
+
+Twee bronnen, samen getoond:
+- **Per boek**: `bijbel/<boek>/referentie/open-vragen.md` (kwestie, gekozen in de tekst, alternatieven, status, besluit, verzen).
+- **Per vers**: de vragen in de wijzigingslogs (`Twijfel / vraag aan redactie` en `## Vragen aan redactie`).
+
+In de tool:
+- **Per vers**: de markering **vraag** in de kolom Regels (zie Lezen).
+- **Overzicht**: een tabblad **Vertaalvragen** naast Begrippen. Per vraag de kwestie, de opties, de status (`open`, `voorlopig besloten`, `besloten`) en alle betrokken verzen met een link. Te filteren op status; open vragen bovenaan.
+- **Een optie kiezen**: opent de vervangfunctie met voorbeeldvenster (zie [Structurele keuzes](#4-structurele-keuzes)), al ingevuld. Een optie kan de **tekst** veranderen of alleen de **markering** op dezelfde woorden (bij "Gezegend": `eeuwigleven` → `genade`). De vervangfunctie moet dus ook opmaak kunnen wisselen.
+- **Doorgeven**: de gekozen optie gaat mee in de [export voor Claude](#5-naar-word-en-naar-claude) als "vraag beantwoord" (vraag, optie, verzen, overgeslagen plekken). Bij het terugvoeren verwerkt Claude het besluit in `open-vragen.md` (status `besloten`) en in de precedenten, na akkoord van de eigenaar.
+
+Nodig in de data: de kolom "Plaats" in `open-vragen.md` is vrije tekst ("Lk 4–24", "Lk 4:2 (4:12, 4:13)"). Er komt een kolom **Verzen** met een vaste lijst (`1:45, 1:48, 6:20-22, 7:23`), bijgehouden door Claude. Zonder die kolom kan de tool een vraag niet betrouwbaar aan verzen koppelen.
 
 ## Terugvoeren (Claude)
 
@@ -144,12 +163,13 @@ docs/                       broncode van de tool
   src/uitlijning/           woordvergelijking bron ↔ vereenvoudigd (regels per vers, gevonden)
   src/controles/            regels uit controleer_hoofdstuk.py (+ controle.json)
   src/begrippen/            precedenten inlezen, gevonden vertalingen tellen
+  src/vragen/               vertaalvragen uit open-vragen.md en de wijzigingslogs, gekoppeld aan verzen
   src/vervangen/            structurele keuzes met voorbeeldvenster
   src/klembord/             kopiëren naar Word (HTML met de Word-stijlnamen)
   src/export/               export voor Claude
   src/tussenstand/          IndexedDB per hoofdstuk, terug naar de repo
 .github/workflows/pages.yml bouwt de tool; zet bij het bouwen bijbel/ om naar JSON
-                            (bron, vereenvoudigd, logs, precedenten, open vragen, STATUS.md,
+                            (bron, vereenvoudigd, logs, precedenten, open vragen met verzen, STATUS.md,
                             boek.json, stijlen uit het Word-sjabloon); draait de tests
 ```
 
@@ -164,11 +184,11 @@ docs/                       broncode van de tool
 | Fase | Inhoud | Klaar als |
 |---|---|---|
 | **0. Prototype plakken** | HTML-pagina met een stuk Lukas in de opmaak van de tool, met de Word-stijlnamen; kopiëren en plakken in een Word-document op basis van het sjabloon; resultaat door `docx_naar_md.py` | Op **Windows**, in **Edge en Chrome**, komen tekst en tags gelijk terug. Zo niet: Word-download in fase 5 |
-| **1. Lezen** | Workflow en Pages, JSON uit `bijbel/`, JS-parser, hoofdstuk naast de bron met opmaak, kolom Regels met links naar richtlijn en precedenten, status in de zijbalk | Lukas 1–24 leesbaar op Pages; pariteitstest met Python slaagt |
-| **2. Begrippen** | Tabbladen Besloten en Gevonden, verschillen bovenaan, links naar verzen | Elk precedent met aantallen; elk verschillend vertaald bronwoord zichtbaar |
+| **1. Lezen** | Workflow en Pages, JSON uit `bijbel/`, JS-parser, hoofdstuk naast de bron met opmaak, kolom Regels met links naar richtlijn en precedenten, markering **vraag** per vers, status en aantal open vragen in de zijbalk; kolom Verzen in `open-vragen.md` | Lukas 1–24 leesbaar op Pages; pariteitstest met Python slaagt; elke open vraag hangt aan de juiste verzen |
+| **2. Begrippen en vragen** | Tabbladen Besloten, Gevonden en Vertaalvragen; verschillen en open vragen bovenaan, links naar verzen | Elk precedent met aantallen; elk verschillend vertaald bronwoord zichtbaar; elke vertaalvraag met opties, status en verzen |
 | **3. Bewerken** | ProseMirror, vrij typen, waarschuwingen, tussenstand in de browser, terug naar de repo, label bij goedgekeurd | md → editor → md exact gelijk; een middag werk overleeft herladen |
-| **5. Naar Word en Claude** | Kopiëren naar Word (of download), Export voor Claude | Een bewerkt hoofdstuk komt via Word en terugvoeren ongeschonden in de repo |
-| **4. Structurele keuzes** | Markering bij aanwijzen, menu bij klikken of selecteren, hint na typen, voorbeeldvenster, herkomst in de export | Een keuze als "de Mensenzoon → X" gaat in één handeling over het boek, met overslaan per plek |
+| **5. Naar Word en Claude** | Kopiëren naar Word (of download), Export voor Claude (incl. beantwoorde vragen) | Een bewerkt hoofdstuk komt via Word en terugvoeren ongeschonden in de repo |
+| **4. Structurele keuzes** | Markering bij aanwijzen, menu bij klikken of selecteren, hint na typen, voorbeeldvenster (tekst en markering wisselen), een optie van een vertaalvraag kiezen, herkomst in de export | Een keuze als "de Mensenzoon → X" gaat in één handeling over het boek, met overslaan per plek; een vraag als "Gezegend" is met één optie te beantwoorden |
 
 Fase 5 komt vóór fase 4: na fase 0–3 en 5 kan de vertaler de hele cyclus rond (lezen, bewerken, naar Word, terugvoeren).
 
@@ -191,4 +211,5 @@ Fase 5 komt vóór fase 4: na fase 0–3 en 5 kan de vertaler de hele cyclus ron
 | Tussenstand in de browser gewist | Werk dat nog niet in Word staat is weg | Duidelijke melding in de tool dat Word leidend is; vaak kopiëren of exporteren |
 | Tool toont een oudere versie dan het Word-bestand van de vertaler | Dubbel werk | Status `bij editor`; werkafspraak eerst terugvoeren |
 | Structurele vervanging op de verkeerde plek | Betekenis verschuift | Altijd voorbeeldvenster; goedgekeurd standaard uit; terugdraaien |
+| Vertaalvraag aan de verkeerde verzen gekoppeld | Vertaler past de keuze op verkeerde plekken toe | Kolom Verzen expliciet bijhouden; voorbeeldvenster toont elke plek |
 | "Gevonden" koppelt woorden verkeerd | Vertaler trekt een verkeerde conclusie | Altijd link naar de verzen; label "automatisch afgeleid" |
