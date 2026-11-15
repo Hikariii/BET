@@ -19,7 +19,7 @@ Een inzage- en keuze-instrument voor **de vertaler**: de persoon die de definiti
 | U3 | **Terugvoeren is handmatig**: de eigenaar geeft Claude het Word-bestand, Claude werkt de repo bij (zie [Terugvoeren](#terugvoeren-claude)). |
 | U4 | **Geen opslag.** De tool bewaart de tussenstand alleen in de browser van de vertaler. Opslag (bv. Google Drive) is geparkeerd en komt mogelijk nooit. |
 | U5 | **Geen goedkeuring in de tool.** Alle hoofdstukken zijn bewerkbaar. De tool toont de status per hoofdstuk alleen, uit `STATUS.md`. |
-| U6 | **Eén vertaler**, op laptop of desktop met **Windows**, browser **Edge of Chrome**. Interface in het Nederlands. Ontwikkelen en testen ook op de Mac (Chrome, Safari). |
+| U6 | **Eén vertaler**, op laptop of desktop met **Windows**, browser **Edge of Chrome**. Interface in het Nederlands. Ontwikkelen en testen ook op de Mac. **Safari wordt niet ondersteund voor kopiëren naar Word** (zie fase 0); lezen en bewerken werken daar wel. |
 | U7 | **Techniek**: Vite + TypeScript + Preact, met ProseMirror als editor. Gebouwd en gepubliceerd via GitHub Actions. |
 | U8 | **Eén hoofdstuk per scherm**, met een zijbalk voor alle hoofdstukken en een adres per vers (`…/lukas/9#22`). |
 
@@ -100,7 +100,10 @@ Vertaalkeuzes in één keer op meer plekken doorvoeren, met behoud van opmaak. Z
 
 ### 5. Naar Word en naar Claude
 
-- **Kopiëren naar Word** met de echte Word-stijlen (Jezuswoorden, GodsStem, domeinstijlen, hoofdstuktitel), zodat `docx_naar_md.py` de opmaak bij het terugvoeren herkent. Of dat werkt, beslist [fase 0](#fasen); werkt het niet, dan komt er een knop **Download als Word** (`.docx` met het sjabloon van het boek, gelijk aan `md_naar_docx.py`).
+- **Kopiëren naar Word** met de echte Word-stijlen (Jezuswoorden, GodsStem, domeinstijlen, hoofdstuktitel), zodat `docx_naar_md.py` de opmaak bij het terugvoeren herkent. Uit [fase 0](#fasen):
+  - kopiëren gaat via een **eigen copy-handler** die HTML schrijft zoals Word die zelf maakt: elke stijl als klasse met `mso-style-name` (de echte stijlnaam uit het sjabloon) in een `<style>`-blok. De standaardkopie van de browser werkt niet (geen stijlnamen);
+  - werkt in **Chrome en Edge**; in **Safari** niet (WebKit gooit het `<style>`-blok weg). In Safari toont de tool: "Kopiëren naar Word werkt in Chrome of Edge";
+  - mislukt de Windows-test toch, dan komt er een knop **Download als Word** (`.docx` met het sjabloon van het boek, gelijk aan `md_naar_docx.py`).
 - **Export voor Claude**: een knop, altijd zichtbaar bovenin, en een hint na kopiëren. Eén bestand per hoofdstuk (`lukas-04.redactie.json`) met:
   - de commit van de repo waarop de vertaler werkte;
   - per gewijzigd vers de oude en de nieuwe tekst, met opmaak-tags volgens `FORMAAT.md`;
@@ -183,11 +186,11 @@ docs/                       broncode van de tool
 
 | Fase | Inhoud | Klaar als |
 |---|---|---|
-| **0. Prototype plakken** | HTML-pagina met een stuk Lukas in de opmaak van de tool, met de Word-stijlnamen; kopiëren en plakken in een Word-document op basis van het sjabloon; resultaat door `docx_naar_md.py` | Op **Windows**, in **Edge en Chrome**, komen tekst en tags gelijk terug. Zo niet: Word-download in fase 5 |
+| **0. Prototype plakken** | HTML-pagina met een stuk Lukas in de opmaak van de tool, met de Word-stijlnamen; kopiëren en plakken in een Word-document op basis van het sjabloon; resultaat door `docx_naar_md.py` | Op **Windows**, in **Edge en Chrome**, komen tekst en tags gelijk terug. Zo niet: Word-download in fase 5. **Stand 2026-11-15:** Mac geslaagd in Chromium (Word-HTML met `mso-style-name`: 17 opmaaksoorten, 0 tekstverschillen); Safari mislukt en valt af; Windows open. Prototype op branch `fase-0-plakken-in-word` |
 | **1. Lezen** | Workflow en Pages, JSON uit `bijbel/`, JS-parser, hoofdstuk naast de bron met opmaak, kolom Regels met links naar richtlijn en precedenten, markering **vraag** per vers, status en aantal open vragen in de zijbalk; kolom Verzen in `open-vragen.md` | Lukas 1–24 leesbaar op Pages; pariteitstest met Python slaagt; elke open vraag hangt aan de juiste verzen |
 | **2. Begrippen en vragen** | Tabbladen Besloten, Gevonden en Vertaalvragen; verschillen en open vragen bovenaan, links naar verzen | Elk precedent met aantallen; elk verschillend vertaald bronwoord zichtbaar; elke vertaalvraag met opties, status en verzen |
 | **3. Bewerken** | ProseMirror, vrij typen, waarschuwingen, tussenstand in de browser, terug naar de repo, label bij goedgekeurd | md → editor → md exact gelijk; een middag werk overleeft herladen |
-| **5. Naar Word en Claude** | Kopiëren naar Word (of download), Export voor Claude (incl. beantwoorde vragen) | Een bewerkt hoofdstuk komt via Word en terugvoeren ongeschonden in de repo |
+| **5. Naar Word en Claude** | Kopiëren naar Word via een eigen copy-handler met Word-HTML (of download), melding in Safari, Export voor Claude (incl. beantwoorde vragen) | Een bewerkt hoofdstuk komt via Word en terugvoeren ongeschonden in de repo |
 | **4. Structurele keuzes** | Markering bij aanwijzen, menu bij klikken of selecteren, hint na typen, voorbeeldvenster (tekst en markering wisselen), een optie van een vertaalvraag kiezen, herkomst in de export | Een keuze als "de Mensenzoon → X" gaat in één handeling over het boek, met overslaan per plek; een vraag als "Gezegend" is met één optie te beantwoorden |
 
 Fase 5 komt vóór fase 4: na fase 0–3 en 5 kan de vertaler de hele cyclus rond (lezen, bewerken, naar Word, terugvoeren).
@@ -205,7 +208,8 @@ Fase 5 komt vóór fase 4: na fase 0–3 en 5 kan de vertaler de hele cyclus ron
 
 | Risico | Gevolg | Maatregel |
 |---|---|---|
-| Plakken in Word neemt de stijlen niet over | Opmaak gaat verloren bij het terugvoeren | Fase 0 vóór al het andere; anders Word-download |
+| Plakken in Word neemt de stijlen niet over | Opmaak gaat verloren bij het terugvoeren | Fase 0 vóór al het andere (Mac in Chromium geslaagd, Windows open); anders Word-download |
+| Vertaler kopieert vanuit Safari | Stijlen gaan verloren | Melding in Safari; het terugvoeren meldt verloren opmaak (WERKPLAN D3) |
 | JS-parser wijkt af van Python | Tekst of tags anders in de tool dan in de repo | Pariteitstest in de workflow; `FORMAAT.md` als enige specificatie |
 | md → editor → md niet gelijk | Ongemerkte wijzigingen in verzen die niet aangeraakt zijn | Heen-en-terugtest op alle hoofdstukken |
 | Tussenstand in de browser gewist | Werk dat nog niet in Word staat is weg | Duidelijke melding in de tool dat Word leidend is; vaak kopiëren of exporteren |
