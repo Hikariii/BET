@@ -9,10 +9,12 @@ const TUSSENWOORDEN_BRONVORM = 1;
 /** Eén woord ruimte voor "op de proef te stellen" bij "op de proef stellen". */
 const TUSSENWOORDEN_DOELVORM = 1;
 
-/** De uitkomst van `telPrecedenten`: het contracttype met wat de scherm nodig heeft om de aantallen goed te duiden. */
+/** De uitkomst van `telPrecedenten`: het contracttype met wat het scherm nodig heeft om de aantallen goed te duiden. */
 export type GetelPrecedent = PrecedentTelling & {
 	/** Waar de vereenvoudigde vorm de bronvorm is: `toegepast` telt dan de verzen waar die vorm in bron en vereenvoudiging staat, en `nietToegepast` is leeg. */
 	blijft: boolean;
+	/** Plekken van het precedent die in geen van beide lijsten staan: de vorm is er niet herkend (bij "blijft" is de bronvorm niet meer in het vers te vinden). Het scherm toont ze, zodat de vertaler elk vers kan openen. */
+	onbepaald: VersRef[];
 	/** Bij een telbaar precedent: waarom de telling onzeker is (haakjes genegeerd, Plaats niet teruggevonden). */
 	opmerkingen: string[];
 };
@@ -40,7 +42,7 @@ function sleutel({ hoofdstuk, vers }: VersRef): string {
 }
 
 function nietTelbaar(precedent: Precedent, reden: string): GetelPrecedent {
-	return { precedent, telbaar: false, reden, toegepast: [], nietToegepast: [], blijft: false, opmerkingen: [] };
+	return { precedent, telbaar: false, reden, toegepast: [], nietToegepast: [], onbepaald: [], blijft: false, opmerkingen: [] };
 }
 
 function telPrecedent(precedent: Precedent, verzen: readonly Vers[], verzenOpSleutel: ReadonlyMap<string, Vers>): GetelPrecedent {
@@ -71,15 +73,18 @@ function telPrecedent(precedent: Precedent, verzen: readonly Vers[], verzenOpSle
 	// Bevat de vereenvoudigde vorm de bronvorm zelf ("huichelaars" bij "huichelaar(s)", "bezeten man" bij "bezetene"), dan blijft de bronvorm staan.
 	const blijft =
 		doelVormen.soort === 'blijft' || doelVormen.vormen.some((doel) => komtEenVanVoor(doel, bronZoekvormen));
-	if (blijft) {
-		return { precedent, telbaar: true, reden: null, toegepast: plekken.filter(staatNogOud).map((vers) => vers.ref), nietToegepast: [], blijft, opmerkingen };
-	}
+	const toegepast = blijft
+		? plekken.filter(staatNogOud)
+		: plekken.filter((vers) => !staatNogOud(vers) && komtEenVanVoor(vers.vereenvoudigd, doelZoekvormen));
+	const nietToegepast = blijft ? [] : plekken.filter(staatNogOud);
+	const geteld = new Set([...toegepast, ...nietToegepast]);
 	return {
 		precedent,
 		telbaar: true,
 		reden: null,
-		toegepast: plekken.filter((vers) => !staatNogOud(vers) && komtEenVanVoor(vers.vereenvoudigd, doelZoekvormen)).map((vers) => vers.ref),
-		nietToegepast: plekken.filter(staatNogOud).map((vers) => vers.ref),
+		toegepast: toegepast.map((vers) => vers.ref),
+		nietToegepast: nietToegepast.map((vers) => vers.ref),
+		onbepaald: plekken.filter((vers) => !geteld.has(vers)).map((vers) => vers.ref),
 		blijft,
 		opmerkingen,
 	};
@@ -90,6 +95,7 @@ function telPrecedent(precedent: Precedent, verzen: readonly Vers[], verzenOpSle
  * Plekken van een precedent zijn de verzen waar de bronvorm in de bron staat plus de verzen uit de kolom Plaats.
  * Toegepast: de vereenvoudigde vorm staat in het vers en de bronvorm niet.
  * Niet toegepast: de bronvorm staat nog in de vereenvoudiging.
+ * Onbepaald: de overige plekken, waar de vorm niet te herkennen is.
  * Een precedent waarvan Bron of Vereenvoudigd geen vorm is die te zoeken is, is niet telbaar, met een reden.
  */
 export function telPrecedenten(precedenten: readonly Precedent[], hoofdstukken: readonly HoofdstukData[]): GetelPrecedent[] {

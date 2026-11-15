@@ -67,6 +67,7 @@
 	background: var(--gekozen, #fff8c5);
 }
 
+.besloten-tabel .onbepaald,
 .besloten-tabel .onzeker {
 	margin: 0.25rem 0 0;
 	color: var(--gedempt, #59636e);

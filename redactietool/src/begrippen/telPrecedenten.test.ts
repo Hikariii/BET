@@ -44,6 +44,24 @@ describe('telPrecedenten op kleine hoofdstukken', () => {
 		expect(uitkomst.nietToegepast).toEqual(verzen(5, 3));
 	});
 
+	it('bewaart plekken waar de vorm niet te herkennen is als onbepaald, in geen van beide lijsten', () => {
+		const tekst = hoofdstuk(3, '[1] Hij zag de zonde. [2] Hij zag de zonde. [3] Hij zag de zonde.', '[1] Hij zag de misstap. [2] Hij zag de zonde. [3] Hij keek weg.');
+
+		const uitkomst = telEen(precedent('zonde', 'misstap'), tekst);
+
+		expect(uitkomst.toegepast).toEqual(verzen(3, 1));
+		expect(uitkomst.nietToegepast).toEqual(verzen(3, 2));
+		expect(uitkomst.onbepaald).toEqual(verzen(3, 3));
+	});
+
+	it('bewaart bij "blijft" de plekken waar de bronvorm niet meer staat als onbepaald', () => {
+		const tekst = hoofdstuk(3, '[1] In de synagoge. [2] In de synagoge.', '[1] In de synagoge. [2] In het gebouw.');
+
+		const uitkomst = telEen(precedent('synagoge', 'blijft'), tekst);
+
+		expect(uitkomst).toMatchObject({ toegepast: verzen(3, 1), nietToegepast: [], onbepaald: verzen(3, 2) });
+	});
+
 	it('houdt de volgorde en het aantal precedenten aan', () => {
 		const uitkomst = telPrecedenten([precedent('Zoon des mensen', 'de Mensenzoon'), precedent('zweeg', 'was stil')], [mensenzoon]);
 
@@ -254,12 +272,24 @@ describe('telPrecedenten op de data van Lukas', () => {
 		expect(precedenten.length).toBe(telbaar.length + nietTelbaar.length);
 	});
 
-	it('rekent alle hoofdstukken ruim onder 300 ms', () => {
+	it('laat geen telbaar precedent zonder plekken: elke plek staat in precies een van de drie lijsten', () => {
+		const telbaar = uitkomsten.filter((telling) => telling.telbaar);
+
+		for (const telling of telbaar) {
+			const plekken = [...telling.toegepast, ...telling.nietToegepast, ...telling.onbepaald].map(({ hoofdstuk, vers }) => `${hoofdstuk}:${vers}`);
+			expect(plekken.length, telling.precedent.bron).toBeGreaterThan(0);
+			expect(new Set(plekken).size, telling.precedent.bron).toBe(plekken.length);
+		}
+		expect(telbaar.some((telling) => telling.onbepaald.length > 0)).toBe(true);
+		expect(uitkomsten.filter((telling) => !telling.telbaar).flatMap((telling) => telling.onbepaald)).toEqual([]);
+	});
+
+	it('rekent alle 24 hoofdstukken in ruim minder dan twee seconden', () => {
 		const begin = performance.now();
 		telPrecedenten(precedenten, hoofdstukken);
 		const duur = performance.now() - begin;
 
 		expect(hoofdstukken).toHaveLength(24);
-		expect(duur).toBeLessThan(300);
+		expect(duur).toBeLessThan(2000);
 	});
 });

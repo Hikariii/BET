@@ -1,42 +1,19 @@
 import { useMemo, useState } from 'preact/hooks';
 import { telPrecedenten, type GetelPrecedent } from '../../begrippen/telPrecedenten';
+import {
+	beslotenSamenvatting,
+	isStatusfilter,
+	metBronvormNogEerst,
+	pastBijStatus,
+	pastBijZoekterm,
+	precedentSleutel,
+	STATUSFILTERS,
+	staatZekerNogOud,
+	type Statusfilter,
+} from './beslotenOverzicht';
 import type { TabbladProps } from './tabbladProps';
 import { VersLinks } from './VersLinks';
 import './besloten.css';
-
-const STATUSFILTERS = [
-	{ waarde: 'alle', label: 'Alle statussen' },
-	{ waarde: 'voorlopig', label: 'Voorlopig' },
-	{ waarde: 'vast', label: 'Vast' },
-] as const;
-
-type Statusfilter = (typeof STATUSFILTERS)[number]['waarde'];
-
-function isStatusfilter(waarde: string): waarde is Statusfilter {
-	return STATUSFILTERS.some((filter) => filter.waarde === waarde);
-}
-
-/** Volgorde van de groepen: eerst wat zeker nog niet is toegepast, dan hetzelfde met een onzekere telling, dan de rest, en wat niet te tellen is onderaan. */
-function groep(telling: GetelPrecedent): number {
-	if (!telling.telbaar) return 3;
-	if (telling.nietToegepast.length === 0) return 2;
-	return telling.opmerkingen.length === 0 ? 0 : 1;
-}
-
-function metBronvormNogEerst(een: GetelPrecedent, ander: GetelPrecedent): number {
-	return groep(een) - groep(ander) || ander.nietToegepast.length - een.nietToegepast.length || ander.toegepast.length - een.toegepast.length;
-}
-
-function pastBijZoekterm(telling: GetelPrecedent, zoekterm: string): boolean {
-	const gezocht = zoekterm.trim().toLowerCase();
-	if (gezocht === '') return true;
-	const { bron, vereenvoudigd } = telling.precedent;
-	return bron.toLowerCase().includes(gezocht) || vereenvoudigd.toLowerCase().includes(gezocht);
-}
-
-function pastBijStatus(telling: GetelPrecedent, filter: Statusfilter): boolean {
-	return filter === 'alle' || telling.precedent.status === filter;
-}
 
 type TellingCellenProps = { boek: string; telling: GetelPrecedent };
 
@@ -54,11 +31,16 @@ function TellingCellen({ boek, telling }: TellingCellenProps) {
 				<span class="aantal">{telling.toegepast.length}</span>
 				{telling.blijft && <span class="uitleg"> blijft staan</span>}{' '}
 				<VersLinks boek={boek} verzen={telling.toegepast} />
+				{telling.onbepaald.length > 0 && (
+					<p class="onbepaald">
+						vorm niet herkend: <VersLinks boek={boek} verzen={telling.onbepaald} />
+					</p>
+				)}
 			</td>
 			{telling.blijft ? (
 				<td class="niet-van-toepassing">de vorm blijft</td>
 			) : (
-				<td class={telling.nietToegepast.length > 0 ? 'nog-oud' : undefined}>
+				<td class={staatZekerNogOud(telling) ? 'nog-oud' : undefined}>
 					<span class="aantal">{telling.nietToegepast.length}</span> <VersLinks boek={boek} verzen={telling.nietToegepast} />
 				</td>
 			)}
@@ -72,7 +54,6 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 	const [statusfilter, zetStatusfilter] = useState<Statusfilter>('alle');
 	const tellingen = useMemo(() => telPrecedenten(referentie.precedenten, hoofdstukken).sort(metBronvormNogEerst), [referentie, hoofdstukken]);
 	const zichtbaar = tellingen.filter((telling) => pastBijStatus(telling, statusfilter) && pastBijZoekterm(telling, zoekterm));
-	const metBronvormNog = zichtbaar.filter((telling) => telling.nietToegepast.length > 0).length;
 
 	return (
 		<div class="besloten">
@@ -97,7 +78,7 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 				</label>
 			</div>
 			<p class="besloten-samenvatting" role="status">
-				{zichtbaar.length} van {tellingen.length} precedenten, waarvan {metBronvormNog} met een bronvorm die nog in de vereenvoudiging staat.
+				{beslotenSamenvatting(zichtbaar, tellingen.length)}
 			</p>
 			<div class="tabelrand">
 				<table class="besloten-tabel">
@@ -115,7 +96,7 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 					</thead>
 					<tbody>
 						{zichtbaar.map((telling) => (
-							<tr>
+							<tr key={precedentSleutel(telling)}>
 								<th scope="row">{telling.precedent.bron}</th>
 								<td>{telling.precedent.vereenvoudigd}</td>
 								<td>{telling.precedent.status}</td>

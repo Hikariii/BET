@@ -72,7 +72,7 @@ function volgtVanaf(tekst: readonly string[], vorige: number, vorm: Zoekvorm, in
 }
 
 /** Staat de vorm in de tekst (woorden uit `zoekWoorden`)? Zonder hoofdletters, op woordgrenzen, met buigingsuitgangen. */
-export function komtVoor(tekst: readonly string[], vorm: Zoekvorm): boolean {
+function komtVoor(tekst: readonly string[], vorm: Zoekvorm): boolean {
 	const eerste = vorm.woorden[0];
 	if (eerste === undefined) return false;
 	for (let plek = 0; plek < tekst.length; plek++) {

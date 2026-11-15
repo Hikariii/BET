@@ -4,9 +4,9 @@ import { zoekWoorden } from './precedentZoek';
 /** Een vorm als lijst woorden, klaar voor `maakZoekvorm`. */
 type Vormwoorden = string[];
 
-export type BronVormen = { soort: 'vormen'; vormen: Vormwoorden[]; haakjesGenegeerd: boolean } | { soort: 'niet telbaar'; reden: string };
+type BronVormen = { soort: 'vormen'; vormen: Vormwoorden[]; haakjesGenegeerd: boolean } | { soort: 'niet telbaar'; reden: string };
 
-export type DoelVormen = { soort: 'blijft' } | { soort: 'vormen'; vormen: Vormwoorden[] } | { soort: 'niet telbaar'; reden: string };
+type DoelVormen = { soort: 'blijft' } | { soort: 'vormen'; vormen: Vormwoorden[] } | { soort: 'niet telbaar'; reden: string };
 
 const OPEN_PLEK = /…|\.\.\./;
 
@@ -30,7 +30,6 @@ function vasteHaakjesUitgevouwen(tekst: string): string[] {
 }
 
 const HAAKJES = /\s*\([^)]*\)/g;
-
 
 /** Splitst op " / " en, bij een lijst van korte stukken, op komma's. */
 function varianten(tekst: string): string[] {
