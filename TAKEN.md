@@ -14,7 +14,6 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[ ]` = open. Gedane punten st
 
 ## Gebouwd, eigenaar bevestigt
 Klaar in de code; de eigenaar kijkt of het is zoals bedoeld, en haalt dan de regel weg.
-- Opmaakwerkbalk in de vers-editor (fase 9a): B, U, Markeren, Kleur ▾ (domeinen en Onderwijs) en Wissen, met Ctrl/Cmd+B, Ctrl/Cmd+U, Alt+K en Ctrl+Spatie (Mac Cmd+\). Let in de proef op: typen direct achter een domeinwoord neemt het domein mee (zoals in Word); is dat hinderlijk, dan kan dat uit.
 - Van vers naar vers: Alt+Pijl omlaag en omhoog in de editor en `j` en `k` op de pagina (`src/app/navigatie/toetsenbord.ts`, `useSprongNaarVers.ts`); de toetsen staan in de Help.
 - Skip-link "Naar de verzen" (`SprongNaarInhoud.tsx`) en de hoofdstukstrip als één tabstop met pijltjes; na een paginawissel staat de focus op de kop (`useKopFocus.ts`).
 - Kiezen bij een vertaalvraag: Kiezen waar de tool kan invullen, anders Zoek de plekken; het `?` in een vertaalregel linkt naar de vraag.
@@ -28,7 +27,6 @@ Klaar in de code; de eigenaar kijkt of het is zoals bedoeld, en haalt dan de reg
 ## Wacht op de eigenaar
 Dit beslist de eigenaar; Claude voert daarna uit. Inhoud van `bijbel/`, `richtlijn/` en git-tags raakt Claude niet aan zonder besluit.
 - [ ] Proef 6a nu doen, en wanneer de redacteur meedoet (6b); welk hoofdstuk (voorstel Lukas 4); welke Word de redacteur gebruikt (desktop of web); welk kanaal de redacteur gebruikt voor Lukas 4 tot 24 (de tool of het reviewdocument in Word).
-- [ ] Alinea ▾ in de werkbalk: bouwen met "geldt voor de hele alinea", of de alineastijl aan Word laten.
 - [ ] Rangorde in `CLAUDE.md` tegenover richtlijn §26 (precedenten boven de richtlijn, of andersom); daarna past Claude `CLAUDE.md` aan, of de redactie §26.
 - [ ] Open vragen in `bijbel/lukas/referentie/open-vragen.md`: 4:2, 4:6 en 4:27 staan op "Gekozen in tekst" maar de tekst zegt iets anders; `open-vragen.md` de enige bron voor "open" maken (STATUS en de takenlijst van het boek verwijzen ernaar); 12:8-9 schrappen of als rij toevoegen.
 - [ ] Lukas 1 tot 3: v1.0 taggen of de status terugzetten tot de vraag 0.9 of 1.0 beslist is; `export/lukas-01-03-review.docx` opnieuw maken. Er zijn nu geen git-tags.
@@ -56,6 +54,7 @@ Alleen wat het werk sneller maakt.
 - [ ] Later: een plakresultaat uit Word als vaste test (na proef 6b); pariteitstests per boek (bij het tweede boek).
 
 ## Opruimen
+- [ ] Werkbalk in de proef: typen direct achter een domeinwoord neemt het domein mee (zoals in Word); is dat hinderlijk, dan kan dat uit (`inclusive: false` voor domeinen, onderwijs en highlight).
 - [ ] Werkbalk: de sneltoetsen staan in de keymap (`versEditorPlugins.ts`), in `sneltoetsen.ts` en in de help; eventueel één tabel.
 Ook kleine punten.
 - [ ] Bewerken: de opmaakwaarschuwing alleen bij opmaak die de tekst van Claude nog had (nu tegen de bron, dus een bewust ontbrekende tag geeft steeds een waarschuwing); hoort bij fase 9a.
