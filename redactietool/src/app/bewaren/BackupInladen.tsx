@@ -29,7 +29,8 @@ type Props = {
 
 const VERSOORTEN: Record<InlaadVoorbeeld['verzen'][number]['soort'], string> = {
 	nieuw: 'nieuw',
-	overschrijft: 'overschrijft',
+	overschrijft: 'back-up nieuwer',
+	'jouwe-blijft': 'jouw versie nieuwer',
 	gelijk: 'gelijk',
 };
 
@@ -120,7 +121,6 @@ type VoorbeeldProps = { toestand: Extract<Toestand, { soort: 'voorbeeld' }>; onK
 function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 	const { backup, voorbeeld } = toestand;
 	const { telling, vervangenWist } = voorbeeld;
-	const lokaalNieuwer = voorbeeld.verzen.filter((vers) => vers.lokaalNieuwer).length;
 	return (
 		<>
 			<p>
@@ -130,8 +130,8 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 			<ul class="bewaren-voorbeeld-telling">
 				<li>{meervoud(telling.nieuw, 'vers komt', 'verzen komen')} erbij.</li>
 				<li>
-					{meervoud(telling.overschrijft, 'vers overschrijft', 'verzen overschrijven')} wat je nu bewaard hebt
-					{lokaalNieuwer > 0 && ` (bij ${lokaalNieuwer} is jouw versie nieuwer dan die in de back-up)`}.
+					{meervoud(telling.overschrijft + telling.jouweBlijft, 'vers staat', 'verzen staan')} in beide met een andere tekst; bij samenvoegen blijft
+					de nieuwste staan: {telling.jouweBlijft} keer jouw versie, {telling.overschrijft} keer die uit de back-up.
 				</li>
 				<li>{meervoud(telling.gelijk, 'vers is', 'verzen zijn')} al gelijk.</li>
 				<li>{meervoud(telling.keuzesNieuw, 'keuze komt', 'keuzes komen')} erbij.</li>
@@ -149,7 +149,7 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 				</details>
 			)}
 			<p class="bewaren-venster-uitleg">
-				<strong>Samenvoegen</strong> houdt alles wat je nu hebt en zet de back-up erbij; bij een vers dat in beide staat wint de back-up.{' '}
+				<strong>Samenvoegen</strong> houdt alles wat je nu hebt en zet de back-up erbij; staat een vers in beide, dan blijft de nieuwste versie staan.{' '}
 				<strong>Vervangen</strong> wist eerst alles wat deze browser van het boek bewaart
 				{vervangenWist.verzen + vervangenWist.keuzes > 0 &&
 					`, dus ook ${meervoud(vervangenWist.verzen, 'vers', 'verzen')} en ${meervoud(vervangenWist.keuzes, 'keuze', 'keuzes')} die niet in de back-up staan`}

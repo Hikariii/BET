@@ -45,7 +45,8 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] Pages aanzetten in de repo-instellingen (bron: GitHub Actions); daarna publiceert de workflow bij elke push naar `main`.
 - [x] Redactietool: bewaarstatus zichtbaar, overzicht van wat er bewaard is, back-up downloaden en inladen (gebouwd in fase 7b, v8e).
 - [ ] Redactietool, uit de review van fase 7b (v8e):
-  - [ ] Back-up samenvoegen: per vers de nieuwste houden in plaats van "de back-up wint" (keuze eigenaar; `voorbeeldInladen` rekent `lokaalNieuwer` al uit).
+  - [x] Back-up samenvoegen: per vers wint de nieuwste (keuze eigenaar, 2026-11-16).
+  - [ ] Feature: bij back-up inladen conflicten tonen (beide versies naast elkaar) en per vers laten kiezen (zie `redactietool/stap2-plan.md`, "conflicten tonen").
   - [ ] Overzicht Bewaard: "verouderd nog niet gecontroleerd" tonen zolang de hoofdstukken laden (`verouderdBekend`); in het voorbeeld van inladen ook verouderde verzen tonen; terug naar de repo per vers vanuit het overzicht.
   - [ ] Bewaarstatus: een mislukte schrijfactie (opslag vol) ook bovenin melden, niet alleen bij het vers.
   - [ ] Vervangen bij inladen: eerst automatisch een back-up van de huidige stand downloaden.

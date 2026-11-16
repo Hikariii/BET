@@ -113,7 +113,7 @@ describe('leesBackup', () => {
 });
 
 describe('voorbeeldInladen', () => {
-	it('zegt per vers nieuw, overschrijft of gelijk en welke keuzes erbij komen', () => {
+	it('zegt per vers nieuw, anders of gelijk en welke keuzes erbij komen', () => {
 		const backup = teruglezen(gevuldeOpslag());
 		const doel = new GeheugenOpslag();
 		bewaarVers(doel, 'lukas', 1, 1, inhoud(' eerste'), inhoud(' oud een'));
@@ -121,16 +121,19 @@ describe('voorbeeldInladen', () => {
 
 		const voorbeeld = voorbeeldInladen(doel, BOEK, backup);
 
-		expect(voorbeeld.verzen.map((vers) => [vers.hoofdstuk, vers.vers, vers.soort])).toEqual([
+		// Welke van de twee versies van 1:2 nieuwer is, hangt hier van de klok af; dat bewaken de tests met vaste tijden.
+		const anders = (soort: string) => (soort === 'overschrijft' || soort === 'jouwe-blijft' ? 'anders' : soort);
+		expect(voorbeeld.verzen.map((vers) => [vers.hoofdstuk, vers.vers, anders(vers.soort)])).toEqual([
 			[1, 1, 'gelijk'],
-			[1, 2, 'overschrijft'],
+			[1, 2, 'anders'],
 			[2, 7, 'nieuw'],
 		]);
-		expect(voorbeeld.telling).toEqual({ nieuw: 1, overschrijft: 1, gelijk: 1, keuzesNieuw: 1 });
+		expect(voorbeeld.telling).toMatchObject({ nieuw: 1, gelijk: 1, keuzesNieuw: 1 });
+		expect(voorbeeld.telling.overschrijft + voorbeeld.telling.jouweBlijft).toBe(1);
 		expect(voorbeeld.keuzes).toMatchObject([{ zoekterm: 'harde', soort: 'nieuw' }]);
 	});
 
-	it('zegt of de lokale bewerking nieuwer is dan die in de back-up', () => {
+	it('zegt per vers in beide of jouw versie of die uit de back-up nieuwer is', () => {
 		const oudeBackup = teruglezen(gevuldeOpslag());
 		const doel = new GeheugenOpslag();
 		bewaarVers(doel, 'lukas', 1, 2, inhoud(' lokaal anders'), inhoud(' oud twee'));
@@ -142,10 +145,10 @@ describe('voorbeeldInladen', () => {
 		if (uitBackup === undefined) throw new Error('Geen vers in de back-up.');
 
 		uitBackup.bewaard = new Date(Date.parse(lokaal.bewaard) - 60_000).toISOString();
-		expect(voorbeeldInladen(doel, BOEK, oudeBackup).verzen.find((vers) => vers.vers === 2)?.lokaalNieuwer).toBe(true);
+		expect(voorbeeldInladen(doel, BOEK, oudeBackup).verzen.find((vers) => vers.vers === 2)?.soort).toBe('jouwe-blijft');
 
 		uitBackup.bewaard = new Date(Date.parse(lokaal.bewaard) + 60_000).toISOString();
-		expect(voorbeeldInladen(doel, BOEK, oudeBackup).verzen.find((vers) => vers.vers === 2)?.lokaalNieuwer).toBe(false);
+		expect(voorbeeldInladen(doel, BOEK, oudeBackup).verzen.find((vers) => vers.vers === 2)?.soort).toBe('overschrijft');
 	});
 
 	it('telt wat Vervangen zou wissen omdat het niet in de back-up staat', () => {
@@ -169,11 +172,21 @@ describe('voorbeeldInladen', () => {
 });
 
 describe('pasBackupToe', () => {
-	it('samenvoegen houdt de lokale verzen en keuzes en laat de back-up winnen bij een vers in beide', () => {
+	/** Een back-up met vers 1:2 bewaard `verschilMs` na (positief) of vóór (negatief) de lokale bewerking van dat vers in `doel`. */
+	function backupMetVers2RelatiefAan(doel: GeheugenOpslag, verschilMs: number) {
 		const backup = teruglezen(gevuldeOpslag());
+		const lokaal = leesTussenstand(doel, 'lukas', 1).verzen[2];
+		const uitBackup = backup.tussenstanden[0]?.verzen[2];
+		if (lokaal === undefined || uitBackup === undefined) throw new Error('Vers 1:2 ontbreekt lokaal of in de back-up.');
+		uitBackup.bewaard = new Date(Date.parse(lokaal.bewaard) + verschilMs).toISOString();
+		return backup;
+	}
+
+	it('samenvoegen houdt de lokale verzen en keuzes en zet de back-up erbij; bij een vers in beide wint een nieuwere back-up', () => {
 		const doel = new GeheugenOpslag();
 		bewaarVers(doel, 'lukas', 1, 2, inhoud(' lokaal anders'), inhoud(' oud twee'));
 		bewaarVers(doel, 'lukas', 3, 4, inhoud(' alleen lokaal'), inhoud(' oud'));
+		const backup = backupMetVers2RelatiefAan(doel, 60_000);
 
 		const uitkomst = pasBackupToe(doel, BOEK, backup, 'samenvoegen');
 
@@ -183,6 +196,19 @@ describe('pasBackupToe', () => {
 		expect(leesTussenstand(doel, 'lukas', 2).verzen[7]).toBeDefined();
 		expect(leesTussenstand(doel, 'lukas', 3).verzen[4]?.inhoud).toEqual(inhoud(' alleen lokaal'));
 		expect(leesKeuzes(doel, 'lukas')).toHaveLength(1);
+	});
+
+	it('samenvoegen laat een nieuwere lokale versie van een vers in beide staan', () => {
+		const doel = new GeheugenOpslag();
+		bewaarVers(doel, 'lukas', 1, 2, inhoud(' lokaal anders'), inhoud(' oud twee'));
+		const backup = backupMetVers2RelatiefAan(doel, -60_000);
+		expect(voorbeeldInladen(doel, BOEK, backup).telling).toMatchObject({ jouweBlijft: 1, overschrijft: 0 });
+
+		const uitkomst = pasBackupToe(doel, BOEK, backup, 'samenvoegen');
+
+		expect(leesTussenstand(doel, 'lukas', 1).verzen[2]?.inhoud).toEqual(inhoud(' lokaal anders'));
+		expect(leesTussenstand(doel, 'lukas', 1).verzen[1]?.inhoud).toEqual(inhoud(' eerste'));
+		expect(uitkomst.geschreven.verzen).toBe(2);
 	});
 
 	it('samenvoegen twee keer na elkaar verandert de tweede keer niets', () => {

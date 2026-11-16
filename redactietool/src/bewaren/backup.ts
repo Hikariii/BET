@@ -117,7 +117,11 @@ export function leesBackup(tekst: string, boek: string): LeesUitkomst {
 	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 1, boek, gemaakt, repoCommit, tussenstanden, keuzes } };
 }
 
-type VersVergelijking = { hoofdstuk: number; vers: number; soort: 'nieuw' | 'overschrijft' | 'gelijk'; lokaalNieuwer: boolean };
+/**
+ * Wat inladen met een vers uit de back-up doet. `overschrijft`: de back-up is nieuwer en vervangt bij samenvoegen jouw versie.
+ * `jouwe-blijft`: jouw versie is nieuwer en blijft bij samenvoegen staan (bij vervangen niet).
+ */
+type VersVergelijking = { hoofdstuk: number; vers: number; soort: 'nieuw' | 'overschrijft' | 'jouwe-blijft' | 'gelijk' };
 
 type KeuzeVergelijking = { id: string; zoekterm: string; nieuw: string; soort: 'nieuw' | 'gelijk' };
 
@@ -125,13 +129,18 @@ export type InlaadVoorbeeld = {
 	/** Per vers in de back-up wat inladen ermee doet, op oplopend hoofdstuk en vers. */
 	verzen: VersVergelijking[];
 	keuzes: KeuzeVergelijking[];
-	telling: { nieuw: number; overschrijft: number; gelijk: number; keuzesNieuw: number };
+	telling: { nieuw: number; overschrijft: number; jouweBlijft: number; gelijk: number; keuzesNieuw: number };
 	/** Wat Vervangen wist omdat het niet in de back-up staat. */
 	vervangenWist: { verzen: number; keuzes: number };
 };
 
 function zelfdeBewerking(lokaal: BewerktVers, uitBackup: BewerktVers): boolean {
 	return zelfdeInhoud(lokaal.inhoud, uitBackup.inhoud) && zelfdeInhoud(lokaal.basis, uitBackup.basis);
+}
+
+/** Bij samenvoegen wint per vers de nieuwste bewerking; bij gelijke tijd de back-up. */
+function lokaalIsNieuwer(lokaal: BewerktVers, uitBackup: BewerktVers): boolean {
+	return Date.parse(lokaal.bewaard) > Date.parse(uitBackup.bewaard);
 }
 
 /** Hoofdstukken waar de opslag of de back-up iets voor heeft, op oplopend nummer. */
@@ -150,9 +159,9 @@ export function voorbeeldInladen(opslag: Opslag, boek: BoekMetHoofdstukken, back
 		for (const [versTekst, bewerkt] of Object.entries(uitBackup)) {
 			const vers = Number(versTekst);
 			const eigen = lokaal[vers];
-			if (eigen === undefined) verzen.push({ hoofdstuk, vers, soort: 'nieuw', lokaalNieuwer: false });
-			else if (zelfdeBewerking(eigen, bewerkt)) verzen.push({ hoofdstuk, vers, soort: 'gelijk', lokaalNieuwer: false });
-			else verzen.push({ hoofdstuk, vers, soort: 'overschrijft', lokaalNieuwer: Date.parse(eigen.bewaard) > Date.parse(bewerkt.bewaard) });
+			if (eigen === undefined) verzen.push({ hoofdstuk, vers, soort: 'nieuw' });
+			else if (zelfdeBewerking(eigen, bewerkt)) verzen.push({ hoofdstuk, vers, soort: 'gelijk' });
+			else verzen.push({ hoofdstuk, vers, soort: lokaalIsNieuwer(eigen, bewerkt) ? 'jouwe-blijft' : 'overschrijft' });
 		}
 		wistVerzen += Object.keys(lokaal).filter((vers) => !(Number(vers) in uitBackup)).length;
 	}
@@ -170,6 +179,7 @@ export function voorbeeldInladen(opslag: Opslag, boek: BoekMetHoofdstukken, back
 		telling: {
 			nieuw: soortAantal('nieuw'),
 			overschrijft: soortAantal('overschrijft'),
+			jouweBlijft: soortAantal('jouwe-blijft'),
 			gelijk: soortAantal('gelijk'),
 			keuzesNieuw: keuzes.filter((keuze) => keuze.soort === 'nieuw').length,
 		},
@@ -207,7 +217,7 @@ function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst
 		let veranderd = 0;
 		for (const [versTekst, bewerkt] of Object.entries(uitBackup)) {
 			const eigen = verzen[Number(versTekst)];
-			if (eigen !== undefined && zelfdeBewerking(eigen, bewerkt)) continue;
+			if (eigen !== undefined && (zelfdeBewerking(eigen, bewerkt) || lokaalIsNieuwer(eigen, bewerkt))) continue;
 			verzen[Number(versTekst)] = bewerkt;
 			veranderd++;
 		}
