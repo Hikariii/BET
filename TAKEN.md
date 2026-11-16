@@ -44,6 +44,14 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] `document.title` per hoofdstuk zetten; Node-versie op één plek (nu `mise.toml` 26.13.1 en workflow `26`).
   - [ ] Pages aanzetten in de repo-instellingen (bron: GitHub Actions); daarna publiceert de workflow bij elke push naar `main`.
 - [x] Redactietool: bewaarstatus zichtbaar, overzicht van wat er bewaard is, back-up downloaden en inladen (gebouwd in fase 7b, v8e).
+- [x] Redactietool fase 8 (vragen beantwoorden): markering wisselen, varianten, bereik, per vers terugdraaien, Kiezen per optie en antwoord zonder wijziging, antwoorden in back-up v2 en export v2.
+- [ ] Redactietool, uit de review van fase 8:
+  - [ ] Opties: een domeinnaam als gewoon woord (dag, geloof, oordeel, zonde) maakt nu een markeringsvoorstel; bij een tweede boek nalopen of de optie markeringstaal gebruikt.
+  - [ ] Zoeken en vervangen: bereik in de keuze bewaren; Annuleren in het voorbeeldvenster; uitleg bij "0 plekken aangepast".
+  - [ ] Test `opties.test.ts` die alle 36 vragen telt (breekt bij elke wijziging aan open-vragen.md): versoepelen, Gezegend-test houden.
+  - [ ] Tests voor `maakAntwoordacties` (Vertaalvragen) en `toepassen` (Vervangen); `Vervangen.tsx` (~470 regels) opsplitsen; comments in `opties.ts` die de code beschrijven.
+  - [ ] Toegankelijkheid: melding in Vertaalvragen altijd renderen (niet `:empty { display: none }`) en focus ook bij dezelfde melding; lidwoordenlijst voor varianten zonder dubbelzinnige woorden (zijn, ons, hun, haar, je) of met waarschuwing.
+  - [ ] Opties: machine-leesbare opties in `open-vragen.md` overwegen als meer vragen echte opties krijgen (keuze eigenaar).
 - [ ] Redactietool, uit de review van fase 7b (v8e):
   - [x] Back-up samenvoegen: per vers wint de nieuwste (keuze eigenaar, 2026-11-16).
   - [ ] Feature: bij back-up inladen conflicten tonen (beide versies naast elkaar) en per vers laten kiezen (zie `redactietool/stap2-plan.md`, "conflicten tonen").
