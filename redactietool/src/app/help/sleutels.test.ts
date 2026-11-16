@@ -21,11 +21,32 @@ function schermbestanden(map: string): string[] {
 	});
 }
 
+const DATA_HELP = /data-help=\{?["']([a-z0-9-]+)["']\}?/g;
+
+/**
+ * De tekst op het element met deze `data-help`-sleutel: alles tussen het einde van de openingstag en de volgende tag.
+ * Een `>` binnen `{…}` (een pijlfunctie in `onClick`) of direct na een `=` sluit de tag niet.
+ */
+function knoptekstInBron(bron: string, sleutel: string): string | null {
+	const begin = [...bron.matchAll(DATA_HELP)].find((treffer) => treffer[1] === sleutel);
+	if (begin === undefined) return null;
+	let diepte = 0;
+	let plek = begin.index + begin[0].length;
+	for (; plek < bron.length; plek++) {
+		const teken = bron[plek];
+		if (teken === '{') diepte++;
+		else if (teken === '}') diepte--;
+		else if (teken === '>' && diepte === 0 && bron[plek - 1] !== '=') break;
+	}
+	const tekst = bron.slice(plek + 1, bron.indexOf('<', plek + 1));
+	return tekst.includes('{') ? null : tekst.replace(/\s+/g, ' ').trim();
+}
+
 /** Elke `data-help="…"` in de schermen, met het bestand waar hij staat; de sleutels van de plekken in de balk komen uit `plekSleutel`. */
 function sleutelsInCode(): Map<string, string> {
 	const sleutels = new Map<string, string>();
 	for (const bestand of schermbestanden(APP)) {
-		for (const treffer of readFileSync(bestand, 'utf8').matchAll(/data-help="([a-z0-9-]+)"/g)) sleutels.set(treffer[1] ?? '', bestand);
+		for (const treffer of readFileSync(bestand, 'utf8').matchAll(DATA_HELP)) sleutels.set(treffer[1] ?? '', bestand);
 	}
 	const balk = join(APP, 'bovenbalk', 'BoekTabbladen.tsx');
 	expect(readFileSync(balk, 'utf8')).toContain('data-help={plekSleutel(plek.plek)}');
@@ -65,7 +86,9 @@ describe('data-help in de schermen en de help', () => {
 		for (const sleutel of KNOPSLEUTELS) {
 			const bestand = inCode.get(sleutel);
 			expect(bestand, sleutel).toBeDefined();
-			for (const naam of inHelp.get(sleutel) ?? []) expect(readFileSync(bestand ?? '', 'utf8'), `${sleutel}: ${naam}`).toContain(naam);
+			const opDeKnop = knoptekstInBron(readFileSync(bestand ?? '', 'utf8'), sleutel);
+			expect(opDeKnop, `${sleutel}: de tekst op de knop is een vaste tekst`).not.toBeNull();
+			for (const naam of inHelp.get(sleutel) ?? []) expect(naam, sleutel).toBe(opDeKnop);
 		}
 	});
 });

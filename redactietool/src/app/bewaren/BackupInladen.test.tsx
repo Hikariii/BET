@@ -29,7 +29,7 @@ function backupBestand(boekId = 'lukas'): File {
 
 function toonScherm() {
 	const invoer = createRef<HTMLInputElement>();
-	const focusNaSluiten = createRef<HTMLElement>();
+	const focusNaSluiten = createRef<HTMLButtonElement>();
 	render(
 		<>
 			<button type="button" ref={focusNaSluiten}>
