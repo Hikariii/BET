@@ -639,7 +639,6 @@ table.verzen > tbody > tr.naslagrij > td {
 }
 
 .naslagkaart {
-	max-width: 56rem;
 	max-height: 30rem;
 	padding: 1rem 1.25rem 1.25rem;
 	overflow-y: auto;
