@@ -64,6 +64,20 @@ describe('de pagina Richtlijn', () => {
 		expect(screen.getByText('Nog te doen.')).toBeTruthy();
 	});
 
+	it('een klik in de inhoud zet het adres, markeert de link en geeft de paragraaf de focus, zonder nieuwe navigatie', async () => {
+		window.location.hash = '#/lukas/richtlijn';
+		await toon();
+		const link = within(inhoud()).getByRole('link', { name: '§2 Namen' });
+		expect(link.getAttribute('aria-current')).toBeNull();
+
+		fireEvent.click(link);
+
+		expect(window.location.hash).toBe('#/lukas/richtlijn/2');
+		expect(link.getAttribute('aria-current')).toBe('location');
+		expect(document.activeElement?.id).toBe('richtlijn-2');
+		expect(within(inhoud()).getAllByRole('link').filter((ander) => ander.getAttribute('aria-current') !== null)).toHaveLength(1);
+	});
+
 	it('geeft de paragraaf uit het adres de focus en scrolt ernaartoe', async () => {
 		await toon('2');
 

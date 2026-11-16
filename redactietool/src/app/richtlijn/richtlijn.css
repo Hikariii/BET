@@ -1,8 +1,93 @@
-/* De pagina Richtlijn: rustige leestekst met een maximale regellengte, zoals de tekst in de help. */
+/*
+ * De pagina Richtlijn: bovenaan de titel en "Over deze versie" over de hele breedte,
+ * daaronder de inhoudsopgave en de tekst naast elkaar, elk met een eigen scrollbalk.
+ * De tekst houdt de regellengte van de help.
+ */
 
 .richtlijn {
-	max-width: 44rem;
 	line-height: 1.55;
+}
+
+.richtlijn-kop .richtlijn-sectie > .markdown {
+	max-width: 60rem;
+}
+
+.richtlijn-kolommen {
+	display: grid;
+	grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr);
+	gap: 0 2rem;
+	/* Het blok vult het scherm onder de vaste balk; de scrollbalken staan in de kolommen, niet op de pagina. */
+	height: calc(100vh - var(--balk-hoogte, 0px) - 1rem);
+	margin-top: 1.5rem;
+	border-top: 1px solid var(--rand);
+	scroll-margin-top: var(--balk-hoogte, 0px);
+}
+
+.richtlijn-inhoud,
+.richtlijn-paneel {
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+.richtlijn-inhoud {
+	padding: 1rem 0.75rem 1rem 0;
+	border-right: 1px solid var(--rand);
+}
+
+.richtlijn-paneel {
+	padding: 0 1rem 2rem 0;
+}
+
+.richtlijn-paneel > * {
+	max-width: 44rem;
+}
+
+/* De lijn boven de kolommen scheidt al; de eerste paragraaf heeft er geen eigen lijn boven. */
+.richtlijn .richtlijn-paneel > .richtlijn-sectie:first-child > h2 {
+	margin-top: 0;
+	border-top: 0;
+}
+
+.richtlijn .richtlijn-inhoud h2 {
+	margin: 0;
+	padding: 0;
+	border-top: 0;
+	font-size: 0.9375rem;
+}
+
+.richtlijn-inhoud a {
+	color: var(--tekst);
+	text-decoration: none;
+}
+
+.richtlijn-inhoud a:hover {
+	text-decoration: underline;
+}
+
+/* De paragraaf die bovenaan het paneel staat. */
+.richtlijn-inhoud a[aria-current='location'] {
+	font-weight: 700;
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.2em;
+}
+
+/* Op een smal scherm staan de kolommen onder elkaar en scrolt de pagina zelf. */
+@media (max-width: 52rem) {
+	.richtlijn-kolommen {
+		display: block;
+		height: auto;
+	}
+
+	.richtlijn-inhoud,
+	.richtlijn-paneel {
+		overflow: visible;
+	}
+
+	.richtlijn-inhoud {
+		border-right: 0;
+	}
 }
 
 .indeling .richtlijn h1 {

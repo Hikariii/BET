@@ -4,9 +4,9 @@ Hier staat de hele redactierichtlijn als tekst, voor alle boeken. Je leest hem h
 
 ## Lezen
 
-Bovenaan staat wat er nieuw is in deze versie. Daaronder staat de inhoud: elke paragraaf met zijn nummer en titel. Een klik brengt je naar de paragraaf, met de focus erop. Het adres bevat het paragraafnummer (bijvoorbeeld `#/lukas/richtlijn/17B`), dus je kunt het delen. De link **Lees in de richtlijn** in de kaart bij een § in de vertaalregels opent dezelfde plek.
+Bovenaan staat over de hele breedte wat er nieuw is in deze versie. Daaronder staan twee kolommen: links de inhoud, elke paragraaf met zijn nummer en titel, en rechts de tekst, die apart scrolt. Een klik in de inhoud scrolt de tekst naar de paragraaf, met de focus erop. Terwijl je leest, is in de inhoud de paragraaf onderstreept waar je bent. Het adres bevat het paragraafnummer (bijvoorbeeld `#/lukas/richtlijn/17B`), dus je kunt het delen. De link **Lees in de richtlijn** in de kaart bij een § in de vertaalregels opent dezelfde plek.
 
-{{wijs richtlijn-inhoud | Inhoud | Bovenaan de pagina, onder de tekst over deze versie.}}
+{{wijs richtlijn-inhoud | Inhoud | Links, onder de tekst over deze versie.}}
 
 Een label achter een titel zegt wat er in de nieuwste versie met de regel gebeurd is: *nieuw in v1.4*, *gewijzigd in v1.4* of *open in v1.4*. Bij *open* is er een keuze gemaakt die nog niet is bevestigd; die valt daarom iets meer op. Heb je bij een paragraaf gereageerd, dan staat in de inhoud ook *gereageerd*, of *voorstel* als je het vinkje aan hebt gezet.
 

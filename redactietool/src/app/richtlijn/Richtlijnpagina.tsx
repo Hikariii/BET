@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { RichtlijnSectie } from '../../data/types';
 import {
 	bewaarRichtlijnReactie,
@@ -32,14 +32,32 @@ type Props = {
 	paragraaf: string | null;
 };
 
-/** De pagina `#/<boek>/richtlijn`: de hele richtlijn als tekst, met per paragraaf een vak Reageren en onderaan een vak voor een nieuwe regel. */
+/**
+ * De pagina `#/<boek>/richtlijn`: bovenaan over de hele breedte de titel en "Over deze versie",
+ * daaronder links de inhoudsopgave en rechts de richtlijn in een eigen scrollpaneel.
+ * Een link in de inhoudsopgave scrolt het paneel; de paragraaf die bovenaan het paneel staat, is in de inhoudsopgave gemarkeerd.
+ */
 export function Richtlijnpagina({ boek, paragraaf }: Props) {
 	const richtlijn = useLaden(laadRichtlijn, []);
 	const opslagTeller = useOpslagTeller();
 	const reacties = useMemo(() => leesRichtlijnReacties(browseropslag()), [opslagTeller]);
+	const kolommen = useRef<HTMLDivElement>(null);
+	const paneel = useRef<HTMLDivElement>(null);
+	const [huidig, zetHuidig] = useState<string | null>(null);
 	const klaar = richtlijn.soort === 'klaar';
+
+	const scrolNaar = (id: string) => {
+		const doel = document.getElementById(id);
+		if (doel === null || paneel.current === null) return;
+		paneel.current.scrollTop += doel.getBoundingClientRect().top - paneel.current.getBoundingClientRect().top;
+		doel.focus({ preventScroll: true });
+		zetHuidig(id);
+	};
+
 	useEffect(() => {
-		if (paragraaf !== null && klaar) naarSectie(`richtlijn-${paragraaf}`);
+		if (paragraaf === null || !klaar) return;
+		kolommen.current?.scrollIntoView({ block: 'start' });
+		scrolNaar(`richtlijn-${paragraaf}`);
 	}, [paragraaf, klaar]);
 
 	if (richtlijn.soort === 'laden') return <p class="melding">De richtlijn wordt geladen.</p>;
@@ -59,32 +77,41 @@ export function Richtlijnpagina({ boek, paragraaf }: Props) {
 	const voorstellen = reacties.filter((reactie) => reactie.paragraaf === null);
 	const onbekend = paragraaf !== null && !secties.some((sectie) => sectie.paragraaf === paragraaf);
 
+	const bijScrollen = () => {
+		const bovenkant = paneel.current?.getBoundingClientRect().top;
+		if (bovenkant === undefined) return;
+		const koppen = [...(paneel.current?.querySelectorAll<HTMLElement>('.richtlijn-sectie > :is(h2, h3), #' + NIEUWE_REGEL_ID) ?? [])];
+		const boven = koppen.filter((kop) => kop.getBoundingClientRect().top <= bovenkant + KOP_MARGE);
+		zetHuidig(boven.at(-1)?.id ?? koppen[0]?.id ?? null);
+	};
+
 	return (
 		<section class="richtlijn" aria-labelledby="richtlijn-titel">
-			<h1 id="richtlijn-titel">{titel}</h1>
-			{onbekend && <p class="richtlijn-onbekend" role="alert">§{paragraaf} staat niet in de richtlijn.</p>}
-			{intro !== null && <Sectietekst sectie={intro} id="richtlijn-over-deze-versie" reactie={null} />}
-			<Inhoudsopgave boek={boek} secties={inhoud} reactiePerId={reactiePerId} aantalVoorstellen={voorstellen.length} />
-			{inhoud.map((sectie, index) => (
-				<Sectietekst
-					key={sectieId(sectie, index)}
-					sectie={sectie}
-					id={sectieId(sectie, index)}
-					reactie={reactiePerId.get(paragraafReactieId(sectie.paragraaf)) ?? null}
-				/>
-			))}
-			<NieuweRegel voorstellen={voorstellen} />
+			<div class="richtlijn-kop">
+				<h1 id="richtlijn-titel">{titel}</h1>
+				{onbekend && <p class="richtlijn-onbekend" role="alert">§{paragraaf} staat niet in de richtlijn.</p>}
+				{intro !== null && <Sectietekst sectie={intro} id="richtlijn-over-deze-versie" reactie={null} />}
+			</div>
+			<div class="richtlijn-kolommen" ref={kolommen}>
+				<Inhoudsopgave boek={boek} secties={inhoud} reactiePerId={reactiePerId} aantalVoorstellen={voorstellen.length} huidig={huidig} scrolNaar={scrolNaar} />
+				<div class="richtlijn-paneel" ref={paneel} onScroll={bijScrollen}>
+					{inhoud.map((sectie, index) => (
+						<Sectietekst
+							key={sectieId(sectie, index)}
+							sectie={sectie}
+							id={sectieId(sectie, index)}
+							reactie={reactiePerId.get(paragraafReactieId(sectie.paragraaf)) ?? null}
+						/>
+					))}
+					<NieuweRegel voorstellen={voorstellen} />
+				</div>
+			</div>
 		</section>
 	);
 }
 
-/** Scrolt naar het element en geeft het de focus; `scroll-padding-top` van de pagina houdt het onder de vaste balk uit. */
-function naarSectie(id: string): void {
-	const element = document.getElementById(id);
-	if (element === null) return;
-	element.scrollIntoView({ block: 'start' });
-	element.focus({ preventScroll: true });
-}
+/** Een kop telt als "hier ben je" zodra hij binnen deze afstand (in pixels) van de bovenkant van het paneel staat. */
+const KOP_MARGE = 24;
 
 function Markeringslabel({ markering }: Pick<RichtlijnSectie, 'markering'>) {
 	if (markering === null) return null;
@@ -96,49 +123,57 @@ type InhoudsopgaveProps = {
 	secties: readonly RichtlijnSectie[];
 	reactiePerId: ReadonlyMap<string, RichtlijnReactie>;
 	aantalVoorstellen: number;
+	/** De id van de kop die bovenaan het paneel staat. */
+	huidig: string | null;
+	scrolNaar: (id: string) => void;
 };
 
-function Inhoudsopgave({ boek, secties, reactiePerId, aantalVoorstellen }: InhoudsopgaveProps) {
+function Inhoudsopgave({ boek, secties, reactiePerId, aantalVoorstellen, huidig, scrolNaar }: InhoudsopgaveProps) {
+	const lijst = useRef<HTMLElement>(null);
 	const paginaAdres = maakAdres({ soort: 'richtlijn', boek, paragraaf: null });
+
+	// De gemarkeerde link blijft in beeld als de inhoudsopgave zelf langer is dan het scherm.
+	useEffect(() => {
+		const link = lijst.current?.querySelector<HTMLElement>('[aria-current="location"]');
+		const houder = lijst.current;
+		if (link === null || link === undefined || houder === null) return;
+		const marge = link.getBoundingClientRect();
+		const rand = houder.getBoundingClientRect();
+		if (marge.top < rand.top) houder.scrollTop -= rand.top - marge.top;
+		else if (marge.bottom > rand.bottom) houder.scrollTop += marge.bottom - rand.bottom;
+	}, [huidig]);
+
+	/** Scrolt het paneel en zet het adres zonder een nieuwe navigatie, zodat terug en delen blijven werken. */
+	const kies = (gebeurtenis: MouseEvent, id: string, href: string) => {
+		gebeurtenis.preventDefault();
+		if (href !== paginaAdres) history.replaceState(null, '', href);
+		scrolNaar(id);
+	};
+
+	const link = (id: string, href: string, tekst: string) => (
+		<a href={href} aria-current={id === huidig ? 'location' : undefined} onClick={(gebeurtenis) => kies(gebeurtenis, id, href)}>
+			{tekst}
+		</a>
+	);
+
 	return (
-		<nav class="richtlijn-inhoud" aria-labelledby="richtlijn-inhoud-titel" data-help="richtlijn-inhoud">
+		<nav class="richtlijn-inhoud" ref={lijst} aria-labelledby="richtlijn-inhoud-titel" data-help="richtlijn-inhoud">
 			<h2 id="richtlijn-inhoud-titel">Inhoud</h2>
 			<ol>
 				{secties.map((sectie, index) => {
 					const reactie = sectie.paragraaf === '' ? undefined : reactiePerId.get(paragraafReactieId(sectie.paragraaf));
-					const id = sectieId(sectie, index);
-					// Een kop zonder nummer heeft geen adres: de link blijft op de pagina en scrolt zelf.
+					// Een kop zonder nummer heeft geen eigen adres.
 					const href = sectie.paragraaf === '' ? paginaAdres : maakAdres({ soort: 'richtlijn', boek, paragraaf: sectie.paragraaf });
 					return (
 						<li class={`richtlijn-inhoud-niveau-${sectie.niveau}`}>
-							<a
-								href={href}
-								onClick={
-									sectie.paragraaf === ''
-										? (gebeurtenis) => {
-												gebeurtenis.preventDefault();
-												naarSectie(id);
-											}
-										: undefined
-								}
-							>
-								{sectiekop(sectie)}
-							</a>
+							{link(sectieId(sectie, index), href, sectiekop(sectie))}
 							<Markeringslabel markering={sectie.markering} />
 							{reactie !== undefined && <span class="richtlijn-label richtlijn-label-reactie">{reactieLabel(reactie)}</span>}
 						</li>
 					);
 				})}
 				<li class="richtlijn-inhoud-niveau-2">
-					<a
-						href={paginaAdres}
-						onClick={(gebeurtenis) => {
-							gebeurtenis.preventDefault();
-							naarSectie(NIEUWE_REGEL_ID);
-						}}
-					>
-						Nieuwe regel voorstellen
-					</a>
+					{link(NIEUWE_REGEL_ID, paginaAdres, 'Nieuwe regel voorstellen')}
 					{aantalVoorstellen > 0 && <span class="richtlijn-label richtlijn-label-reactie">{aantalVoorstellen === 1 ? '1 voorstel' : `${aantalVoorstellen} voorstellen`}</span>}
 				</li>
 			</ol>
