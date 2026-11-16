@@ -1,1 +1,114 @@
-/* Variant v4: vul dit bestand met de opmaak van deze variant. Het wordt alleen geladen bij ?ontwerp=v4, na vormgeving.css. */
+/*
+ * Variant v4, Volle breedte: de hele schermbreedte met de kolomverhouding van nu, één balk, zijbalk inklapbaar.
+ * Wordt alleen geladen bij ?ontwerp=v4, na vormgeving.css. Geen kleur of opmaak op de Bijbeltekst, geen rood in of rond de tekstkolommen.
+ */
+
+/*
+ * De letter groeit evenredig mee met het scherm vanaf 1440 px (0,9vw is bij 1440 px 13px, de grootte van nu).
+ * Daardoor blijft het aantal tekens per regel gelijk terwijl de kolommen breder worden: zonder deze regel is dat op 1920 px ongeveer 80.
+ * Ingeklapt krijgen de kolommen ongeveer 130px erbij; een vijfde deel daarvan gaat naar een iets grotere letter, zodat de regels niet te lang worden.
+ */
+:root:has(.indeling.ontwerp-v4) {
+	font-size: calc(clamp(0.8125rem, 0.9vw, 1.375rem) * var(--schaal, 1));
+}
+
+:root:has(.indeling.ontwerp-v4.zijbalk-ingeklapt) {
+	font-size: calc(clamp(0.8125rem, 0.9vw, 1.375rem) * 1.05 * var(--schaal, 1));
+}
+
+/* ---------- Bovenbalk ---------- */
+
+/* De titel neemt de ruimte; bewaarstatus en grootte staan ook op pagina's zonder hoofdstukacties rechts. */
+.bovenbalk .bovenbalk-rij {
+	flex-wrap: nowrap;
+	gap: 0.5rem 1rem;
+	padding: 0.5rem 1.5rem 0.5rem 0.8125rem;
+}
+
+.bovenbalk .bovenbalk-titel {
+	flex: 1 1 auto;
+}
+
+.bovenbalk .bovenbalk-boek {
+	flex-shrink: 0;
+}
+
+.bovenbalk .bovenbalk-acties {
+	flex-shrink: 0;
+	margin-left: 0;
+}
+
+.bovenbalk .bovenbalk-bewaarstatus,
+.bovenbalk .bovenbalk-grootte {
+	flex-shrink: 0;
+}
+
+.bovenbalk .bovenbalk-hoofdstuktitel,
+.bovenbalk .bovenbalk-paginatitel {
+	white-space: nowrap;
+}
+
+/* ---------- Ingeklapte zijbalk: de strook is net breed genoeg voor `1 ✓ 3?` ---------- */
+
+.indeling.ontwerp-v4.zijbalk-ingeklapt {
+	grid-template-columns: 6rem minmax(0, 1fr);
+}
+
+.indeling.ontwerp-v4 .hoofdstuk-kort {
+	grid-template-columns: 1.65rem 1rem 1.75rem;
+	gap: 0.2rem;
+	padding-block: 0.1rem;
+}
+
+.indeling.ontwerp-v4 .hoofdstuk-kort .hoofdstuk-kort-nummer {
+	height: 1.35rem;
+}
+
+/* Alle 24 hoofdstukken moeten ook op 1920 px zonder scrollen passen, en bij scrollen moet het laatste boven de pijl kunnen komen. */
+.indeling.ontwerp-v4 nav.zijbalk {
+	padding-bottom: 0.5rem;
+	font-size: 0.9375rem;
+}
+
+.indeling.ontwerp-v4 nav.zijbalk ul {
+	margin-bottom: 2.75rem;
+}
+
+.indeling.ontwerp-v4 nav.zijbalk ul a {
+	padding-block: 0.08rem;
+}
+
+.indeling.ontwerp-v4 nav.zijbalk .hoofdstuknummer {
+	height: 1.35rem;
+}
+
+/* ---------- Kolomkoppen blijven onder de balk staan, zodat Bron, Vereenvoudigd en Vertaalregels zichtbaar blijven ---------- */
+
+.indeling.ontwerp-v4 table.verzen > thead > tr > th {
+	position: sticky;
+	top: var(--balk-hoogte, 0px);
+	z-index: 5;
+}
+
+/* De rand onder de kolomkoppen hoort bij een sticky cel niet mee met de tabelrand; een eigen lijn blijft zichtbaar bij scrollen. */
+.indeling.ontwerp-v4 table.verzen > thead > tr > th::after {
+	content: '';
+	position: absolute;
+	inset: auto 0 0;
+	border-bottom: 1px solid var(--rand-donker);
+}
+
+.indeling.ontwerp-v4 tr.vers {
+	scroll-margin-top: calc(var(--balk-hoogte, 0px) + 3rem);
+}
+
+/* ---------- De pagina gebruikt de hele breedte ---------- */
+
+.indeling.ontwerp-v4 main {
+	padding-inline: 1.5rem;
+}
+
+.indeling.ontwerp-v4 .hoofdstuk > header,
+.indeling.ontwerp-v4 .hoofdstuk .regelsschakelaar {
+	max-width: none;
+}
