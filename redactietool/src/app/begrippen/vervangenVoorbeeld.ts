@@ -97,11 +97,14 @@ type Toe = {
 	overgeslagen: OvergeslagenPlek[];
 };
 
-/** Een variant die niet wordt toegepast is niet bewust afgewezen: de vertaler heeft de vorm niet gekozen, dus geen besluit. */
+/**
+ * De reden waarom een plek niet wordt toegepast. Met de hand (opmaakgrens) en goedgekeurd gaan voor: dat zijn besluiten, ook bij een variant.
+ * Een variant die verder niet wordt toegepast is niet bewust afgewezen: de vertaler heeft de vorm niet gekozen, dus geen besluit.
+ */
 function redenOvergeslagen(plek: Plek): OvergeslagenPlek['reden'] {
-	if (plek.variant !== null) return 'variant niet toegepast';
 	if (!plek.vervangbaar) return 'met de hand';
-	return plek.goedgekeurd ? 'goedgekeurd' : 'uitgevinkt';
+	if (plek.goedgekeurd) return 'goedgekeurd';
+	return plek.variant !== null ? 'variant niet toegepast' : 'uitgevinkt';
 }
 
 /**

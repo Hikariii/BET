@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
-import { bewaarAntwoord, leesAntwoorden, verwijderAntwoord, type Antwoord } from '../../antwoorden/antwoorden';
+import { antwoordToestand, bewaarAntwoord, leesAntwoorden, verwijderAntwoord, type Antwoord } from '../../antwoorden/antwoorden';
+import { leesKeuzes } from '../../vervangen/keuzes';
 import { isHoudOptie, maakVoorstel, splitsOpties } from '../../begrippen/opties';
 import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels, type VragenFilter } from '../../begrippen/vragenOverzicht';
 import { verzamelVragen } from '../../begrippen/verzamelVragen';
@@ -40,9 +41,10 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	const sleutel = (vraag: Vertaalvraag): string => sleutels.get(vraag) ?? '';
 	const opslagTeller = useOpslagTeller();
 	const antwoorden = useMemo(() => new Map(leesAntwoorden(browseropslag(), boek.id).map((antwoord) => [antwoord.kwestie, antwoord])), [boek.id, opslagTeller]);
+	const bestaandeKeuzes = useMemo(() => new Set(leesKeuzes(browseropslag(), boek.id).map((keuze) => keuze.id)), [boek.id, opslagTeller]);
 	const acties = maakAntwoordacties(boek.id, () => bouwHoofdstukVerzen(hoofdstukken, boek, (hoofdstuk) => leesTussenstand(browseropslag(), boek.id, hoofdstuk)));
 	const registervraag = (vraag: Vertaalvraag) => (
-		<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} antwoord={antwoorden.get(vraag.kwestie) ?? null} acties={acties} />
+		<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} antwoord={antwoorden.get(vraag.kwestie) ?? null} bestaandeKeuzes={bestaandeKeuzes} acties={acties} />
 	);
 
 	return (
@@ -152,15 +154,15 @@ function maakAntwoordacties(boek: string, bouwVerzen: () => HoofdstukVerzen[]): 
 	};
 }
 
-type RegisterVraagProps = { boek: string; vraag: Vertaalvraag; antwoord: Antwoord | null; acties: Antwoordacties };
+type RegisterVraagProps = { boek: string; vraag: Vertaalvraag; antwoord: Antwoord | null; bestaandeKeuzes: ReadonlySet<string>; acties: Antwoordacties };
 
-function RegisterVraag({ boek, vraag, antwoord, acties }: RegisterVraagProps) {
+function RegisterVraag({ boek, vraag, antwoord, bestaandeKeuzes, acties }: RegisterVraagProps) {
 	const opties = splitsOpties(vraag.alternatief);
 	const [melding, zetMelding] = useState('');
 	const meldingvak = useRef<HTMLParagraphElement>(null);
 	const uitlegId = useId();
 	// Een tweede antwoord zou de toegepaste keuze verweesd laten: eerst de keuze terugdraaien onder Zoeken en vervangen.
-	const vergrendeld = antwoord !== null && antwoord.keuzeId !== null;
+	const vergrendeld = antwoordToestand(antwoord, bestaandeKeuzes) === 'met keuze';
 	const uitleg = vergrendeld ? uitlegId : undefined;
 	useEffect(() => {
 		if (melding !== '') meldingvak.current?.focus();
@@ -208,7 +210,7 @@ function RegisterVraag({ boek, vraag, antwoord, acties }: RegisterVraagProps) {
 			{antwoord !== null && (
 				<p class="antwoord" id={uitlegId}>
 					Beantwoord in deze browser: optie {antwoord.optie}.{' '}
-					{antwoord.keuzeId === null ? (
+					{!vergrendeld ? (
 						<button type="button" onClick={() => zetMelding(acties.trekIn(vraag))}>
 							Antwoord intrekken
 						</button>

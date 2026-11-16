@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { GeheugenOpslag } from '../bewaren/testhulp';
-import { antwoordenSleutel, bewaarAntwoord, leesAntwoorden, verwijderAntwoord, verwijderAntwoordenVanKeuze, type Antwoord } from './antwoorden';
+import { antwoordenSleutel, antwoordToestand, bewaarAntwoord, leesAntwoorden, verwijderAntwoord, verwijderAntwoordenVanKeuze, type Antwoord } from './antwoorden';
 
 const GEZEGEND: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-16T10:00:00.000Z' };
 const HOUDEN: Antwoord = { kwestie: 'Houden', optie: 'b) niets doen', keuzeId: null, gegeven: '2026-11-16T10:05:00.000Z' };
@@ -86,5 +86,16 @@ describe('verwijderAntwoordenVanKeuze', () => {
 		verwijderAntwoordenVanKeuze(opslag, 'lukas', 'k1');
 
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([HOUDEN, anderKeuze]);
+	});
+});
+
+describe('antwoordToestand', () => {
+	const antwoord = (keuzeId: string | null) => ({ kwestie: 'k', optie: 'a) x', keuzeId, gegeven: '2026-11-16T10:00:00.000Z' });
+
+	it('telt een antwoord alleen als met keuze zolang die keuze bestaat', () => {
+		expect(antwoordToestand(null, new Set())).toBe('geen');
+		expect(antwoordToestand(antwoord(null), new Set(['k1']))).toBe('zonder keuze');
+		expect(antwoordToestand(antwoord('k1'), new Set(['k1']))).toBe('met keuze');
+		expect(antwoordToestand(antwoord('weg'), new Set(['k1']))).toBe('zonder keuze');
 	});
 });

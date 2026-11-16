@@ -67,3 +67,12 @@ export function verwijderAntwoord(opslag: Opslag, boek: string, kwestie: string)
 export function verwijderAntwoordenVanKeuze(opslag: Opslag, boek: string, keuzeId: string): void {
 	schrijfAntwoorden(opslag, boek, leesAntwoorden(opslag, boek).filter((antwoord) => antwoord.keuzeId !== keuzeId));
 }
+
+/**
+ * Hoe een vraag nu beantwoord is: `met keuze` alleen als de keuze waar het antwoord naar wijst nog bestaat;
+ * een antwoord naar een verdwenen keuze telt als zonder keuze, zodat het in te trekken is en Kiezen weer kan.
+ */
+export function antwoordToestand(antwoord: Antwoord | null, bestaandeKeuzes: ReadonlySet<string>): 'geen' | 'zonder keuze' | 'met keuze' {
+	if (antwoord === null) return 'geen';
+	return antwoord.keuzeId !== null && bestaandeKeuzes.has(antwoord.keuzeId) ? 'met keuze' : 'zonder keuze';
+}

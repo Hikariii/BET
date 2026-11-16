@@ -200,6 +200,18 @@ describe('verdeelPlekken', () => {
 	});
 });
 
+describe('verdeelPlekken bij varianten met een eigen reden', () => {
+	it('houdt bij een variant de reden met de hand of goedgekeurd: dat zijn besluiten', () => {
+		const metDeHand = plek(1, 5, { variant: 'zegende', vervangbaar: false, gevonden: 'ze-gende' });
+		const goedgekeurd = plek(2, 2, { variant: 'zegende', goedgekeurd: true, gevonden: 'zegende' });
+		const gewoon = plek(1, 6, { variant: 'zegende', gevonden: 'zegende' });
+
+		const { overgeslagen } = verdeelPlekken([metDeHand, goedgekeurd, gewoon], new Set(), 'tekst', new Map());
+
+		expect(overgeslagen.map((plaats) => plaats.reden)).toEqual(['met de hand', 'goedgekeurd', 'variant niet toegepast']);
+	});
+});
+
 describe('kiesBereik', () => {
 	const verzen = [{ hoofdstuk: 6, vers: 20 }];
 

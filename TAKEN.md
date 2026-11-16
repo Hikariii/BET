@@ -51,6 +51,8 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] Test `opties.test.ts` die alle 36 vragen telt (breekt bij elke wijziging aan open-vragen.md): versoepelen, Gezegend-test houden.
   - [ ] Tests voor `maakAntwoordacties` (Vertaalvragen) en `toepassen` (Vervangen); `Vervangen.tsx` (~470 regels) opsplitsen; comments in `opties.ts` die de code beschrijven.
   - [ ] Toegankelijkheid: melding in Vertaalvragen altijd renderen (niet `:empty { display: none }`) en focus ook bij dezelfde melding; lidwoordenlijst voor varianten zonder dubbelzinnige woorden (zijn, ons, hun, haar, je) of met waarschuwing.
+  - [ ] `draaiKeuzeTerug` (alles terugdraaien) registreert bij een gedeeltelijke terugdraai de echt teruggedraaide verzen niet als `teruggedraaid`, anders dan `draaiVersTerug`.
+  - [ ] Back-up inladen: bij antwoorden ook tonen welke een lokaal antwoord overschrijven of blijven staan (zoals bij verzen).
   - [ ] Opties: machine-leesbare opties in `open-vragen.md` overwegen als meer vragen echte opties krijgen (keuze eigenaar).
 - [ ] Redactietool, uit de review van fase 7b (v8e):
   - [x] Back-up samenvoegen: per vers wint de nieuwste (keuze eigenaar, 2026-11-16).
