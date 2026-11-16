@@ -7,8 +7,8 @@ type Props = {
 	plekken: readonly BoekPlek[];
 	/** De plek die open staat; `null` op de pagina Bewaard of een onbekend adres. */
 	huidig: Plek | null;
-	/** `tabbladen`: de volledige namen. `werkbalk`: een pictogram met een kort woord, de volledige naam als tooltip en voor schermlezers. */
-	vorm: 'tabbladen' | 'werkbalk';
+	/** `tabbladen`: de volledige namen. `tabbladen-iconen`: de volledige namen met een pictogram ervoor. `werkbalk`: een pictogram met een kort woord, de volledige naam als tooltip en voor schermlezers. */
+	vorm: 'tabbladen' | 'werkbalk' | 'tabbladen-iconen';
 };
 
 /** Alleen bij de vragen telt een getal mee in de balk; de andere aantallen staan op het scherm zelf. */
@@ -41,9 +41,10 @@ function Inhoud({ plek, vorm }: { plek: BoekPlek; vorm: Props['vorm'] }): Compon
 				<span class="alleen-lezers"> open</span>
 			</span>
 		);
-	if (vorm === 'tabbladen') {
+	if (vorm === 'tabbladen' || vorm === 'tabbladen-iconen') {
 		return (
 			<>
+				{vorm === 'tabbladen-iconen' && <PlekIcoon plek={plek.plek} />}
 				{plek.naam}
 				{aantalTekst}
 			</>

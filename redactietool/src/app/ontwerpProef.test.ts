@@ -73,6 +73,7 @@ describe('leesOntwerp', () => {
 		expect(config('?ontwerp=v8a')).toEqual({ ...basis, boeknavigatie: 'tabbladen' });
 		expect(config('?ontwerp=v8b')).toEqual({ ...basis, boeknavigatie: 'menu' });
 		expect(config('?ontwerp=v8c')).toEqual({ ...basis, boeknavigatie: 'werkbalk', status: 'kort' });
+		expect(config('?ontwerp=v8d')).toEqual({ ...basis, boeknavigatie: 'tabbladen-iconen' });
 	});
 
 	it('geeft alleen v8a tot en met v8c een andere boeknavigatie dan de knop', () => {
@@ -85,6 +86,7 @@ describe('cssVanOntwerp', () => {
 	it('laadt voor v8a tot en met v8c eerst de basis v7, voor de andere varianten alleen hun eigen css', () => {
 		expect(cssVanOntwerp('v7')).toEqual(['v7']);
 		expect(cssVanOntwerp('v8b')).toEqual(['v7', 'v8b']);
+		expect(cssVanOntwerp('v8d')).toEqual(['v7', 'v8d']);
 		expect(cssVanOntwerp('v3')).toEqual(['v3']);
 	});
 });

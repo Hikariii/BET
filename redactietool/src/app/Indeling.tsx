@@ -125,7 +125,7 @@ function BoekSlot({ boek, referentie, config, ingeklapt, begrippenOpen, huidigHo
 			{boek.naam}
 		</a>
 	);
-	if (config.boeknavigatie === 'tabbladen' || config.boeknavigatie === 'werkbalk') {
+	if (config.boeknavigatie === 'tabbladen' || config.boeknavigatie === 'werkbalk' || config.boeknavigatie === 'tabbladen-iconen') {
 		return (
 			<>
 				{naam}
