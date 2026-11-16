@@ -72,7 +72,8 @@ describe('BackupInladen', () => {
 	});
 
 	it('voegt samen: het nieuwe vers komt erbij en het lokale vers blijft staan als het nieuwer is', async () => {
-		const lokaal = new Date(NU.getTime() + 60_000);
+		// De verzen in de back-up krijgen bij het maken de echte tijd (bewaarVers), dus het lokale vers is pas nieuwer als het na de echte tijd ligt.
+		const lokaal = new Date(Date.now() + 60_000);
 		bewaarVers(window.localStorage, 'lukas', 1, 2, inhoud(' lokaal, vers twee'), inhoud(' oud twee'));
 		const stand = leesTussenstand(window.localStorage, 'lukas', 1);
 		const lokaalVers = stand.verzen[2];
