@@ -31,7 +31,7 @@ function splitsRegels(tekst: string): string[] {
 	return regels;
 }
 
-/** Een stuk tekst uit een logregel: gewone tekst, of een verwijzing zoals die in de tekst staat (`§11`, `precedent`). */
+/** Een stuk tekst uit een logregel: gewone tekst, of een verwijzing met de tekst die de tool toont (`§11`, `vertaalkeuze`). */
 export type Tekstdeel = { soort: 'tekst'; tekst: string } | { soort: 'verwijzing'; tekst: string; verwijzing: Verwijzing };
 
 /** Knipt tekst op de plekken waar een verwijzing staat, zodat de weergave die verwijzingen zelf klikbaar kan maken. */
@@ -41,11 +41,21 @@ export function splitsOpVerwijzingen(tekst: string): Tekstdeel[] {
 	for (const treffer of tekst.matchAll(VERWIJZING)) {
 		if (treffer.index > vorigeEinde) delen.push({ soort: 'tekst', tekst: tekst.slice(vorigeEinde, treffer.index) });
 		const paragraaf = treffer[1];
-		delen.push({ soort: 'verwijzing', tekst: treffer[0], verwijzing: paragraaf === undefined ? { soort: 'precedent' } : { soort: 'paragraaf', paragraaf } });
+		delen.push(
+			paragraaf === undefined
+				? { soort: 'verwijzing', tekst: alsVertaalkeuze(treffer[0]), verwijzing: { soort: 'precedent' } }
+				: { soort: 'verwijzing', tekst: treffer[0], verwijzing: { soort: 'paragraaf', paragraaf } },
+		);
 		vorigeEinde = treffer.index + treffer[0].length;
 	}
 	if (vorigeEinde < tekst.length) delen.push({ soort: 'tekst', tekst: tekst.slice(vorigeEinde) });
 	return delen;
+}
+
+/** Claude schrijft "precedent(en)"; de tool noemt dat een vertaalkeuze (woordenlijst in de README), met dezelfde hoofdletter en hetzelfde getal. */
+function alsVertaalkeuze(woord: string): string {
+	const vertaalkeuze = woord.endsWith('en') ? 'vertaalkeuzes' : 'vertaalkeuze';
+	return woord.startsWith('P') ? `V${vertaalkeuze.slice(1)}` : vertaalkeuze;
 }
 
 function leesVerwijzingen(tekst: string): Verwijzing[] {

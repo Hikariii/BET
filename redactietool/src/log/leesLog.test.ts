@@ -267,14 +267,14 @@ describe('bestandsvormen', () => {
 });
 
 describe('splitsOpVerwijzingen', () => {
-	it('knipt paragrafen en het woord precedent uit de tekst, op hun plek en zoals ze er staan', () => {
+	it('knipt paragrafen en het woord precedent uit de tekst, op hun plek; precedent heet daar vertaalkeuze', () => {
 		expect(splitsOpVerwijzingen('"smaad" → "schande" — §11 (tabel) en §7A; Precedent na 4.')).toEqual([
 			{ soort: 'tekst', tekst: '"smaad" → "schande" — ' },
 			{ soort: 'verwijzing', tekst: '§11', verwijzing: { soort: 'paragraaf', paragraaf: '11' } },
 			{ soort: 'tekst', tekst: ' (tabel) en ' },
 			{ soort: 'verwijzing', tekst: '§7A', verwijzing: { soort: 'paragraaf', paragraaf: '7A' } },
 			{ soort: 'tekst', tekst: '; ' },
-			{ soort: 'verwijzing', tekst: 'Precedent', verwijzing: { soort: 'precedent' } },
+			{ soort: 'verwijzing', tekst: 'Vertaalkeuze', verwijzing: { soort: 'precedent' } },
 			{ soort: 'tekst', tekst: ' na 4.' },
 		]);
 	});
@@ -282,5 +282,11 @@ describe('splitsOpVerwijzingen', () => {
 	it('laat tekst zonder verwijzing heel, en tekst die met een verwijzing begint of eindigt zonder lege stukken', () => {
 		expect(splitsOpVerwijzingen('geen vaste regel')).toEqual([{ soort: 'tekst', tekst: 'geen vaste regel' }]);
 		expect(splitsOpVerwijzingen('§8')).toEqual([{ soort: 'verwijzing', tekst: '§8', verwijzing: { soort: 'paragraaf', paragraaf: '8' } }]);
+	});
+
+	it('houdt bij vertaalkeuze het getal en de hoofdletter van precedent aan', () => {
+		const getoond = (tekst: string) => splitsOpVerwijzingen(tekst).flatMap((deel) => (deel.soort === 'verwijzing' ? [deel.tekst] : []));
+
+		expect(getoond('precedent, precedenten, Precedenten')).toEqual(['vertaalkeuze', 'vertaalkeuzes', 'Vertaalkeuzes']);
 	});
 });

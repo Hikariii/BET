@@ -33,10 +33,10 @@ Wil je alle vertaalregels tegelijk vast, zoals in een gewone kolom? Klik dan op 
 
 ## Een regel naslaan
 
-In de tekst van een regel is een paragraafteken met nummer, zoals **§11**, klikbaar, en ook het woord **precedent**. Dat woord komt uit de tekst van Claude en betekent een vertaalkeuze. Klik erop en onder het vers opent een kaart. Bij een § staat daar de paragraaf uit de richtlijn, met de link **Lees in de richtlijn**. Bij *precedent* staan daar de vertaalkeuzes die bij de regel horen. Is de kaart lang, dan scrolt alleen de inhoud; de titel en **Sluiten** blijven bovenaan staan. Sluit de kaart met **Sluiten** of Escape. De punaise staat ook als een kaart open is. Heb je het vak vastgezet, dan blijft het vastgezet nadat je de kaart sluit.
+In de tekst van een regel is een paragraafteken met nummer, zoals **§11**, klikbaar, en ook het woord **vertaalkeuze**. Klik erop en onder het vers opent een kaart. Bij een § staat daar de paragraaf uit de richtlijn, met de link **Lees in de richtlijn**. Bij *vertaalkeuze* staan daar de vertaalkeuzes die bij de regel horen. Is de kaart lang, dan scrolt alleen de inhoud; de titel en **Sluiten** blijven bovenaan staan. Sluit de kaart met **Sluiten** of Escape. De punaise staat ook als een kaart open is. Heb je het vak vastgezet, dan blijft het vastgezet nadat je de kaart sluit.
 
-{{wijs naslag-verwijzing | § en precedent | In de kolom Vertaalregels, achter een regel.}}
-{{wijs naslagkaart | De naslagkaart | Verschijnt onder het vers nadat je op § of precedent klikt.}}
+{{wijs naslag-verwijzing | § en vertaalkeuze | In de kolom Vertaalregels, achter een regel.}}
+{{wijs naslagkaart | De naslagkaart | Verschijnt onder het vers nadat je op § of vertaalkeuze klikt.}}
 
 ## Een vraagteken bij het versnummer
 

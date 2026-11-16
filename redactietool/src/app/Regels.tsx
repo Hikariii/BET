@@ -68,7 +68,7 @@ export function Regels({ boekId, versVraag, logVerzen, vragen, gekapt, openNasla
 
 type RegelTekstProps = Pick<RegelsProps, 'openNaslag' | 'kaartId' | 'onOpenNaslag'> & { tekst: string };
 
-/** Een vertaalregel met de verwijzingen (`§11`, `precedent`) als knop op hun eigen plek in de tekst, zodat elke verwijzing er één keer staat. */
+/** Een vertaalregel met de verwijzingen (`§11`, `vertaalkeuze`) als knop op hun eigen plek in de tekst, zodat elke verwijzing er één keer staat. */
 function RegelTekst({ tekst, openNaslag, kaartId, onOpenNaslag }: RegelTekstProps) {
 	const metKnoppen = (stuk: string) =>
 		splitsOpVerwijzingen(stuk).map((deel) => {
