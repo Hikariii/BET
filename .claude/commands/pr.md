@@ -18,7 +18,7 @@ Nooit `gh pr create` zonder `--web`. Dit commando stopt bij het ingevulde formul
 3. Geen `.plan/intent-<branch>.md` ([/intent](intent.md))? Schrijf het uit de sessie en de diff in de vorm van dat commando, en zeg dat.
 4. Werk dat nog niet gecommit is: stagen en committen. Eén onderwerpregel in de gebiedende wijs die de ene uitkomst noemt, nooit een lijst van wijzigingen; de PR-titel is dezelfde regel. Geen body tenzij het waarom niet voor de hand ligt. Nooit `--no-verify`. Sluit af met de attributieregels die de omgeving voorschrijft.
 5. `git push -u origin HEAD`.
-6. Wijziging aan de omzet-, export- of controlescripts: draai eerst de heen-en-terugtest en de controles (`CLAUDE.md`, "Gereedschap") en neem het resultaat op onder evidence.
+6. Wijziging aan de omzet-, export- of controlescripts: draai eerst de heen-en-terugtest (`python3 -I scripts/controleer_heen_en_terug.py --boek <boek>`) en de controles (`CLAUDE.md`, "Gereedschap") en neem het resultaat op onder evidence.
 7. Schrijf de body naar een tijdelijk bestand en open het formulier:
    ```bash
    gh pr create --web --base main --head <branch> --title "<titel>" --body-file <bestand>

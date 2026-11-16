@@ -37,3 +37,21 @@ De betekenis zit deels in de Word-opmaak. Die wordt als tags in de tekst bewaard
 ## Hoofdregel
 
 Een tag die in de bron in een vers staat, moet in de vereenvoudiging in hetzelfde vers terugkomen (de inhoud ertussen mag wel veranderen).
+
+## Wijzigingslog
+
+Het bestand `bijbel/<boek>/wijzigingslog/<prefix>-NN.md` is geen Markdown met opmaak-tags, maar het wordt wel door twee programma's gelezen: `parse_log` in `scripts/md_naar_docx.py` (voor het reviewdocument) en `redactietool/src/log/leesLog.ts` (voor de tool). Een pariteitstest bewaakt dat beide hetzelfde lezen. Het sjabloon staat in `sjablonen/wijzigingslog.md`. De bevindingen van de onafhankelijke controle staan in `<prefix>-NN-controle.md`; dat bestand wordt niet gelezen.
+
+**Volgorde van de kopjes** (zoals in de echte logs):
+1. `# Wijzigingslog <Naam> N`, met daaronder een korte inleiding.
+2. `## Vragen aan redactie`: de algemene vragen van het hoofdstuk.
+3. `## Aandachtspunten (stap 1)`: de aandachtspuntenlijst uit WERKPLAN stap 1. Deze kop is voor de lezers gewoon een andere kop: wat eronder staat, wordt niet gelezen.
+4. Per gewijzigd vers `## Vers N` of, voor een reeks, `## Vers N-M`.
+
+**Wat de lezers afdwingen:**
+- Het kopje voor de algemene vragen is een regel die met `##`, een spatie en het woord `Vragen` begint (hoofdletters maken niet uit). Elk item is een genummerde regel (`1. `) of een lijstregel (`- ` of `* `). Een ingesprongen regel (spatie of tab) hoort bij het vorige item. De lijst eindigt bij de volgende regel die met `#` begint.
+- Een versdeel begint met `## Vers N`, of `## Vers N-M` voor een reeks (tussen N en M een koppelteken, gedachtestreep of aandachtsstreep), met eventueel een dubbele punt erachter, en niets anders op die regel. Elke andere kop sluit het deel af; een deel zonder juiste kop wordt niet gelezen. Bij een reeks krijgt het eerste vers de inhoud en de andere verzen een verwijzing "zie bij vers N". Een omgekeerde reeks (`## Vers 5-3`) bevat geen verzen en wordt overgeslagen.
+- In een versdeel is een veld een lijstregel met een vetgedrukte naam: `- **Wijzigingen:** …`. Een naam die met `wijziging` begint, bevat de wijzigingen; een naam die met `twijfel` begint of het woord `vraag` bevat (bijvoorbeeld `Twijfel / vraag aan redactie`), bevat de vragen bij dit vers. Andere velden (`Bron`, `Nieuw`) worden niet gebruikt. Een veld mag zijn tekst op dezelfde regel hebben, of daaronder als ingesprongen lijstregels. Een niet-lege regel zonder lijstteken hoort bij het vorige item.
+- Een vraag die alleen `(optioneel)`, `geen`, `nee`, `n.v.t.`, `-` of een aandachtsstreep is, telt niet als vraag.
+- Wijzigingen verwijzen met `§7A` (de paragraaf van de richtlijn) of met het woord `precedent` naar hun grond; de tool maakt daar links van.
+- De status van een vraag (open, voorlopig besloten) staat niet in een eigen veld. De tool leidt hem af uit een statuswoord in de tekst (bijvoorbeeld `VOORLOPIG BESLOTEN DOOR HOOFDSESSIE` of `Nog open`); `referentie/open-vragen.md` is de bron voor de status zelf.
