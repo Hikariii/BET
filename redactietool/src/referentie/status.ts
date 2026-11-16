@@ -10,7 +10,8 @@ const STATUS_IN_BESTAND: Readonly<Record<string, Status>> = {
 	verwerkt: 'verwerkt',
 	goedgekeurd: 'goedgekeurd',
 };
-const HOOFDSTUKNUMMER = /^\S+ (\d+)$/;
+/** Het laatste getal van de cel is het hoofdstuk, ook als de boeknaam een getal of spaties heeft ("1 Korintiërs 3"). */
+const HOOFDSTUKNUMMER = /^\S.*\s(\d+)$/;
 
 /** Leest de tabel uit bijbel/<boek>/STATUS.md. Een onbekende status of een hoofdstuknaam zonder nummer geeft een ReferentieFout met het regelnummer. */
 export function leesStatus(tekst: string): HoofdstukInfo[] {

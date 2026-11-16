@@ -19,6 +19,7 @@ import { leesPrecedenten } from '../referentie/precedenten';
 import { leesRichtlijn } from '../referentie/richtlijn';
 import { leesStatus } from '../referentie/status';
 import { leesStijlen } from '../sjabloon/leesStijlen';
+import { ontbrekendeStijlen } from './controleerStijlen';
 import { leesStylesXml } from './leesStylesXml';
 
 export type BouwOpties = {
@@ -90,7 +91,7 @@ function isBoekBestand(waarde: unknown): waarde is BoekBestand {
 		typeof kandidaat['bestandsprefix'] === 'string' &&
 		typeof kandidaat['sjabloon'] === 'string' &&
 		Array.isArray(kandidaat['verzen_per_hoofdstuk']) &&
-		kandidaat['verzen_per_hoofdstuk'].every((aantal) => typeof aantal === 'number')
+		kandidaat['verzen_per_hoofdstuk'].every((aantal) => Number.isInteger(aantal))
 	);
 }
 
@@ -99,6 +100,10 @@ function schrijfBoek(id: string, boekmap: string, boek: BoekBestand, uitvoermap:
 
 	const sjabloonPad = path.join(boekmap, boek.sjabloon);
 	const stijlen = leesStijlen(leesStylesXml(readFileSync(sjabloonPad), sjabloonPad));
+	const ontbrekend = ontbrekendeStijlen(stijlen);
+	if (ontbrekend.length > 0) {
+		throw new Error(`${sjabloonPad}: het sjabloon mist stijlen die de tool gebruikt: ${ontbrekend.join('; ')}`);
+	}
 	const statusRijen = leesBestand(path.join(boekmap, 'STATUS.md'), leesStatus);
 
 	const hoofdstukken: HoofdstukInfo[] = boek.verzen_per_hoofdstuk.map((_aantalVerzen, index) => {

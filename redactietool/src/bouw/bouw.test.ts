@@ -4,6 +4,7 @@ import path from 'node:path';
 import { strToU8, zipSync } from 'fflate';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { hoofdstukJsonNaam } from '../data/bestandsnamen';
+import { ALINEASTIJL_NAAR_WORD, DOMEIN_NAAR_WORD, TITEL_WORD } from '../data/stijlkoppeling';
 import type { BoekData, BoekLijst, HoofdstukData, Referentie, RichtlijnSectie, Status } from '../data/types';
 import type { Hoofdstuk } from '../formaat/types';
 import { bouwData } from './bouw';
@@ -39,10 +40,22 @@ function versnummers(hoofdstuk: Hoofdstuk): number[] {
 		.flatMap((stuk) => (stuk.soort === 'vers' ? [stuk.nummer] : []));
 }
 
-type MiniRepoInhoud = { statusTekst?: string; openVragenRegels?: string[] };
+type MiniRepoInhoud = { statusTekst?: string; openVragenRegels?: string[]; stijlenZonder?: string };
+
+/** styles.xml met alle stijlen die de tool nodig heeft, behalve `zonder`. */
+function stylesXmlMetAlleStijlen(zonder: string | undefined): string {
+	const stijlen = [
+		...Object.values(ALINEASTIJL_NAAR_WORD).map((id) => ({ id, type: 'paragraph' })),
+		...[...Object.values(DOMEIN_NAAR_WORD), TITEL_WORD].map((id) => ({ id, type: 'character' })),
+	];
+	const elementen = stijlen
+		.filter(({ id }) => id !== zonder)
+		.map(({ id, type }) => `<w:style w:type="${type}" w:styleId="${id}"><w:name w:val="${id}"/></w:style>`);
+	return `<w:styles>${elementen.join('')}</w:styles>`;
+}
 
 /** Een boek `test` van één hoofdstuk met drie verzen, net genoeg voor `bouwData`. */
-function maakMiniRepo({ statusTekst, openVragenRegels }: MiniRepoInhoud): string {
+function maakMiniRepo({ statusTekst, openVragenRegels, stijlenZonder }: MiniRepoInhoud): string {
 	const hoofdmap = mkdtempSync(path.join(tmpdir(), 'bet-minirepo-'));
 	const boekmap = path.join(hoofdmap, 'bijbel/test');
 	for (const map of ['bron', 'referentie']) {
@@ -52,8 +65,7 @@ function maakMiniRepo({ statusTekst, openVragenRegels }: MiniRepoInhoud): string
 
 	const boek = { naam: 'Test', bestandsprefix: 'test', sjabloon: 'sjabloon.docx', verzen_per_hoofdstuk: [3] };
 	writeFileSync(path.join(boekmap, 'boek.json'), JSON.stringify(boek));
-	const stylesXml = '<w:styles><w:style w:type="paragraph" w:styleId="Jezuswoorden"><w:name w:val="Jezus_woorden"/></w:style></w:styles>';
-	writeFileSync(path.join(boekmap, 'sjabloon.docx'), zipSync({ 'word/styles.xml': strToU8(stylesXml) }));
+	writeFileSync(path.join(boekmap, 'sjabloon.docx'), zipSync({ 'word/styles.xml': strToU8(stylesXmlMetAlleStijlen(stijlenZonder)) }));
 	writeFileSync(
 		path.join(boekmap, 'STATUS.md'),
 		statusTekst ?? '| Hoofdstuk | Status | Versie | Herkomst | Opmerking |\n|---|---|---|---|---|\n| Test 1 | - | | | |\n',
@@ -122,12 +134,32 @@ describe('bouwData op een kleine repo', () => {
 		expect(melding).toContain('vers 2:1 bestaat niet, hoofdstuk 2 bestaat niet (het boek heeft 1 hoofdstukken)');
 	});
 
+	it('weigert een boek.json met een aantal verzen dat geen geheel getal is', () => {
+		const hoofdmap = maakMiniRepo({});
+		const boekPad = path.join(hoofdmap, 'bijbel/test/boek.json');
+		writeFileSync(boekPad, JSON.stringify({ naam: 'Test', bestandsprefix: 'test', sjabloon: 'sjabloon.docx', verzen_per_hoofdstuk: [3.5] }));
+		try {
+			expect(() => bouwData({ hoofdmap, uitvoermap: path.join(hoofdmap, 'uit') })).toThrow(
+				`${boekPad}: verwacht naam, bestandsprefix, sjabloon en verzen_per_hoofdstuk`,
+			);
+		} finally {
+			rmSync(hoofdmap, { recursive: true, force: true });
+		}
+	});
+
 	it('zet het pad van het referentiebestand voor een fout van de parser', () => {
 		const regel = '| Lk 1:1 | kwestie | gekozen | alternatief | open | | eerste vers |';
 
 		const melding = foutVanBouw({ openVragenRegels: [regel] });
 
 		expect(melding).toContain(path.join('bijbel/test/referentie/open-vragen.md') + ': regel 3: ongeldige versaanduiding');
+	});
+
+	it('weigert een sjabloon zonder een stijl die de tool gebruikt en noemt sjabloon en stijl', () => {
+		const melding = foutVanBouw({ stijlenZonder: 'Torah' });
+
+		expect(melding).toContain(path.join('bijbel/test/sjabloon.docx'));
+		expect(melding).toContain("tekenstijl 'Torah' ontbreekt");
 	});
 
 	it('zet het pad van STATUS.md voor een fout van de parser', () => {

@@ -59,6 +59,14 @@ describe('leesStatus op kleine invoer', () => {
 		expect(() => leesStatus(`${KOP}\n| Lukas | ✓ | concept | | | |`)).toThrowError("regel 3: hoofdstuk 'Lukas' heeft geen nummer");
 	});
 
+	it('neemt het laatste getal van de hoofdstukcel, ook als de boeknaam een getal en een spatie heeft', () => {
+		expect(leesStatus(`${KOP}\n| 1 Korintiërs 3 | ✓ | concept | | | |`).map(({ nummer }) => nummer)).toEqual([3]);
+	});
+
+	it('meldt een boeknaam met een getal maar zonder hoofdstuknummer', () => {
+		expect(() => leesStatus(`${KOP}\n| 1 Johannes | ✓ | concept | | | |`)).toThrowError("regel 3: hoofdstuk '1 Johannes' heeft geen nummer");
+	});
+
 	it('meldt een bestand zonder tabel', () => {
 		expect(() => leesStatus('Geen tabel.')).toThrowError('regel 1: geen tabel gevonden');
 	});
