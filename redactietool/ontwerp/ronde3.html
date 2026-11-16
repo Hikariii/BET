@@ -1,0 +1,199 @@
+<!doctype html><html lang="nl"><meta charset="utf-8"><title>Ontwerpronde 3</title><style>
+body{font:15px/1.5 system-ui,sans-serif;margin:2rem;color:#111}h1{font-size:1.7rem}h2{font-size:1.3rem;margin-top:3rem;border-top:2px solid #111;padding-top:1rem}h3{font-size:1.05rem;margin-top:2rem}h4{font-size:.95rem;margin:.6rem 0 .2rem}
+.rooster{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}.rooster4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}figure{margin:0}figcaption{font-weight:600;margin-bottom:.25rem}figcaption a{font-weight:400;font-size:.85rem;margin-left:.4rem}img{width:100%;border:1px solid #ccc;display:block}
+nav a,.knop{margin-right:.8rem;color:#a61816}.notities{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;font-size:13px}.notities>div{border-top:1px solid #ccc;padding-top:.5rem}code{background:#f2f2f2;padding:0 .2em}table{border-collapse:collapse;margin:.4rem 0}td{border:1px solid #ddd;padding:.2rem .5rem}
+.schakel{position:sticky;top:0;background:#fff;padding:.5rem 0;border-bottom:1px solid #ddd;z-index:5}.schakel label{margin-right:1rem}</style>
+<h1>Ontwerpronde 3: bovenbalk, navigatie, grootte, bewaren, dichte verzen</h1>
+<p>Zes varianten (v1 tot v6) op dezelfde werkende basis: bewaarstatus, back-up downloaden en inladen, grootte A− A A+ A++, inklapbare zijbalk of hoofdstukstrip, sticky bovenbalk. Daarnaast drie manieren om de verzen dichter op elkaar te zetten (d1 tot d3), te combineren met elke variant. In alle 28 combinaties is de Bijbeltekst gelijk aan Word (opmaakcontrole: 0 afwijkingen) en zijn er 0 consolefouten.</p>
+<p><strong>Live proberen</strong> (dev-server): <a class="knop" href="http://localhost:5173/?ontwerp=v1#/lukas/22">v1</a><a class="knop" href="http://localhost:5173/?ontwerp=v2#/lukas/22">v2</a><a class="knop" href="http://localhost:5173/?ontwerp=v3#/lukas/22">v3</a><a class="knop" href="http://localhost:5173/?ontwerp=v4#/lukas/22">v4</a><a class="knop" href="http://localhost:5173/?ontwerp=v5#/lukas/22">v5</a><a class="knop" href="http://localhost:5173/?ontwerp=v6#/lukas/22">v6</a> · met dichte verzen: <a class="knop" href="http://localhost:5173/?ontwerp=v4&verzen=d1#/lukas/22">v4 + d1</a><a class="knop" href="http://localhost:5173/?ontwerp=v4&verzen=d2#/lukas/22">v4 + d2</a><a class="knop" href="http://localhost:5173/?ontwerp=v4&verzen=d3#/lukas/22">v4 + d3</a>. Rechtsonder wissel je in de tool zelf.</p>
+<nav><a href="#varianten">Varianten v1 tot v6</a><a href="#verzen">Dichte verzen d1 tot d3</a><a href="#combi">Combinaties</a><a href="#notities">Toelichting per variant</a></nav>
+<div class="schakel"><strong>Toon:</strong> <label><input type="radio" name="b" value="1440" checked> 1440 px</label><label><input type="radio" name="b" value="1920"> 1920 px</label> · <label><input type="radio" name="g" value="normaal" checked> normaal</label><label><input type="radio" name="g" value="groot"> groot (+2)</label></div>
+<h2 id="varianten">Varianten v1 tot v6</h2>
+<h3>Lezen (Lukas 22)</h3><div class="rooster">
+<figure><figcaption>v1 Compact<a href="http://localhost:5173/?ontwerp=v1#/lukas/22">live</a></figcaption><img class="wissel" data-v="v1" data-s="lezen" src="v1-1440-normaal-lezen.png" alt="v1 Compact, Lezen (Lukas 22)" loading="lazy"></figure>
+<figure><figcaption>v2 Twee balken<a href="http://localhost:5173/?ontwerp=v2#/lukas/22">live</a></figcaption><img class="wissel" data-v="v2" data-s="lezen" src="v2-1440-normaal-lezen.png" alt="v2 Twee balken, Lezen (Lukas 22)" loading="lazy"></figure>
+<figure><figcaption>v3 Hoofdstukstrip<a href="http://localhost:5173/?ontwerp=v3#/lukas/22">live</a></figcaption><img class="wissel" data-v="v3" data-s="lezen" src="v3-1440-normaal-lezen.png" alt="v3 Hoofdstukstrip, Lezen (Lukas 22)" loading="lazy"></figure>
+<figure><figcaption>v4 Volle breedte<a href="http://localhost:5173/?ontwerp=v4#/lukas/22">live</a></figcaption><img class="wissel" data-v="v4" data-s="lezen" src="v4-1440-normaal-lezen.png" alt="v4 Volle breedte, Lezen (Lukas 22)" loading="lazy"></figure>
+<figure><figcaption>v5 Werkbank<a href="http://localhost:5173/?ontwerp=v5#/lukas/22">live</a></figcaption><img class="wissel" data-v="v5" data-s="lezen" src="v5-1440-normaal-lezen.png" alt="v5 Werkbank, Lezen (Lukas 22)" loading="lazy"></figure>
+<figure><figcaption>v6 Groot lezen<a href="http://localhost:5173/?ontwerp=v6#/lukas/22">live</a></figcaption><img class="wissel" data-v="v6" data-s="lezen" src="v6-1440-normaal-lezen.png" alt="v6 Groot lezen, Lezen (Lukas 22)" loading="lazy"></figure>
+</div>
+<h3>Zijbalk ingeklapt</h3><div class="rooster">
+<figure><figcaption>v1 Compact<a href="http://localhost:5173/?ontwerp=v1#/lukas/22">live</a></figcaption><img class="wissel" data-v="v1" data-s="ingeklapt" src="v1-1440-normaal-ingeklapt.png" alt="v1 Compact, Zijbalk ingeklapt" loading="lazy"></figure>
+<figure><figcaption>v2 Twee balken<a href="http://localhost:5173/?ontwerp=v2#/lukas/22">live</a></figcaption><img class="wissel" data-v="v2" data-s="ingeklapt" src="v2-1440-normaal-ingeklapt.png" alt="v2 Twee balken, Zijbalk ingeklapt" loading="lazy"></figure>
+<figure><figcaption>v3 Hoofdstukstrip<a href="http://localhost:5173/?ontwerp=v3#/lukas/22">live</a></figcaption><img class="wissel" data-v="v3" data-s="ingeklapt" src="v3-1440-normaal-ingeklapt.png" alt="v3 Hoofdstukstrip, Zijbalk ingeklapt" loading="lazy"></figure>
+<figure><figcaption>v4 Volle breedte<a href="http://localhost:5173/?ontwerp=v4#/lukas/22">live</a></figcaption><img class="wissel" data-v="v4" data-s="ingeklapt" src="v4-1440-normaal-ingeklapt.png" alt="v4 Volle breedte, Zijbalk ingeklapt" loading="lazy"></figure>
+<figure><figcaption>v5 Werkbank<a href="http://localhost:5173/?ontwerp=v5#/lukas/22">live</a></figcaption><img class="wissel" data-v="v5" data-s="ingeklapt" src="v5-1440-normaal-ingeklapt.png" alt="v5 Werkbank, Zijbalk ingeklapt" loading="lazy"></figure>
+<figure><figcaption>v6 Groot lezen<a href="http://localhost:5173/?ontwerp=v6#/lukas/22">live</a></figcaption><img class="wissel" data-v="v6" data-s="ingeklapt" src="v6-1440-normaal-ingeklapt.png" alt="v6 Groot lezen, Zijbalk ingeklapt" loading="lazy"></figure>
+</div>
+<h3>Bewaarstatus en back-up</h3><div class="rooster">
+<figure><figcaption>v1 Compact<a href="http://localhost:5173/?ontwerp=v1#/lukas/22">live</a></figcaption><img class="wissel" data-v="v1" data-s="bewaren" src="v1-1440-normaal-bewaren.png" alt="v1 Compact, Bewaarstatus en back-up" loading="lazy"></figure>
+<figure><figcaption>v2 Twee balken<a href="http://localhost:5173/?ontwerp=v2#/lukas/22">live</a></figcaption><img class="wissel" data-v="v2" data-s="bewaren" src="v2-1440-normaal-bewaren.png" alt="v2 Twee balken, Bewaarstatus en back-up" loading="lazy"></figure>
+<figure><figcaption>v3 Hoofdstukstrip<a href="http://localhost:5173/?ontwerp=v3#/lukas/22">live</a></figcaption><img class="wissel" data-v="v3" data-s="bewaren" src="v3-1440-normaal-bewaren.png" alt="v3 Hoofdstukstrip, Bewaarstatus en back-up" loading="lazy"></figure>
+<figure><figcaption>v4 Volle breedte<a href="http://localhost:5173/?ontwerp=v4#/lukas/22">live</a></figcaption><img class="wissel" data-v="v4" data-s="bewaren" src="v4-1440-normaal-bewaren.png" alt="v4 Volle breedte, Bewaarstatus en back-up" loading="lazy"></figure>
+<figure><figcaption>v5 Werkbank<a href="http://localhost:5173/?ontwerp=v5#/lukas/22">live</a></figcaption><img class="wissel" data-v="v5" data-s="bewaren" src="v5-1440-normaal-bewaren.png" alt="v5 Werkbank, Bewaarstatus en back-up" loading="lazy"></figure>
+<figure><figcaption>v6 Groot lezen<a href="http://localhost:5173/?ontwerp=v6#/lukas/22">live</a></figcaption><img class="wissel" data-v="v6" data-s="bewaren" src="v6-1440-normaal-bewaren.png" alt="v6 Groot lezen, Bewaarstatus en back-up" loading="lazy"></figure>
+</div>
+<h3>Keuzes en vragen</h3><div class="rooster">
+<figure><figcaption>v1 Compact<a href="http://localhost:5173/?ontwerp=v1#/lukas/begrippen/besloten">live</a></figcaption><img class="wissel" data-v="v1" data-s="keuzes" src="v1-1440-normaal-keuzes.png" alt="v1 Compact, Keuzes en vragen" loading="lazy"></figure>
+<figure><figcaption>v2 Twee balken<a href="http://localhost:5173/?ontwerp=v2#/lukas/begrippen/besloten">live</a></figcaption><img class="wissel" data-v="v2" data-s="keuzes" src="v2-1440-normaal-keuzes.png" alt="v2 Twee balken, Keuzes en vragen" loading="lazy"></figure>
+<figure><figcaption>v3 Hoofdstukstrip<a href="http://localhost:5173/?ontwerp=v3#/lukas/begrippen/besloten">live</a></figcaption><img class="wissel" data-v="v3" data-s="keuzes" src="v3-1440-normaal-keuzes.png" alt="v3 Hoofdstukstrip, Keuzes en vragen" loading="lazy"></figure>
+<figure><figcaption>v4 Volle breedte<a href="http://localhost:5173/?ontwerp=v4#/lukas/begrippen/besloten">live</a></figcaption><img class="wissel" data-v="v4" data-s="keuzes" src="v4-1440-normaal-keuzes.png" alt="v4 Volle breedte, Keuzes en vragen" loading="lazy"></figure>
+<figure><figcaption>v5 Werkbank<a href="http://localhost:5173/?ontwerp=v5#/lukas/begrippen/besloten">live</a></figcaption><img class="wissel" data-v="v5" data-s="keuzes" src="v5-1440-normaal-keuzes.png" alt="v5 Werkbank, Keuzes en vragen" loading="lazy"></figure>
+<figure><figcaption>v6 Groot lezen<a href="http://localhost:5173/?ontwerp=v6#/lukas/begrippen/besloten">live</a></figcaption><img class="wissel" data-v="v6" data-s="keuzes" src="v6-1440-normaal-keuzes.png" alt="v6 Groot lezen, Keuzes en vragen" loading="lazy"></figure>
+</div>
+<h2 id="verzen">Dichte verzen d1 tot d3 (op v1)</h2>
+<p>Wisselen met <code>?verzen=d1</code>, <code>d2</code> of <code>d3</code>, ook naast <code>?ontwerp=v1</code> tot <code>v6</code>. Een keuzestrook staat rechtsonder boven die van de ontwerpen; <code>ruim</code> is de huidige indeling. Schermafbeeldingen: <code>d1-1440-lezen.png</code> enzovoort, met <code>nu-</code> ter vergelijking.</p>
+<p><strong>Gemeenschappelijk (alle drie).</strong> Minder witruimte in de rijen (<code>verzen/dicht.css</code>): de gemiddelde rij in Lukas 22 gaat van 159 naar 76 px, de totale hoogte van 11.296 naar 5.390 px. De rijhoogte komt nu van bron en vereenvoudiging, niet van de vertaalregels. Bewerken, de naslagkaart onder het vers, de vraagmarkering en Escape werken in alle drie.</p>
+<table><tr><td>Verzen per scherm (Lukas 22, v1)</td><td>nu</td><td>d1, d2, d3</td></tr><tr><td>1440 x 900, eerste scherm / gemiddeld</td><td>4 / 5,0</td><td>10 / 10,5</td></tr><tr><td>1920 x 1080, eerste scherm / gemiddeld</td><td>5 / 6,2</td><td>13 / 12,9</td></tr></table>
+<p><strong>d1 Overloop zweeft.</strong> De cel is zo hoog als het vers; wat niet past vervaagt. Bij aanwijzen (na 0,18 s) of toetsenbordfocus klapt hij uit over de volgende verzen, zonder dat de tekst verschuift; &quot;nog N regels&quot; werkt in het vak.</p>
+<ul>
+<li>Sterk: de kolom blijft op zijn plek en de regels staan altijd naast hun vers; het kleinste ingrijpen.</li>
+<li>Zwak: de vervaging verbergt de verwijzingen (§, precedent) en de vraag tot je aanwijst; je ziet niet hoeveel er verborgen is, behalve aan de vervaging.</li>
+</ul>
+<p><strong>d2 Samenvatting.</strong> Per vers één regel: de eerste vertaalregel ingekort, met de labels §, precedent en vraag. Aanwijzen of focus opent onder het vers een breed vak in kolommen met alle regels; het vers zelf blijft leesbaar. Het vak ligt over bron en vereenvoudiging van de volgende verzen, want de vereenvoudiging staat tussen bron en vertaalregels en kan niet worden overgeslagen.</p>
+<ul>
+<li>Sterk: de rustigste pagina, en de labels geven in één blik waar een vraag of precedent zit; alle regels staan in een breed, leesbaar vak.</li>
+<li>Zwak: de regels lezen kost altijd een aanwijsbeweging; het vak dekt het volgende vers af. &quot;Nog N regels&quot; is hier niet nodig (het vak toont alles).</li>
+</ul>
+<p><strong>d3 Kanttekeningen.</strong> De regels staan als notities in de rechtermarge, uitgelijnd met hun vers; loopt er een door, dan schuiven de volgende omlaag (<code>plaatsNotities</code>, getest) en krijgen ze het versnummer ervoor. Een notitie toont één regel plus &quot;nog N regels&quot;, en mag bij schermen vanaf 1400 px verder doorlopen dan de tabel.</p>
+<ul>
+<li>Sterk: niets zweeft of verbergt zich; alles blijft zichtbaar en klikbaar naast het vers.</li>
+<li>Zwak: de lange logregels maken de notities hoger dan de verzen. Met de eerste opzet (regel en knop onder elkaar, in een smallere marge) liep de verschuiving in Lukas 22 op tot 1060 px; nu is het hoogstens 86 px. Een uitgeklapte notitie duwt de volgende omlaag. Vraagt JS (metingen).</li>
+</ul>
+<p><strong>Gemeten.</strong> Opmaakcontrole (<code>opmaakcontrole.mjs</code> met <code>?ontwerp=v1&amp;verzen=dN</code>): 0 afwijkingen op Lukas 1, 4 en 22 bij alle drie; de vakken en notities zitten in <code>td.regels</code>, dat de controle uitsluit omdat het geen Bijbeltekst is. 0 consolefouten. Geen overlap van notities bij 1100, 1280, 1440 en 1700 px, bij bewerken en bij uitklappen.</p>
+<h3>Lezen</h3><div class="rooster4">
+<figure><figcaption>nu (ruim)</figcaption><img class="wisselb" data-bestand="nu-{b}-lezen.png" src="nu-1440-lezen.png" alt="nu" loading="lazy"></figure>
+<figure><figcaption>d1 Overloop zweeft<a href="http://localhost:5173/?ontwerp=v1&verzen=d1#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d1-{b}-lezen.png" src="d1-1440-lezen.png" alt="d1 Overloop zweeft, Lezen" loading="lazy"></figure>
+<figure><figcaption>d2 Samenvatting<a href="http://localhost:5173/?ontwerp=v1&verzen=d2#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d2-{b}-lezen.png" src="d2-1440-lezen.png" alt="d2 Samenvatting, Lezen" loading="lazy"></figure>
+<figure><figcaption>d3 Kanttekeningen<a href="http://localhost:5173/?ontwerp=v1&verzen=d3#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d3-{b}-lezen.png" src="d3-1440-lezen.png" alt="d3 Kanttekeningen, Lezen" loading="lazy"></figure>
+</div>
+<h3>Vertaalregels uitgeklapt bij een vers met veel regels</h3><div class="rooster4">
+<figure><figcaption>d1 Overloop zweeft<a href="http://localhost:5173/?ontwerp=v1&verzen=d1#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d1-{b}-uitgeklapt.png" src="d1-1440-uitgeklapt.png" alt="d1 Overloop zweeft, Vertaalregels uitgeklapt bij een vers met veel regels" loading="lazy"></figure>
+<figure><figcaption>d2 Samenvatting<a href="http://localhost:5173/?ontwerp=v1&verzen=d2#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d2-{b}-uitgeklapt.png" src="d2-1440-uitgeklapt.png" alt="d2 Samenvatting, Vertaalregels uitgeklapt bij een vers met veel regels" loading="lazy"></figure>
+<figure><figcaption>d3 Kanttekeningen<a href="http://localhost:5173/?ontwerp=v1&verzen=d3#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d3-{b}-uitgeklapt.png" src="d3-1440-uitgeklapt.png" alt="d3 Kanttekeningen, Vertaalregels uitgeklapt bij een vers met veel regels" loading="lazy"></figure>
+</div>
+<h3>Bewerken</h3><div class="rooster4">
+<figure><figcaption>d1 Overloop zweeft<a href="http://localhost:5173/?ontwerp=v1&verzen=d1#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d1-{b}-bewerken.png" src="d1-1440-bewerken.png" alt="d1 Overloop zweeft, Bewerken" loading="lazy"></figure>
+<figure><figcaption>d2 Samenvatting<a href="http://localhost:5173/?ontwerp=v1&verzen=d2#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d2-{b}-bewerken.png" src="d2-1440-bewerken.png" alt="d2 Samenvatting, Bewerken" loading="lazy"></figure>
+<figure><figcaption>d3 Kanttekeningen<a href="http://localhost:5173/?ontwerp=v1&verzen=d3#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d3-{b}-bewerken.png" src="d3-1440-bewerken.png" alt="d3 Kanttekeningen, Bewerken" loading="lazy"></figure>
+</div>
+<h3>Naslagkaart open</h3><div class="rooster4">
+<figure><figcaption>d1 Overloop zweeft<a href="http://localhost:5173/?ontwerp=v1&verzen=d1#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d1-{b}-naslag.png" src="d1-1440-naslag.png" alt="d1 Overloop zweeft, Naslagkaart open" loading="lazy"></figure>
+<figure><figcaption>d2 Samenvatting<a href="http://localhost:5173/?ontwerp=v1&verzen=d2#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d2-{b}-naslag.png" src="d2-1440-naslag.png" alt="d2 Samenvatting, Naslagkaart open" loading="lazy"></figure>
+<figure><figcaption>d3 Kanttekeningen<a href="http://localhost:5173/?ontwerp=v1&verzen=d3#/lukas/22">live</a></figcaption><img class="wisselb" data-bestand="d3-{b}-naslag.png" src="d3-1440-naslag.png" alt="d3 Kanttekeningen, Naslagkaart open" loading="lazy"></figure>
+</div>
+<h2 id="combi">Combinaties (1440 px)</h2>
+<h3>v4 met ruim, d1, d2 en d3</h3><div class="rooster4">
+<figure><figcaption>v4 + ruim</figcaption><img src="combi-v4-ruim-1440.png" alt="v4 met ruim" loading="lazy"></figure>
+<figure><figcaption>v4 + d1</figcaption><img src="combi-v4-d1-1440.png" alt="v4 met d1" loading="lazy"></figure>
+<figure><figcaption>v4 + d2</figcaption><img src="combi-v4-d2-1440.png" alt="v4 met d2" loading="lazy"></figure>
+<figure><figcaption>v4 + d3</figcaption><img src="combi-v4-d3-1440.png" alt="v4 met d3" loading="lazy"></figure>
+</div>
+<h3>v6 met ruim, d1, d2 en d3</h3><div class="rooster4">
+<figure><figcaption>v6 + ruim</figcaption><img src="combi-v6-ruim-1440.png" alt="v6 met ruim" loading="lazy"></figure>
+<figure><figcaption>v6 + d1</figcaption><img src="combi-v6-d1-1440.png" alt="v6 met d1" loading="lazy"></figure>
+<figure><figcaption>v6 + d2</figcaption><img src="combi-v6-d2-1440.png" alt="v6 met d2" loading="lazy"></figure>
+<figure><figcaption>v6 + d3</figcaption><img src="combi-v6-d3-1440.png" alt="v6 met d3" loading="lazy"></figure>
+</div>
+<h2 id="notities">Toelichting per variant</h2><div class="notities">
+<div><h3>v1 Compact</h3><p>Alles op één lage balk (ongeveer 2,5 rem), met de tekst als hoofdzaak. Opmaak in <code>src/app/ontwerp/v1.css</code>; schermen in deze map als <code>v1-&lt;breedte&gt;-&lt;grootte&gt;-&lt;scherm&gt;.png</code>.</p>
+<p><strong>Wat de variant kiest</strong></p>
+<ul>
+<li>Links het boek als stille link (gedempt) en de hoofdstuktitel als enige vette element, met een dunne lijn ertussen. Rechts de twee acties (kleiner, op één regel), de bewaarstatus als stille regel met een pijltje, en de grootte-keuze als één streepje.</li>
+<li>De bewaarstatus is tekst met een menu. Het menu is een vlak met rijen (uitleg, Back-up downloaden, Back-up inladen, Overzicht), geen knoppen in een kader.</li>
+<li>De naam van het boek en het kaartje Keuzes en vragen verdwijnen uit de zijbalk. Het boek staat al in de balk; Keuzes en vragen is een gewone rij zoals een hoofdstuk, rood alleen als de pagina open is.</li>
+<li>De zijbalk scrolt zelf en de pijl staat onderaan in de stroom, zodat hij nooit over een hoofdstuk valt (dat gebeurde bij +2 met de sticky pijl).</li>
+<li>De kolommen staan in het midden zodra er ruimte over is (1920 px), in plaats van links met een lege rechterkant. Bij 1440 px vullen ze de pagina.</li>
+<li>&quot;n verzen bewerkt&quot; in de balk verschijnt pas vanaf 1600 px; op smallere schermen zegt de bewaarstatus hetzelfde.</li>
+</ul>
+<p><strong>Sterk</strong>: laagste balk, rustigste beeld, geen sprongen bij inklappen of bij +2 (de balk past op 1440 px ook bij A++). Weinig opmaak boven op de basis.</p>
+<p><strong>Zwak</strong>: de bewaarstatus is lang en wordt bij een smal scherm afgekapt. Ingeklapt staat Keuzes en vragen als kleine link naast de boeknaam, minder zichtbaar dan het kaartje in de zijbalk. Het aantal bewerkte verzen in het hoofdstuk valt onder 1600 px weg.</p>
+<p><strong>Markupwensen</strong></p>
+<ul>
+<li>Het aantal bewerkte verzen per hoofdstuk hoort in het bewaarmenu in plaats van in de balk.</li>
+<li>Een korte vorm van de bewaarstatus (bv. &quot;Bewaard 06:08&quot;) naast de lange in het menu, zodat er niets afgekapt hoeft.</li>
+<li>De hoofdstuktitel in de balk zou de boeknaam kunnen bevatten zodat de aparte boeklink alleen een home-pijl hoeft te zijn.</li>
+</ul></div>
+<div><h3>v2 Twee balken</h3><h4>Keuzes</h4>
+<ul>
+<li>Grijs is &quot;het hele boek&quot;, wit is &quot;dit hoofdstuk&quot;: de grijze boekbalk en de grijze zijbalk vormen een L om de witte werkplek.</li>
+<li>De hoofdstukbalk is links grijs (zo breed als de zijbalk, ook ingeklapt) en rechts wit. De titel staat op de linkerrand van de tabel, de acties eindigen bij de vertaalregels.</li>
+<li>De boekbalk sluit rechts op dezelfde rand aan (168ch), zodat de balken op 1920 px niet uit elkaar drijven. Onder 60rem valt de L weg.</li>
+<li>De zijbalkkop &quot;Lukas&quot; is nog alleen voor schermlezers, want de boekbalk noemt het boek.</li>
+<li>Bewaarstatus is stille tekst met een pijltje voor het menu. Keuzes en vragen in de boekbalk is wit op grijs, rood als het de pagina is.</li>
+</ul>
+<h4>Sterk</h4>
+<ul>
+<li>Duidelijke scheiding zonder lijnen, kaartjes of schaduw; rood alleen voor actieve plek en hoofdactie.</li>
+<li>Titel en acties staan boven de kolommen waar ze over gaan. Opmaakcontrole 0 afwijkingen (Lukas 1, 4, 22), 0 consolefouten.</li>
+</ul>
+<h4>Zwak</h4>
+<ul>
+<li>Twee balken kosten 75 px (normaal) tot 85 px (A++) hoogte bij elke scroll.</li>
+<li>Het bewaarmenu bedekt op 1920 de hoofdactie zolang het open staat.</li>
+<li>Ingeklapt en A++ is de lijst hoger dan het scherm; de pijl ligt dan over het laatste hoofdstuk tot je scrolt.</li>
+</ul>
+<h4>Markupwensen</h4>
+<ul>
+<li><code>--links</code> (zijbalkbreedte) en <code>--inhoud-breedte</code> (nu 168ch, overgetypt in v2.css) als gedeelde variabelen op <code>&lt;html&gt;</code>, zonder <code>:has()</code>.</li>
+<li>Een paginaklasse (<code>hoofdstuk</code>, <code>begrippen</code>, <code>bewaard</code>) op de balk; de zijbalkkop weglaten als er een boekbalk is.</li>
+</ul></div>
+<div><h3>v3 Hoofdstukstrip</h3><p>Eén balk van twee regels (boek, Keuzes en vragen, titel, acties, bewaarstatus, grootte; daaronder de strip), geen zijbalk, de tabel over de hele breedte. Alleen <code>src/app/ontwerp/v3.css</code> is gewijzigd.</p>
+<ul>
+<li>Strip als tekst zonder kaders: nummer vet, vinkje en <code>N?</code> als bijzaak, een dun streepje tussen hoofdstukken (anders leest <code>12 2? 13</code> fout). Het huidige hoofdstuk is het enige rode vlak in de balk.</li>
+<li>Eén rij die zijwaarts schuift: de balk blijft 63 px hoog bij 24 en bij 150 hoofdstukken (getest met 126 extra items in de DOM). De rand vervaagt aan de kant met meer hoofdstukken (scroll-gestuurde animatie, alleen actief bij overloop).</li>
+<li>Lichter dan de basis: Keuzes en vragen is een onderstreepte link, grootte is vier letters met een streep onder de gekozen. Rood blijft bij hoofdactie, huidig hoofdstuk en focus.</li>
+<li>De letter groeit met het scherm (13 px tot 1440, 17,3 px op 1920, hoogstens 19 px), zodat het aantal tekens per regel gelijk blijft.</li>
+</ul>
+<p>Tekens per regel in de vereenvoudiging (mediaan van volle regels, Lukas 4 en 22): normaal 80 op 1440 en 80 tot 82 op 1920; groot (A++) 67 tot 68 op 1440 en 68 op 1920. Bron: 72 tot 73 (normaal), 60 tot 62 (groot). Ruimer dan de 65 van de leesbreedtevarianten bij normaal; groot zit eronder.</p>
+<p>Controle: <code>opmaakcontrole.mjs</code> met <code>?ontwerp=v3</code> op Lukas 1, 4, 22: 0 afwijkingen. 0 consolefouten op alle zestien schermen.</p>
+<p>Kritisch: de balk is twee regels (63 px normaal, ongeveer 70 groot), de prijs van de strip; op 900 px staat de grootte op een derde regel. Een ingeklapt scherm bestaat niet in v3: <code>ingeklapt</code> is de strip op 900 px met vervaagde rand. Schuiven met een gewoon muiswiel werkt niet.</p>
+<p>Markupwensen (niet gedaan): een label of <code>title</code> &quot;Hoofdstukken&quot; op de strip met knoppen <code>&lt;</code> en <code>&gt;</code> bij overloop; wiel omlaag laten schuiven in de strip (JS); in v3 de titel zonder boek, want <code>Lukas</code> staat er al.</p></div>
+<div><h3>v4 Volle breedte</h3><p>Eén balk, zijbalk inklapbaar, hele schermbreedte met de kolomverhouding van nu, bewaarstatus als icoon met venster. Alleen <code>src/app/ontwerp/v4.css</code>.</p>
+<ul>
+<li>De letter groeit evenredig met het scherm (<code>0,9vw</code>, tussen 13 en 22 px), zodat het aantal tekens per regel gelijk blijft. Zonder die regel waren het op 1920 px 79 tot 86.</li>
+<li>Ingeklapt winnen de kolommen ongeveer 130 px; de letter wordt dan 5 procent groter, anders worden de regels te lang.</li>
+<li>Ingeklapte strook 6 rem (<code>1 ✓ 3?</code> paste niet in 5,25 rem); lagere hoofdstukrijen, zodat 24 hoofdstukken op 1920 px zonder scrollen passen.</li>
+<li>Kolomkoppen blijven onder de balk staan; een gekozen vers scrolt eronder uit.</li>
+<li>Balk breekt niet om; de titel neemt de ruimte, dus bewaarstatus en grootte staan ook op Keuzes en vragen rechts.</li>
+</ul>
+<p>Tekens per regel in de vereenvoudiging (mediaan, bereik; Lukas 22):</p>
+<table><tr><td>breedte</td><td>grootte</td><td>zijbalk uit</td><td>zijbalk in</td></tr><tr><td>1440</td><td>normaal</td><td>70 (61 tot 77)</td><td>72 (61 tot 78)</td></tr><tr><td>1440</td><td>groot</td><td>57 (48 tot 63)</td><td>60 (48 tot 67)</td></tr><tr><td>1920</td><td>normaal</td><td>71 (61 tot 78)</td><td>72 (61 tot 78)</td></tr><tr><td>1920</td><td>groot</td><td>58 (48 tot 64)</td><td>60 (48 tot 67)</td></tr></table>
+<p>Opmaakcontrole <code>?ontwerp=v4</code> (Lukas 1, 4, 22): 0 afwijkingen. 0 consolefouten. Typecheck en tests groen.</p>
+<p>Markupwensen: de zijbalk naar het huidige hoofdstuk laten scrollen (bij groot op 1920 px valt 22 buiten beeld); een eigen klasse op de hoofdstuklijst voor de ruimte boven de pijl; naslagkaart onder de sticky kolomkoppen niet getest.</p></div>
+<div><h3>v5 Werkbank</h3><p>Twee balken, zijbalk inklapbaar, breedte in tekens, bewaarstatus als link naar <code>#/lukas/bewaard</code>. Alleen <code>src/app/ontwerp/v5.css</code>. Schermen: <code>v5-&lt;breedte&gt;-&lt;grootte&gt;-&lt;scherm&gt;.png</code>.</p>
+<ul>
+<li><strong>Balk</strong>: boekbalk compact met een dunne lijn eronder. De bewaarstatus is een korte link (icoon, &quot;Bewaard: 5 verzen in 2 hoofdstukken, 1 keuze&quot;, een <code>›</code>). Op de overzichtspagina onderstreept in rood als actieve plek en zonder pijl.</li>
+<li><strong>Overzichtspagina</strong>: kop en samenvatting links, per hoofdstuk een lijst met dunne lijnen zoals de tabellen bij Keuzes en vragen (vers, tijd, label &quot;verouderd&quot; als gevuld blokje). Rechts een vaste kolom Back-up met een dunne lijn, zonder kader: Back-up downloaden is de hoofdactie (rood), Back-up inladen is een omlijnde knop. Onder 64rem komt de back-up boven de lijst.</li>
+<li><strong>Tweede balk op de overzichtspagina</strong>: die staat dan uit (<code>:has(.bewaard-overzicht)</code>), want de titel staat al als kop op de pagina.</li>
+<li><strong>Venster Back-up inladen</strong>: kop met lijn, ruimere marges, knoppen onder een lijn.</li>
+</ul>
+<h4>Markupwensen</h4>
+<p>1. <code>.bewaard-acties</code> krijgt een eigen kop &quot;Back-up&quot; en een uitleg als echte tekst; nu komen die uit <code>::before</code> en <code>::after</code> in de css (tijdelijk, weg zodra de markup er is).</p>
+<p>2. <code>.bewaard-regel</code> begint met &quot;Bewaard in deze browser&quot;, precies de kop erboven. Zonder dat voorvoegsel leest de samenvatting beter.</p>
+<p>3. Back-up downloaden hoort uit (<code>disabled</code>) als er niets bewaard is.</p>
+<p>4. De melding &quot;Back-up gedownload&quot; hoort naast de knoppen te staan, niet onder de samenvatting; nu staat hij in de linkerkolom omdat de rechterkolom vast is.</p>
+<p>5. Een link &quot;Bewaard&quot; in de zijbalk naast Keuzes en vragen zou de pagina ook vanuit de navigatie bereikbaar maken.</p>
+<p>6. Per hoofdstuk het aantal verzen in de kop (<code>h2</code>), en een knop &quot;Hoofdstuk terug naar de repo&quot; naast de lijst.</p>
+<p>Opmaakcontrole (<code>?ontwerp=v5</code>, Lukas 1, 4 en 22): 0 afwijkingen. 0 consolefouten.</p></div>
+<div><h3>v6 Groot lezen</h3><p>Alleen <code>src/app/ontwerp/v6.css</code>. Schermafbeeldingen: <code>v6-&lt;1440|1920&gt;-&lt;normaal|groot&gt;-&lt;lezen|ingeklapt|uitgeklapt|bewaren|keuzes&gt;.png</code>. Hier is <code>normaal</code> de standaard +1 (schaal 1,08, 1 rem = 14 px) en <code>groot</code> stap +2 (1 rem = 15 px).</p>
+<p><strong>Aanpak.</strong> De kleine delen groeien harder dan de vereenvoudiging. De basis had vereenvoudiging : bron : vertaalregels = 1 : 0,74 : 0,61; v6 maakt er 1 : 0,78 : 0,68. Kolombreedtes volgen uit een aantal tekens (52 bron, 62 vereenvoudiging, 42 vertaalregels) maal de gemiddelde tekenbreedte, dus ze groeien mee met de grootte en krimpen op een smal scherm in tekens in plaats van te schuiven. Rijen staan op één basislijn. De kopregel blijft onder de balk staan.</p>
+<p><strong>Gemeten (px, +1 / +2).</strong></p>
+<ul>
+<li>Vereenvoudiging 19,0 / 20,4 (basis bij Normaal: 15,4).</li>
+<li>Bron 14,7 / 15,8 (basis 11,4). Vertaalregels 12,9 / 13,9 (basis 9,4).</li>
+<li>Versnummer 13,3 / 14,3. Kopregel en labels 11,2 / 12,1. Zijbalk: nummers 14,0 / 15,1, vinkje en vragen 12,0 / 12,8.</li>
+<li>Balk: 35 / 38 px hoog (v1 +1: 42), tekst in de balk 12,6 / 13,6 (was 10,5).</li>
+<li>Ingeklapte zijbalk 81 / 87 px breed. Uitgeklapt 16 rem, met 2,4 rem brede nummervakjes.</li>
+<li>Tekens per regel (bron / vereenvoudiging / regels): 1920 px 52 / 62 / 42 bij beide groottes; 1440 px 52 / 62 / 42 bij +1 en 51 / 60 / 41 bij +2.</li>
+<li>Tabel 1233 px bij +1 (past in 1440 px met 1359 px main), 1324 px bij +2 op 1920 px.</li>
+</ul>
+<p><strong>Opmaakcontrole</strong> (<code>?ontwerp=v6</code>, Lukas 1, 4, 22): 0 afwijkingen. 0 consolefouten in alle schermen.</p>
+<p><strong>Markupwensen.</strong> (1) De versrij en de naslagrij in een tabel laten als nu, maar de titel in de balk (<code>.bovenbalk-titel</code>) een eigen klasse voor de status geven; nu moet v6 <code>.status</code> binnen de balk selecteren. (2) De zijbalk uitgeklapt past op 900 px hoogte niet bij +2 (24 hoofdstukken); de pijl onderaan overlapt dan rijen. De pijl hoort buiten de scrollende lijst te staan. (3) Een gedeelde variabele voor tekenbreedte (0,44 em) in <code>vormgeving.css</code> in plaats van per variant.</p></div>
+</div>
+<script>
+const kies=()=>{const b=document.querySelector('input[name=b]:checked').value,g=document.querySelector('input[name=g]:checked').value;
+document.querySelectorAll('img.wissel').forEach(i=>{let gr=g; if(i.dataset.v==='v6'&&g==='normaal'){gr='normaal'} i.src=`${i.dataset.v}-${b}-${gr}-${i.dataset.s}.png`});
+document.querySelectorAll('img.wisselb').forEach(i=>{i.src=i.dataset.bestand.replace('{b}',b)})};
+document.querySelectorAll('.schakel input').forEach(x=>x.addEventListener('change',kies));
+</script>
