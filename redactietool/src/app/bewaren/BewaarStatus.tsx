@@ -4,6 +4,7 @@ import { BEWAARD_NAAM } from '../navigatie/boekplekken';
 import { bewaarRegel, bewaarTelling } from './bewaarTekst';
 import { useBackupStand } from './useBackupStand';
 import { useBewaardOverzicht } from './useBewaardOverzicht';
+import { useNetOpgeslagen } from './useNetOpgeslagen';
 import './bewaren.css';
 
 type Props = {
@@ -21,14 +22,24 @@ function OpslagIcoon() {
 	);
 }
 
+function OpslaanIcoon() {
+	return (
+		<svg class="bewaarstatus-icoon bewaarstatus-bezig" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false">
+			<circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".25" />
+			<path d="M10 3a7 7 0 0 1 7 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+		</svg>
+	);
+}
+
 /** Laat zien dat en wat de browser bewaart, als link naar de pagina Opgeslagen; Back-up downloaden en inladen staan op die pagina. */
 export function BewaarStatus({ boek, overzichtOpen }: Props) {
 	const overzicht = useBewaardOverzicht(boek);
 	const backup = useBackupStand(boek.id, overzicht);
+	const netOpgeslagen = useNetOpgeslagen();
 	const regel = [bewaarRegel(overzicht), backup.regel, backup.herinnering].filter((deel) => deel !== null).join('. ');
 	return (
 		<a class="bewaarstatus bewaarstatus-pagina" href={maakAdres({ soort: 'bewaard', boek: boek.id })} aria-current={overzichtOpen ? 'page' : undefined} title={regel}>
-			<OpslagIcoon />
+			{netOpgeslagen ? <OpslaanIcoon /> : <OpslagIcoon />}
 			<span class="bewaarstatus-tekst">{BEWAARD_NAAM}: {bewaarTelling(overzicht)}</span>
 			{backup.herinnering !== null && <span class="bewaarstatus-herinnering">Maak een back-up</span>}
 			<span class="alleen-lezers">. {regel}</span>

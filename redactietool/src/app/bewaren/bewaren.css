@@ -231,3 +231,14 @@
 	font-size: 0.6875rem;
 	white-space: nowrap;
 }
+
+/* Een seconde na elke wijziging draait een cirkel in plaats van de diskette. */
+.bewaarstatus-bezig {
+	animation: bewaarstatus-draai 0.8s linear infinite;
+}
+
+@keyframes bewaarstatus-draai {
+	to {
+		transform: rotate(360deg);
+	}
+}
