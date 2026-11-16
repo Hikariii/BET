@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
-import { antwoordToestand, bewaarAntwoord, leesAntwoorden, verwijderAntwoord, type Antwoord } from '../../antwoorden/antwoorden';
-import { leesKeuzes } from '../../vervangen/keuzes';
+import { EIGEN_ANTWOORD, leesAntwoorden, legAntwoordVast, levendeKeuzeIds, pasToelichtingAan, trekAntwoordIn, type Antwoord, type Uitkomst } from '../../antwoorden/antwoorden';
+import { leesKeuzes, type StructureleKeuze } from '../../vervangen/keuzes';
 import { isHoudOptie, maakVoorstel, splitsOpties } from '../../begrippen/opties';
 import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels, type VragenFilter } from '../../begrippen/vragenOverzicht';
 import { verzamelVragen } from '../../begrippen/verzamelVragen';
@@ -15,19 +15,25 @@ import { browseropslag } from '../bewerken/useTussenstand';
 import { useOpslagTeller } from '../bewaren/useOpslagTeller';
 import type { TabbladProps } from './tabbladProps';
 import { VersLinks } from './VersLinks';
-import { bouwHoofdstukVerzen } from './vervangenVoorbeeld';
+import { bouwHoofdstukVerzen, keuzeBeschrijving, kortUit, optieOmschrijving } from './vervangenVoorbeeld';
 import './vertaalvragen.css';
 
 const STATUSSEN: readonly VraagStatus[] = ['open', 'onbeslist', 'voorlopig besloten', 'besloten'];
 const KORT_AANTAL_VERZEN = 3;
 const GEEN_VERS_IN_KOP = 'Geen vers in de kop';
 
-/** Wat een registervraag kan doen met een optie; elke actie geeft een melding voor de vertaler, of `null` als er niets te melden is. */
+/** Wat een registervraag kan doen met een antwoord. `kies` geeft een melding voor de vertaler, of `null` als Zoeken en vervangen opent; de rest geeft een uitkomst met melding. */
 type Antwoordacties = {
 	kies: (vraag: Vertaalvraag, optie: string) => string | null;
-	legVast: (vraag: Vertaalvraag, optie: string) => string;
-	trekIn: (vraag: Vertaalvraag) => string;
+	legVast: (vraag: Vertaalvraag, optie: string, toelichting: string) => Uitkomst;
+	pasToelichtingAan: (vraag: Vertaalvraag, toelichting: string) => Uitkomst;
+	trekIn: (vraag: Vertaalvraag, bestaandeKeuzes: ReadonlySet<string>) => Uitkomst;
 };
+
+/** De uitkomst van een actie als tekst voor de melding: bij succes de gegeven bevestiging. */
+function meldingVan(uitkomst: Uitkomst, bevestiging: string): string {
+	return uitkomst.gelukt ? bevestiging : uitkomst.melding;
+}
 
 /** Tabblad Vertaalvragen: het register en de vragen uit de logs, met status, herkomst en verzen. */
 export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) {
@@ -41,7 +47,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	const sleutel = (vraag: Vertaalvraag): string => sleutels.get(vraag) ?? '';
 	const opslagTeller = useOpslagTeller();
 	const antwoorden = useMemo(() => new Map(leesAntwoorden(browseropslag(), boek.id).map((antwoord) => [antwoord.kwestie, antwoord])), [boek.id, opslagTeller]);
-	const bestaandeKeuzes = useMemo(() => new Set(leesKeuzes(browseropslag(), boek.id).map((keuze) => keuze.id)), [boek.id, opslagTeller]);
+	const bestaandeKeuzes = useMemo(() => new Map(leesKeuzes(browseropslag(), boek.id).map((keuze) => [keuze.id, keuze])), [boek.id, opslagTeller]);
 	const acties = maakAntwoordacties(boek.id, () => bouwHoofdstukVerzen(hoofdstukken, boek, (hoofdstuk) => leesTussenstand(browseropslag(), boek.id, hoofdstuk)));
 	const registervraag = (vraag: Vertaalvraag) => (
 		<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} antwoord={antwoorden.get(vraag.kwestie) ?? null} bestaandeKeuzes={bestaandeKeuzes} acties={acties} />
@@ -133,46 +139,32 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 }
 
 function maakAntwoordacties(boek: string, bouwVerzen: () => HoofdstukVerzen[]): Antwoordacties {
-	const legVast = (vraag: Vertaalvraag, optie: string): string => {
-		const bewaard = bewaarAntwoord(browseropslag(), boek, { kwestie: vraag.kwestie, optie, keuzeId: null, gegeven: new Date().toISOString() });
-		return bewaard ? `Antwoord vastgelegd: optie ${optie}, zonder wijziging in de tekst.` : 'Het antwoord kon niet worden bewaard, waarschijnlijk is de opslag vol.';
-	};
+	const legVast = (vraag: Vertaalvraag, optie: string, toelichting: string): Uitkomst =>
+		legAntwoordVast(browseropslag(), boek, { kwestie: vraag.kwestie, optie, toelichting }, new Date());
 	return {
 		kies(vraag, optie) {
 			// "… houden": er verandert niets aan de tekst, dus alleen het antwoord vastleggen (anders zou de wissel de plaatselijke keuzes terugdraaien).
-			if (isHoudOptie(optie)) return legVast(vraag, optie);
+			if (isHoudOptie(optie)) return meldingVan(legVast(vraag, optie, ''), `Antwoord vastgelegd: ${optieOmschrijving(optie)}, zonder wijziging in de tekst.`);
 			const voorstel = maakVoorstel(vraag, optie, (zoekterm) => domeinenOpZoekterm(bouwVerzen(), zoekterm, { soort: 'verzen', verzen: vraag.verzen }));
 			if (!bewaarVoorstel(sessieopslag(), boek, voorstel)) return 'De browser staat niet toe dat de keuze aan Zoeken en vervangen wordt doorgegeven.';
 			window.location.hash = maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' });
 			return null;
 		},
 		legVast,
-		trekIn(vraag) {
-			verwijderAntwoord(browseropslag(), boek, vraag.kwestie);
-			return 'Antwoord ingetrokken.';
-		},
+		pasToelichtingAan: (vraag, toelichting) => pasToelichtingAan(browseropslag(), boek, vraag.kwestie, toelichting, new Date()),
+		trekIn: (vraag, bestaandeKeuzes) => trekAntwoordIn(browseropslag(), boek, vraag.kwestie, bestaandeKeuzes),
 	};
 }
 
-type RegisterVraagProps = { boek: string; vraag: Vertaalvraag; antwoord: Antwoord | null; bestaandeKeuzes: ReadonlySet<string>; acties: Antwoordacties };
+type RegisterVraagProps = { boek: string; vraag: Vertaalvraag; antwoord: Antwoord | null; bestaandeKeuzes: ReadonlyMap<string, StructureleKeuze>; acties: Antwoordacties };
 
 function RegisterVraag({ boek, vraag, antwoord, bestaandeKeuzes, acties }: RegisterVraagProps) {
 	const opties = splitsOpties(vraag.alternatief);
 	const [melding, zetMelding] = useState('');
 	const meldingvak = useRef<HTMLParagraphElement>(null);
-	const uitlegId = useId();
-	// Een tweede antwoord zou de toegepaste keuze verweesd laten: eerst de keuze terugdraaien onder Zoeken en vervangen.
-	const vergrendeld = antwoordToestand(antwoord, bestaandeKeuzes) === 'met keuze';
-	const uitleg = vergrendeld ? uitlegId : undefined;
 	useEffect(() => {
 		if (melding !== '') meldingvak.current?.focus();
 	}, [melding]);
-
-	function vastleggen(gebeurtenis: Event) {
-		gebeurtenis.preventDefault();
-		const gekozen = new FormData(gebeurtenis.currentTarget as HTMLFormElement).get('optie');
-		if (typeof gekozen === 'string' && gekozen !== '') zetMelding(acties.legVast(vraag, gekozen));
-	}
 
 	return (
 		<li class="registervraag">
@@ -190,7 +182,7 @@ function RegisterVraag({ boek, vraag, antwoord, bestaandeKeuzes, acties }: Regis
 							{opties.map((optie) => (
 								<li key={optie}>
 									<span class="optietekst">{optie}</span>
-									<button type="button" aria-label={`Kiezen: ${optie}`} disabled={vergrendeld} aria-describedby={uitleg} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
+									<button type="button" aria-label={`Kiezen: ${optie}`} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
 										Kiezen
 									</button>
 								</li>
@@ -207,39 +199,238 @@ function RegisterVraag({ boek, vraag, antwoord, bestaandeKeuzes, acties }: Regis
 				<dt>Verzen</dt>
 				<dd>{vraag.verzen.length === 0 ? <span class="geen-verzen">het hele boek</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}</dd>
 			</dl>
-			{antwoord !== null && (
-				<p class="antwoord" id={uitlegId}>
-					Beantwoord in deze browser: optie {antwoord.optie}.{' '}
-					{!vergrendeld ? (
-						<button type="button" onClick={() => zetMelding(acties.trekIn(vraag))}>
-							Antwoord intrekken
-						</button>
-					) : (
-						<>
-							Dit antwoord hoort bij een toegepaste keuze. Kiezen kan pas weer als je die keuze eerst terugdraait onder <a href={maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' })}>Zoeken en vervangen</a>; dan vervalt het antwoord.
-						</>
-					)}
-				</p>
-			)}
-			{opties.length > 0 && (
-				<form class="zonderwijziging" onSubmit={vastleggen}>
-					<label>
-						Optie zonder wijziging
-						<select name="optie" disabled={vergrendeld}>
-							{opties.map((optie) => (
-								<option value={optie}>{optie}</option>
-							))}
-						</select>
-					</label>
-					<button type="submit" disabled={vergrendeld} aria-describedby={uitleg}>
-						Antwoord vastleggen zonder wijziging
-					</button>
-				</form>
+			{antwoord === null ? (
+				<AntwoordFormulier vraag={vraag} opties={opties} acties={acties} zetMelding={zetMelding} />
+			) : (
+				<GegevenAntwoord boek={boek} vraag={vraag} antwoord={antwoord} bestaandeKeuzes={bestaandeKeuzes} acties={acties} zetMelding={zetMelding} />
 			)}
 			<p role="status" class="vraagmelding" tabIndex={-1} ref={meldingvak}>
 				{melding}
 			</p>
 		</li>
+	);
+}
+
+const GEEN_KEUZE = '';
+const TOELICHTING_UITLEG =
+	'Schrijf wanneer je wat kiest, zodat het een regel wordt. Claude gebruikt deze toelichting bij het terugvoeren om regels of precedenten voor te stellen; na akkoord van de eigenaar gelden ze voor de volgende vertaalkeuzes.';
+const EIGEN_ANTWOORD_UITLEG =
+	'Geef per context aan wat je kiest, bijvoorbeeld per vers of per soort zin. Daarna pas je met Kiezen een keuze toe voor een groep verzen; die komt onder dit antwoord.';
+const TOELICHTING_VOORBEELD = 'Bijvoorbeeld: in een zaligspreking kiezen we genade; waar iemand een persoon prijst, laten we eeuwigleven staan.';
+
+type FormulierProps = { vraag: Vertaalvraag; opties: readonly string[]; acties: Antwoordacties; zetMelding: (melding: string) => void };
+
+/** Legt een antwoord vast: een van de opties zonder wijziging in de tekst, of een eigen antwoord met toelichting. */
+function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps) {
+	const [gekozen, zetGekozen] = useState(opties.length === 0 ? EIGEN_ANTWOORD : GEEN_KEUZE);
+	const [toelichting, zetToelichting] = useState('');
+	const [fout, zetFout] = useState('');
+	const keuzeveld = useRef<HTMLSelectElement>(null);
+	const toelichtingveld = useRef<HTMLTextAreaElement>(null);
+	const id = useId();
+	const eigen = gekozen === EIGEN_ANTWOORD;
+	const foutBijKeuze = fout !== '' && gekozen === GEEN_KEUZE;
+	const foutBijToelichting = fout !== '' && !foutBijKeuze;
+	const hulp = `${id}-uitleg${eigen ? ` ${id}-eigen` : ''}`;
+
+	function vastleggen(gebeurtenis: Event) {
+		gebeurtenis.preventDefault();
+		if (gekozen === GEEN_KEUZE) {
+			zetFout('Kies een optie of "Eigen antwoord (genuanceerd)".');
+			keuzeveld.current?.focus();
+			return;
+		}
+		const uitkomst = acties.legVast(vraag, gekozen, toelichting);
+		if (!uitkomst.gelukt) {
+			zetFout(uitkomst.melding);
+			toelichtingveld.current?.focus();
+			return;
+		}
+		zetFout('');
+		zetToelichting('');
+		const metToelichting = toelichting.trim() === '' ? ', zonder wijziging in de tekst' : ' met toelichting';
+		zetMelding(eigen ? 'Eigen antwoord vastgelegd. Met Kiezen kun je er keuzes onder toepassen.' : `Antwoord vastgelegd: ${optieOmschrijving(gekozen)}${metToelichting}.`);
+	}
+
+	return (
+		<form class="antwoordformulier" aria-label={`Antwoord vastleggen: ${vraag.kwestie}`} noValidate onSubmit={vastleggen}>
+			<h4>Antwoord vastleggen</h4>
+			<label>
+				Antwoord
+				<select
+					ref={keuzeveld}
+					value={gekozen}
+					aria-invalid={foutBijKeuze}
+					aria-describedby={foutBijKeuze ? `${id}-fout` : undefined}
+					onChange={(gebeurtenis) => zetGekozen(gebeurtenis.currentTarget.value)}
+				>
+					<option value={GEEN_KEUZE}>Kies een antwoord</option>
+					{opties.map((optie) => (
+						<option value={optie}>{optie}</option>
+					))}
+					<option value={EIGEN_ANTWOORD}>Eigen antwoord (genuanceerd)</option>
+				</select>
+			</label>
+			<label>
+				Toelichting of regel{eigen ? ' (verplicht)' : ' (optioneel)'}
+				<textarea
+					ref={toelichtingveld}
+					rows={3}
+					value={toelichting}
+					placeholder={TOELICHTING_VOORBEELD}
+					aria-required={eigen}
+					aria-invalid={foutBijToelichting}
+					aria-describedby={foutBijToelichting ? `${hulp} ${id}-fout` : hulp}
+					onInput={(gebeurtenis) => zetToelichting(gebeurtenis.currentTarget.value)}
+				/>
+			</label>
+			<p class="veldhulp" id={`${id}-uitleg`}>
+				{TOELICHTING_UITLEG}
+			</p>
+			{eigen && (
+				<p class="veldhulp" id={`${id}-eigen`}>
+					{EIGEN_ANTWOORD_UITLEG}
+				</p>
+			)}
+			{fout !== '' && (
+				<p class="veldfout" id={`${id}-fout`} role="alert">
+					{fout}
+				</p>
+			)}
+			<div>
+				<button type="submit">Antwoord vastleggen</button>
+			</div>
+		</form>
+	);
+}
+
+type GegevenAntwoordProps = {
+	boek: string;
+	vraag: Vertaalvraag;
+	antwoord: Antwoord;
+	bestaandeKeuzes: ReadonlyMap<string, StructureleKeuze>;
+	acties: Antwoordacties;
+	zetMelding: (melding: string) => void;
+};
+
+function aantalVerzen({ verzen }: StructureleKeuze): string {
+	return verzen.length === 1 ? '1 vers' : `${verzen.length} verzen`;
+}
+
+/** Een beantwoorde vraag: de optie, de toelichting (aan te passen), de keuzes eronder en intrekken zolang er geen keuzes meer zijn. */
+function GegevenAntwoord({ boek, vraag, antwoord, bestaandeKeuzes, acties, zetMelding }: GegevenAntwoordProps) {
+	const [aanpassen, zetAanpassen] = useState(false);
+	const [concept, zetConcept] = useState(antwoord.toelichting);
+	const [fout, zetFout] = useState('');
+	const aanpasknop = useRef<HTMLButtonElement>(null);
+	const veld = useRef<HTMLTextAreaElement>(null);
+	const id = useId();
+	const bestaandeIds = new Set(bestaandeKeuzes.keys());
+	const keuzes = levendeKeuzeIds(antwoord, bestaandeIds).flatMap((keuzeId) => bestaandeKeuzes.get(keuzeId) ?? []);
+	const eigen = antwoord.optie === EIGEN_ANTWOORD;
+	const vervangenAdres = maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' });
+
+	function begin() {
+		zetConcept(antwoord.toelichting);
+		zetFout('');
+		zetAanpassen(true);
+		// Het veld bestaat pas na de volgende render.
+		setTimeout(() => veld.current?.focus());
+	}
+
+	function annuleer() {
+		zetAanpassen(false);
+		aanpasknop.current?.focus();
+	}
+
+	function bewaar(gebeurtenis: Event) {
+		gebeurtenis.preventDefault();
+		const uitkomst = acties.pasToelichtingAan(vraag, concept);
+		if (!uitkomst.gelukt) {
+			zetFout(uitkomst.melding);
+			veld.current?.focus();
+			return;
+		}
+		zetAanpassen(false);
+		zetMelding('Toelichting bewaard.');
+	}
+
+	return (
+		<section class="antwoord" aria-labelledby={`${id}-kop`}>
+			<h4 id={`${id}-kop`}>Beantwoord in deze browser</h4>
+			<dl>
+				<dt>Antwoord</dt>
+				<dd>{eigen ? 'Eigen antwoord' : antwoord.optie}</dd>
+				<dt>Toelichting</dt>
+				<dd>
+					{antwoord.toelichting === '' ? <span class="geen-verzen">geen toelichting</span> : <span class="toelichting">{antwoord.toelichting}</span>}{' '}
+					<button type="button" ref={aanpasknop} aria-expanded={aanpassen} aria-controls={`${id}-aanpassen`} onClick={aanpassen ? annuleer : begin}>
+						Toelichting aanpassen
+					</button>
+					{aanpassen && (
+						<form class="toelichtingaanpassen" id={`${id}-aanpassen`} noValidate onSubmit={bewaar}>
+							<label>
+								Toelichting of regel{eigen ? ' (verplicht)' : ' (optioneel)'}
+								<textarea
+									ref={veld}
+									rows={3}
+									value={concept}
+									placeholder={TOELICHTING_VOORBEELD}
+									aria-required={eigen}
+									aria-invalid={fout !== ''}
+									aria-describedby={fout === '' ? `${id}-uitleg` : `${id}-uitleg ${id}-fout`}
+									onInput={(gebeurtenis) => zetConcept(gebeurtenis.currentTarget.value)}
+								/>
+							</label>
+							<p class="veldhulp" id={`${id}-uitleg`}>
+								{TOELICHTING_UITLEG}
+							</p>
+							{fout !== '' && (
+								<p class="veldfout" id={`${id}-fout`} role="alert">
+									{fout}
+								</p>
+							)}
+							<div class="knoppen">
+								<button type="submit">Toelichting bewaren</button>
+								<button type="button" onClick={annuleer}>
+									Annuleren
+								</button>
+							</div>
+						</form>
+					)}
+				</dd>
+				<dt>Keuzes</dt>
+				<dd>
+					{keuzes.length === 0 ? (
+						<span class="geen-verzen">nog geen keuzes toegepast</span>
+					) : (
+						<>
+							{keuzes.length === 1 ? '1 keuze toegepast' : `${keuzes.length} keuzes toegepast`}
+							<ul class="antwoordkeuzes">
+								{keuzes.map((keuze) => (
+									<li key={keuze.id}>
+										{kortUit(keuzeBeschrijving(keuze), 100)}, {aantalVerzen(keuze)}{' '}
+										<a href={vervangenAdres} aria-label={`Keuze ${keuzeBeschrijving(keuze)} bekijken bij Zoeken en vervangen`}>
+											Zoeken en vervangen
+										</a>
+									</li>
+								))}
+							</ul>
+						</>
+					)}
+				</dd>
+			</dl>
+			{keuzes.length === 0 ? (
+				<button type="button" onClick={() => zetMelding(meldingVan(acties.trekIn(vraag, bestaandeIds), 'Antwoord ingetrokken.'))}>
+					Antwoord intrekken
+				</button>
+			) : (
+				<p class="veldhulp">
+					Intrekken kan pas als er geen keuzes meer onder dit antwoord hangen. Draai ze eerst terug onder <a href={vervangenAdres}>Zoeken en vervangen</a>
+					{antwoord.toelichting === '' ? '; dan vervalt het antwoord vanzelf.' : '; het antwoord met de toelichting blijft dan staan.'}
+				</p>
+			)}
+		</section>
 	);
 }
 

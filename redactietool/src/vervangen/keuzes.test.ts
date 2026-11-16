@@ -5,7 +5,7 @@ import type { VersInhoud } from '../bewerken/types';
 import type { HoofdstukData } from '../data/types';
 import { parseerHoofdstuk } from '../formaat/parseer';
 import { maakExport } from '../export/maakExport';
-import { bewaarAntwoord, leesAntwoorden } from '../antwoorden/antwoorden';
+import { bewaarAntwoord, EIGEN_ANTWOORD, leesAntwoorden, type Antwoord } from '../antwoorden/antwoorden';
 import type { Opmaak } from '../formaat/types';
 import { alsKeuze, draaiKeuzeTerug, draaiVersTerug, leesKeuzes, pasKeuzeToe, pasOpdrachtToe, type StructureleKeuze, type Toepassing } from './keuzes';
 import type { HoofdstukVerzen, Vondst } from './types';
@@ -385,7 +385,7 @@ function markeringToepassing(opslag: Opslag, uitzonderingen: Partial<Toepassing>
 }
 
 describe('pasOpdrachtToe met een markeringswissel', () => {
-	it('wisselt de markering, bewaart de keuze met soort, overgeslagen plek en vraag, en bewaart het antwoord met het keuze-id', () => {
+	it('wisselt de markering, bewaart de keuze met soort, overgeslagen plek en vraag, en bewaart het antwoord met het keuze-id onder keuzeIds', () => {
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([]);
 
 		const { keuze, meldingen } = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU);
@@ -405,7 +405,7 @@ describe('pasOpdrachtToe met een markeringswissel', () => {
 			vraag: KWESTIE,
 			overgeslagen: [{ hoofdstuk: 6, vers: 24, gevonden: 'gezegend', reden: 'uitgevinkt' }],
 		});
-		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: KWESTIE, optie: OPTIE, keuzeId: keuze.id, gegeven: NU.toISOString() }]);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: KWESTIE, optie: OPTIE, toelichting: '', keuzeIds: [keuze.id], gegeven: NU.toISOString() }]);
 	});
 
 	it('bewaart bij een tekstvervanging alleen de gebruikte varianten met een vervanging', () => {
@@ -441,12 +441,21 @@ describe('pasOpdrachtToe met een markeringswissel', () => {
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([]);
 	});
 
-	it('vervangt het eerdere antwoord op dezelfde vraag', () => {
-		bewaarAntwoord(opslag, 'lukas', { kwestie: KWESTIE, optie: 'b) houden', keuzeId: null, gegeven: '2026-11-14T10:00:00.000Z' });
+	it('zet de keuze bij een bestaand antwoord op dezelfde vraag en laat optie, toelichting en tijd van dat antwoord staan', () => {
+		const bestaand: Antwoord = { kwestie: KWESTIE, optie: EIGEN_ANTWOORD, toelichting: 'In een zaligspreking genade.', keuzeIds: ['eerder'], gegeven: '2026-11-14T10:00:00.000Z' };
+		bewaarAntwoord(opslag, 'lukas', bestaand);
 
 		const { keuze } = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU);
 
-		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: KWESTIE, optie: OPTIE, keuzeId: keuze.id, gegeven: NU.toISOString() }]);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ ...bestaand, keuzeIds: ['eerder', keuze.id] }]);
+	});
+
+	it('zet twee toegepaste keuzes onder één antwoord', () => {
+		const eerste = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag, { aangevinkt: [plekIn(22, 'gezegend')] }), NU).keuze;
+		const tweede = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag, { aangevinkt: [plekIn(23, 'Gezegend')] }), new Date('2026-11-16T12:05:00.000Z')).keuze;
+
+		expect(eerste.id).not.toBe(tweede.id);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: KWESTIE, optie: OPTIE, toelichting: '', keuzeIds: [eerste.id, tweede.id], gegeven: NU.toISOString() }]);
 	});
 
 	it('meldt een antwoord dat niet bewaard kon worden, terwijl de keuze wel bewaard is', () => {
@@ -466,10 +475,10 @@ describe('pasOpdrachtToe met een markeringswissel', () => {
 });
 
 describe('draaiVersTerug', () => {
-	const TIJD_ANDER = '2026-11-15T09:00:00.000Z';
+	const ANDERE_VRAAG: Antwoord = { kwestie: 'Andere vraag', optie: 'houden', toelichting: '', keuzeIds: [], gegeven: '2026-11-15T09:00:00.000Z' };
 
 	function keuzeOverTweeVerzen() {
-		bewaarAntwoord(opslag, 'lukas', { kwestie: 'Andere vraag', optie: 'houden', keuzeId: null, gegeven: TIJD_ANDER });
+		bewaarAntwoord(opslag, 'lukas', ANDERE_VRAAG);
 		const { keuze } = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU);
 		return keuze;
 	}
@@ -517,7 +526,7 @@ describe('draaiVersTerug', () => {
 		expect(meldingen).toEqual([]);
 		expect(leesTussenstand(opslag, 'lukas', 6).verzen).toEqual({});
 		expect(leesKeuzes(opslag, 'lukas')).toEqual([]);
-		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: 'Andere vraag', optie: 'houden', keuzeId: null, gegeven: TIJD_ANDER }]);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([ANDERE_VRAAG]);
 	});
 
 	it('laat een vers staan dat de vertaler zelf bewerkte, haalt het uit de keuze en meldt dat', () => {
@@ -544,7 +553,7 @@ describe('draaiVersTerug', () => {
 
 		expect(meldingen).toEqual(['Vers 6:22 is daarna veranderd door de keuze "gezegend"; draai die eerst terug.']);
 		expect(leesKeuzes(opslag, 'lukas').find((k) => k.id === eerste.id)?.verzen.map((v) => v.vers)).toEqual([22, 23]);
-		expect(leesAntwoorden(opslag, 'lukas').some((antwoord) => antwoord.keuzeId === eerste.id)).toBe(true);
+		expect(leesAntwoorden(opslag, 'lukas').some((antwoord) => antwoord.keuzeIds.includes(eerste.id))).toBe(true);
 	});
 
 	it('meldt een vers dat niet bij de keuze hoort en een keuze die er niet is', () => {
@@ -556,25 +565,54 @@ describe('draaiVersTerug', () => {
 	});
 });
 
-describe('draaiKeuzeTerug en antwoorden', () => {
-	it('haalt het antwoord van de keuze weg en laat het antwoord van een andere keuze staan', () => {
-		const eerste = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU).keuze;
-		const tweede = pasOpdrachtToe(
-			opslag,
-			'lukas',
-			markeringToepassing(opslag, {
-				opdracht: { soort: 'markering', zoekterm: 'gezegend', van: 'genade', naar: 'geloof', bereik: { soort: 'boek' } },
-				aangevinkt: [plekIn(22, 'gezegend')],
-				overgeslagen: [],
-				vraag: { kwestie: 'Tweede vraag', optie: 'a)' },
-			}),
-			new Date('2026-11-15T16:05:00.000Z'),
-		).keuze;
-		expect(leesAntwoorden(opslag, 'lukas').map((antwoord) => antwoord.keuzeId)).toEqual([eerste.id, tweede.id]);
+describe('terugdraaien en antwoorden', () => {
+	const REGEL = 'In een zaligspreking genade.';
 
+	function twee(uitzondering: Partial<Antwoord> = {}) {
+		bewaarAntwoord(opslag, 'lukas', { kwestie: KWESTIE, optie: EIGEN_ANTWOORD, toelichting: '', keuzeIds: [], gegeven: '2026-11-14T10:00:00.000Z', ...uitzondering });
+		const eerste = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag, { aangevinkt: [plekIn(22, 'gezegend')] }), NU).keuze;
+		const tweede = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag, { aangevinkt: [plekIn(23, 'Gezegend')] }), new Date('2026-11-16T12:05:00.000Z')).keuze;
+		return { eerste, tweede };
+	}
+
+	it('haalt bij een keuze die verdwijnt alleen die keuze uit het antwoord en laat de andere keuze staan', () => {
+		const { eerste, tweede } = twee();
+		expect(leesAntwoorden(opslag, 'lukas')[0]?.keuzeIds).toEqual([eerste.id, tweede.id]);
+
+		draaiKeuzeTerug(opslag, 'lukas', eerste.id);
+
+		expect(leesAntwoorden(opslag, 'lukas')).toMatchObject([{ kwestie: KWESTIE, keuzeIds: [tweede.id] }]);
+		expect(leesKeuzes(opslag, 'lukas').map((keuze) => keuze.id)).toEqual([tweede.id]);
+	});
+
+	it('houdt het antwoord met toelichting als de laatste keuze weg is', () => {
+		const { eerste, tweede } = twee({ toelichting: REGEL });
+
+		draaiKeuzeTerug(opslag, 'lukas', eerste.id);
 		draaiKeuzeTerug(opslag, 'lukas', tweede.id);
 
-		expect(leesAntwoorden(opslag, 'lukas').map((antwoord) => antwoord.keuzeId)).toEqual([eerste.id]);
+		expect(leesKeuzes(opslag, 'lukas')).toEqual([]);
+		expect(leesAntwoorden(opslag, 'lukas')).toMatchObject([{ kwestie: KWESTIE, optie: EIGEN_ANTWOORD, toelichting: REGEL, keuzeIds: [] }]);
+	});
+
+	it('haalt het antwoord weg als de laatste keuze weg is en er geen toelichting is', () => {
+		const { eerste, tweede } = twee({ toelichting: '' });
+
+		draaiKeuzeTerug(opslag, 'lukas', eerste.id);
+		expect(leesAntwoorden(opslag, 'lukas')).toHaveLength(1);
+		draaiKeuzeTerug(opslag, 'lukas', tweede.id);
+
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([]);
+	});
+
+	it('laat het antwoord met toelichting staan als het laatste vers van de laatste keuze per vers is teruggedraaid', () => {
+		const { eerste, tweede } = twee({ toelichting: REGEL });
+
+		draaiVersTerug(opslag, 'lukas', eerste.id, 6, 22);
+		expect(leesAntwoorden(opslag, 'lukas')).toMatchObject([{ keuzeIds: [tweede.id] }]);
+		draaiVersTerug(opslag, 'lukas', tweede.id, 6, 23);
+
+		expect(leesAntwoorden(opslag, 'lukas')).toMatchObject([{ toelichting: REGEL, keuzeIds: [] }]);
 	});
 });
 

@@ -4,11 +4,12 @@ import type { KeuzeVariant, StructureleKeuze } from '../vervangen/keuzes';
 
 /**
  * Het bestand `<prefix>-NN.redactie.json` dat de vertaler aan Claude geeft; een toelichting, nooit een bron van tekst.
- * Versie 1 had geen keuzes of vragen (de lijsten waren altijd leeg); versie 2 vult ze.
+ * Versie 1 had geen keuzes of vragen (de lijsten waren altijd leeg); versie 2 vulde ze met antwoorden met één `keuzeId`;
+ * versie 3 geeft elk antwoord een `toelichting` en `keuzeIds` (nul of meer keuzes).
  */
 export type RedactieExport = {
 	formaat: 'bet-redactie-export';
-	versie: 2;
+	versie: 3;
 	boek: string;
 	hoofdstuk: number;
 	/** De commit van de build (`GITHUB_SHA` via Vite `define`); `null` bij een lokale build zonder die variabele. */
@@ -20,14 +21,19 @@ export type RedactieExport = {
 	/** De structurele keuzes die dit hoofdstuk raken (toegepast of overgeslagen), op volgorde van toepassen (oudste eerst). */
 	structureleKeuzes: ExportKeuze[];
 	/**
-	 * De antwoorden op vertaalvragen waarvan de keuze dit hoofdstuk raakt, plus de antwoorden zonder keuze
+	 * De antwoorden op vertaalvragen waarvan een keuze dit hoofdstuk raakt, plus de antwoorden zonder bestaande keuze
 	 * op een vraag die dit hoofdstuk in haar verzen heeft (of helemaal geen verzen heeft).
 	 */
 	beantwoordeVragen: ExportAntwoord[];
 };
 
-/** Een antwoord op een vertaalvraag, met de verzen van de vraag uit open-vragen.md (leeg als de vraag geen verzen heeft). */
-export type ExportAntwoord = Antwoord & {
+/**
+ * Een antwoord op een vertaalvraag, met de verzen van de vraag uit open-vragen.md (leeg als de vraag geen verzen heeft).
+ * `toelichting` is de regel van de vertaler ("wanneer kiezen we wat"): input voor regels of precedentvoorstellen, pas na akkoord van de eigenaar.
+ */
+export type ExportAntwoord = Omit<Antwoord, 'keuzeIds'> & {
+	/** De bestaande keuzes onder het antwoord die dit hoofdstuk raken (te vinden in `structureleKeuzes`); leeg bij een antwoord zonder keuzes. */
+	keuzeIds: string[];
 	/** Als `hoofdstuk:vers`. */
 	verzen: string[];
 };
@@ -42,7 +48,7 @@ export type ExportKeuze = {
 	van: Domein | null;
 	naar: Domein | null;
 	varianten: KeuzeVariant[];
-	/** De kwestie van de vertaalvraag die hiermee beantwoord is, of `null`; ook `null` als het antwoord op die vraag inmiddels naar een andere keuze wijst. */
+	/** De kwestie van de vertaalvraag die hiermee beantwoord is, of `null`; ook `null` als het antwoord op die vraag deze keuze niet (meer) noemt. */
 	vraag: string | null;
 	/** Het aantal verzen waarop de keuze nog toegepast staat, in alle hoofdstukken samen. */
 	aantalToegepasteVerzen: number;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { BewerktVers, Tussenstand, VersInhoud } from '../bewerken/types';
 import type { HoofdstukData, VersRef } from '../data/types';
-import type { Antwoord } from '../antwoorden/antwoorden';
+import { EIGEN_ANTWOORD, type Antwoord } from '../antwoorden/antwoorden';
 import { parseerHoofdstuk } from '../formaat/parseer';
 import type { StructureleKeuze } from '../vervangen/keuzes';
 import { exportBestandsnaam, maakExport } from './maakExport';
@@ -59,7 +59,7 @@ describe('maakExport', () => {
 	it('geeft zonder bewerkingen een export zonder verzen', () => {
 		expect(maakExport(invoer({ verzen: {} }, 'niets te doen'))).toEqual({
 			formaat: 'bet-redactie-export',
-			versie: 2,
+			versie: 3,
 			boek: 'lukas',
 			hoofdstuk: 4,
 			repoCommit: 'abc123',
@@ -197,7 +197,7 @@ const OVER_TWEE_HOOFDSTUKKEN = keuze({
 
 describe('maakExport met structurele keuzes', () => {
 	it('geeft de hele keuze met de plekken van dit hoofdstuk apart, ook als de keuze over meer hoofdstukken loopt', () => {
-		const antwoord: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-15T10:00:00.000Z' };
+		const antwoord: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', toelichting: '', keuzeIds: ['k1'], gegeven: '2026-11-15T10:00:00.000Z' };
 		const uitkomst = maakExport(invoer({ verzen: {} }, '', [OVER_TWEE_HOOFDSTUKKEN], [antwoord]));
 
 		expect(uitkomst.structureleKeuzes).toEqual([
@@ -221,8 +221,8 @@ describe('maakExport met structurele keuzes', () => {
 	it('zet bij een keuze de vraag alleen als het antwoord op die vraag nog naar de keuze wijst', () => {
 		const eerste = keuze({ id: 'k1', verzen: [keuzeVers(4, 1)], vraag: 'Gezegend' });
 		const tweede = keuze({ id: 'k2', toegepast: '2026-11-15T11:00:00.000Z', verzen: [keuzeVers(4, 3)], vraag: 'Gezegend' });
-		const antwoordOpEerste: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-15T10:00:00.000Z' };
-		const antwoordOpTweede: Antwoord = { ...antwoordOpEerste, optie: 'c) iets anders', keuzeId: 'k2', gegeven: '2026-11-15T11:00:00.000Z' };
+		const antwoordOpEerste: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', toelichting: '', keuzeIds: ['k1'], gegeven: '2026-11-15T10:00:00.000Z' };
+		const antwoordOpTweede: Antwoord = { ...antwoordOpEerste, optie: 'c) iets anders', keuzeIds: ['k2'], gegeven: '2026-11-15T11:00:00.000Z' };
 
 		const voor = maakExport(invoer({ verzen: {} }, '', [eerste, tweede], [antwoordOpEerste])).structureleKeuzes;
 		const na = maakExport(invoer({ verzen: {} }, '', [eerste, tweede], [antwoordOpTweede])).structureleKeuzes;
@@ -262,9 +262,9 @@ describe('maakExport met structurele keuzes', () => {
 });
 
 describe('maakExport met beantwoorde vragen', () => {
-	const ANTWOORD_OP_KEUZE: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-15T10:00:00.000Z' };
-	const ANTWOORD_ZONDER_WIJZIGING: Antwoord = { kwestie: 'Houden', optie: 'b) niets doen', keuzeId: null, gegeven: '2026-11-15T10:05:00.000Z' };
-	const ANTWOORD_ANDER_HOOFDSTUK: Antwoord = { kwestie: 'Elders', optie: 'a)', keuzeId: 'k3', gegeven: '2026-11-15T10:10:00.000Z' };
+	const ANTWOORD_OP_KEUZE: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', toelichting: '', keuzeIds: ['k1'], gegeven: '2026-11-15T10:00:00.000Z' };
+	const ANTWOORD_ZONDER_WIJZIGING: Antwoord = { kwestie: 'Houden', optie: 'b) niets doen', toelichting: '', keuzeIds: [], gegeven: '2026-11-15T10:05:00.000Z' };
+	const ANTWOORD_ANDER_HOOFDSTUK: Antwoord = { kwestie: 'Elders', optie: 'a)', toelichting: '', keuzeIds: ['k3'], gegeven: '2026-11-15T10:10:00.000Z' };
 	const ELDERS = keuze({ id: 'k3', verzen: [keuzeVers(2, 5)] });
 
 	it('neemt het antwoord op van een keuze die dit hoofdstuk raakt en het antwoord zonder keuze, en laat dat van een keuze elders weg', () => {
@@ -295,9 +295,9 @@ describe('maakExport met beantwoorde vragen', () => {
 			{ hoofdstuk: 6, vers: 20 },
 		];
 		const alleenZes: VersRef[] = [{ hoofdstuk: 6, vers: 20 }];
-		const metVerzenInDitHoofdstuk: Antwoord = { kwestie: 'Hier', optie: 'b)', keuzeId: null, gegeven: '2026-11-15T10:20:00.000Z' };
-		const metVerzenElders: Antwoord = { kwestie: 'Daar', optie: 'b)', keuzeId: null, gegeven: '2026-11-15T10:21:00.000Z' };
-		const zonderVerzen: Antwoord = { kwestie: 'Nergens', optie: 'b)', keuzeId: null, gegeven: '2026-11-15T10:22:00.000Z' };
+		const metVerzenInDitHoofdstuk: Antwoord = { kwestie: 'Hier', optie: 'b)', toelichting: '', keuzeIds: [], gegeven: '2026-11-15T10:20:00.000Z' };
+		const metVerzenElders: Antwoord = { kwestie: 'Daar', optie: 'b)', toelichting: '', keuzeIds: [], gegeven: '2026-11-15T10:21:00.000Z' };
+		const zonderVerzen: Antwoord = { kwestie: 'Nergens', optie: 'b)', toelichting: '', keuzeIds: [], gegeven: '2026-11-15T10:22:00.000Z' };
 
 		const { beantwoordeVragen } = maakExport(
 			invoer({ verzen: {} }, '', [], [metVerzenInDitHoofdstuk, metVerzenElders, zonderVerzen], { Hier: inVierEnZes, Daar: alleenZes }),
@@ -306,10 +306,42 @@ describe('maakExport met beantwoorde vragen', () => {
 		expect(beantwoordeVragen.map((antwoord) => antwoord.kwestie)).toEqual(['Hier', 'Nergens']);
 	});
 
-	it('laat een antwoord weg waarvan de keuze niet meer bestaat', () => {
-		const { beantwoordeVragen } = maakExport(invoer({ verzen: {} }, '', [], [ANTWOORD_OP_KEUZE]));
+	it('geeft een antwoord met toelichting en twee keuzes die dit hoofdstuk raken, met alleen die keuzes in keuzeIds', () => {
+		const eerste = keuze({ id: 'k1', verzen: [keuzeVers(4, 1)], vraag: 'Gezegend' });
+		const tweede = keuze({ id: 'k2', toegepast: '2026-11-15T11:00:00.000Z', verzen: [keuzeVers(4, 3)], vraag: 'Gezegend' });
+		const anderHoofdstuk = keuze({ id: 'k3', toegepast: '2026-11-15T12:00:00.000Z', verzen: [keuzeVers(6, 20)], vraag: 'Gezegend' });
+		const eigen: Antwoord = {
+			kwestie: 'Gezegend',
+			optie: EIGEN_ANTWOORD,
+			toelichting: 'In een zaligspreking genade.',
+			keuzeIds: ['k1', 'k2', 'k3'],
+			gegeven: '2026-11-15T10:00:00.000Z',
+		};
 
-		expect(beantwoordeVragen).toEqual([]);
+		const { beantwoordeVragen, structureleKeuzes } = maakExport(invoer({ verzen: {} }, '', [eerste, tweede, anderHoofdstuk], [eigen], { Gezegend: [{ hoofdstuk: 4, vers: 1 }] }));
+
+		expect(beantwoordeVragen).toEqual([{ ...eigen, keuzeIds: ['k1', 'k2'], verzen: ['4:1'] }]);
+		expect(structureleKeuzes.map((uitkomst) => [uitkomst.id, uitkomst.vraag])).toEqual([['k1', 'Gezegend'], ['k2', 'Gezegend']]);
+	});
+
+	it('geeft een eigen antwoord met toelichting zonder keuzes in een hoofdstuk van de vraag', () => {
+		const eigen: Antwoord = { kwestie: 'Gezegend', optie: EIGEN_ANTWOORD, toelichting: 'Regel.', keuzeIds: [], gegeven: '2026-11-15T10:00:00.000Z' };
+
+		const hier = maakExport(invoer({ verzen: {} }, '', [], [eigen], { Gezegend: [{ hoofdstuk: 4, vers: 1 }] })).beantwoordeVragen;
+		const elders = maakExport(invoer({ verzen: {} }, '', [], [eigen], { Gezegend: [{ hoofdstuk: 6, vers: 20 }] })).beantwoordeVragen;
+
+		expect(hier).toEqual([{ ...eigen, verzen: ['4:1'] }]);
+		expect(elders).toEqual([]);
+	});
+
+	it('telt een antwoord waarvan alle keuzes verdwenen zijn als antwoord zonder keuzes', () => {
+		const verdwenen: Antwoord = { kwestie: 'Gezegend', optie: EIGEN_ANTWOORD, toelichting: 'Regel.', keuzeIds: ['weg'], gegeven: '2026-11-15T10:00:00.000Z' };
+
+		const hier = maakExport(invoer({ verzen: {} }, '', [], [verdwenen], { Gezegend: [{ hoofdstuk: 4, vers: 1 }] })).beantwoordeVragen;
+		const elders = maakExport(invoer({ verzen: {} }, '', [], [verdwenen], { Gezegend: [{ hoofdstuk: 6, vers: 20 }] })).beantwoordeVragen;
+
+		expect(hier).toEqual([{ ...verdwenen, keuzeIds: [], verzen: ['4:1'] }]);
+		expect(elders).toEqual([]);
 	});
 });
 

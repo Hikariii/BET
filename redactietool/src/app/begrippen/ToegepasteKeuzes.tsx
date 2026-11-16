@@ -1,7 +1,7 @@
 import type { Antwoord } from '../../antwoorden/antwoorden';
 import type { StructureleKeuze } from '../../vervangen/keuzes';
 import { versAdres } from '../adres';
-import { keuzeBeschrijving, kortUit } from './vervangenVoorbeeld';
+import { keuzeBeschrijving, kortUit, optieOmschrijving } from './vervangenVoorbeeld';
 
 type Props = {
 	boek: string;
@@ -28,7 +28,7 @@ export function ToegepasteKeuzes({ boek, keuzes, antwoorden, onTerugdraaien, onV
 			<ul>
 				{keuzes.map((keuze) => {
 					const beschrijving = keuzeBeschrijving(keuze);
-					const antwoord = antwoorden.find(({ keuzeId }) => keuzeId === keuze.id);
+					const antwoord = antwoorden.find(({ keuzeIds }) => keuzeIds.includes(keuze.id));
 					return (
 						<li key={keuze.id}>
 							<details>
@@ -37,8 +37,8 @@ export function ToegepasteKeuzes({ boek, keuzes, antwoorden, onTerugdraaien, onV
 								</summary>
 								{keuze.vraag !== null && (
 									<p class="keuzevraag" title={keuze.vraag}>
-										Beantwoordt: {kortUit(keuze.vraag, 80)}
-										{antwoord !== undefined && `, optie ${kortUit(antwoord.optie, 80)}`}
+										Hoort bij het antwoord op: {kortUit(keuze.vraag, 80)}
+										{antwoord !== undefined && `, ${optieOmschrijving(kortUit(antwoord.optie, 80))}`}
 									</p>
 								)}
 								{keuze.overgeslagen.length > 0 && (

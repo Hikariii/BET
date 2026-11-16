@@ -162,29 +162,84 @@
 	min-width: 0;
 }
 
-.vertaalvragen .antwoord {
-	margin: .6rem 0 0;
+.vertaalvragen .antwoord,
+.vertaalvragen .antwoordformulier {
+	margin: .75rem 0 0;
+	padding-top: .5rem;
+	border-top: 1px solid var(--rand);
 }
 
-.vertaalvragen .zonderwijziging {
+.vertaalvragen .antwoord h4,
+.vertaalvragen .antwoordformulier h4 {
+	margin: 0 0 .4rem;
+	font-size: .9rem;
+}
+
+.vertaalvragen .antwoord dl {
+	margin-top: 0;
+}
+
+.vertaalvragen .toelichting {
+	white-space: pre-wrap;
+}
+
+.vertaalvragen .antwoordkeuzes {
+	margin: .2rem 0 0;
+	padding-left: 1.1rem;
+}
+
+.vertaalvragen .antwoordformulier {
 	display: flex;
-	flex-wrap: wrap;
-	gap: .5rem 1rem;
-	align-items: end;
-	margin: .6rem 0 0;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: .5rem;
 }
 
-.vertaalvragen .zonderwijziging label {
+.vertaalvragen .antwoordformulier label,
+.vertaalvragen .toelichtingaanpassen label {
 	display: flex;
 	flex-direction: column;
 	gap: .2rem;
 	font-size: .75rem;
-	min-width: 0;
+	width: min(40rem, 100%);
 }
 
-.vertaalvragen .zonderwijziging select {
+.vertaalvragen .antwoordformulier select {
 	max-width: 100%;
 	font: inherit;
+}
+
+.vertaalvragen .antwoordformulier textarea,
+.vertaalvragen .toelichtingaanpassen textarea {
+	width: 100%;
+	font: inherit;
+	box-sizing: border-box;
+}
+
+.vertaalvragen .toelichtingaanpassen {
+	display: flex;
+	flex-direction: column;
+	gap: .4rem;
+	margin-top: .5rem;
+}
+
+.vertaalvragen .toelichtingaanpassen .knoppen {
+	display: flex;
+	gap: .5rem;
+}
+
+.vertaalvragen .veldhulp {
+	margin: 0;
+	max-width: 40rem;
+	color: var(--gedempt);
+	font-size: .75rem;
+}
+
+.vertaalvragen .veldfout {
+	margin: 0;
+	padding-left: .5rem;
+	border-left: 2px solid var(--rood);
+	font-weight: 600;
 }
 
 .vertaalvragen .vraagmelding {

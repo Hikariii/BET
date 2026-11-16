@@ -1,4 +1,4 @@
-import type { Antwoord } from '../antwoorden/antwoorden';
+import { levendeKeuzeIds, type Antwoord } from '../antwoorden/antwoorden';
 import type { HoofdstukData, VersRef } from '../data/types';
 import { serialiseerHoofdstuk } from '../formaat/serialiseer';
 import { isBewerkingVerouderd } from '../bewerken/tussenstand';
@@ -56,7 +56,7 @@ function plekNaam(hoofdstuk: number, vers: number): string {
 
 /**
  * De keuze met de plekken van dit hoofdstuk, of `null` als de keuze dit hoofdstuk niet raakt.
- * De vraag staat er alleen bij als het antwoord op die vraag nog naar deze keuze wijst.
+ * De vraag staat er alleen bij als het antwoord op die vraag deze keuze nog noemt.
  */
 function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number, antwoorden: readonly Antwoord[]): ExportKeuze | null {
 	const toegepast = keuze.verzen.filter((vers) => vers.hoofdstuk === hoofdstuk).map((vers) => plekNaam(vers.hoofdstuk, vers.vers));
@@ -73,7 +73,7 @@ function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number, antwoorden: rea
 		van: keuze.van,
 		naar: keuze.naar,
 		varianten: keuze.varianten,
-		vraag: antwoorden.some((antwoord) => antwoord.kwestie === keuze.vraag && antwoord.keuzeId === keuze.id) ? keuze.vraag : null,
+		vraag: antwoorden.some((antwoord) => antwoord.kwestie === keuze.vraag && antwoord.keuzeIds.includes(keuze.id)) ? keuze.vraag : null,
 		aantalToegepasteVerzen: keuze.verzen.length,
 		hoofdstukken: [...hoofdstukken].sort((een, ander) => een - ander),
 		toegepast,
@@ -82,17 +82,19 @@ function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number, antwoorden: rea
 }
 
 /**
- * Het antwoord met de verzen van zijn vraag, of `null` als het niet in de export van dit hoofdstuk hoort:
- * een antwoord met keuze hoort bij het hoofdstuk waar de keuze iets raakt, een antwoord zonder keuze
- * bij een hoofdstuk in de verzen van de vraag (of bij elk hoofdstuk als de vraag geen verzen heeft).
+ * Het antwoord met de verzen van zijn vraag, of `null` als het niet in de export van dit hoofdstuk hoort.
+ * Hangen er bestaande keuzes onder (`bestaandeKeuzes`: alle keuzes van het boek), dan hoort het antwoord bij het hoofdstuk waar een van die keuzes iets raakt (`keuzeIds`: die van deze export);
+ * zonder bestaande keuze bij een hoofdstuk in de verzen van de vraag, of bij elk hoofdstuk als de vraag geen verzen heeft.
  */
-function exportAntwoord(antwoord: Antwoord, keuzeIds: ReadonlySet<string>, invoer: ExportInvoer): ExportAntwoord | null {
+function exportAntwoord(antwoord: Antwoord, keuzeIds: ReadonlySet<string>, bestaandeKeuzes: ReadonlySet<string>, invoer: ExportInvoer): ExportAntwoord | null {
 	const vraagVerzen = invoer.vraagVerzen.get(antwoord.kwestie) ?? [];
-	const hoortBij =
-		antwoord.keuzeId === null
-			? vraagVerzen.length === 0 || vraagVerzen.some(({ hoofdstuk }) => hoofdstuk === invoer.hoofdstuk.nummer)
-			: keuzeIds.has(antwoord.keuzeId);
-	return hoortBij ? { ...antwoord, verzen: vraagVerzen.map(({ hoofdstuk, vers }) => plekNaam(hoofdstuk, vers)) } : null;
+	const verzen = vraagVerzen.map(({ hoofdstuk, vers }) => plekNaam(hoofdstuk, vers));
+	if (levendeKeuzeIds(antwoord, bestaandeKeuzes).length === 0) {
+		const hoortBij = vraagVerzen.length === 0 || vraagVerzen.some(({ hoofdstuk }) => hoofdstuk === invoer.hoofdstuk.nummer);
+		return hoortBij ? { ...antwoord, keuzeIds: [], verzen } : null;
+	}
+	const hier = levendeKeuzeIds(antwoord, keuzeIds);
+	return hier.length > 0 ? { ...antwoord, keuzeIds: hier, verzen } : null;
 }
 
 /** Maakt de export voor Claude uit de bewerkte verzen van een hoofdstuk, op oplopend versnummer. */
@@ -103,9 +105,10 @@ export function maakExport(invoer: ExportInvoer): RedactieExport {
 	const keuzes = [...invoer.keuzes].sort((een, ander) => Date.parse(een.toegepast) - Date.parse(ander.toegepast));
 	const structureleKeuzes = keuzes.flatMap((keuze) => exportKeuze(keuze, invoer.hoofdstuk.nummer, invoer.antwoorden) ?? []);
 	const keuzeIds = new Set(structureleKeuzes.map((keuze) => keuze.id));
+	const bestaandeKeuzes = new Set(invoer.keuzes.map((keuze) => keuze.id));
 	return {
 		formaat: 'bet-redactie-export',
-		versie: 2,
+		versie: 3,
 		boek: invoer.boek,
 		hoofdstuk: invoer.hoofdstuk.nummer,
 		repoCommit: invoer.repoCommit,
@@ -113,7 +116,7 @@ export function maakExport(invoer: ExportInvoer): RedactieExport {
 		toelichting: invoer.toelichting,
 		verzen,
 		structureleKeuzes,
-		beantwoordeVragen: invoer.antwoorden.flatMap((antwoord) => exportAntwoord(antwoord, keuzeIds, invoer) ?? []),
+		beantwoordeVragen: invoer.antwoorden.flatMap((antwoord) => exportAntwoord(antwoord, keuzeIds, bestaandeKeuzes, invoer) ?? []),
 	};
 }
 

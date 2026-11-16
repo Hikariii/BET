@@ -14,7 +14,7 @@ type BackupHoofdstuk = {
 /** Alles wat de browser van één boek bewaart, als één bestand om later terug te laden. */
 export type Backup = {
 	formaat: 'bet-bewaard';
-	versie: 2;
+	versie: 3;
 	boek: string;
 	/** ISO-tijd van maken. */
 	gemaakt: string;
@@ -23,7 +23,10 @@ export type Backup = {
 	tussenstanden: BackupHoofdstuk[];
 	/** Op volgorde van toepassen, oudste eerst, zoals in de opslag. */
 	keuzes: StructureleKeuze[];
-	/** Antwoorden op vertaalvragen, op volgorde van bewaren. Een back-up van versie 1 heeft ze niet en wordt zonder antwoorden gelezen. */
+	/**
+	 * Antwoorden op vertaalvragen, op volgorde van bewaren, met toelichting en `keuzeIds`.
+	 * Versie 1 heeft geen antwoorden; versie 2 heeft antwoorden met één `keuzeId` (of `null`) en zonder toelichting. Beide worden als versie 3 gelezen.
+	 */
 	antwoorden: Antwoord[];
 };
 
@@ -44,7 +47,7 @@ export function maakBackup(opslag: Opslag, boek: BoekMetHoofdstukken, repoCommit
 	});
 	return {
 		formaat: 'bet-bewaard',
-		versie: 2,
+		versie: 3,
 		boek: boek.id,
 		gemaakt: nu.toISOString(),
 		repoCommit,
@@ -104,8 +107,8 @@ export function leesBackup(tekst: string, boek: string): LeesUitkomst {
 		return fout('Dit bestand is geen back-up van de redactietool (het formaat is niet "bet-bewaard").');
 	}
 	const versie = json['versie'];
-	if (versie !== 1 && versie !== 2) {
-		return fout(`Deze back-up heeft versie ${JSON.stringify(versie)}; deze tool kent alleen versie 1 en 2.`);
+	if (versie !== 1 && versie !== 2 && versie !== 3) {
+		return fout(`Deze back-up heeft versie ${JSON.stringify(versie)}; deze tool kent alleen versie 1, 2 en 3.`);
 	}
 	if (json['boek'] !== boek) {
 		return fout(`Deze back-up is van het boek "${String(json['boek'])}", niet van "${boek}".`);
@@ -133,7 +136,7 @@ export function leesBackup(tekst: string, boek: string): LeesUitkomst {
 	}
 	const antwoorden = versie === 1 ? [] : leesAntwoordenUitBackup(json['antwoorden']);
 	if (typeof antwoorden === 'string') return fout(antwoorden);
-	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 2, boek, gemaakt, repoCommit, tussenstanden, keuzes, antwoorden } };
+	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 3, boek, gemaakt, repoCommit, tussenstanden, keuzes, antwoorden } };
 }
 
 /**
@@ -166,13 +169,27 @@ function lokaalIsNieuwer(lokaal: BewerktVers, uitBackup: BewerktVers): boolean {
 	return Date.parse(lokaal.bewaard) > Date.parse(uitBackup.bewaard);
 }
 
-function zelfdeAntwoord(lokaal: Antwoord, uitBackup: Antwoord): boolean {
-	return lokaal.optie === uitBackup.optie && lokaal.keuzeId === uitBackup.keuzeId && lokaal.gegeven === uitBackup.gegeven;
+function zelfdeKeuzes(lokaal: Antwoord, uitBackup: Antwoord): boolean {
+	return lokaal.keuzeIds.length === uitBackup.keuzeIds.length && uitBackup.keuzeIds.every((id) => lokaal.keuzeIds.includes(id));
 }
 
-/** Bij samenvoegen wint per kwestie het nieuwste antwoord; bij gelijke tijd de back-up. */
+function zelfdeAntwoord(lokaal: Antwoord, uitBackup: Antwoord): boolean {
+	return lokaal.optie === uitBackup.optie && lokaal.toelichting === uitBackup.toelichting && lokaal.gegeven === uitBackup.gegeven && zelfdeKeuzes(lokaal, uitBackup);
+}
+
+/** Bij samenvoegen wint per kwestie de nieuwste optie en toelichting; bij gelijke tijd de back-up. */
 function lokaalAntwoordIsNieuwer(lokaal: Antwoord, uitBackup: Antwoord): boolean {
 	return Date.parse(lokaal.gegeven) > Date.parse(uitBackup.gegeven);
+}
+
+/**
+ * Het antwoord na samenvoegen: optie, toelichting en tijd van het nieuwste antwoord, met de keuzes van beide.
+ * De keuzes zelf worden ook samengevoegd (alles wat in beide lijsten staat blijft), dus een keuze mag zijn antwoord niet kwijtraken
+ * omdat het andere antwoord ouder is.
+ */
+function voegAntwoordenSamen(lokaal: Antwoord, uitBackup: Antwoord): Antwoord {
+	const winnaar = lokaalAntwoordIsNieuwer(lokaal, uitBackup) ? lokaal : uitBackup;
+	return { ...winnaar, keuzeIds: [...new Set([...lokaal.keuzeIds, ...uitBackup.keuzeIds])] };
 }
 
 /** Hoofdstukken waar de opslag of de back-up iets voor heeft, op oplopend nummer. */
@@ -286,8 +303,11 @@ function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst
 		const index = samenAntwoorden.findIndex((eigen) => eigen.kwestie === antwoord.kwestie);
 		const eigen = samenAntwoorden[index];
 		if (eigen === undefined) samenAntwoorden.push(antwoord);
-		else if (zelfdeAntwoord(eigen, antwoord) || lokaalAntwoordIsNieuwer(eigen, antwoord)) continue;
-		else samenAntwoorden[index] = antwoord;
+		else {
+			const samen = voegAntwoordenSamen(eigen, antwoord);
+			if (zelfdeAntwoord(eigen, samen)) continue;
+			samenAntwoorden[index] = samen;
+		}
 		veranderdeAntwoorden++;
 	}
 	if (veranderdeAntwoorden > 0) {
@@ -331,7 +351,8 @@ function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): Inl
 
 /**
  * Schrijft de back-up in de opslag.
- * Samenvoegen houdt wat er is; bij een vers of een antwoord in beide wint het nieuwste, bij gelijke tijd de back-up; keuzes die al bestaan blijven.
+ * Samenvoegen houdt wat er is; bij een vers wint het nieuwste, bij gelijke tijd de back-up; keuzes die al bestaan blijven.
+ * Een antwoord in beide krijgt optie en toelichting van het nieuwste (bij gelijke tijd de back-up) en de keuzes van beide.
  * Vervangen wist eerst alles van dit boek; lukt het schrijven niet helemaal, dan komt de oude stand terug.
  */
 export function pasBackupToe(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup, modus: InlaadModus): InlaadUitkomst {

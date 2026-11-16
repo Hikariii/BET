@@ -18,6 +18,7 @@ import {
 	groepeerPlekken,
 	kiesBereik,
 	kortUit,
+	optieOmschrijving,
 	plekken as plekkenTekst,
 	standaardAangevinkt,
 	verdeelPlekken,
@@ -316,15 +317,12 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 		);
 		const aangepast = verdeling.toe.filter((plek) => uitkomst.keuze.verzen.some(({ hoofdstuk, vers }) => hoofdstuk === plek.hoofdstuk && vers === plek.vers)).length;
 		const regels = [...uitkomst.meldingen, `${plekkenTekst(aangepast)} aangepast.`];
-		const beantwoord = vraag !== null && leesAntwoorden(browseropslag(), boek.id).some(({ keuzeId }) => keuzeId === uitkomst.keuze.id);
-		// Een tweede Toepassen op dezelfde vraag zou het antwoord stil naar de nieuwe keuze zetten en de eerste keuze verweesd achterlaten.
+		const beantwoord = vraag !== null && leesAntwoorden(browseropslag(), boek.id).some(({ keuzeIds }) => keuzeIds.includes(uitkomst.keuze.id));
 		if (beantwoord) {
-			regels.push(`Vraag beantwoord met optie ${vraag.optie}. De zoekopdracht is niet meer aan de vraag gekoppeld en zoekt in het hele boek.`);
-			zetVraag(null);
-			zetHeleBoek(false);
+			regels.push(`De keuze staat nu onder het antwoord op "${kortUit(vraag.kwestie, 80)}". De zoekopdracht blijft aan dat antwoord gekoppeld: een volgende keuze komt er ook onder. Met Loslaten zoek je weer in het hele boek.`);
 		}
 		zetMeldingen(regels);
-		zoekMet(beantwoord ? null : vraag, beantwoord ? false : heleBoek, variantVervangingen);
+		zoekMet(vraag, heleBoek, variantVervangingen);
 		herlees();
 		meldingenvak.current?.focus();
 	}
@@ -349,6 +347,9 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 	const huidigeSoort = opdracht?.soort ?? soort;
 	const wijziging = wijzigingVan(opdracht);
 	const lijstprops = { boek: boek.id, stijlen: boek.stijlen, aangevinkt, bijWissel: wissel };
+	const bestaandAntwoord = vraag === null ? undefined : antwoorden.find(({ kwestie }) => kwestie === vraag.kwestie);
+	// Bestaat er al een antwoord, dan komt een nieuwe keuze eronder en blijven optie en toelichting zoals ze zijn.
+	const koppelingOptie = optieOmschrijving(bestaandAntwoord?.optie ?? vraag?.optie ?? '');
 	const vervangingLeeg = opdracht?.soort === 'tekst' && opdracht.nieuw === '';
 
 	return (
@@ -359,8 +360,8 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 
 			{vraag !== null && (
 				<div class="vraagkoppeling">
-					<p title={`${vraag.kwestie}, optie ${vraag.optie}`}>
-						Beantwoordt: {kortUit(vraag.kwestie, 80)}, optie {kortUit(vraag.optie, 80)}
+					<p title={`${vraag.kwestie}, ${koppelingOptie}`}>
+						Hoort bij het antwoord op: {kortUit(vraag.kwestie, 80)} ({kortUit(koppelingOptie, 80)})
 					</p>
 					<button type="button" onClick={koppelLos}>
 						Loslaten

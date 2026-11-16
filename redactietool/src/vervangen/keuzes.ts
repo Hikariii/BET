@@ -1,7 +1,7 @@
 import { alsInhoud, bewaarKeuzeVers, bewaarVers, leesTussenstand, wisVers, zelfdeInhoud } from '../bewerken/tussenstand';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
-import { bewaarAntwoord, verwijderAntwoordenVanKeuze } from '../antwoorden/antwoorden';
+import { haalKeuzeUitAntwoorden, voegKeuzeToe } from '../antwoorden/antwoorden';
 import { vervangInVers } from './zoekEnVervang';
 import { DOMEINEN, type Domein } from '../formaat/types';
 import type { HoofdstukVerzen, Vondst } from './types';
@@ -275,7 +275,7 @@ function draaiKeuzeVersTerug(opslag: Opslag, boek: string, keuzes: readonly Stru
 
 /**
  * Schrijft de keuzelijst met alleen `overgebleven` verzen en de `overgeslagen` plekken voor `keuze`; zonder verzen is de keuze uit de lijst
- * en ook een antwoord dat naar de keuze wijst.
+ * en ook uit de antwoorden die ernaar wijzen (een antwoord zonder keuzes en zonder toelichting verdwijnt dan).
  */
 function bewaarKeuzeNaTerugdraaien(
 	opslag: Opslag,
@@ -289,14 +289,14 @@ function bewaarKeuzeNaTerugdraaien(
 		if (k.id !== keuze.id) return [k];
 		return overgebleven.length === 0 ? [] : [{ ...k, verzen: overgebleven, overgeslagen }];
 	});
-	if (schrijfKeuzes(opslag, boek, nieuweLijst) && overgebleven.length === 0) verwijderAntwoordenVanKeuze(opslag, boek, keuze.id);
+	if (schrijfKeuzes(opslag, boek, nieuweLijst) && overgebleven.length === 0) haalKeuzeUitAntwoorden(opslag, boek, keuze.id);
 }
 
 const KEUZE_ONTBREEKT = 'Deze keuze staat niet meer in de lijst.';
 
 /**
  * Draait een keuze terug, vers voor vers met de regels van `draaiKeuzeVersTerug`. Verzen die blijven staan zonder bij de keuze te blijven
- * (door een eigen bewerking) verdwijnen uit de keuze. Zijn er geen verzen meer over, dan is de keuze uit de lijst en ook het antwoord dat ernaar wees.
+ * (door een eigen bewerking) verdwijnen uit de keuze. Zijn er geen verzen meer over, dan is de keuze uit de lijst en uit het antwoord dat ernaar wees.
  * Geeft de meldingen terug.
  */
 export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): string[] {
@@ -312,7 +312,7 @@ export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): 
 /**
  * Draait één vers van een keuze terug, met dezelfde regels als `draaiKeuzeTerug` (niet als een latere keuze of eigen bewerking
  * het vers veranderde). Het vers gaat uit de keuze, behalve als het niet terug kon of een latere keuze het bezit; gaat het laatste vers eruit,
- * dan verdwijnt de keuze en ook een antwoord dat ernaar wijst. Een vers dat echt terugging komt bij de overgeslagen plekken van de keuze, met reden `teruggedraaid`.
+ * dan verdwijnt de keuze en gaat hij ook uit het antwoord dat ernaar wijst. Een vers dat echt terugging komt bij de overgeslagen plekken van de keuze, met reden `teruggedraaid`.
  * Geeft de meldingen.
  */
 export function draaiVersTerug(opslag: Opslag, boek: string, keuzeId: string, hoofdstuk: number, vers: number): string[] {
@@ -353,7 +353,8 @@ function gebruikteVarianten(toepassing: Toepassing): KeuzeVariant[] {
 
 /**
  * Past een zoekopdracht (tekst of markering, met varianten) toe zoals `pasKeuzeToe`, en bewaart de keuze met soort, varianten,
- * overgeslagen plekken en vraag. Hoort er een vraag bij, dan wordt ook het antwoord bewaard, met het keuze-id.
+ * overgeslagen plekken en vraag. Hoort er een vraag bij, dan komt de keuze onder het antwoord op die vraag:
+ * bestaat dat al, dan komt de keuze erbij (optie en toelichting blijven); anders wordt er een antwoord met de optie van de vraag bewaard.
  * Is er niets veranderd of kon de keuze niet bewaard worden, dan is er ook geen antwoord.
  */
 export function pasOpdrachtToe(opslag: Opslag, boek: string, toepassing: Toepassing, nu: Date): ToepasUitkomst {
@@ -374,8 +375,7 @@ export function pasOpdrachtToe(opslag: Opslag, boek: string, toepassing: Toepass
 		wijzigVers(inhoud, plekken, opdracht, toepassing.variantVervangingen),
 	);
 	if (vraag !== null && keuzeBewaard) {
-		const antwoord = { kwestie: vraag.kwestie, optie: vraag.optie, keuzeId: keuze.id, gegeven: nu.toISOString() };
-		if (!bewaarAntwoord(opslag, boek, antwoord)) meldingen.push('Het antwoord op de vraag kon niet worden bewaard, waarschijnlijk is de opslag vol.');
+		if (!voegKeuzeToe(opslag, boek, vraag, keuze.id, nu)) meldingen.push('Het antwoord op de vraag kon niet worden bewaard, waarschijnlijk is de opslag vol.');
 	}
 	return { keuze, meldingen };
 }

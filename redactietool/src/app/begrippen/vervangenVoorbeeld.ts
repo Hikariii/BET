@@ -1,3 +1,4 @@
+import { EIGEN_ANTWOORD } from '../../antwoorden/antwoorden';
 import { pasTussenstandToe } from '../../bewerken/tussenstand';
 import { knipVers } from '../../bewerken/versknip';
 import type { Tussenstand } from '../../bewerken/types';
@@ -161,4 +162,9 @@ export function kortUit(tekst: string, maximum: number): string {
 export function keuzeBeschrijving(keuze: Pick<StructureleKeuze, 'soort' | 'zoekterm' | 'nieuw' | 'van' | 'naar'>): string {
 	if (keuze.soort === 'markering') return `markering van "${keuze.zoekterm}": ${keuze.van ?? '?'} wordt ${keuze.naar ?? '?'}`;
 	return `"${keuze.zoekterm}" door "${keuze.nieuw}"`;
+}
+
+/** Hoe een antwoord in de schermen heet: "eigen antwoord" of `optie a) …`. */
+export function optieOmschrijving(optie: string): string {
+	return optie === EIGEN_ANTWOORD ? 'eigen antwoord' : `optie ${optie}`;
 }
