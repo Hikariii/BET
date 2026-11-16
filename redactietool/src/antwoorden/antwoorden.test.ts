@@ -3,13 +3,16 @@ import { GeheugenOpslag } from '../bewaren/testhulp';
 import {
 	antwoordenSleutel,
 	bewaarAntwoord,
+	controleerKeuze,
 	EIGEN_ANTWOORD,
 	haalKeuzeUitAntwoorden,
 	leesAntwoorden,
 	legAntwoordVast,
 	levendeKeuzeIds,
+	meldingHoudenBijBestaandAntwoord,
 	pasToelichtingAan,
 	trekAntwoordIn,
+	verliestToelichtingBijIntrekken,
 	voegKeuzeToe,
 	type Antwoord,
 } from './antwoorden';
@@ -115,7 +118,10 @@ describe('legAntwoordVast', () => {
 
 		const uitkomst = legAntwoordVast(opslag, 'lukas', { kwestie: 'Gezegend', optie: EIGEN_ANTWOORD, toelichting: 'anders' }, NU);
 
-		expect(uitkomst.gelukt).toBe(false);
+		expect(uitkomst).toEqual({
+			gelukt: false,
+			melding: 'Er is al een antwoord op deze vraag. Pas de toelichting aan, of draai de keuzes terug en trek het antwoord in.',
+		});
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([GEZEGEND]);
 	});
 });
@@ -221,5 +227,48 @@ describe('levendeKeuzeIds', () => {
 		const antwoord = { ...GEZEGEND, keuzeIds: ['k1', 'weg', 'k2'] };
 
 		expect(levendeKeuzeIds(antwoord, new Set(['k1', 'k2', 'k3']))).toEqual(['k1', 'k2']);
+	});
+});
+
+describe('verliestToelichtingBijIntrekken', () => {
+	it('is waar bij een toelichting en onwaar bij een lege of lege-ruimte toelichting', () => {
+		expect(verliestToelichtingBijIntrekken({ ...GEZEGEND, toelichting: 'regel' })).toBe(true);
+		expect(verliestToelichtingBijIntrekken({ ...GEZEGEND, toelichting: '' })).toBe(false);
+		expect(verliestToelichtingBijIntrekken({ ...GEZEGEND, toelichting: '  \n' })).toBe(false);
+	});
+});
+
+describe('controleerKeuze', () => {
+	const andereOptie = 'b) eeuwig leven';
+
+	it('weigert een andere optie dan het vastgelegde antwoord, met een uitvoerbare melding', () => {
+		expect(controleerKeuze(GEZEGEND, andereOptie)).toEqual({
+			gelukt: false,
+			melding:
+				'Het antwoord op deze vraag is a) genade. Kies een optie die erbij past, of draai de keuzes terug, trek het antwoord in en leg een eigen antwoord vast.',
+		});
+	});
+
+	it('laat dezelfde optie nog eens toe', () => {
+		expect(controleerKeuze(GEZEGEND, GEZEGEND.optie)).toEqual({ gelukt: true });
+	});
+
+	it('laat bij een eigen antwoord elke optie toe, en ook als er nog geen antwoord is', () => {
+		const eigen = { ...GEZEGEND, optie: EIGEN_ANTWOORD, toelichting: 'regel' };
+
+		expect(controleerKeuze(eigen, GEZEGEND.optie)).toEqual({ gelukt: true });
+		expect(controleerKeuze(eigen, andereOptie)).toEqual({ gelukt: true });
+		expect(controleerKeuze(null, andereOptie)).toEqual({ gelukt: true });
+	});
+});
+
+describe('meldingHoudenBijBestaandAntwoord', () => {
+	it('geeft bij een andere optie de uitvoerbare weigering, bij dezelfde optie dat het al vastligt', () => {
+		const bestaand = { ...HOUDEN, keuzeIds: ['k1'] };
+
+		expect(meldingHoudenBijBestaandAntwoord(bestaand, 'a) iets anders')).toBe(
+			'Het antwoord op deze vraag is b) niets doen. Kies een optie die erbij past, of draai de keuzes terug, trek het antwoord in en leg een eigen antwoord vast.',
+		);
+		expect(meldingHoudenBijBestaandAntwoord(bestaand, bestaand.optie)).toBe('Het antwoord op deze vraag ligt al vast. Er verandert niets in de tekst.');
 	});
 });

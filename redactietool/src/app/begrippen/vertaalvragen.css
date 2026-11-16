@@ -223,7 +223,8 @@
 	margin-top: .5rem;
 }
 
-.vertaalvragen .toelichtingaanpassen .knoppen {
+.vertaalvragen .toelichtingaanpassen .knoppen,
+.vertaalvragen .intrekbevestiging .knoppen {
 	display: flex;
 	gap: .5rem;
 }

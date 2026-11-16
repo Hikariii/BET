@@ -54,6 +54,11 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] `draaiKeuzeTerug` (alles terugdraaien) registreert bij een gedeeltelijke terugdraai de echt teruggedraaide verzen niet als `teruggedraaid`, anders dan `draaiVersTerug`.
   - [ ] Back-up inladen: bij antwoorden ook tonen welke een lokaal antwoord overschrijven of blijven staan (zoals bij verzen).
   - [ ] Opties: machine-leesbare opties in `open-vragen.md` overwegen als meer vragen echte opties krijgen (keuze eigenaar).
+- [ ] Redactietool, uit de review van het genuanceerde antwoord:
+  - [ ] Voorvertoning bij back-up inladen toont niet dat een antwoord verandert of een toelichting verloren gaat (samenvoegen neemt het nieuwste antwoord, met een eventueel lege toelichting).
+  - [ ] Export: een antwoord met keuzes ook opnemen in de hoofdstukken van de vraagverzen (unie van de hoofdstukken van de keuzes en van de verzen).
+  - [ ] Dezelfde melding twee keer achter elkaar wordt niet opnieuw voorgelezen (teller of sleutel bij de melding).
+  - [ ] Hulptekst eventueel iets groter (.8125rem in plaats van .75rem).
 - [ ] Redactietool, uit de review van fase 7b (v8e):
   - [x] Back-up samenvoegen: per vers wint de nieuwste (keuze eigenaar, 2026-11-16).
   - [ ] Feature: bij back-up inladen conflicten tonen (beide versies naast elkaar) en per vers laten kiezen (zie `redactietool/stap2-plan.md`, "conflicten tonen").

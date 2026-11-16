@@ -96,7 +96,7 @@ export function legAntwoordVast(opslag: Opslag, boek: string, { kwestie, optie, 
 	const schoon = toelichting.trim();
 	if (optie === EIGEN_ANTWOORD && schoon === '') return { gelukt: false, melding: TOELICHTING_VERPLICHT };
 	if (leesAntwoorden(opslag, boek).some((bestaand) => bestaand.kwestie === kwestie)) {
-		return { gelukt: false, melding: 'Er is al een antwoord op deze vraag. Trek dat eerst in, of pas de toelichting aan.' };
+		return { gelukt: false, melding: 'Er is al een antwoord op deze vraag. Pas de toelichting aan, of draai de keuzes terug en trek het antwoord in.' };
 	}
 	return vastgelegd(opslag, boek, { kwestie, optie, toelichting: schoon, keuzeIds: [], gegeven: nu.toISOString() });
 }
@@ -149,4 +149,27 @@ export function trekAntwoordIn(opslag: Opslag, boek: string, kwestie: string, be
 		return { gelukt: false, melding: 'Er hangen nog keuzes onder dit antwoord. Draai die eerst terug onder Zoeken en vervangen.' };
 	}
 	return schrijfAntwoorden(opslag, boek, antwoorden.filter((kandidaat) => kandidaat !== antwoord)) ? { gelukt: true } : { gelukt: false, melding: OPSLAG_VOL };
+}
+
+/** Een antwoord met toelichting verliest die toelichting bij intrekken; de vertaler moet dat eerst bevestigen. */
+export function verliestToelichtingBijIntrekken(antwoord: Antwoord): boolean {
+	return antwoord.toelichting.trim() !== '';
+}
+
+/**
+ * Mag er onder het bestaande antwoord een keuze met deze optie komen? Een eigen antwoord laat elke optie toe;
+ * een gewoon antwoord alleen dezelfde optie nog eens (meer verzen). Zonder antwoord staat alles vrij.
+ */
+export function controleerKeuze(bestaand: Antwoord | null, optie: string): Uitkomst {
+	if (bestaand === null || bestaand.optie === EIGEN_ANTWOORD || bestaand.optie === optie) return { gelukt: true };
+	return {
+		gelukt: false,
+		melding: `Het antwoord op deze vraag is ${bestaand.optie}. Kies een optie die erbij past, of draai de keuzes terug, trek het antwoord in en leg een eigen antwoord vast.`,
+	};
+}
+
+/** De melding bij een houden-optie als er al een antwoord is: een andere optie wordt geweigerd, dezelfde of een eigen antwoord laat niets nieuws toe. */
+export function meldingHoudenBijBestaandAntwoord(bestaand: Antwoord, optie: string): string {
+	const keuze = controleerKeuze(bestaand, optie);
+	return keuze.gelukt ? 'Het antwoord op deze vraag ligt al vast. Er verandert niets in de tekst.' : keuze.melding;
 }
