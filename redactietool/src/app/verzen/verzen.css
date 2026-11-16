@@ -5,6 +5,7 @@
  * De rijhoogte komt van bron en vereenvoudiging; de cel Vertaalregels (VertaalregelsCel) is hoogstens zo hoog als het vers.
  * Wat niet past vervaagt onderaan. Bij aanwijzen of toetsenbordfocus klapt het vak uit over de volgende verzen, zonder dat iets verschuift.
  * Zolang de naslagkaart onder het vers open staat, zweeft de cel niet: hij staat vast in de kolom met alle regels en de rij groeit mee.
+ * Een punaise rechtsonder in het uitgeklapte vak (en bij een open naslagkaart) zet het vak ook vast.
  *
  * De tabel heeft de klassen verzen en verzen-dicht.
  */

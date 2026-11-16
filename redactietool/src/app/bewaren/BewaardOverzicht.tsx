@@ -8,7 +8,7 @@ import { useBackupStand } from './useBackupStand';
 import { useBewaardOverzicht } from './useBewaardOverzicht';
 import './bewaren.css';
 
-/** De pagina `#/<boek>/bewaard`: wat de browser bewaart per hoofdstuk, de toegepaste keuzes en de back-upknoppen. */
+/** De pagina `#/<boek>/opgeslagen`: wat de browser bewaart per hoofdstuk, de toegepaste keuzes en de back-upknoppen. */
 export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 	const overzicht = useBewaardOverzicht(boek);
 	const backup = useBackupStand(boek.id, overzicht);

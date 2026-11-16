@@ -5,9 +5,9 @@ De eenvoudigste werkwijze, in vier stappen.
 1. Kies bij {{plek:hoofdstukken}} een hoofdstuk. Links staat de bron, in het midden de vereenvoudigde tekst, rechts de vertaalregels.
 2. Klik in de vereenvoudigde tekst van een vers en pas het aan. De tool slaat elke wijziging meteen op, in deze browser.
 3. Klaar met een hoofdstuk? Klik rechtsboven op **Hoofdstuktekst kopiëren voor Word** en plak de tekst in Word. De opmaak gaat mee.
-4. Lever het Word-bestand aan. Dat bestand is leidend: Claude leest het terug in de repo, met de opmaak.
+4. Lever het Word-bestand aan. Dat bestand is leidend: Claude leest het terug in de repo (de map met de teksten die Claude beheert), met de opmaak.
 
-Wil je Claude ook laten weten welke keuzes en antwoorden achter je tekst zitten? Klik dan op **Export voor Claude**, download het bestand en lever het samen met het Word-bestand aan. De export is alleen uitleg. De tekst komt altijd uit Word.
+Wil je Claude ook laten weten welke keuzes en antwoorden achter je tekst zitten? Klik dan op **Export voor Claude**. Er opent een formulier waarin je een toelichting kunt schrijven. Klik op **Downloaden** en lever het bestand samen met het Word-bestand aan. De export is uitleg bij je werk. Claude haalt de tekst zelf altijd uit Word.
 
 Sluit elke werksessie af met een back-up. Alles wat je doet staat alleen in deze browser op deze computer; een back-up is je vangnet. Lees meer bij *Opslaan en laden*.
 

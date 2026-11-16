@@ -15,7 +15,7 @@ Op verzoek van de eigenaar leest Claude je Word-bestand terug in de repo, één 
 
 ## Waarvoor de export dient
 
-**Export voor Claude** is uitleg, nooit tekst. Hij laat Claude zien welke verzen je hebt bewerkt, welke keuzes je hebt toegepast en welke vragen je hebt beantwoord, met je toelichting. Verschilt de tekst in de export van die in Word, dan volgt Claude Word en meldt het verschil.
+**Export voor Claude** is uitleg. Hij bevat wel de tekst van de verzen die je hebt bewerkt, maar Claude gebruikt die nooit als bron voor de tekst: de tekst komt altijd uit Word. Hij laat Claude zien welke verzen je hebt bewerkt, welke keuzes je hebt toegepast en welke vragen je hebt beantwoord, met je toelichting. Verschilt de tekst in de export van die in Word, dan volgt Claude Word en meldt het verschil.
 
 De export is niet nodig: Word alleen is genoeg. Hij helpt Claude wel om te begrijpen waarom je iets hebt gedaan.
 

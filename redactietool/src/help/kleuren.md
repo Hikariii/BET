@@ -2,7 +2,7 @@
 
 De opmaak van de Bijbeltekst is dezelfde als in Word. De tool bedenkt er niets bij: de kleuren en stijlen komen uit het Word-sjabloon van {{boek}}.
 
-Rond de tekst gebruikt de tool alleen de toolkleur. Staat er in de tekst iets gekleurd, dan komt dat uit de bron.
+Knoppen, randen en achtergrond hebben de eigen kleuren van de tool, en die betekenen niets voor de tekst. Staat er in de tekst iets gekleurd, dan komt dat uit de bron.
 
 ## De legenda
 

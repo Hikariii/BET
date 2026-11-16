@@ -6,7 +6,7 @@ type Toets = { key: string; ctrlKey: boolean; metaKey: boolean; altKey: boolean;
 const INVOERVELDEN = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
 
 /** Een invoerveld of de editor: daar is `?` een teken dat de lezer typt. */
-export function isInvoer(doel: ToetsDoel): boolean {
+function isInvoer(doel: ToetsDoel): boolean {
 	return doel !== null && (INVOERVELDEN.has(doel.tagName) || doel.isContentEditable);
 }
 

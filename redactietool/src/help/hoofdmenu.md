@@ -16,7 +16,7 @@ De vertaalkeuzes die al vastliggen. Per keuze zie je op hoeveel plekken in het b
 
 ## {{plek:gevonden}}
 
-Per bronwoord zie je hoe het in het boek is vertaald. Woorden die op verschillende manieren zijn vertaald staan bovenaan. Je komt uit bij een tabel met links naar de verzen.
+Per bronwoord zie je hoe het in het boek is vertaald. Standaard zie je alleen de woorden die verschillend zijn vertaald; zoek je een woord, dan zie je ze allemaal. Je komt uit bij een tabel met links naar de verzen.
 
 {{wijs plek-gevonden | {{plek:gevonden}} | Bovenaan in de balk.}}
 
@@ -44,7 +44,7 @@ Met de vier letters rechts in de balk maak je de tekst kleiner of groter. De too
 
 {{wijs grootte | Lettergrootte | Rechtsboven in de balk, naast Help.}}
 
-## Hoofdstukken
+## De hoofdstukkenbalk
 
 Op de pagina van een hoofdstuk staat onder de balk een tweede rij met de hoofdstukken. Elk hoofdstuk heeft een nummer, een vinkje als het goedgekeurd is en het aantal open vragen. Schuif zijwaarts als niet alles past.
 

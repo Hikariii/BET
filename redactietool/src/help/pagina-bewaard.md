@@ -22,6 +22,16 @@ Twijfel je, kies dan Samenvoegen.
 
 {{wijs back-up-inladen | Back-up inladen | Bovenaan deze pagina, naast Back-up downloaden.}}
 
+## Wanneer was je laatste back-up?
+
+Onder de opslagregel staat **Laatste back-up: nooit**, **Laatste back-up: vandaag** of bijvoorbeeld **Laatste back-up: 3 dagen geleden**. Zo weet je of je vangnet nog vers is.
+
+Is je laatste back-up ouder dan een week en heb je daarna nog iets bewerkt, dan staat er ook een herinnering op deze pagina, en staat in de balk naast Opgeslagen **Maak een back-up**. Heb je nog nooit een back-up gemaakt en is je oudste bewerking ouder dan een week, dan komt dezelfde herinnering. Een back-up downloaden haalt de herinnering weg.
+
+## Een lege pagina
+
+Is er nog niets opgeslagen, bijvoorbeeld omdat je in een andere browser of op een andere computer werkt? Dan staat er een tip om je back-up in te laden, met een knop **Back-up inladen**.
+
 ## De opslagstatus
 
 In de balk bovenaan staat op elke pagina hoeveel je hebt opgeslagen. Een klik brengt je naar deze pagina. Lukt het opslaan niet omdat de opslag van de browser vol is, dan meldt de tool dat bij het vers. Download dan meteen een back-up.

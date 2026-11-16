@@ -8,7 +8,7 @@ describe('helpPlekBijPagina', () => {
 		expect(TABBLADEN.map((tabblad) => helpPlekBijPagina('begrippen', tabblad))).toEqual(['besloten', 'gevonden', 'vragen', 'vervangen']);
 	});
 
-	it('geeft de hoofdstukken bij een hoofdstuk en Bewaard bij de pagina Bewaard', () => {
+	it('geeft de hoofdstukken bij een hoofdstuk en Opgeslagen bij de pagina Opgeslagen', () => {
 		expect(helpPlekBijPagina('hoofdstuk', null)).toBe('hoofdstukken');
 		expect(helpPlekBijPagina('bewaard', null)).toBe('bewaard');
 	});
@@ -20,7 +20,7 @@ describe('onderdelen van de help', () => {
 		expect(paginaOnderdeel(helpPlekBijPagina('bewaard', null))).toBe('pagina-bewaard');
 	});
 
-	it('heeft een onderdeel voor elke plek in de balk en voor Bewaard', () => {
+	it('heeft een onderdeel voor elke plek in de balk en voor Opgeslagen', () => {
 		const plekken = boekPlekken('lukas', { precedenten: [], openVragen: [] }, null, 1).map((plek) => plek.plek);
 		expect(plekken).toHaveLength(5);
 		for (const plek of plekken) expect(HELP_PLEKKEN).toContain(plek);

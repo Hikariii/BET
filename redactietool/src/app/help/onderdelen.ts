@@ -1,10 +1,10 @@
 import type { Tabblad } from '../adres';
 import { PLEKNAAM, type Plek } from '../navigatie/boekplekken';
 
-/** De pagina's van een boek waar de help een eigen onderdeel voor heeft: de plekken uit de balk en de pagina Bewaard. */
+/** De pagina's van een boek waar de help een eigen onderdeel voor heeft: de plekken uit de balk en de pagina Opgeslagen. */
 export type HelpPlek = Plek | 'bewaard';
 
-/** De plekken in de volgorde van de balk, met Bewaard achteraan. De lijst volgt `PLEKNAAM`, zodat een nieuwe plek vanzelf meetelt. */
+/** De plekken in de volgorde van de balk, met Opgeslagen achteraan. De lijst volgt `PLEKNAAM`, zodat een nieuwe plek vanzelf meetelt. */
 export const HELP_PLEKKEN: readonly HelpPlek[] = [...(Object.keys(PLEKNAAM) as Plek[]), 'bewaard'];
 
 /** De onderdelen die op elke pagina hetzelfde zijn. De id is de naam van het Markdown-bestand in `src/help/`. */
@@ -23,7 +23,8 @@ export function alleOnderdelen(): HelpOnderdeel[] {
 	return [...ALGEMENE_ONDERDELEN, ...HELP_PLEKKEN.map(paginaOnderdeel)];
 }
 
-type Pagina = 'hoofdstuk' | 'begrippen' | 'bewaard';
+/** Welke pagina binnen het boek open staat, voor `aria-current`, de strip in de bovenbalk en de help. */
+export type Pagina = 'hoofdstuk' | 'begrippen' | 'bewaard';
 
 /** De plek waar de lezer is, uit de pagina en het tabblad van de indeling. */
 export function helpPlekBijPagina(pagina: Pagina, tabblad: Tabblad | null): HelpPlek {

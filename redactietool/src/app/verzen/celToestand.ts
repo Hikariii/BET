@@ -21,6 +21,15 @@ type Invoer = {
 };
 
 /**
+ * Of de regels niet in de cel passen, na een meting.
+ * Zolang de cel vast staat groeit de rij mee en past alles; die meting zegt niets over het zweefvak.
+ * Dan blijft de uitkomst van vóór het vastzetten gelden, zodat de punaise (en de focus erop) blijft staan nadat je hem hebt losgemaakt.
+ */
+export function overloopNaMeting(vorige: boolean, vast: boolean, gemeten: boolean): boolean {
+	return vast ? vorige : gemeten;
+}
+
+/**
  * Bepaalt hoe de cel Vertaalregels erbij staat: zolang de naslagkaart open is of het vak vastgezet is, staat hij vast en volledig,
  * anders zweeft hij en klapt hij open bij aanwijzen of toetsenbordfocus, maar alleen als de regels niet in de cel passen.
  */

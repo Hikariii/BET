@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import type { Precedent, Referentie, RichtlijnSectie } from '../data/types';
 import { maakAdres } from './adres';
 import { laadRichtlijn } from './gegevens';
+import { dialoogOpen } from './help/dialoogOpen';
 import { useLaden } from './hooks';
 import { InlineMarkdown, Markdownweergave } from './Markdownweergave';
 import type { Naslag } from './naslag';
@@ -22,7 +23,7 @@ export function Naslagkaart({ naslag, boekId, referentie, id, onSluit }: Props) 
 	useEffect(() => {
 		kopRef.current?.focus();
 		const bijToets = (gebeurtenis: KeyboardEvent) => {
-			if (gebeurtenis.key === 'Escape') {
+			if (gebeurtenis.key === 'Escape' && !dialoogOpen()) {
 				onSluit();
 			}
 		};

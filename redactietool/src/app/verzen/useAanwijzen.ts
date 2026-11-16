@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { dialoogOpen } from '../help/dialoogOpen';
 
 /** Zo lang moet de aanwijzer op een cel blijven voor het vak opent, zodat een vak niet oplicht bij elke rij waar de muis langs gaat. */
 const AANWIJSVERTRAGING_MS = 180;
@@ -34,7 +35,7 @@ export function useAanwijzen(): { open: boolean; handelers: Aanwijshandelers } {
 	useEffect(() => {
 		if (!open) return;
 		const bijToets = (gebeurtenis: KeyboardEvent) => {
-			if (gebeurtenis.key === 'Escape') zetWeggedrukt(true);
+			if (gebeurtenis.key === 'Escape' && !dialoogOpen()) zetWeggedrukt(true);
 		};
 		window.addEventListener('keydown', bijToets);
 		return () => window.removeEventListener('keydown', bijToets);

@@ -16,9 +16,11 @@ De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een ma
 
 ## De vertaalregels
 
-Rechts van elk vers staat wat Claude bij dit vers heeft veranderd en op grond van welke regel. Het vak is zo hoog als het vers. Past niet alles, dan vervaagt de tekst onderaan en staat er **nog 3 regels** (of een ander aantal). Wijs het vak aan of tab erheen en het klapt uit over de verzen eronder. Een klik op **nog N regels** laat de rest staan.
+Rechts van elk vers staat wat Claude bij dit vers heeft veranderd en op grond van welke regel. Het vak is zo hoog als het vers. Is het vers korter dan de regels ernaast, dan vervaagt de tekst onderaan: er past niet meer in. Wijs het vak aan of tab erheen en het klapt uit over de verzen eronder, zodat je alles ziet.
 
-Rechtsonder in een uitgeklapt vak staat een punaise. Met **Vertaalregels vastzetten** blijft het vak open in de kolom, met alle regels. Nog een klik (**Vertaalregels losmaken**) maakt het weer los. Het vak blijft ook een moment open nadat je de muis ervan weghaalt, zodat je rustig kunt lezen.
+Heeft een vers veel regels (meer dan drie), dan staan er eerst drie. De rest zit achter **nog 3 regels** (of een ander aantal). Een klik daarop toont de rest. De knop heet dan **minder regels**; een klik daarop klapt de regels weer in.
+
+Rechtsonder in een uitgeklapt vak staat een punaise. Met **Vertaalregels vastzetten** blijft het vak open in de kolom, met alle regels. Nog een klik maakt het weer los. Het vak blijft ook een moment open nadat je de muis ervan weghaalt, zodat je rustig kunt lezen.
 
 Met **Vertaalregels altijd tonen** zet je de kolom aan of uit. Staat hij uit, dan klik je op een vers om de regels onder dat vers te zien.
 
@@ -28,7 +30,7 @@ Met **Vertaalregels altijd tonen** zet je de kolom aan of uit. Staat hij uit, da
 
 ## Een regel naslaan
 
-Achter een regel staat soms **§11** of **precedent**. Klik erop en onder het vers opent een kaart. Bij een § staat daar de paragraaf uit de richtlijn. Bij precedent staan daar de vertaalkeuzes die bij de regel horen. Sluit de kaart met **Sluiten** of Escape.
+Achter een regel staat soms **§11** of **precedent**. Klik erop en onder het vers opent een kaart. Bij een § staat daar de paragraaf uit de richtlijn. Bij precedent staan daar de vertaalkeuzes die bij de regel horen. Sluit de kaart met **Sluiten** of Escape. De punaise staat ook als een kaart open is. Heb je het vak vastgezet, dan blijft het vastgezet nadat je de kaart sluit.
 
 {{wijs naslag-verwijzing | § en precedent | In de kolom Vertaalregels, achter een regel.}}
 {{wijs naslagkaart | De naslagkaart | Verschijnt onder het vers nadat je op § of precedent klikt.}}
@@ -45,7 +47,7 @@ Onder de boekbalk staat de balk van dit hoofdstuk: de titel met de status als pi
 
 **Hoofdstuktekst kopiëren voor Word** zet de tekst van het hele hoofdstuk op het klembord, met de Word-opmaak. Plak hem daarna in Word. Dat werkt in Chrome en Edge, niet in Safari. Staat er een melding dat een bewerking verouderd is, kijk dat vers dan eerst na: Claude heeft de tekst sinds jouw wijziging aangepast.
 
-**Export voor Claude** maakt een bestand met je wijzigingen, keuzes en antwoorden voor dit hoofdstuk. Je kunt er een toelichting bij schrijven. Lees *Terugvoeren naar Claude* voor wat Claude ermee doet.
+**Export voor Claude** opent een formulier met een veld voor je toelichting en de knop **Downloaden**. Het bestand dat je downloadt bevat je wijzigingen, keuzes en antwoorden voor dit hoofdstuk. Lees *Terugvoeren naar Claude* voor wat Claude ermee doet.
 
 {{wijs hoofdstuk-kopieren | Hoofdstuktekst kopiëren voor Word | Rechtsboven in de balk van het hoofdstuk.}}
 {{wijs export-voor-claude | Export voor Claude | Rechtsboven in de balk van het hoofdstuk.}}

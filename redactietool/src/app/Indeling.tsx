@@ -4,16 +4,13 @@ import { versAdres, type Tabblad } from './adres';
 import { BewaarStatus } from './bewaren/BewaarStatus';
 import { BoekTabbladen } from './bovenbalk/BoekTabbladen';
 import { Help } from './help/Help';
-import { helpPlekBijPagina } from './help/onderdelen';
+import { helpPlekBijPagina, type Pagina } from './help/onderdelen';
 import { Bovenbalk } from './bovenbalk/Bovenbalk';
 import { GrootteKeuze } from './GrootteKeuze';
 import type { Plek } from './navigatie/boekplekken';
 import { HoofdstukStrip } from './navigatie/HoofdstukStrip';
 import { useBoekPlekken } from './navigatie/useBoekPlekken';
 import type { Weergavebeheer } from './weergave/useWeergave';
-
-/** Welke pagina binnen het boek open staat, voor `aria-current` en de strip in de bovenbalk. */
-type Pagina = 'hoofdstuk' | 'begrippen' | 'bewaard';
 
 type Props = {
 	weergavebeheer: Weergavebeheer;

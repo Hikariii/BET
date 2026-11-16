@@ -86,10 +86,3 @@ export function titelVan(onderdeel: HelpOnderdeel, namen: Helpnamen): string {
 	if (kop === null) throw new Error(`src/help/${onderdeel}.md begint niet met een kop.`);
 	return vulIn(kop[1] ?? '', namen);
 }
-
-/** De sleutels van alle onderdelen die de help aanwijst, voor de controle tegen `data-help` in de code. */
-export function alleWijsSleutels(namen: Helpnamen): string[] {
-	return alleOnderdelen().flatMap((onderdeel) =>
-		splitsBlokken(helptekst(onderdeel), namen).flatMap((blok) => (blok.soort === 'wijs' ? [blok.sleutel] : [])),
-	);
-}

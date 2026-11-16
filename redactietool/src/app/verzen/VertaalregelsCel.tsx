@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { celToestand } from './celToestand';
+import { celToestand, overloopNaMeting } from './celToestand';
 import { useAanwijzen } from './useAanwijzen';
 import './verzen.css';
 
@@ -24,12 +24,17 @@ export function VertaalregelsCel({ nummer, naslagOpen, regels }: Props) {
 	const [overloopt, zetOverloopt] = useState(false);
 	const [vastgezet, zetVastgezet] = useState(false);
 	const toestand = celToestand({ naslagOpen, vastgezet, overloopt, open });
+	const vastRef = useRef(toestand.vast);
+	vastRef.current = toestand.vast;
 
 	useEffect(() => {
 		const cel = celRef.current;
 		const inhoud = inhoudRef.current;
 		if (cel === null || inhoud === null) return;
-		const meet = () => zetOverloopt(inhoud.offsetTop + inhoud.offsetHeight > cel.clientHeight + 1);
+		const meet = () => {
+			const gemeten = inhoud.offsetTop + inhoud.offsetHeight > cel.clientHeight + 1;
+			zetOverloopt((vorige) => overloopNaMeting(vorige, vastRef.current, gemeten));
+		};
 		meet();
 		const waarnemer = new ResizeObserver(meet);
 		waarnemer.observe(cel);
@@ -53,7 +58,7 @@ export function VertaalregelsCel({ nummer, naslagOpen, regels }: Props) {
 }
 
 function Punaise({ vastgezet, wissel }: { vastgezet: boolean; wissel: () => void }) {
-	const label = vastgezet ? 'Vertaalregels losmaken' : 'Vertaalregels vastzetten';
+	const label = 'Vertaalregels vastzetten';
 	return (
 		<div class="punaisestrook">
 			<button type="button" class="punaise" aria-pressed={vastgezet} aria-label={label} title={label} onClick={wissel}>

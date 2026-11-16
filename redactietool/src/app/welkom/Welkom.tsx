@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { ruweBrowseropslag } from '../bewerken/useTussenstand';
+import { BEWAARD_NAAM } from '../navigatie/boekplekken';
 import { bewaarWelkomGezien, isWelkomGezien } from './welkomGezien';
 import './welkom.css';
 
@@ -40,7 +41,7 @@ export function Welkom() {
 			<h2 id="welkom-titel">Welkom bij de redactietool</h2>
 			<p>
 				Met deze tool lees en bewerk je de vereenvoudiging naast de bron en breng je hem naar Word. Je werk wordt automatisch opgeslagen in deze browser op deze
-				computer; maak bij Opgeslagen een back-up. De knop Help rechtsboven legt uit hoe alles werkt.
+				computer; maak bij {BEWAARD_NAAM} een back-up. De knop Help rechtsboven legt uit hoe alles werkt.
 			</p>
 			<p class="welkom-knoppen">
 				<button

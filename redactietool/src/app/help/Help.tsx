@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { BoekData } from '../../data/types';
 import type { BoekPlek } from '../navigatie/boekplekken';
+import { dialoogOpen } from './dialoogOpen';
 import { Helpvenster } from './Helpvenster';
 import { paginaOnderdeel, type HelpOnderdeel, type HelpPlek } from './onderdelen';
 import { isHelpToets } from './toets';
@@ -12,11 +13,6 @@ type Props = {
 	plek: HelpPlek;
 	plekken: readonly BoekPlek[];
 };
-
-/** Een modale dialoog die al open staat, bijvoorbeeld Back-up inladen: dan opent `?` de help niet erbovenop. */
-function dialoogOpen(): boolean {
-	return document.querySelector('dialog[open]') !== null;
-}
 
 /**
  * De knop Help in de boekbalk en het helpvenster. De toets `?` opent hem ook, behalve in een invoerveld of de editor.

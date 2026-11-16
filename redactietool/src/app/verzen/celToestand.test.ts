@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { celToestand } from './celToestand';
+import { celToestand, overloopNaMeting } from './celToestand';
 
 const rust = { naslagOpen: false, vastgezet: false, overloopt: false, open: false };
 
@@ -30,5 +30,17 @@ describe('celToestand', () => {
 		expect(celToestand({ ...rust, vastgezet: true, overloopt: true })).toEqual(verwacht);
 		expect(celToestand({ ...rust, vastgezet: true, overloopt: true, open: true })).toEqual(verwacht);
 		expect(celToestand({ ...rust, vastgezet: true, naslagOpen: true })).toEqual(verwacht);
+	});
+});
+
+describe('overloopNaMeting', () => {
+	it('neemt de meting over zolang de cel los staat', () => {
+		expect(overloopNaMeting(false, false, true)).toBe(true);
+		expect(overloopNaMeting(true, false, false)).toBe(false);
+	});
+
+	it('houdt de uitkomst van vóór het vastzetten, ook als de vaste cel alles laat passen', () => {
+		expect(overloopNaMeting(true, true, false)).toBe(true);
+		expect(overloopNaMeting(false, true, true)).toBe(false);
 	});
 });

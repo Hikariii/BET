@@ -27,7 +27,7 @@ export function bewaarTelling(overzicht: BewaardOverzicht): string {
 	return delen.join(', ');
 }
 
-/** De regel voor de bewaarstatus: "Bewaard in deze browser · 12 verzen in 3 hoofdstukken · 14:32". */
+/** De regel voor de bewaarstatus: "Opgeslagen in deze browser · 12 verzen in 3 hoofdstukken · 14:32". */
 export function bewaarRegel(overzicht: BewaardOverzicht, nu: Date = new Date()): string {
 	if (overzicht.laatstBewaard === null) return 'Nog niets opgeslagen in deze browser';
 	const delen = ['Opgeslagen in deze browser', bewaarTelling(overzicht), tijdVan(overzicht.laatstBewaard, nu)];

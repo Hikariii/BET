@@ -4,7 +4,7 @@ export type Tabblad = (typeof TABBLADEN)[number];
 
 /**
  * Het adres in de browser.
- * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden; `#/lukas/bewaard` is het overzicht van wat de browser bewaart; `#/galerij` is de galerij met de componenten. Een slash achteraan mag.
+ * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden; `#/lukas/opgeslagen` is het overzicht van wat de browser bewaart; `#/galerij` is de galerij met de componenten. Een slash achteraan mag.
  */
 export type Adres = BoekAdres | { soort: 'galerij' };
 
