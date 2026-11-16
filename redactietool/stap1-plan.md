@@ -2,6 +2,14 @@
 
 Status: **afgesloten** op 2026-11-15. Dit was stap 1 van de bouw; wat nog niet gebouwd is, staat in [`stap2-plan.md`](stap2-plan.md). De uitgangspunten, de architectuur en het terugvoeren hieronder gelden nog steeds.
 
+> **Wijkt nu af (2026-11-16).** Dit plan is ouder dan de tool. Waar het hieronder anders staat dan de code, geldt de code:
+> - **Opslag:** de tussenstand staat in `localStorage`, niet in IndexedDB (U4, §3, architectuur en risico's). Een hoofdstuk is klein genoeg.
+> - **Mappen:** `src/controles/`, `src/vragen/` en `src/tussenstand/` bestaan niet. De code staat in `src/antwoorden/`, `bewaren/`, `bewerken/`, `export/`, `vervangen/` en `begrippen/`.
+> - **U8:** er is geen zijbalk meer. Hoofdstukken staan in een hoofdstukstrip in de bovenbalk (v8e); een stip bij een bewerkt hoofdstuk hoort in die strip (zie stap 2, fase 9b).
+> - **Fase 4** is gebouwd (zoeken en vervangen, markering wisselen, varianten, een optie van een vraag kiezen), niet "deels". Fase 5 is ook gebouwd.
+> - **Lukas 1 tot 3:** de "8 open fouten" zijn hersteld of geaccepteerd; `STATUS.md` meldt 0 fouten.
+> - **Namen:** Besloten heet nu Vertaalkeuzes, Gevonden heet Zo vertaald, Vervangen heet Zoeken en vervangen, Begrippen heet Keuzes en vragen, Bewaard heet Opgeslagen, Regels heet Vertaalregels, en een uitgevoerde zoek-en-vervang heet een vervanging. De adressen en de bestandsnamen in de code zijn gelijk gebleven.
+
 **Stand bij afsluiten:** fase 0, 1, 2, 3 en 5 gebouwd (met openstaande onderdelen, zie stap 2). Fase 4 deels: zoeken en vervangen met voorbeeldvenster, terugdraaien per keuze en herkomst in de export. Fase 0: Mac geslaagd; een aparte Windows-test vervalt, de redacteur test in het gebruik.
 
 ## Doel
