@@ -10,9 +10,13 @@ html[data-ontwerp='v8d'] .bovenbalk .bovenbalk-boekbalk {
 	gap: 0.4rem 2rem;
 }
 
+/* Hoofdstukbalk: lucht boven de knoppen (onder de boekbalk) en tussen de knoppen en de hoofdstukstrip. */
 html[data-ontwerp='v8d'] .bovenbalk .bovenbalk-hoofdstukbalk {
-	padding-right: 1.5rem;
-	padding-left: 1.5rem;
+	padding: 0.6rem 1.5rem 0.5rem;
+}
+
+html[data-ontwerp='v8d'] .bovenbalk .bovenbalk-navigatie {
+	padding: 0.35rem 1.5rem;
 }
 
 html[data-ontwerp='v8d'] .bovenbalk .boekplek-icoon {
