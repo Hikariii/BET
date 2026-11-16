@@ -78,6 +78,13 @@ Kleine punten (toegankelijkheid, componenttests, rooktest, woordgrenzen bij een 
 - **Bovenbalk los en sticky**: de knop Keuzes en vragen, de hoofdstuktitel en de acties (Hoofdstuktekst kopiëren voor Word, Export voor Claude) staan in een balk bovenaan die blijft staan bij scrollen en niet mee inklapt met de navigatiekolom.
 - **Kolom Vertaalregels inklappen**: twijfel. Er is al een schakelaar "Vertaalregels altijd tonen" (anders onder het gekozen vers); bekijken of een ingeklapte smalle kolom met alleen labels (§7A, precedent, vraag) beter is.
 
+**Opslag zichtbaar, back-up downloaden en inladen (eigenaar, 2026-11-16; nog niet ontworpen):** de tussenstand (bewerkte verzen) en de structurele keuzes staan in `localStorage`, maar de vertaler ziet nergens óf en wát er bewaard is.
+- **Bewaarstatus** in de bovenbalk, bv. "Bewaard in deze browser · 12 verzen in 3 hoofdstukken · 14:32", met een melding als bewaren mislukt (opslag vol).
+- **Overzicht van wat er bewaard is**: per hoofdstuk de bewerkte verzen (met link), de toegepaste keuzes, verouderde bewerkingen (repo veranderd); terug naar de repo per vers of per hoofdstuk.
+- **Back-up downloaden**: één bestand per boek (`lukas.bet-bewaard.json`) met alle tussenstanden en keuzes, de datum en de repo-commit. Anders dan Export voor Claude: dit is om terug in te laden, niet om te laten verwerken.
+- **Back-up inladen**: bestand kiezen, eerst een voorbeeld (wat komt erin, wat wordt overschreven, wat is verouderd), dan kiezen tussen samenvoegen en vervangen. Geldt als herstel en om op een andere computer verder te werken.
+- Past binnen U4 (geen opslag op een server): het bestand is van de vertaler. Neemt het risico "tussenstand in de browser gewist" grotendeels weg.
+
 **Werkwijze:**
 1. **Analyse.** Schermafbeeldingen van de huidige tool en de taken van de redacteur als verloop uitgeschreven (een vers aanpassen, een vertaalvraag beantwoorden, een hoofdstuk naar Word brengen). Wat werkt, wat schuurt, welke patronen ontbreken.
 2. **Richtingen met Claude Design.** Binnen de basis hierboven twee of drie typografische richtingen voor de schermen die het meest tellen: lezen en bewerken, het menu bij een woord, het voorbeeldvenster met varianten. Altijd met echte Lukas-tekst, ook uit een druk hoofdstuk. De eigenaar kiest, de redacteur reageert, daarna itereren.

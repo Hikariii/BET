@@ -43,6 +43,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] `redactietool/src/klembord/chromiumKlembord.mjs` (alleen macOS, gebruikt rolldown van Vite en Playwright uit `/tmp/pw`) opnemen in de tests of vervangen.
   - [ ] `document.title` per hoofdstuk zetten; Node-versie op één plek (nu `mise.toml` 26.13.1 en workflow `26`).
   - [ ] Pages aanzetten in de repo-instellingen (bron: GitHub Actions); daarna publiceert de workflow bij elke push naar `main`.
+- [ ] Redactietool: bewaarstatus zichtbaar, overzicht van wat er bewaard is, back-up downloaden en inladen (zie `redactietool/stap2-plan.md`, "Opslag zichtbaar").
 - [ ] Redactietool, uit de review van fase 7 (ontwerp):
   - [ ] Opmaakcontrole (`redactietool/ontwerp/opmaakcontrole.mjs`) uitbreiden: vet, cursief, onderstreept; vers-editor, naslagkaart, versvoorproef, Zoeken en vervangen; boek en hoofdstukken niet vast in het script; eventueel als test in de build.
   - [ ] Bewerken door klikken: de Bijbeltekst gewone tekst laten (geen `role="button"`), met een knop "Vers N bewerken" die bij focus zichtbaar wordt; testen met een schermlezer.
