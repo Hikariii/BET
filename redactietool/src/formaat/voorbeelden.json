@@ -1,0 +1,37 @@
+{
+  "_uitleg": "Teksten die parseer.ts en parse_md (scripts/formaat.py) allebei moeten weigeren (ongeldig) of allebei moeten lezen (geldig). Gebruikt door pariteit.test.ts via scripts/formaat_naar_json.py --voorbeelden.",
+  "ongeldig": [
+    { "naam": "regel met alleen spaties", "tekst": "a\n  \nb\n" },
+    { "naam": "regel met alleen een tab", "tekst": "a\n\t\nb\n" },
+    { "naam": "drie lege regels achter elkaar", "tekst": "a\n\n\n\nb\n" },
+    { "naam": "cursief buiten vet", "tekst": "{cursief}{vet}x{/vet}{/cursief}\n" },
+    { "naam": "vet en cursief in de verkeerde volgorde gesloten", "tekst": "{vet}{cursief}x{/vet}{/cursief}\n" },
+    { "naam": "onderwijs binnen vet", "tekst": "{vet}{onderwijs}x{/onderwijs}{/vet}\n" },
+    { "naam": "highlight binnen vet", "tekst": "{vet}==x=={/vet}\n" },
+    { "naam": "highlight kruist vet", "tekst": "=={vet}x=={/vet}\n" },
+    { "naam": "versnummer binnen een tag", "tekst": "{vet}a [5] b{/vet}\n" },
+    { "naam": "versnummer binnen highlight", "tekst": "==a [5] b==\n" },
+    { "naam": "onbekende tag", "tekst": "{foo}x{/foo}\n" },
+    { "naam": "tag met hoofdletter", "tekst": "{Torah}x{/Torah}\n" },
+    { "naam": "tag zonder naam", "tekst": "{}x{/}\n" },
+    { "naam": "interne naam highlight als tag", "tekst": "{highlight}x{/highlight}\n" },
+    { "naam": "sluittag zonder open tag", "tekst": "a{/vet}\n" },
+    { "naam": "tag dubbel open", "tekst": "{vet}{vet}x{/vet}{/vet}\n" },
+    { "naam": "tag niet gesloten", "tekst": "a {vet}b\n" },
+    { "naam": "highlight niet gesloten", "tekst": "==a\n" },
+    { "naam": "tag over twee regels", "tekst": "{vet}a\nb{/vet}\n" },
+    { "naam": "onbekende alineatag", "tekst": "@profeet tekst\n" },
+    { "naam": "twee spaties na de alineatag", "tekst": "@jezus  tekst\n" },
+    { "naam": "alineatag met alleen een spatie erna", "tekst": "@jezus \n" },
+    { "naam": "kop met twee hekjes", "tekst": "## Lukas 3\n" },
+    { "naam": "kop zonder spatie", "tekst": "#Lukas 3\n" }
+  ],
+  "geldig": [
+    { "naam": "kop, lege regel en tekst met vers", "tekst": "# Lukas 1\n\n[1] Tekst\n" },
+    { "naam": "twee lege regels achter elkaar", "tekst": "a\n\n\nb\n" },
+    { "naam": "alineatag zonder tekst", "tekst": "@jezus\n" },
+    { "naam": "alineatag met tab", "tekst": "@jezus\ttekst\n" },
+    { "naam": "opmaak van buiten naar binnen", "tekst": "{onderwijs}a ==b {onderstreept}{vet}{cursief}{genade}c{/genade}{/cursief}{/vet}{/onderstreept}==d{/onderwijs}\n" },
+    { "naam": "twee domeinen in elkaar", "tekst": "{genade}a{geloof}b{/geloof}{/genade}\n" }
+  ]
+}

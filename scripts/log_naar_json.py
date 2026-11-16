@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Geeft voor elk hoofdstuk de uitvoer van parse_log (md_naar_docx.py) als JSON.
+"""Geeft voor elk hoofdstuk de uitvoer van parse_log (formaat.py) als JSON.
 
 De parser in redactietool/src/log/ wordt met deze uitvoer vergeleken (pariteitstest).
 
@@ -22,7 +22,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import boek as boekmod  # noqa: E402
-import md_naar_docx  # noqa: E402
+import formaat  # noqa: E402
 
 MAP = "wijzigingslog"
 
@@ -37,14 +37,14 @@ def main(argv=None):
         for hoofdstuk in range(1, boek.aantal_hoofdstukken + 1):
             pad = boek.pad(MAP, hoofdstuk)
             if os.path.isfile(pad):
-                verzen, algemene_vragen = md_naar_docx.parse_log(pad)
+                verzen, algemene_vragen = formaat.parse_log(pad)
                 bestanden[f"{MAP}/{boek.bestandsnaam(hoofdstuk)}"] = {
                     "verzen": {str(vers): inhoud for vers, inhoud in verzen.items()},
                     "algemene_vragen": algemene_vragen,
                 }
-    except (md_naar_docx.MdError, boekmod.BoekFout) as e:
-        sys.stderr.write(f"FOUT: {e}\n")
-        return 1
+    except boekmod.BoekFout as fout:
+        sys.stderr.write(f"FOUT: {fout}\n")
+        return 2
     json.dump({"bestanden": bestanden}, sys.stdout, ensure_ascii=False)
     sys.stdout.write("\n")
     return 0

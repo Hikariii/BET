@@ -33,123 +33,10 @@ from xml.sax.saxutils import escape
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import boek as boekmod  # noqa: E402
-
-BOEK = None  # wordt in main() gezet (boek.json): sjabloon, naam, mappen
-
-# ---------------------------------------------------------------------------
-# Tags -> Word
-# ---------------------------------------------------------------------------
-
-PARA_STYLES = {  # @tag -> pStyle
-    "jezus": "Jezuswoorden",
-    "god": "GodsStem",
-    "engel": "engelenwoord",
-    "citaat-ot": "citaatOT",
-}
-CHAR_STYLES = {  # {tag} -> rStyle
-    "eeuwigleven": "eeuwigleven",
-    "genade": "genade",
-    "geloof": "geloof",
-    "oordeel": "oordeel",
-    "rechtvaardig": "rechtvaardig",
-    "zonde": "zonde",
-    "torah": "Torah",
-    "dag": "dag",
-}
-DIRECT = {"vet", "cursief", "onderstreept"}  # directe Word-opmaak zonder eigen stijl (aanvulling van docx_naar_md.py)
-RED = "onderwijs"  # {onderwijs} -> w:color FF0000
-HIGHLIGHT = "=="  # ==...== -> w:highlight yellow
-
-TAG_RE = re.compile(r"\{(/?)([^{}\s]*)\}|==|\[(\d+)\]")
-INVALID_XML_RE = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f￾￿]")
-
-
-class MdError(Exception):
-    pass
-
-
-def _fout(pad, regelnr, msg):
-    return MdError(f"{pad}:{regelnr}: {msg}")
-
-
-# ---------------------------------------------------------------------------
-# Parsen van de Markdown
-# ---------------------------------------------------------------------------
-# Een alinea = {"soort": "leeg"|"tekst"|"titel", "pstyle": str|None,
-#               "segs": [("tekst", tags) | ("vers", n, tags)], "regel": int}
-# `tags` is een tuple van actieve tags in volgorde van openen ("==" = highlight).
-
-
-def parse_inline(tekst, pad, regelnr):
-    segs = []
-    actief = []  # lijst van tags
-    pos = 0
-    for m in TAG_RE.finditer(tekst):
-        if m.start() > pos:
-            segs.append(("tekst", tekst[pos:m.start()], tuple(actief)))
-        pos = m.end()
-        if m.group(3) is not None:
-            segs.append(("vers", int(m.group(3)), tuple(actief)))
-        elif m.group(0) == HIGHLIGHT:
-            if HIGHLIGHT in actief:
-                actief.remove(HIGHLIGHT)
-            else:
-                actief.append(HIGHLIGHT)
-        else:
-            sluit, naam = m.group(1) == "/", m.group(2)
-            if naam not in CHAR_STYLES and naam not in DIRECT and naam != RED:
-                raise _fout(pad, regelnr, f"onbekende tag {m.group(0)!r}")
-            if sluit:
-                if naam not in actief:
-                    raise _fout(pad, regelnr, f"{m.group(0)} sluit een tag die niet open staat")
-                actief.remove(naam)
-            else:
-                if naam in actief:
-                    raise _fout(pad, regelnr, f"{{{naam}}} staat al open (geneste dubbele tag)")
-                actief.append(naam)
-    if pos < len(tekst):
-        segs.append(("tekst", tekst[pos:], tuple(actief)))
-    if actief:
-        open_ = ", ".join("==" if t == HIGHLIGHT else "{" + t + "}" for t in actief)
-        raise _fout(pad, regelnr, f"tag(s) niet gesloten aan het eind van de alinea: {open_}")
-    return segs
-
-
-def parse_md(pad):
-    """Geeft de lijst alinea's van een md-bestand."""
-    pad = Path(pad)
-    try:
-        tekst = pad.read_text(encoding="utf-8-sig")
-    except OSError as e:
-        raise MdError(f"{pad}: kan niet lezen: {e}")
-    regels = tekst.replace("\r\n", "\n").replace("\r", "\n").split("\n")
-    if regels and regels[-1] == "":
-        regels.pop()  # slot-newline is geen lege alinea
-    alineas = []
-    for nr, regel in enumerate(regels, 1):
-        if INVALID_XML_RE.search(regel):
-            raise _fout(pad, nr, "bevat een ongeldig stuurteken")
-        if regel.strip() == "":
-            alineas.append({"soort": "leeg", "pstyle": None, "segs": [], "regel": nr})
-            continue
-        if regel.startswith("#"):
-            m = re.match(r"^# (\S.*?)\s*$", regel)
-            if not m:
-                raise _fout(pad, nr, "alleen '# Titel' wordt ondersteund (bv. '# Lukas 1')")
-            alineas.append({"soort": "titel", "pstyle": None, "titel": m.group(1),
-                            "segs": [], "regel": nr})
-            continue
-        pstyle = None
-        m = re.match(r"^@(\S+)(?:\s+|$)", regel)
-        if m:
-            if m.group(1) not in PARA_STYLES:
-                raise _fout(pad, nr, f"onbekende alineatag '@{m.group(1)}'")
-            pstyle = PARA_STYLES[m.group(1)]
-            regel = regel[m.end():]
-        alineas.append({"soort": "tekst", "pstyle": pstyle,
-                        "segs": parse_inline(regel, pad, nr), "regel": nr})
-    return alineas
-
+from formaat import (  # noqa: E402
+    CHAR_STYLES, HIGHLIGHT, PARA_STYLES, RED, REVIEW_HEADING_STYLE, REVIEW_TITLE_STYLE, TITLE_STYLE,
+    missing_styles, parse_log, parse_md,
+)
 
 # ---------------------------------------------------------------------------
 # XML-bouwstenen
@@ -193,13 +80,13 @@ def run_xml(tekst, rpr=""):
     return f'<w:r>{rpr}<w:t xml:space="preserve">{escape(tekst)}</w:t></w:r>'
 
 
-def segs_xml(segs, sz=None, vers_zichtbaar=True):
+def segs_xml(segs, sz=None):
     """Runs voor een lijst segmenten. Versnummer: eigen superscript-run, zoals in het origineel."""
     uit = []
     for seg in segs:
         if seg[0] == "tekst":
             uit.append(run_xml(seg[1], rpr_xml(seg[2], extra_sz=sz)))
-        elif vers_zichtbaar:
+        else:
             uit.append(run_xml(str(seg[1]), rpr_xml(seg[2], extra_sz=sz, superscript=True, verse=True)))
     return "".join(uit)
 
@@ -232,7 +119,7 @@ def body_doc(alineas_per_bestand):
         while i < len(alineas):
             a = alineas[i]
             if a["soort"] == "leeg":
-                # Eén lege regel = één lege alinea. Twee (of meer) lege regels = sectiescheiding:
+                # Eén lege regel = één lege alinea. Twee lege regels (het maximum in FORMAAT.md) = sectiescheiding:
                 # een lege alinea gevolgd door een lege alinea met rand erboven (zoals in het origineel).
                 n = 0
                 while i + n < len(alineas) and alineas[i + n]["soort"] == "leeg":
@@ -240,12 +127,12 @@ def body_doc(alineas_per_bestand):
                 if n == 1:
                     uit.append("<w:p/>")
                 else:
-                    uit.extend(["<w:p/>"] * (n - 1))
+                    uit.append("<w:p/>")
                     uit.append(SECTIESCHEIDING)
                 i += n
                 continue
             elif a["soort"] == "titel":
-                titel_run = run_xml(a["titel"], '<w:rPr><w:rStyle w:val="Bblhfdstk"/></w:rPr>')
+                titel_run = run_xml(a["titel"], f'<w:rPr><w:rStyle w:val="{TITLE_STYLE}"/></w:rPr>')
                 # In het origineel staat 'Lukas N' inline aan het begin van de eerste alinea.
                 # Zoek de eerstvolgende niet-lege regel; samenvoegen als die geen alineastijl heeft.
                 j = i + 1
@@ -268,14 +155,14 @@ def body_doc(alineas_per_bestand):
 # ---------------------------------------------------------------------------
 
 
-def hoofdstuk_nummer(alineas, pad):
+def hoofdstuk_nummer(boek, alineas, pad):
+    """Het nummer uit de titel (`# Lukas 4`), anders uit de bestandsnaam; None als beide ontbreken."""
     for a in alineas:
         if a["soort"] == "titel":
-            m = re.search(r"(\d+)", a["titel"])
+            m = boek.titel_re.match(a["titel"])
             if m:
                 return int(m.group(1))
-    m = re.search(r"(\d+)", Path(pad).stem)
-    return int(m.group(1)) if m else None
+    return boek.nummer_uit_bestandsnaam(pad)
 
 
 def split_verzen(alineas):
@@ -331,84 +218,6 @@ def platte_tekst(stukken):
     return re.sub(r"\s+", " ", tekst).strip()
 
 
-def parse_log(pad):
-    """Geeft ({vers: {"wijz": [..], "vraag": [..], "label": str}}, [globale vragen]) uit een wijzigingslog.
-
-    Globale vragen = items onder een kop '## Vragen aan redactie' (genummerde of bullet-lijst).
-    """
-    pad = Path(pad)
-    try:
-        regels = pad.read_text(encoding="utf-8-sig").splitlines()
-    except OSError as e:
-        raise MdError(f"{pad}: kan niet lezen: {e}")
-    entries = {}
-    secties = []  # (verzen, [regels])
-    huidig = None
-    globaal = []
-    in_vragen = False
-    for regel in regels:
-        if re.match(r"^##\s+Vragen\b", regel, re.I):
-            in_vragen, huidig = True, None
-            continue
-        if in_vragen and not regel.startswith("#"):
-            m = re.match(r"^(?:\d+\.|[-*])\s+(.*)$", regel)
-            if m:
-                globaal.append(m.group(1).strip())
-            elif regel.strip() and globaal and regel.startswith((" ", "\t")):
-                globaal[-1] += " " + regel.strip()
-            continue
-        if regel.startswith("#"):
-            in_vragen = False
-        m = re.match(r"^##\s+Vers\s+(\d+)(?:\s*[-\u2013\u2014]\s*(\d+))?\s*:?\s*$", regel, re.I)
-        if m:
-            a = int(m.group(1))
-            b = int(m.group(2)) if m.group(2) else a
-            huidig = (list(range(a, b + 1)), [])
-            secties.append(huidig)
-        elif regel.startswith("#"):
-            huidig = None
-        elif huidig is not None:
-            huidig[1].append(regel)
-    for verzen, inhoud in secties:
-        sleutel = None
-        wijz, vraag = [], []
-        for regel in inhoud:
-            m = re.match(r"^[-*]\s+\*\*(.+?):?\*\*:?\s*(.*)$", regel)
-            if m:
-                naam = m.group(1).strip().lower().rstrip(":")
-                rest = m.group(2).strip()
-                if naam.startswith("wijziging"):
-                    sleutel = "wijz"
-                elif naam.startswith("twijfel") or "vraag" in naam:
-                    sleutel = "vraag"
-                else:
-                    sleutel = None  # Bron / Nieuw: niet nodig in het reviewdocument
-                if sleutel and rest:
-                    (wijz if sleutel == "wijz" else vraag).append(rest)
-                continue
-            if sleutel is None or not regel.strip():
-                continue
-            m = re.match(r"^\s+[-*]\s+(.*)$", regel)
-            if m:
-                (wijz if sleutel == "wijz" else vraag).append(m.group(1).strip())
-            else:  # voortzetting van de vorige regel
-                doel = wijz if sleutel == "wijz" else vraag
-                if doel:
-                    doel[-1] += " " + regel.strip()
-                else:
-                    doel.append(regel.strip())
-        vraag = [v for v in vraag if v.strip("() ").lower() not in
-                 ("", "optioneel", "geen", "nee", "n.v.t.", "nvt", "-", "\u2014")]
-        for k, n in enumerate(verzen):
-            label = f"vers {verzen[0]}–{verzen[-1]}" if len(verzen) > 1 else ""
-            if k == 0:
-                entries[n] = {"wijz": wijz, "vraag": vraag, "label": label}
-            else:
-                entries[n] = {"wijz": [], "vraag": [], "label": "",
-                              "zie": f"zie bij vers {verzen[0]}"}
-    return entries, globaal
-
-
 # --- celinhoud --------------------------------------------------------------
 
 CEL_SZ = None  # standaard grootte uit het origineel (11 pt) voor Bron/Vereenvoudigd
@@ -425,11 +234,11 @@ def cel_para(pstyle, segs):
     De pStyle blijft staan (kleur, cursief, lettertype komen uit de stijl); alleen
     w:ind (inspringing), w:spacing en de kader van Jezuswoorden worden overschreven.
     """
-    extra = (GEEN_RAND if pstyle == "Jezuswoorden" else "") + CEL_PPR
-    return para_xml(segs_xml(segs, sz=CEL_SZ, vers_zichtbaar=True), pstyle, extra)
+    extra = (GEEN_RAND if pstyle == PARA_STYLES["jezus"] else "") + CEL_PPR
+    return para_xml(segs_xml(segs, sz=CEL_SZ), pstyle, extra)
 
 
-def cel_tekst(inhoud, stukken, ontbreekt=False, kleur_vers=None):
+def cel_tekst(stukken, ontbreekt=False):
     if ontbreekt:
         return para_xml(run_xml("ONTBREEKT", rpr_xml((), bold=True, color="FF0000")), None, CEL_PPR)
     if not stukken:
@@ -510,8 +319,8 @@ def maak_rij(hfd, n, volgnr, bron_stukken, nieuw_stukken, log, heeft_log):
     geen_log_regel = bool(heeft_log and not gelijk and not bron_mist and not nieuw_mist and not entry)
     cellen = [
         tc(KOLOMMEN[0], para_xml(run_xml(label, rpr_xml((), bold=True, extra_sz=20)), None, CEL_PPR), shd),
-        tc(KOLOMMEN[1], cel_tekst(None, bron_stukken, bron_mist), shd),
-        tc(KOLOMMEN[2], cel_tekst(None, nieuw_stukken, nieuw_mist), shd),
+        tc(KOLOMMEN[1], cel_tekst(bron_stukken, bron_mist), shd),
+        tc(KOLOMMEN[2], cel_tekst(nieuw_stukken, nieuw_mist), shd),
         tc(KOLOMMEN[3], cel_log(entry, geen_log_regel), shd),
     ]
     return f'<w:tr>{"".join(cellen)}</w:tr>', gelijk, bron_mist or nieuw_mist
@@ -522,14 +331,14 @@ def lijst_item(tekst_xml):
                     '<w:spacing w:before="0" w:after="60"/><w:ind w:left="340" w:hanging="340"/>')
 
 
+LEGENDA_TEKST = {"eeuwigleven": "eeuwig leven", "torah": "Torah"}  # alle andere domeinen staan er onder de tagnaam
+
+
 def legenda_xml():
     delen = [run_xml("Opmaak zoals in het origineel: ")]
-    voorbeelden = [("eeuwig leven", "eeuwigleven"), ("genade", "genade"), ("geloof", "geloof"),
-                   ("oordeel", "oordeel"), ("rechtvaardig", "rechtvaardig"), ("zonde", "zonde"),
-                   ("Torah", "torah"), ("dag", "dag")]
-    for i, (tekst, tag) in enumerate(voorbeelden):
-        delen.append(run_xml(tekst, rpr_xml((tag,))))
-        delen.append(run_xml(", " if i < len(voorbeelden) - 1 else "; "))
+    for i, tag in enumerate(CHAR_STYLES):
+        delen.append(run_xml(LEGENDA_TEKST.get(tag, tag), rpr_xml((tag,))))
+        delen.append(run_xml(", " if i < len(CHAR_STYLES) - 1 else "; "))
     delen.append(run_xml("onderwijs", rpr_xml((RED,))))
     delen.append(run_xml(" (rood), "))
     delen.append(run_xml("highlight", rpr_xml((HIGHLIGHT,))))
@@ -537,11 +346,11 @@ def legenda_xml():
     return para_xml("".join(delen), None, '<w:spacing w:before="0" w:after="120"/>')
 
 
-def body_review(hoofdstukken):
+def body_review(boek, hoofdstukken):
     """hoofdstukken: lijst dicts met nr, bron (verzen), nieuw (verzen), log (dict|None)."""
     uit = []
     titel_nrs = ", ".join(str(h["nr"]) for h in hoofdstukken)
-    uit.append(para_xml(run_xml(f"Reviewdocument {BOEK.naam} {titel_nrs}"), "Kop1", '<w:spacing w:before="0" w:after="120"/>'))
+    uit.append(para_xml(run_xml(f"Reviewdocument {boek.naam} {titel_nrs}"), REVIEW_TITLE_STYLE, '<w:spacing w:before="0" w:after="120"/>'))
     uit.append(para_xml(run_xml(
         "Per vers staat links de brontekst (origineel) en daarnaast de vereenvoudigde tekst. "
         "De laatste kolom noemt wat er is veranderd en op grond van welke regel. "
@@ -565,14 +374,14 @@ def body_review(hoofdstukken):
             for n in sorted(h["log"]):
                 vragen.extend((h["nr"], n, v) for v in h["log"][n]["vraag"])
     if vragen:
-        uit.append(para_xml(run_xml(f"Vragen aan de redactie ({len(vragen)})"), "Kop2"))
+        uit.append(para_xml(run_xml(f"Vragen aan de redactie ({len(vragen)})"), REVIEW_HEADING_STYLE))
         meerdere = len(hoofdstukken) > 1
         for hfd, n, v in vragen:
             kop = ""
             if n is not None:
-                kop = run_xml(f"{BOEK.naam} {hfd}:{n}", rpr_xml((), bold=True)) + run_xml(" \u2014 ")
+                kop = run_xml(f"{boek.naam} {hfd}:{n}", rpr_xml((), bold=True)) + run_xml(" \u2014 ")
             elif meerdere:
-                kop = run_xml(f"{BOEK.naam} {hfd}: ", rpr_xml((), bold=True))
+                kop = run_xml(f"{boek.naam} {hfd}: ", rpr_xml((), bold=True))
             uit.append(lijst_item(kop + md_inline(v, None)))
         if any(h.get("globaal") for h in hoofdstukken) and per_vers:
             uit.append(para_xml(run_xml(
@@ -582,7 +391,7 @@ def body_review(hoofdstukken):
 
     totaal = {"verzen": 0, "gelijk": 0, "mist": 0}
     for h in hoofdstukken:
-        uit.append(para_xml(run_xml(f"{BOEK.naam} {h['nr']}"), "Kop2"))
+        uit.append(para_xml(run_xml(f"{boek.naam} {h['nr']}"), REVIEW_HEADING_STYLE))
         sleutels = sorted(set(h["bron"]) | set(h["nieuw"]))
         rijen = []
         for sl in sleutels:
@@ -593,7 +402,7 @@ def body_review(hoofdstukken):
             totaal["gelijk"] += gelijk
             totaal["mist"] += mist
             if mist:
-                sys.stderr.write(f"waarschuwing: {BOEK.naam} {h['nr']}:{sl[0]} ontbreekt in "
+                sys.stderr.write(f"waarschuwing: {boek.naam} {h['nr']}:{sl[0]} ontbreekt in "
                                  f"{'bron' if sl not in h['bron'] else 'vereenvoudigd'}\n")
         if h["log"]:
             for n in h["log"]:
@@ -610,18 +419,36 @@ def body_review(hoofdstukken):
 # Pakket schrijven
 # ---------------------------------------------------------------------------
 
-def lees_sjabloon():
-    sjabloon = Path(BOEK.sjabloon)
-    if not sjabloon.exists():
-        raise MdError(f"sjabloon niet gevonden: {sjabloon}")
-    with zipfile.ZipFile(sjabloon) as z:
-        entries = [(i, z.read(i.filename)) for i in z.infolist()]
-    doc = next(d for i, d in entries if i.filename == "word/document.xml").decode("utf-8")
+WORD_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+
+def stijlen_in_sjabloon(onderdelen, sjabloon):
+    """styleId -> w:type uit word/styles.xml van het sjabloon."""
+    sleutel = f"{{{WORD_NAMESPACE}}}"
+    try:
+        styles = ElementTree.fromstring(onderdelen["word/styles.xml"])
+    except KeyError:
+        raise boekmod.BoekFout(f"{sjabloon}: word/styles.xml ontbreekt, is dit een Word-bestand?")
+    except ElementTree.ParseError as fout:
+        raise boekmod.BoekFout(f"{sjabloon}: word/styles.xml is niet welgevormd: {fout}")
+    return {stijl.get(sleutel + "styleId"): stijl.get(sleutel + "type") for stijl in styles.iter(sleutel + "style")}
+
+
+def lees_sjabloon(boek):
+    """Geeft (onderdelen, begin, sectPr) van het sjabloon; een sjabloon zonder de stijlen van de export is een BoekFout."""
+    with boekmod.open_docx(boek.sjabloon) as docx:
+        entries = [(i, docx.read(i.filename)) for i in docx.infolist()]
+    onderdelen = {i.filename: data for i, data in entries}
+    ontbrekend = missing_styles(stijlen_in_sjabloon(onderdelen, boek.sjabloon))
+    if ontbrekend:
+        raise boekmod.BoekFout(f"{boek.sjabloon}: het sjabloon mist stijlen die de export gebruikt: {'; '.join(ontbrekend)}")
+    if "word/document.xml" not in onderdelen:
+        raise boekmod.BoekFout(f"{boek.sjabloon}: word/document.xml ontbreekt, is dit een Word-bestand?")
+    doc = onderdelen["word/document.xml"].decode("utf-8")
     start = doc.index("<w:body>") + len("<w:body>")
     kop = doc[:start]
     m = re.search(r"<w:sectPr\b.*</w:sectPr>", doc, re.S)
     if not m:
-        raise MdError("geen sectPr in sjabloon")
+        raise boekmod.BoekFout(f"{boek.sjabloon}: geen sectPr in word/document.xml")
     return entries, kop, m.group(0)
 
 
@@ -633,22 +460,25 @@ def landscape(sectpr):
     return sectpr
 
 
-def schrijf_docx(uitvoer, body, liggend=False):
-    entries, kop, sectpr = lees_sjabloon()
+def schrijf_docx(boek, uitvoer, body, liggend=False):
+    entries, kop, sectpr = lees_sjabloon(boek)
     if liggend:
         sectpr = landscape(sectpr)
     document = f"{kop}{body}{sectpr}</w:body></w:document>"
     try:  # valideer voor we schrijven
         ElementTree.fromstring(document.encode("utf-8"))
     except ElementTree.ParseError as e:
-        raise MdError(f"intern: gegenereerde document.xml is niet welgevormd: {e}")
+        raise boekmod.BoekFout(f"intern: gegenereerde document.xml is niet welgevormd: {e}")
     uitvoer = Path(uitvoer)
-    uitvoer.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(uitvoer, "w", zipfile.ZIP_DEFLATED) as z:
-        for info, data in entries:
-            if info.filename == "word/document.xml":
-                data = document.encode("utf-8")
-            z.writestr(info.filename, data)
+    try:
+        uitvoer.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(uitvoer, "w", zipfile.ZIP_DEFLATED) as z:
+            for info, data in entries:
+                if info.filename == "word/document.xml":
+                    data = document.encode("utf-8")
+                z.writestr(info.filename, data)
+    except OSError as fout:
+        raise boekmod.BoekFout(f"{uitvoer}: kan niet schrijven: {fout}")
     valideer_docx(uitvoer)
 
 
@@ -656,11 +486,10 @@ def valideer_docx(pad):
     with zipfile.ZipFile(pad) as z:
         slecht = z.testzip()
         if slecht:
-            raise MdError(f"{pad}: corrupte zip-entry {slecht}")
+            raise boekmod.BoekFout(f"{pad}: corrupte zip-entry {slecht}")
         for naam in z.namelist():
             if naam.endswith(".xml") or naam.endswith(".rels"):
                 ElementTree.fromstring(z.read(naam))
-    return True
 
 
 # ---------------------------------------------------------------------------
@@ -668,72 +497,53 @@ def valideer_docx(pad):
 # ---------------------------------------------------------------------------
 
 
-def bereik(spec):
-    nrs = []
-    for deel in spec.split(","):
-        deel = deel.strip()
-        m = re.match(r"^(\d+)(?:\s*-\s*(\d+))?$", deel)
-        if not m:
-            raise MdError(f"ongeldig hoofdstukbereik: {spec!r} (bv. 1-3 of 1,4,5)")
-        a = int(m.group(1))
-        b = int(m.group(2)) if m.group(2) else a
-        nrs.extend(range(a, b + 1))
-    return nrs
-
-
-def cmd_doc(args):
+def cmd_doc(boek, args):
     alineas = [parse_md(p) for p in args.md]
     body = body_doc(alineas)
-    schrijf_docx(args.output, body)
+    schrijf_docx(boek, args.output, body)
     print(f"geschreven: {args.output}")
 
 
-def cmd_review(args):
+def cmd_review(boek, args):
     bronnen = list(args.bron or [])
     nieuwe = list(args.nieuw or [])
     logs = list(args.log or [])
     if args.hoofdstuk:
-        for nr in bereik(args.hoofdstuk):
-            bronnen.append(BOEK.pad("bron", nr))
-            nieuwe.append(BOEK.pad("vereenvoudigd", nr))
-            lg = Path(BOEK.pad("wijzigingslog", nr))
+        for nr in boek.hoofdstukken(args.hoofdstuk):
+            bronnen.append(boek.pad("bron", nr))
+            nieuwe.append(boek.pad("vereenvoudigd", nr))
+            lg = Path(boek.pad("wijzigingslog", nr))
             if lg.exists():
                 logs.append(str(lg))
             else:
                 sys.stderr.write(f"waarschuwing: geen log voor hoofdstuk {nr} ({lg}); kolom Wijzigingen blijft leeg\n")
     if not bronnen or not nieuwe:
-        raise MdError("review vraagt --bron en --nieuw (of --hoofdstuk)")
+        raise boekmod.BoekFout("review vraagt --bron en --nieuw (of --hoofdstuk)")
     if len(bronnen) != len(nieuwe):
-        raise MdError(f"aantal --bron ({len(bronnen)}) en --nieuw ({len(nieuwe)}) verschilt")
-    if logs and len(logs) not in (len(bronnen),) and not args.hoofdstuk:
-        raise MdError(f"aantal --log ({len(logs)}) moet gelijk zijn aan het aantal hoofdstukken ({len(bronnen)}), of 0")
+        raise boekmod.BoekFout(f"aantal --bron ({len(bronnen)}) en --nieuw ({len(nieuwe)}) verschilt")
+    if logs and len(logs) != len(bronnen) and not args.hoofdstuk:
+        raise boekmod.BoekFout(f"aantal --log ({len(logs)}) moet gelijk zijn aan het aantal hoofdstukken ({len(bronnen)}), of 0")
 
-    # Bij --hoofdstuk kunnen logs voor sommige hoofdstukken ontbreken: koppel op hoofdstuknummer in de bestandsnaam.
-    def log_voor(pad_bron, i):
-        m = re.search(r"(\d+)", Path(pad_bron).stem)
+    def log_voor(index, nr):
+        """Bij --hoofdstuk kunnen logs voor sommige hoofdstukken ontbreken: dan telt het nummer in de bestandsnaam."""
         if len(logs) == len(bronnen):
-            return logs[i]
-        if m:
-            for lg in logs:
-                mm = re.search(r"(\d+)", Path(lg).stem)
-                if mm and int(mm.group(1)) == int(m.group(1)):
-                    return lg
-        return None
+            return logs[index]
+        return next((lg for lg in logs if boek.nummer_uit_bestandsnaam(lg) == nr), None)
 
     hoofdstukken = []
     for i, (b, n) in enumerate(zip(bronnen, nieuwe)):
         ab, an = parse_md(b), parse_md(n)
-        nr = hoofdstuk_nummer(ab, b)
-        nr_n = hoofdstuk_nummer(an, n)
+        nr = hoofdstuk_nummer(boek, ab, b)
+        nr_n = hoofdstuk_nummer(boek, an, n)
         if nr is None:
-            raise MdError(f"{b}: hoofdstuknummer niet te bepalen (verwacht '# {BOEK.naam} N' of {BOEK.bestandsnaam(1).replace('01', 'NN')})")
+            raise boekmod.BoekFout(f"{b}: hoofdstuknummer niet te bepalen (verwacht '# {boek.naam} N' of {boek.prefix}-NN.md)")
         if nr_n is not None and nr_n != nr:
-            raise MdError(f"{n}: hoofdstuk {nr_n} past niet bij {b} (hoofdstuk {nr})")
-        lg = log_voor(b, i)
+            raise boekmod.BoekFout(f"{n}: hoofdstuk {nr_n} past niet bij {b} (hoofdstuk {nr})")
+        lg = log_voor(i, nr)
         entries, globaal = parse_log(lg) if lg else (None, [])
         hoofdstukken.append({"nr": nr, "bron": split_verzen(ab), "nieuw": split_verzen(an),
                              "log": entries, "globaal": globaal})
-    schrijf_docx(args.output, body_review(hoofdstukken), liggend=True)
+    schrijf_docx(boek, args.output, body_review(boek, hoofdstukken), liggend=True)
     print(f"geschreven: {args.output}")
 
 
@@ -753,13 +563,11 @@ def main(argv=None):
     r.add_argument("-o", "--output", required=True)
     r.set_defaults(func=cmd_review)
     args = p.parse_args(argv)
-    global BOEK
     try:
-        BOEK = boekmod.laad(args.boek)
-        args.func(args)
-    except (MdError, boekmod.BoekFout) as e:
-        sys.stderr.write(f"FOUT: {e}\n")
-        return 1
+        args.func(boekmod.laad(args.boek), args)
+    except boekmod.BoekFout as fout:
+        sys.stderr.write(f"FOUT: {fout}\n")
+        return 2
     return 0
 
 

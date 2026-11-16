@@ -1,5 +1,5 @@
 {
-  "_uitleg": "Extra oude vormen uit referentie/precedenten.md van dit boek: [regex, bron, uitleg]. Gebruikt door scripts/controleer_hoofdstuk.py naast de algemene lijst uit de richtlijn.",
+  "_uitleg": "Extra oude vormen van dit boek, uit referentie/precedenten.md of de richtlijn: [regex, bron, uitleg]. Gebruikt door scripts/controleer_hoofdstuk.py naast de algemene lijst in scripts/controle_lijsten.json.",
   "oude_vormen": [
     ["\\bZoon des mensen\\b", "precedent", "Zoon des mensen → de Mensenzoon"],
     ["\\b[Vv]erzo(ek|cht)", "precedent", "verzoeken → op de proef stellen"],
@@ -34,7 +34,10 @@
     ["\\bonderken", "precedent", "onderkennen → herkennen"],
     ["\\bwaardig geacht", "precedent", "waardig geacht → het waard gevonden"],
     ["\\bverkrijgen\\b", "precedent", "verkrijgen → krijgen"],
-    ["\\b(ge)?worpen\\b|\\bwierp(en)?\\b", "precedent", "werpen → gooien"]
+    ["\\b(ge)?worpen\\b|\\bwierp(en)?\\b", "precedent", "werpen → gooien"],
+    ["\\bZaligmaker\\b", "§17", "Zaligmaker → Redder"],
+    ["\\bstadhouder\\b", "§28", "stadhouder → bestuurder"],
+    ["\\bviervorst\\b", "§28", "viervorst → heerser"]
   ],
   "_uitleg_geaccepteerd": "Bewuste keuzes van de vertaler (aangeleverd Word is leidend) die afwijken van de bron. scripts/controleer_hoofdstuk.py meldt ze als GEACCEPTEERD in plaats van als fout of waarschuwing. Per regel: vers, soort (tag of vast begrip) en reden.",
   "geaccepteerd": [
@@ -72,6 +75,14 @@
       "vers": "2:26",
       "soort": "Christus",
       "reden": "idem: met de uitleg verdween ook het vaste begrip uit dit vers"
+    }
+  ],
+  "_uitleg_docx_geaccepteerd": "Afwijkingen die scripts/controleer_docx_md.py tussen het Word-bestand en de bron/ vindt en die kloppen. Per regel: hoofdstuk, opmaak (tag) en reden. Het script meldt ze als GEACCEPTEERD en geeft dan exit 0.",
+  "docx_geaccepteerd": [
+    {
+      "hoofdstuk": 8,
+      "opmaak": "onderstreept",
+      "reden": "in 8:1 is de onderstreping in Word één reeks; de md splitst hem rond een spatie die niet rood is. Tekst en opmaak per teken kloppen"
     }
   ]
 }

@@ -5,6 +5,7 @@ import path from 'node:path';
 const HOOFDMAP = path.resolve(import.meta.dirname, '../../..');
 const BOEK = 'lukas';
 const MAPPEN = ['bron', 'vereenvoudigd'] as const;
+const VOORBEELDEN_PAD = path.join(import.meta.dirname, 'voorbeelden.json');
 
 export type Bijbelbestand = {
 	/** Zoals het Python-script het noemt, bv. `bron/lukas-01.md`. */
@@ -44,17 +45,30 @@ export type PythonAlinea = {
 	regel: number;
 };
 
+/** Per voorbeeldnaam de foutmelding van `parse_md`, of null als de tekst geldig is. */
+export type PythonVoorbeelden = Record<'geldig' | 'ongeldig', Record<string, string | null>>;
+
+export type Voorbeeld = { naam: string; tekst: string };
+export type VoorbeeldenBestand = Record<'geldig' | 'ongeldig', Voorbeeld[]>;
+
 export type PythonUitvoer = {
 	alineastijlen: string[];
 	domeinen: string[];
 	directe_opmaak: string[];
 	onderwijs: string;
+	opmaak_volgorde: string[];
+	stijlkoppeling: { alineastijlen: Record<string, string>; domeinen: Record<string, string>; titel: string };
 	bestanden: Record<string, PythonAlinea[]>;
+	voorbeelden: PythonVoorbeelden;
 };
 
-/** Draait `scripts/formaat_naar_json.py`: de uitvoer van `parse_md` voor elk hoofdstuk. */
+export function leesVoorbeelden(): VoorbeeldenBestand {
+	return JSON.parse(readFileSync(VOORBEELDEN_PAD, 'utf-8')) as VoorbeeldenBestand;
+}
+
+/** Draait `scripts/formaat_naar_json.py`: de uitvoer van `parse_md` voor elk hoofdstuk en voor de voorbeelden in `voorbeelden.json`. */
 export function leesPythonUitvoer(): PythonUitvoer {
-	const uitvoer = execFileSync('python3', ['-I', path.join(HOOFDMAP, 'scripts/formaat_naar_json.py'), '--boek', BOEK], {
+	const uitvoer = execFileSync('python3', ['-I', path.join(HOOFDMAP, 'scripts/formaat_naar_json.py'), '--boek', BOEK, '--voorbeelden', VOORBEELDEN_PAD], {
 		cwd: HOOFDMAP,
 		encoding: 'utf-8',
 		maxBuffer: 256 * 1024 * 1024,

@@ -4,9 +4,7 @@ import { leesStijlen } from '../sjabloon/leesStijlen';
 import { leesStylesXmlVanSjabloon } from '../sjabloon/sjabloon.testhulp';
 import { ALINEASTIJL_NAAR_WORD, DOMEIN_NAAR_WORD, TITEL_WORD } from './stijlkoppeling';
 
-type PythonKoppeling = { stijlkoppeling: { alineastijlen: Record<string, string>; domeinen: Record<string, string> } };
-
-const python = leesPythonUitvoer() as unknown as PythonKoppeling;
+const python = leesPythonUitvoer();
 const stijlen = new Map(leesStijlen(leesStylesXmlVanSjabloon()).map((stijl) => [stijl.id, stijl]));
 
 describe('stijlkoppeling tegen scripts/md_naar_docx.py', () => {
@@ -16,6 +14,10 @@ describe('stijlkoppeling tegen scripts/md_naar_docx.py', () => {
 
 	it('koppelt elk domein aan dezelfde Word-stijl als de Word-export', () => {
 		expect(DOMEIN_NAAR_WORD).toEqual(python.stijlkoppeling.domeinen);
+	});
+
+	it('zet de hoofdstuktitel op dezelfde Word-stijl als de Word-export', () => {
+		expect(TITEL_WORD).toBe(python.stijlkoppeling.titel);
 	});
 });
 

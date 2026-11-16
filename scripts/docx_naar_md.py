@@ -27,41 +27,18 @@ Hoe de Word-opmaak wordt gelezen (zie ook FORMAAT.md):
 """
 import argparse
 import os
-import re
 import sys
-import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import boek as boekmod  # noqa: E402
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # noqa: E402
+from formaat import (  # noqa: E402
+    BOLD_PSTYLES, HIGHLIGHT, HIGHLIGHT_TEKEN, ITALIC_PSTYLES, ORDER, RED, TAG_OF_PSTYLE, TAG_OF_RSTYLE,
+    TITLE_STYLE, TITLE_STYLES_READ, MAX_BLANK_LINES,
+)
 
 W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
 
-PSTYLE_PREFIX = {
-    'Jezuswoorden': '@jezus',
-    'GodsStem': '@god',
-    'engelenwoord': '@engel',
-    'citaatOT': '@citaat-ot',
-}
-# Alineastijlen die zelf cursief/vet zijn: directe b/i in zo'n alinea voegt niets toe.
-ITALIC_PSTYLES = {'engelenwoord', 'citaatOT', 'GodsStem'}
-BOLD_PSTYLES = {'GodsStem'}
-
-RSTYLE_TAG = {
-    'eeuwigleven': 'eeuwigleven',
-    'genade': 'genade',
-    'geloof': 'geloof',
-    'oordeel': 'oordeel',
-    'rechtvaardig': 'rechtvaardig',
-    'zonde': 'zonde',
-    'Torah': 'torah',
-    'dag': 'dag',
-}
-TITLE_RSTYLES = {'Bblhfdstk', 'HoofdsukChar'}
-
-# Buitenste tag eerst.
-ORDER = ['onderwijs', 'highlight', 'onderstreept', 'vet', 'cursief',
-         'eeuwigleven', 'genade', 'geloof', 'oordeel', 'rechtvaardig', 'zonde', 'torah', 'dag']
 RANK = {a: i for i, a in enumerate(ORDER)}
 
 VERSE = 'VERSE'  # item-soort voor een versnummer
@@ -70,14 +47,14 @@ VERSE = 'VERSE'  # item-soort voor een versnummer
 class Ctx:
     def __init__(self):
         self.warnings = []   # (hoofdstuk, vers, tekst)
-        self.unknown = {}    # soort -> teller
+        self.onbekende = {}    # soort -> teller
         self.notes = {}      # informatieve tellers
 
     def warn(self, ch, vs, msg):
         self.warnings.append((ch, vs, msg))
 
-    def unk(self, what):
-        self.unknown[what] = self.unknown.get(what, 0) + 1
+    def onbekend(self, what):
+        self.onbekende[what] = self.onbekende.get(what, 0) + 1
 
     def note(self, what, n=1):
         self.notes[what] = self.notes.get(what, 0) + n
@@ -98,24 +75,24 @@ def run_atoms(rpr, pstyle, ctx):
         rs = rpr.find(W + 'rStyle')
         if rs is not None:
             rstyle = rs.get(W + 'val')
-    if rstyle in RSTYLE_TAG:
-        atoms.add(RSTYLE_TAG[rstyle])
-    elif rstyle is not None and rstyle not in TITLE_RSTYLES:
-        ctx.unk('rStyle ' + rstyle)
+    if rstyle in TAG_OF_RSTYLE:
+        atoms.add(TAG_OF_RSTYLE[rstyle])
+    elif rstyle is not None and rstyle not in TITLE_STYLES_READ:
+        ctx.onbekend('rStyle ' + rstyle)
     if rpr is not None:
         col = rpr.find(W + 'color')
         if col is not None:
             v = (col.get(W + 'val') or '').upper()
             if v == 'FF0000':
-                atoms.add('onderwijs')
+                atoms.add(RED)
             elif v not in ('AUTO', '000000', ''):
-                ctx.unk('kleur ' + v)
+                ctx.onbekend('kleur ' + v)
         hl = rpr.find(W + 'highlight')
         if hl is not None and hl.get(W + 'val') != 'none':
             if hl.get(W + 'val') == 'yellow':
-                atoms.add('highlight')
+                atoms.add(HIGHLIGHT)
             else:
-                ctx.unk('markering ' + str(hl.get(W + 'val')))
+                ctx.onbekend('markering ' + str(hl.get(W + 'val')))
         if is_on(rpr, 'u'):
             atoms.add('onderstreept')
         if rstyle is None:
@@ -125,41 +102,42 @@ def run_atoms(rpr, pstyle, ctx):
                 atoms.add('cursief')
             if (rpr.find(W + 'i') is not None and not is_on(rpr, 'i')
                     and pstyle in ITALIC_PSTYLES):
-                ctx.unk('recht in cursieve alinea (niet gecodeerd)')
+                ctx.onbekend('recht in cursieve alinea (niet gecodeerd)')
         for el in rpr:
             n = el.tag.replace(W, '')
             if n in ('strike', 'dstrike', 'smallCaps', 'caps', 'shd') and is_on(rpr, n):
-                ctx.unk('run-eigenschap ' + n)
+                ctx.onbekend('run-eigenschap ' + n)
     return frozenset(atoms)
 
 
 class Ch:
     """Een Word-teken met opmaak."""
-    __slots__ = ('c', 'atoms', 'sup', 'title')
+    __slots__ = ('teken', 'atoms', 'sup', 'title')
 
-    def __init__(self, c, atoms, sup, title):
-        self.c = c
+    def __init__(self, teken, atoms, sup, title):
+        self.teken = teken
         self.atoms = atoms
         self.sup = sup
         self.title = title
 
 
 def read_paragraphs(path, ctx):
-    with zipfile.ZipFile(path) as z:
-        xml = z.read('word/document.xml')
-    root = ET.fromstring(xml)
+    try:
+        root = ET.fromstring(boekmod.lees_docx_onderdeel(path, 'word/document.xml'))
+    except ET.ParseError as fout:
+        raise boekmod.BoekFout('%s: word/document.xml is niet welgevormd: %s' % (path, fout))
     for el in root.iter():
         n = el.tag.replace(W, '')
         if n in ('footnoteReference', 'endnoteReference'):
-            ctx.unk(n)
+            ctx.onbekend(n)
         elif n in ('tbl', 'drawing', 'pict', 'object', 'ins', 'del', 'hyperlink', 'sdt'):
-            ctx.unk('element ' + n)
+            ctx.onbekend('element ' + n)
     paras = []
     for p in root.iter(W + 'p'):
         ps_el = p.find(W + 'pPr/' + W + 'pStyle')
         pstyle = ps_el.get(W + 'val') if ps_el is not None else None
-        if pstyle is not None and pstyle not in PSTYLE_PREFIX:
-            ctx.unk('pStyle ' + pstyle)
+        if pstyle is not None and pstyle not in TAG_OF_PSTYLE:
+            ctx.onbekend('pStyle ' + pstyle)
         chars = []
         for r in p.iter(W + 'r'):
             rpr = r.find(W + 'rPr')
@@ -169,7 +147,7 @@ def read_paragraphs(path, ctx):
                 va = rpr.find(W + 'vertAlign')
                 sup = va is not None and va.get(W + 'val') == 'superscript'
                 rs = rpr.find(W + 'rStyle')
-                title = rs is not None and rs.get(W + 'val') in TITLE_RSTYLES
+                title = rs is not None and rs.get(W + 'val') in TITLE_STYLES_READ
             atoms = run_atoms(rpr, pstyle, ctx)
             for c in r:
                 if c.tag == W + 't':
@@ -186,25 +164,21 @@ def read_paragraphs(path, ctx):
                 elif c.tag in (W + 'rPr', W + 'lastRenderedPageBreak', W + 'proofErr'):
                     pass
                 else:
-                    ctx.unk('run-kind ' + c.tag.replace(W, ''))
+                    ctx.onbekend('run-kind ' + c.tag.replace(W, ''))
         paras.append((pstyle, chars))
     return paras
 
 
-TITLE_RE = None  # wordt in main() gezet uit boek.json ("Lukas N")
-NAAM = None
-
-
-def split_chapters(paras, ctx):
+def split_chapters(paras, ctx, titel_re):
     """-> lijst van (hoofdstuknr, [(pstyle, chars)])"""
     chapters = []
     cur = None
     for pstyle, chars in paras:
         tchars = [i for i, c in enumerate(chars) if c.title]
         if tchars:
-            title = ''.join(chars[i].c for i in tchars)
-            m = TITLE_RE.match(title)
-            first_non_ws = next((i for i, c in enumerate(chars) if not c.c.isspace()), None)
+            title = ''.join(chars[i].teken for i in tchars)
+            m = titel_re.match(title)
+            first_non_ws = next((i for i, c in enumerate(chars) if not c.teken.isspace()), None)
             if not m or first_non_ws != tchars[0]:
                 ctx.warn(None, None, 'hoofdstuktitel niet aan het begin van de alinea of onleesbaar: %r' % title)
                 chars = [c for c in chars if not c.title]
@@ -216,7 +190,7 @@ def split_chapters(paras, ctx):
                 if len(chapters) > 1 and num != chapters[-2][0] + 1:
                     ctx.warn(num, None, 'hoofdstuk volgt niet op %d' % chapters[-2][0])
         if cur is None:
-            if any(not c.c.isspace() for c in chars):
+            if any(not c.teken.isspace() for c in chars):
                 ctx.warn(None, None, 'tekst voor het eerste hoofdstuktitel genegeerd')
             continue
         cur[1].append((pstyle, chars))
@@ -233,11 +207,11 @@ def tokenize_verses(chapter_no, paras, ctx):
         n = len(chars)
         while i < n:
             ch = chars[i]
-            if ch.sup and (ch.c.isdigit() or ch.c.isspace()):
+            if ch.sup and (ch.teken.isdigit() or ch.teken.isspace()):
                 j = i
-                while j < n and chars[j].sup and (chars[j].c.isdigit() or chars[j].c.isspace()):
+                while j < n and chars[j].sup and (chars[j].teken.isdigit() or chars[j].teken.isspace()):
                     j += 1
-                digits = ''.join(c.c for c in chars[i:j] if c.c.isdigit())
+                digits = ''.join(c.teken for c in chars[i:j] if c.teken.isdigit())
                 if digits == '':
                     for c in chars[i:j]:
                         items.append(Ch(' ', frozenset(), False, False))
@@ -252,9 +226,9 @@ def tokenize_verses(chapter_no, paras, ctx):
                 es = str(expected)
                 if es.startswith(digits) and len(es) > len(digits):
                     rest = es[len(digits):]
-                    tail = ''.join(c.c for c in chars[j:j + len(rest)])
+                    tail = ''.join(c.teken for c in chars[j:j + len(rest)])
                     nxt = chars[j + len(rest)] if j + len(rest) < n else None
-                    if tail == rest and (nxt is None or not nxt.c.isdigit()):
+                    if tail == rest and (nxt is None or not nxt.teken.isdigit()):
                         items.append((VERSE, expected))
                         ctx.note('versnummer over twee runs (superscript + gewone tekst)')
                         ctx.warn(chapter_no, expected, 'versnummer gesplitst %r + %r samengevoegd' % (digits, rest))
@@ -264,22 +238,22 @@ def tokenize_verses(chapter_no, paras, ctx):
                 ctx.warn(chapter_no, expected - 1,
                          'superscript %r gevonden, verwacht %d: als gewone tekst behouden' % (digits, expected))
                 for c in chars[i:j]:
-                    items.append(Ch(c.c, c.atoms, False, False))
+                    items.append(Ch(c.teken, c.atoms, False, False))
                 i = j
                 continue
             # gewone tekst: verwacht versnummer als platte cijfers?
-            if ch.c.isdigit() and (i == 0 or not chars[i - 1].c.isdigit()):
+            if ch.teken.isdigit() and (i == 0 or not chars[i - 1].teken.isdigit()):
                 j = i
-                while j < n and chars[j].c.isdigit():
+                while j < n and chars[j].teken.isdigit():
                     j += 1
-                if int(''.join(c.c for c in chars[i:j])) == expected and (i == 0 or not chars[i - 1].c.isalnum()):
+                if int(''.join(c.teken for c in chars[i:j])) == expected and (i == 0 or not chars[i - 1].teken.isalnum()):
                     items.append((VERSE, expected))
                     ctx.note('versnummer als gewone tekst (niet superscript)')
                     ctx.warn(chapter_no, expected, 'versnummer als gewone tekst herkend (niet superscript)')
                     expected += 1
                     i = j
                     continue
-            items.append(Ch(ch.c, ch.atoms, False, False))
+            items.append(Ch(ch.teken, ch.atoms, False, False))
             i += 1
         out.append((pstyle, items))
     return out, expected - 1
@@ -294,7 +268,7 @@ def normalize_items(items):
     seq = []
     for it in items:
         if isinstance(it, Ch):
-            if it.c.isspace() or it.c == '​':
+            if it.teken.isspace() or it.teken == '​':
                 seq.append(Ch(' ', None, False, False))   # atoms nog onbekend
             else:
                 seq.append(it)
@@ -306,27 +280,27 @@ def normalize_items(items):
         if not isinstance(it, Ch):
             if spaced:
                 prev = spaced[-1]
-                if isinstance(prev, Ch) and prev.c != ' ':
-                    last_is_open = prev.c in OPEN_QUOTES and (len(spaced) < 2 or (isinstance(spaced[-2], Ch) and spaced[-2].c == ' ') or not isinstance(spaced[-2], Ch))
+                if isinstance(prev, Ch) and prev.teken != ' ':
+                    last_is_open = prev.teken in OPEN_QUOTES and (len(spaced) < 2 or (isinstance(spaced[-2], Ch) and spaced[-2].teken == ' ') or not isinstance(spaced[-2], Ch))
                     if not last_is_open:
                         spaced.append(Ch(' ', None, False, False))
                 elif not isinstance(prev, Ch):
                     spaced.append(Ch(' ', None, False, False))
             spaced.append(it)
             nxt = seq[k + 1] if k + 1 < len(seq) else None
-            if isinstance(nxt, Ch) and nxt.c != ' ':
+            if isinstance(nxt, Ch) and nxt.teken != ' ':
                 spaced.append(Ch(' ', None, False, False))
         else:
             spaced.append(it)
     # 3. spaties samenvouwen, kop/staart weg
     folded = []
     for it in spaced:
-        if isinstance(it, Ch) and it.c == ' ' and folded and isinstance(folded[-1], Ch) and folded[-1].c == ' ':
+        if isinstance(it, Ch) and it.teken == ' ' and folded and isinstance(folded[-1], Ch) and folded[-1].teken == ' ':
             continue
         folded.append(it)
-    while folded and isinstance(folded[0], Ch) and folded[0].c == ' ':
+    while folded and isinstance(folded[0], Ch) and folded[0].teken == ' ':
         folded.pop(0)
-    while folded and isinstance(folded[-1], Ch) and folded[-1].c == ' ':
+    while folded and isinstance(folded[-1], Ch) and folded[-1].teken == ' ':
         folded.pop()
     # 4. atomen van spaties = doorsnede van de dichtstbijzijnde niet-spatie-buren
     n = len(folded)
@@ -334,7 +308,7 @@ def normalize_items(items):
     cur = frozenset()
     have = False
     for k, it in enumerate(folded):
-        if isinstance(it, Ch) and it.c == ' ':
+        if isinstance(it, Ch) and it.teken == ' ':
             left[k] = cur if have else frozenset()
         else:
             cur = it.atoms if isinstance(it, Ch) else frozenset()
@@ -345,7 +319,7 @@ def normalize_items(items):
     have = False
     for k in range(n - 1, -1, -1):
         it = folded[k]
-        if isinstance(it, Ch) and it.c == ' ':
+        if isinstance(it, Ch) and it.teken == ' ':
             right[k] = cur if have else frozenset()
         else:
             cur = it.atoms if isinstance(it, Ch) else frozenset()
@@ -354,10 +328,10 @@ def normalize_items(items):
     result = []
     for k, it in enumerate(folded):
         if isinstance(it, Ch):
-            if it.c == ' ':
+            if it.teken == ' ':
                 result.append((' ', left[k] & right[k]))
             else:
-                result.append((it.c, it.atoms))
+                result.append((it.teken, it.atoms))
         else:
             result.append((VERSE, it[1]))
     return result
@@ -371,8 +345,8 @@ def render_items(items, chapter_no, ctx, verse_start):
     prev_char = None
 
     def mark(a, opening):
-        if a == 'highlight':
-            return '=='
+        if a == HIGHLIGHT:
+            return HIGHLIGHT_TEKEN
         return '{%s}' % a if opening else '{/%s}' % a
 
     for k, (c, atoms) in enumerate(items):
@@ -409,18 +383,18 @@ def render_items(items, chapter_no, ctx, verse_start):
     return ''.join(out), verse
 
 
-def convert_chapter(num, paras, ctx):
-    tok, last_verse = tokenize_verses(num, paras, ctx)
+def convert_chapter(naam, num, paras, ctx):
+    tokens, last_verse = tokenize_verses(num, paras, ctx)
     lines = []     # str; '' = lege regel
     verse = 0
-    for pstyle, items in tok:
+    for pstyle, items in tokens:
         norm = normalize_items(items)
         if not norm:
             lines.append('')
             continue
         text, verse = render_items(norm, num, ctx, verse)
-        prefix = PSTYLE_PREFIX.get(pstyle)
-        lines.append((prefix + ' ' if prefix else '') + text)
+        tag = TAG_OF_PSTYLE.get(pstyle)
+        lines.append(('@' + tag + ' ' if tag else '') + text)
     # lege regels: kop/staart weg, maximaal twee op rij
     out = []
     blanks = 0
@@ -429,11 +403,26 @@ def convert_chapter(num, paras, ctx):
             blanks += 1
             continue
         if out:
-            out.extend([''] * min(blanks, 2))
+            out.extend([''] * min(blanks, MAX_BLANK_LINES))
         blanks = 0
         out.append(ln)
-    md = '# %s %d\n\n%s\n' % (NAAM, num, '\n'.join(out))
+    md = '# %s %d\n\n%s\n' % (naam, num, '\n'.join(out))
     return md, last_verse
+
+
+def schrijf_hoofdstukken(boek, chapters, ctx, args):
+    try:
+        os.makedirs(args.uitvoermap, exist_ok=True)
+        for num, cp in chapters:
+            if args.max_hoofdstuk is not None and num > args.max_hoofdstuk:
+                continue
+            md, last = convert_chapter(boek.naam, num, cp, ctx)
+            path = os.path.join(args.uitvoermap, boek.bestandsnaam(num))
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(md)
+            print('%s: %d verzen' % (boek.bestandsnaam(num), last))
+    except OSError as fout:
+        raise boekmod.BoekFout('kan niet schrijven: %s' % fout)
 
 
 def main(argv=None):
@@ -444,36 +433,24 @@ def main(argv=None):
     ap.add_argument('--max-hoofdstuk', type=int, default=None,
                     help='schrijf alleen hoofdstukken t/m dit nummer')
     args = ap.parse_args(argv)
-    global TITLE_RE, NAAM
-    try:
-        boek = boekmod.laad(args.boek)
-    except boekmod.BoekFout as e:
-        print('FOUT: %s' % e, file=sys.stderr)
-        return 2
-    TITLE_RE, NAAM = boek.titel_re, boek.naam
     if (args.docx is None) != (args.uitvoermap is None):
         ap.error('geef <docx> en <uitvoermap> allebei op, of geen van beide')
-    if args.docx is None:
-        args.docx = boek.sjabloon
-        args.uitvoermap = os.path.join(boek.map, 'bron')
-
-    ctx = Ctx()
-    paras = read_paragraphs(args.docx, ctx)
-    chapters = split_chapters(paras, ctx)
-    if not chapters:
-        print('Geen hoofdstuktitels ("%s N" in tekenstijl Bblhfdstk) gevonden.' % NAAM, file=sys.stderr)
-        return 1
-    os.makedirs(args.uitvoermap, exist_ok=True)
-    for num, cp in chapters:
-        if args.max_hoofdstuk is not None and num > args.max_hoofdstuk:
-            continue
-        md, last = convert_chapter(num, cp, ctx)
-        path = os.path.join(args.uitvoermap, boek.bestandsnaam(num))
-        with open(path, 'w', encoding='utf-8') as f:
-            f.write(md)
-        print('%s: %d verzen' % (boek.bestandsnaam(num), last))
-    for k in sorted(ctx.unknown):
-        print('ONBEKENDE OPMAAK (genegeerd): %s x%d' % (k, ctx.unknown[k]), file=sys.stderr)
+    try:
+        boek = boekmod.laad(args.boek)
+        if args.docx is None:
+            args.docx = boek.sjabloon
+            args.uitvoermap = os.path.join(boek.map, 'bron')
+        ctx = Ctx()
+        paras = read_paragraphs(args.docx, ctx)
+        chapters = split_chapters(paras, ctx, boek.titel_re)
+        if not chapters:
+            raise boekmod.BoekFout('geen hoofdstuktitels ("%s N" in tekenstijl %s) gevonden in %s' % (boek.naam, TITLE_STYLE, args.docx))
+        schrijf_hoofdstukken(boek, chapters, ctx, args)
+    except boekmod.BoekFout as fout:
+        print('FOUT: %s' % fout, file=sys.stderr)
+        return 2
+    for k in sorted(ctx.onbekende):
+        print('ONBEKENDE OPMAAK (genegeerd): %s x%d' % (k, ctx.onbekende[k]), file=sys.stderr)
     for k in sorted(ctx.notes):
         print('NOTITIE: %s x%d' % (k, ctx.notes[k]), file=sys.stderr)
     for ch, vs, msg in ctx.warnings:

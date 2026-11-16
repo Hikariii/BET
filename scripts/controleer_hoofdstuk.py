@@ -7,185 +7,156 @@ Gebruik:
     (--boek mag weg zolang er maar één boek in bijbel/ staat)
 
 Meldt:
-  FOUT         versnummers ontbreken/dubbel/volgorde, tags niet in balans,
+  FOUT         een bestand dat niet volgens FORMAAT.md is (parse_md), versnummers ontbreken/dubbel/volgorde,
                een opmaaksoort uit de bron ontbreekt in het vers
   WAARSCHUWING aantal tags per vers verschilt, oude vormen (§11 e.a.),
                vaste begrippen (§15) verdwenen, vers niet in het wijzigingslog
   GEACCEPTEERD bewuste afwijking van de bron, vastgelegd in controle.json (telt niet als fout)
-Exitcode 1 bij een FOUT.
+Exitcode 1 bij een FOUT, 2 bij een fout in de invoer (boek, bereik).
+
+De algemene lijsten oude vormen en vaste begrippen staan in controle_lijsten.json naast dit script;
+de vormen van één boek staan in bijbel/<boek>/controle.json.
 """
 import argparse
 import os
 import re
 import sys
-from collections import Counter
+from collections import Counter, namedtuple
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import boek as boekmod  # noqa: E402
+from formaat import TAG_OF_PSTYLE, parse_log, parse_md_text  # noqa: E402
 
-TAG_RE = re.compile(r"\{(/?)([a-z-]+)\}|==")
-VERS_RE = re.compile(r"\[(\d+)\]")
-PSTIJL_RE = re.compile(r"^@([a-z-]+) ")
+LIJSTEN_PAD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "controle_lijsten.json")
 
-# Oude/ongewenste vormen in de vereenvoudiging (regex, paragraaf, uitleg), uit de richtlijn.
-# Vormen uit de precedenten van een boek staan in bijbel/<boek>/controle.json.
-OUDE_VORMEN = [
-    (r"\bHeere\b", "§11", "Heere → Heer"),
-    (r"\bgeschiedde\b|\bgeschieden\b", "§11", "geschiedde → gebeurde"),
-    (r"\bbevreesd\b", "§11", "bevreesd → bang"),
-    (r"\bondertrouwd", "§11", "ondertrouwd → verloofd"),
-    (r"\baangezien\b", "§11", "aangezien → omdat"),
-    (r"\bgereed\b|\bgereed(?!maken)\w+", "§11", "gereed → klaar (behalve 'gereedmaken' bij een volk)"),
-    (r"\b[Ee]n zie\b|(^|[.:;!?“\"] *)[Zz]ie,", "§7A", "'zie' weglaten of 'Kijk'"),
-    (r"\b(baren|baarde|gebaard)\b", "§11", "baren → krijgen / ter wereld brengen"),
-    (r"\bwelbehagen\b", "§11", "welbehagen → blij zijn met"),
-    (r"\bZaligmaker\b", "§17", "Zaligmaker → Redder"),
-    (r"\b[Zz]alig(heid)?\b", "§17", "zalig → gezegend/gered; zaligheid → redding"),
-    (r"\b[Hh]eidenen\b", "§17", "heidenen → niet-Joodse volken / niet-Joden"),
-    (r"\bEvangelie\b", "§22", "Evangelie → het Goede Nieuws"),
-    (r"\bverwonder", "§18", "verwonderd → onder de indruk / verbaasd"),
-    (r"\bbarmhartig", "§17", "barmhartigheid → goedheid en medeleven"),
-    (r"\b(gedoopt|dopen|doopte|doop)\b", "§17A", "dopen → onderdompelen"),
-    (r"\b(loofde|loofden|loven)\b", "§11", "loven → prijzen"),
-    (r"\b(dienst)?knecht(en)?\b", "§11", "knecht → dienaar"),
-    (r"\bmenigte\b", "§11", "menigte → (de) mensen / grote groep"),
-    (r"\bverheug", "§11", "zich verheugen → blij zijn"),
-    (r"\bonvruchtbaar\b", "§11", "onvruchtbaar → geen kinderen kunnen krijgen"),
-    (r"\bopdat\b", "§7A", "opdat → zodat / zo"),
-    (r"\bantwoordde en zei\b", "§7A", "antwoordde en zei → antwoordde"),
-    (r"\bvan wie de naam\b", "§7A", "van wie de naam X was → die X heette"),
-    (r"\bstadhouder\b", "§28", "stadhouder → bestuurder"),
-    (r"\bviervorst\b", "§28", "viervorst → heerser"),
-    (r"\bprofeteer", "§17", "profeteren → woorden van God doorgeven"),
-    (r"\bgodvrezend\b", "§17", "godvrezend → ontzag hebben voor God"),
-    (r"\bdes\b", "§11", "'des' (ouderwetse genitief) vervangen"),
-]
+# vers: "4:12" of None bij een melding over het hele bestand; soort: de opmaak, het begrip of de
+# oude vorm waar de melding over gaat, waarop `geaccepteerd` in controle.json matcht.
+Melding = namedtuple("Melding", "vers soort tekst")
 
-# Vaste begrippen (§15): als ze in het bronvers staan, moeten ze in het vereenvoudigde vers staan
-VASTE_BEGRIPPEN = [
-    r"Christus", r"Messias", r"Zoon van God|Gods Zoon", r"Heilige Geest", r"Allerhoogste",
-    r"Koninkrijk van God", r"[Pp]rofeet", r"[Pp]rofeten", r"Rabbi", r"[Vv]erbond",
-    r"[Tt]empel", r"[Ss]abbat", r"[Ss]ynagoge", r"Torah", r"[Aa]postel",
-]
+
+def lees_lijsten():
+    """(oude vormen [(regex, paragraaf, uitleg)], vaste begrippen [regex]) uit controle_lijsten.json."""
+    lijsten = boekmod.lees_json(LIJSTEN_PAD)
+    try:
+        oude_vormen = [tuple(vorm) for vorm in lijsten["oude_vormen"]]
+        vaste_begrippen = list(lijsten["vaste_begrippen"])
+    except (KeyError, TypeError):
+        raise boekmod.BoekFout(f"{LIJSTEN_PAD}: verwacht oude_vormen en vaste_begrippen")
+    for regex, _paragraaf, _uitleg in oude_vormen:
+        re.compile(regex)
+    return oude_vormen, vaste_begrippen
 
 
 def lees_verzen(pad):
-    """Geeft (verzen, fouten). verzen: dict n -> {'tekst': platte tekst, 'tags': Counter, 'ruw': str}."""
+    """Geeft (verzen, fouten). verzen: n -> {'tekst': platte tekst, 'tags': Counter}; None als het bestand niet te lezen is."""
+    naam = os.path.basename(pad)
+    try:
+        alineas = parse_md_text(boekmod.lees_tekst(pad), naam)
+    except boekmod.BoekFout as fout:
+        return None, [str(fout)]
     fouten = []
     verzen = {}
     volgorde = []
     huidig = None
-    open_tags = []
-    with open(pad, encoding="utf-8") as f:
-        regels = f.read().split("\n")
-    for nr, regel in enumerate(regels, 1):
-        if regel.startswith("# "):
+    for alinea in alineas:
+        if alinea["soort"] != "tekst":
             continue
-        m = PSTIJL_RE.match(regel)
-        pstijl = None
-        if m:
-            pstijl = m.group(1)
-            regel = regel[m.end():]
-        if open_tags:
-            fouten.append(f"{os.path.basename(pad)}:{nr}: tag(s) niet gesloten aan eind van vorige regel: {open_tags}")
-            open_tags = []
-        if pstijl and huidig is not None:
-            verzen[huidig]["tags"]["@" + pstijl] += 1
-        pos = 0
-        for vm in list(VERS_RE.finditer(regel)) + [None]:
-            stuk = regel[pos: vm.start() if vm else len(regel)]
-            if huidig is not None and stuk:
-                v = verzen[huidig]
-                v["ruw"] += stuk
-                for t in TAG_RE.finditer(stuk):
-                    if t.group(0) == "==":
-                        if open_tags and open_tags[-1] == "==":
-                            open_tags.pop()
-                        else:
-                            open_tags.append("==")
-                            v["tags"]["highlight"] += 1
-                    elif t.group(1):
-                        if not open_tags or open_tags[-1] != t.group(2):
-                            fouten.append(f"{os.path.basename(pad)}:{nr}: sluittag {{/{t.group(2)}}} past niet (open: {open_tags})")
-                        else:
-                            open_tags.pop()
-                    else:
-                        open_tags.append(t.group(2))
-                        v["tags"][t.group(2)] += 1
-            if vm is None:
-                break
-            if open_tags:
-                fouten.append(f"{os.path.basename(pad)}:{nr}: tag(s) {open_tags} lopen over versgrens [{vm.group(1)}]")
-                open_tags = []
-            huidig = int(vm.group(1))
-            if huidig in verzen:
-                fouten.append(f"{os.path.basename(pad)}:{nr}: vers {huidig} komt dubbel voor")
-            else:
-                verzen[huidig] = {"tags": Counter(), "ruw": ""}
-                volgorde.append(huidig)
-            if pstijl and regel[:vm.start()].strip() == "":
-                verzen[huidig]["tags"]["@" + pstijl] += 1
-            pos = vm.end()
+        stijl = TAG_OF_PSTYLE.get(alinea["pstyle"])
+        voor_eerste_vers = True  # alleen witruimte of niets vóór het eerste versnummer van deze alinea
+        stijl_geteld = False
+        vorige_tags = ()
+        for seg in alinea["segs"]:
+            if seg[0] == "vers":
+                huidig = seg[1]
+                if huidig in verzen:
+                    fouten.append(f"{naam}:{alinea['regel']}: vers {huidig} komt dubbel voor")
+                else:
+                    verzen[huidig] = {"tags": Counter(), "ruw": []}
+                    volgorde.append(huidig)
+                if stijl and voor_eerste_vers and not stijl_geteld:
+                    verzen[huidig]["tags"]["@" + stijl] += 1
+                    stijl_geteld = True
+                voor_eerste_vers = False
+                vorige_tags = ()
+                continue
+            if voor_eerste_vers and seg[1].strip():
+                voor_eerste_vers = False
+            if huidig is None:
+                continue
+            if stijl and not stijl_geteld and not voor_eerste_vers:
+                verzen[huidig]["tags"]["@" + stijl] += 1  # alinea begint midden in dit vers
+                stijl_geteld = True
+            verzen[huidig]["ruw"].append(seg[1])
+            for opmaak in seg[2]:
+                if opmaak not in vorige_tags:
+                    verzen[huidig]["tags"][opmaak] += 1
+            vorige_tags = seg[2]
         if huidig is not None:
-            verzen[huidig]["ruw"] += " "
-    if volgorde != sorted(volgorde) or (volgorde and volgorde != list(range(1, len(volgorde) + 1))):
-        fouten.append(f"{os.path.basename(pad)}: versnummers niet doorlopend 1..n")
-    for v in verzen.values():
-        v["tekst"] = " ".join(TAG_RE.sub("", v["ruw"]).split())
+            verzen[huidig]["ruw"].append(" ")
+    if volgorde != list(range(1, len(volgorde) + 1)):
+        fouten.append(f"{naam}: versnummers niet doorlopend 1..n")
+    for vers in verzen.values():
+        vers["tekst"] = " ".join("".join(vers["ruw"]).split())
     return verzen, fouten
 
 
 def log_verzen(pad):
+    """De versnummers in het wijzigingslog, of None als het log ontbreekt."""
     if not os.path.exists(pad):
         return None
-    gevonden = set()
-    with open(pad, encoding="utf-8") as f:
-        for m in re.finditer(r"^## Vers (\d+)(?:\s*[-–]\s*(\d+))?", f.read(), re.M):
-            a = int(m.group(1))
-            b = int(m.group(2) or a)
-            gevonden.update(range(a, b + 1))
-    return gevonden
+    verzen, _algemene_vragen = parse_log(pad)
+    return set(verzen)
 
 
-def controleer(boek, h):
+def controleer(boek, hoofdstuk, oude_vormen, vaste_begrippen):
+    """Geeft (fouten, waarschuwingen) als lijsten Melding."""
+    h = hoofdstuk
     bron_pad = boek.pad("bron", h)
     nieuw_pad = boek.pad("vereenvoudigd", h)
     log_pad = boek.pad("wijzigingslog", h)
-    oude_vormen = OUDE_VORMEN + boek.extra_oude_vormen()
-    fouten, waarsch = [], []
+    oude_vormen = oude_vormen + boek.oude_vormen
     if not os.path.exists(nieuw_pad):
-        return [f"{boek.kop(h)}: {nieuw_pad} bestaat niet"], []
-    bron, f1 = lees_verzen(bron_pad)
-    nieuw, f2 = lees_verzen(nieuw_pad)
-    fouten += f1 + f2
+        return [Melding(None, None, f"{boek.kop(h)}: {nieuw_pad} bestaat niet")], []
+    bron, bron_fouten = lees_verzen(bron_pad)
+    nieuw, nieuw_fouten = lees_verzen(nieuw_pad)
+    fouten = [Melding(None, None, tekst) for tekst in bron_fouten + nieuw_fouten]
+    waarsch = []
+
+    def melding(lijst, vers, soort, tekst):
+        lijst.append(Melding(f"{h}:{vers}", soort, f"{h}:{vers} {tekst}"))
+
+    if bron is None or nieuw is None:
+        return fouten, waarsch  # een bestand dat parse_md weigert, valt niet te vergelijken
     for n in sorted(set(bron) - set(nieuw)):
-        fouten.append(f"{h}:{n} ontbreekt in de vereenvoudiging")
+        melding(fouten, n, None, "ontbreekt in de vereenvoudiging")
     for n in sorted(set(nieuw) - set(bron)):
-        fouten.append(f"{h}:{n} staat niet in de bron")
+        melding(fouten, n, None, "staat niet in de bron")
     gelogd = log_verzen(log_pad)
     if gelogd is None:
-        waarsch.append(f"{boek.kop(h)}: geen wijzigingslog ({log_pad})")
+        waarsch.append(Melding(None, None, f"{boek.kop(h)}: geen wijzigingslog ({log_pad})"))
     for n in sorted(set(bron) & set(nieuw)):
         b, v = bron[n], nieuw[n]
         for soort in b["tags"]:
             if soort not in v["tags"]:
-                fouten.append(f"{h}:{n} opmaak '{soort}' uit de bron ontbreekt")
+                melding(fouten, n, soort, f"opmaak '{soort}' uit de bron ontbreekt")
             elif b["tags"][soort] != v["tags"][soort]:
-                waarsch.append(f"{h}:{n} aantal '{soort}': bron {b['tags'][soort]}, nieuw {v['tags'][soort]}")
+                melding(waarsch, n, soort, f"aantal '{soort}': bron {b['tags'][soort]}, nieuw {v['tags'][soort]}")
         for soort in v["tags"]:
             if soort not in b["tags"]:
-                waarsch.append(f"{h}:{n} opmaak '{soort}' staat niet in de bron")
-        for patroon, par, uitleg in oude_vormen:
+                melding(waarsch, n, soort, f"opmaak '{soort}' staat niet in de bron")
+        for patroon, paragraaf, uitleg in oude_vormen:
             for m in re.finditer(patroon, v["tekst"]):
                 if re.search(patroon, b["tekst"]) is None:
                     continue  # komt alleen voor als het ook in de bron stond (dus niet nieuw ingevoerd)
-                waarsch.append(f"{h}:{n} oude vorm '{m.group(0).strip()}' ({par}: {uitleg})")
+                vorm = m.group(0).strip()
+                melding(waarsch, n, vorm, f"oude vorm '{vorm}' ({paragraaf}: {uitleg})")
                 break
-        for patroon in VASTE_BEGRIPPEN:
+        for patroon in vaste_begrippen:
             if re.search(patroon, b["tekst"]) and not re.search(patroon, v["tekst"]):
-                waarsch.append(f"{h}:{n} vast begrip /{patroon}/ (§15/§16) staat in de bron maar niet in de vereenvoudiging")
+                melding(waarsch, n, patroon,
+                        f"vast begrip /{patroon}/ (§15/§16) staat in de bron maar niet in de vereenvoudiging")
         if gelogd is not None and b["tekst"] != v["tekst"] and n not in gelogd:
-            waarsch.append(f"{h}:{n} gewijzigd, maar niet in het wijzigingslog")
+            melding(waarsch, n, "wijzigingslog", "gewijzigd, maar niet in het wijzigingslog")
     return fouten, waarsch
 
 
@@ -193,8 +164,7 @@ def scheid_geaccepteerd(meldingen, geaccepteerd):
     """Splits meldingen in (open, [(melding, reden)]) volgens de geaccepteerde afwijkingen uit controle.json."""
     open_, ok = [], []
     for m in meldingen:
-        reden = next((r for vers, soort, r in geaccepteerd
-                      if m.startswith(vers + " ") and (f"'{soort}'" in m or f"/{soort}/" in m)), None)
+        reden = next((r for vers, soort, r in geaccepteerd if m.vers == vers and m.soort == soort), None)
         if reden is None:
             open_.append(m)
         else:
@@ -202,39 +172,33 @@ def scheid_geaccepteerd(meldingen, geaccepteerd):
     return open_, ok
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description="Controleer vereenvoudigde hoofdstukken tegen de bron.")
     ap.add_argument("hoofdstukken", help="bv. 4, 1-3 of 1,4,5")
     ap.add_argument("--boek", help="map in bijbel/ (mag weg als er maar één boek is)")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
     try:
         boek = boekmod.laad(args.boek)
-    except boekmod.BoekFout as e:
-        print(f"FOUT: {e}", file=sys.stderr)
-        sys.exit(2)
-    hoofdstukken = []
-    for deel in args.hoofdstukken.split(","):
-        if "-" in deel:
-            a, b = deel.split("-")
-            hoofdstukken.extend(range(int(a), int(b) + 1))
-        else:
-            hoofdstukken.append(int(deel))
-    geaccepteerd = boek.geaccepteerd()
-    totaal_fout = 0
-    for h in hoofdstukken:
-        fouten, waarsch = controleer(boek, h)
-        fouten, ok1 = scheid_geaccepteerd(fouten, geaccepteerd)
-        waarsch, ok2 = scheid_geaccepteerd(waarsch, geaccepteerd)
-        print(f"== {boek.kop(h)}: {len(fouten)} fouten, {len(waarsch)} waarschuwingen")
-        for x in fouten:
-            print("  FOUT        ", x)
-        for x in waarsch:
-            print("  WAARSCHUWING", x)
-        for x, reden in ok1 + ok2:
-            print("  GEACCEPTEERD", x, f"({reden})")
-        totaal_fout += len(fouten)
-    sys.exit(1 if totaal_fout else 0)
+        hoofdstukken = boek.hoofdstukken(args.hoofdstukken)
+        oude_vormen, vaste_begrippen = lees_lijsten()
+        totaal_fout = 0
+        for h in hoofdstukken:
+            fouten, waarsch = controleer(boek, h, oude_vormen, vaste_begrippen)
+            fouten, ok1 = scheid_geaccepteerd(fouten, boek.geaccepteerd)
+            waarsch, ok2 = scheid_geaccepteerd(waarsch, boek.geaccepteerd)
+            print(f"== {boek.kop(h)}: {len(fouten)} fouten, {len(waarsch)} waarschuwingen")
+            for x in fouten:
+                print("  FOUT        ", x.tekst)
+            for x in waarsch:
+                print("  WAARSCHUWING", x.tekst)
+            for x, reden in ok1 + ok2:
+                print("  GEACCEPTEERD", x.tekst, f"({reden})")
+            totaal_fout += len(fouten)
+    except boekmod.BoekFout as fout:
+        print(f"FOUT: {fout}", file=sys.stderr)
+        return 2
+    return 1 if totaal_fout else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
