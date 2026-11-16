@@ -67,9 +67,9 @@ export const BEWERKEN: VersOnderdeel = {
 	toestanden: [
 		toestand('Editor open met een opmaakwaarschuwing', VERZEN.editorMetWaarschuwing, 'De bewerking mist de markeringen zonde en genade uit de bron.', 'bewerken'),
 		toestand(
-			'Gewijzigd, met Herstel vereenvoudiging',
+			'Gewijzigd, met Vers terugzetten',
 			VERZEN.gewijzigd,
-			'De marker en de knop staan onder de tekst. Herstel vereenvoudiging wist de bewerking uit het geheugen van deze pagina.',
+			'De marker en de knop staan onder de tekst. Vers terugzetten wist de bewerking uit het geheugen van deze pagina.',
 		),
 		toestand('Bewerking op een oudere tekst van Claude', VERZEN.verouderd, 'Claude heeft het vers veranderd sinds de bewerking begon.'),
 		toestand(

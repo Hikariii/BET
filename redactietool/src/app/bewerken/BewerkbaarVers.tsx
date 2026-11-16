@@ -117,8 +117,14 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 					</span>
 				)}
 				{bewerkt !== null && (
-					<button type="button" data-help="terug-naar-de-repo" onClick={terugNaarRepo} aria-label={`Herstel de vereenvoudiging van vers ${nummer}`}>
-						Herstel vereenvoudiging
+					<button
+						type="button"
+						data-help="terug-naar-de-repo"
+						onClick={terugNaarRepo}
+						aria-label={`Vers ${nummer} terugzetten`}
+						title="Zet de vereenvoudiging van Claude terug; je wijzigingen in dit vers gaan weg."
+					>
+						Vers terugzetten
 					</button>
 				)}
 			</div>
@@ -126,7 +132,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 				<div class="versverouderd" role="status">
 					<p>
 						Deze bewerking kan niet worden toegepast: Claude heeft de indeling in alinea's veranderd. Je eerdere tekst staat hieronder; kopieer
-						hem als je hem wilt houden, want opnieuw bewerken of Herstel vereenvoudiging overschrijft hem.
+						hem als je hem wilt houden, want opnieuw bewerken of Vers terugzetten overschrijft hem.
 					</p>
 					{bewerkt.inhoud.delen.map((deel) => (
 						<p class="eerdere-tekst">{deel.stukken.map((stuk) => stuk.tekst).join('').trim()}</p>

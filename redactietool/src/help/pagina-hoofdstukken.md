@@ -6,13 +6,13 @@ Hier lees en bewerk je één hoofdstuk. Elk vers heeft een rij met vier kolommen
 
 Klik in de vereenvoudigde tekst van het vers en typ. Met het toetsenbord ga je met Tab naar het vers en druk je op Enter of de spatiebalk. Klik op **Klaar** of druk op Escape om te stoppen.
 
-De tool slaat je wijziging meteen op. Bij een gewijzigd vers staat het woord *gewijzigd*. Met **Herstel vereenvoudiging** haal je je wijziging weg en staat de vereenvoudiging van Claude er weer.
+De tool slaat je wijziging meteen op. Bij een gewijzigd vers staat het woord *gewijzigd*. Met **Vers terugzetten** zet je de vereenvoudiging van Claude terug; je wijzigingen in dat vers gaan weg.
 
 De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een markering uit de bron uit het vers, dan waarschuwt de tool. Zie *Kleuren en markeringen*.
 
 {{wijs vers-bewerken | Een vers bewerken | Klik in de vereenvoudigde tekst van een vers.}}
 {{wijs vers-gewijzigd | gewijzigd | Verschijnt onder een vers dat je hebt aangepast.}}
-{{wijs terug-naar-de-repo | Herstel vereenvoudiging | Verschijnt onder een vers dat je hebt aangepast.}}
+{{wijs terug-naar-de-repo | Vers terugzetten | Verschijnt onder een vers dat je hebt aangepast.}}
 
 ## De vertaalregels
 
