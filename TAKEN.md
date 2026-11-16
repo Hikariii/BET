@@ -6,7 +6,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[ ]` = open. Gedane punten st
 - [ ] Proef 6a: de eigenaar bewerkt drie tot vijf verzen van Lukas 4 in de tool, beantwoordt "Gezegend", kopieert naar Word en exporteert; Claude doorloopt `WERKPLAN.md` D1 tot D3 op een kopie (stap2-plan, fase 6).
 - [ ] Proef 6b: de redacteur plakt Lukas 2 van de live site in het sjabloon op Windows (welke Word?); `docx_naar_md.py` erover. Mislukt het: Download als Word.
 - [ ] Inhoud: Lukas 4 door de redacteur, de negen open vragen, voorlopig naar `vast`, richtlijn v1.5 (stap2-plan, spoor Inhoud).
-- [ ] Fase 9a: waarschuwingen uit één lijst, daarna de opmaakwerkbalk.
+- [ ] Fase 9a: waarschuwingen uit één lijst (de opmaakwerkbalk is gebouwd).
 - [ ] Fase 9b: verschil, terug per hoofdstuk, stip in de hoofdstukstrip; alleen als de proef laat zien dat het gemist wordt.
 - [ ] Conflicten bij back-up inladen tonen en per vers kiezen (eerst `besluitPerVers` en de diff, zie stap2-plan).
 - [ ] Fase 10: menu bij een woord, na 9a en na open vraag 3.
@@ -14,6 +14,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[ ]` = open. Gedane punten st
 
 ## Gebouwd, eigenaar bevestigt
 Klaar in de code; de eigenaar kijkt of het is zoals bedoeld, en haalt dan de regel weg.
+- Opmaakwerkbalk in de vers-editor (fase 9a): B, U, Markeren, Kleur ▾ (domeinen en Onderwijs) en Wissen, met Ctrl/Cmd+B, Ctrl/Cmd+U, Alt+K en Ctrl+Spatie (Mac Cmd+\). Let in de proef op: typen direct achter een domeinwoord neemt het domein mee (zoals in Word); is dat hinderlijk, dan kan dat uit.
 - Van vers naar vers: Alt+Pijl omlaag en omhoog in de editor en `j` en `k` op de pagina (`src/app/navigatie/toetsenbord.ts`, `useSprongNaarVers.ts`); de toetsen staan in de Help.
 - Skip-link "Naar de verzen" (`SprongNaarInhoud.tsx`) en de hoofdstukstrip als één tabstop met pijltjes; na een paginawissel staat de focus op de kop (`useKopFocus.ts`).
 - Kiezen bij een vertaalvraag: Kiezen waar de tool kan invullen, anders Zoek de plekken; het `?` in een vertaalregel linkt naar de vraag.
@@ -55,6 +56,7 @@ Alleen wat het werk sneller maakt.
 - [ ] Later: een plakresultaat uit Word als vaste test (na proef 6b); pariteitstests per boek (bij het tweede boek).
 
 ## Opruimen
+- [ ] Werkbalk: de sneltoetsen staan in de keymap (`versEditorPlugins.ts`), in `sneltoetsen.ts` en in de help; eventueel één tabel.
 Ook kleine punten.
 - [ ] Bewerken: de opmaakwaarschuwing alleen bij opmaak die de tekst van Claude nog had (nu tegen de bron, dus een bewust ontbrekende tag geeft steeds een waarschuwing); hoort bij fase 9a.
 - [ ] Bewerken: `wisVers` vangt opslagfouten niet af (anders dan `bewaarVers`); onleesbare verzen in de opslag verdwijnen stil bij de volgende bewaring; dubbele samenvoeglogica in `tussenstand.ts` en `versknip.ts`.

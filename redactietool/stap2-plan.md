@@ -15,7 +15,7 @@ De tool staat op https://hikariii.github.io/BET/ en wordt bij elke push naar `ma
 | **7b. Opslag zichtbaar** | Bewaarstatus in de bovenbalk, pagina Opgeslagen (overzicht per hoofdstuk), back-up downloaden en inladen met voorbeeld, samenvoegen (per vers wint de nieuwste) of vervangen | Conflicten tonen en per vers kiezen, zie [Conflicten bij back-up inladen](#conflicten-bij-back-up-inladen-open) |
 | **8. Vragen beantwoorden** | Markering wisselen, varianten, bereik van een vraag, terugdraaien per vers, Kiezen per optie en antwoord zonder wijziging; genuanceerd antwoord (toelichting of regel, eigen antwoord, meer keuzes onder één antwoord); in de export de structurele keuzes met overgeslagen plekken en de beantwoorde vragen (back-up en export versie 3). Opties komen uit de vrije kolom Alternatief; alleen Gezegend heeft nu echte opties | Niets in dit plan. De route is af: bij elke optie Kiezen (waar de tool kan invullen) of Zoek de plekken, het `?` in een vertaalregel linkt naar de vraag, en antwoorden staan in Opgeslagen en in de back-up. Wat nog mist staat in `TAKEN.md` |
 | **Help** | Knop Help en toets `?` met uitleg per pagina en "Wijs aan", welkom bij het eerste bezoek, "Laatste back-up" met herinnering, tip bij een lege browser | Niets in dit plan |
-| **9a. Opmaak en waarschuwingen** | Opmaakwaarschuwing bij een weggevallen markering; waarschuwingen staan als tekst in de export | De opmaakwerkbalk, waarschuwingen voor oude vormen en vaste begrippen uit één gedeelde lijst; zie [Fase 9a](#fase-9a-opmaak-en-waarschuwingen-open) |
+| **9a. Opmaak en waarschuwingen** | Opmaakwaarschuwing bij een weggevallen markering; waarschuwingen staan als tekst in de export | Waarschuwingen voor oude vormen en vaste begrippen uit één gedeelde lijst (de opmaakwerkbalk is gebouwd); zie [Fase 9a](#fase-9a-opmaak-en-waarschuwingen-open) |
 | **9b. Verschil en terug** | Terug naar de tekst van Claude per vers | Verschil zichtbaar, terug per hoofdstuk, stip in de hoofdstukkeuze; zie [Fase 9b](#fase-9b-verschil-en-terug-open) |
 | **10. Keuzes in de tekst** | Niets | Menu bij een woord; zie [Fase 10](#fase-10-keuzes-in-de-tekst-open) |
 
@@ -44,7 +44,7 @@ Geen bouwwerk. De uitkomst bepaalt wat van 9a, 9b en 10 gebouwd wordt.
 - **6b:** de proef met de redacteur op Windows. Lukas 2 van de live site plakken in het sjabloon, het Word-bestand terugsturen, `scripts/docx_naar_md.py` erover. Vraag ook welke Word het is (desktop of Word voor het web).
 - **Klaar als:** het hoofdstuk staat ongeschonden in de repo (criterium van fase 5 uit stap 1), of we weten precies waar het misgaat. Mislukt plakken op Windows, dan is [Download als Word](#alleen-op-een-trigger) het eerstvolgende bouwwerk.
 
-## Fase 9a: opmaak en waarschuwingen (open)
+## Fase 9a: opmaak en waarschuwingen (werkbalk gebouwd, waarschuwingen open)
 
 Dit onderdeel repareert het enige bewezen verlies: een herschreven zin kan nu nooit een Jezuswoord of domein krijgen (de editor kent alleen Enter, undo, redo en Escape; opmaakverlies was de pijn bij Lukas 1 tot 3).
 
@@ -104,7 +104,7 @@ Eerst fase 6; die laat zien wat de redacteur echt mist. Daarna de gedeelde bouws
 
 1. De gedeelde diff (`terugNaarRepo` bestaat al).
 2. De waarschuwingen-JSON, de bouw en Python `--json`, dan de waarschuwingen en hun export.
-3. 9a: de werkbalk (B, U, Kleur, Wissen), met de plaatsing van zwevende balken (`plekBij` in `VersVoorproefVak.tsx`, naast `useAanwijzen.ts` en `wijsAan.ts`) naar één gedeelde functie.
+3. 9a: de werkbalk is gebouwd als vaste balk (2026-11-16); een zwevende balk voor fase 10 krijgt de plaatsing van zwevende balken (`plekBij` in `VersVoorproefVak.tsx`, naast `useAanwijzen.ts` en `wijsAan.ts`) naar één gedeelde functie.
 4. 9b: verschil, terug per hoofdstuk en de stip, op 1 en 2.
 5. Conflicten bij back-up inladen, op `besluitPerVers` en de diff.
 6. Fase 10, na de werkbalk en na open vraag 3, op dezelfde balk.
