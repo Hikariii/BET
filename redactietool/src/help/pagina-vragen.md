@@ -16,7 +16,7 @@ Heeft een vraag opties, dan staat bij elke optie een knop **Kiezen**. Een optie 
 
 ## Antwoord vastleggen
 
-Onder een vraag staat het formulier **Antwoord vastleggen**. Kies een optie, of kies **Eigen antwoord (genuanceerd)** als geen optie past. Bij een eigen antwoord is de toelichting verplicht.
+Onder een vraag staat het formulier **Antwoord vastleggen**. Een antwoord hoeft niet: een vraag mag ook open blijven. Kies een optie, of kies **Eigen antwoord (genuanceerd)** (bovenaan de lijst) als geen optie past. Bij een eigen antwoord is de toelichting verplicht; bij een optie helpt een toelichting Claude om er een regel van te maken.
 
 In de toelichting schrijf je wanneer je wat kiest. Bijvoorbeeld: in een zaligspreking kiezen we genade, waar iemand een persoon prijst laten we eeuwigleven staan. Zo wordt het een regel. Claude leest je toelichting bij het terugvoeren en stelt er een regel of precedent van voor. Pas als de eigenaar akkoord geeft, geldt hij bij de volgende hoofdstukken.
 

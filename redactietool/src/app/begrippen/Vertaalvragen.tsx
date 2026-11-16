@@ -232,7 +232,7 @@ function RegisterVraag({ boek, vraag, antwoord, bestaandeKeuzes, acties }: Regis
 
 const GEEN_KEUZE = '';
 const TOELICHTING_UITLEG =
-	'Schrijf wanneer je wat kiest, zodat het een regel wordt. Claude gebruikt deze toelichting bij het terugvoeren om regels of precedenten voor te stellen; na akkoord van de eigenaar gelden ze voor de volgende vertaalkeuzes.';
+	'Schrijf erbij wanneer je wat kiest; dan kan Claude er bij het terugvoeren een regel of precedent van voorstellen. Na akkoord van de eigenaar geldt die voor de volgende vertaalkeuzes.';
 const TOELICHTING_VOORBEELD = 'Bijvoorbeeld: in een zaligspreking kiezen we genade; waar iemand een persoon prijst, laten we eeuwigleven staan.';
 
 type FormulierProps = { vraag: Vertaalvraag; opties: readonly string[]; acties: Antwoordacties; zetMelding: (melding: string) => void };
@@ -272,52 +272,57 @@ function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps
 
 	return (
 		<form class="antwoordformulier" data-help="antwoord-formulier" aria-label={`Antwoord vastleggen: ${vraag.kwestie}`} noValidate onSubmit={vastleggen}>
-			<h4>Antwoord vastleggen</h4>
-			<label>
-				Antwoord
-				<select
-					ref={keuzeveld}
-					value={gekozen}
-					aria-invalid={foutBijKeuze}
-					aria-describedby={foutBijKeuze ? `${id}-fout` : undefined}
-					onChange={(gebeurtenis) => zetGekozen(gebeurtenis.currentTarget.value)}
-				>
-					<option value={GEEN_KEUZE}>Kies een antwoord</option>
-					{opties.map((optie) => (
-						<option value={optie}>{optie}</option>
-					))}
-					<option value={EIGEN_ANTWOORD}>Eigen antwoord (genuanceerd)</option>
-				</select>
-			</label>
-			<label data-help="antwoord-toelichting">
-				Toelichting of regel{eigen ? ' (verplicht)' : ' (optioneel)'}
-				<textarea
-					ref={toelichtingveld}
-					rows={3}
-					value={toelichting}
-					placeholder={TOELICHTING_VOORBEELD}
-					aria-required={eigen}
-					aria-invalid={foutBijToelichting}
-					aria-describedby={foutBijToelichting ? `${hulp} ${id}-fout` : hulp}
-					onInput={(gebeurtenis) => zetToelichting(gebeurtenis.currentTarget.value)}
-				/>
-			</label>
-			<p class="veldhulp" id={`${id}-uitleg`}>
-				{TOELICHTING_UITLEG}
-			</p>
-			{eigen && (
-				<p class="veldhulp" id={`${id}-eigen`}>
-					{eigenAntwoordUitleg(kanKiezen)}
+			<div class="antwoordkop">
+				<h4>Antwoord vastleggen</h4>
+				<p class="veldhulp">Hoeft niet: een vraag mag ook open blijven.</p>
+			</div>
+			<div class="antwoordkeuze">
+				<label>
+					Antwoord
+					<select
+						ref={keuzeveld}
+						value={gekozen}
+						aria-invalid={foutBijKeuze}
+						aria-describedby={foutBijKeuze ? `${id}-fout` : undefined}
+						onChange={(gebeurtenis) => zetGekozen(gebeurtenis.currentTarget.value)}
+					>
+						<option value={GEEN_KEUZE}>Kies een antwoord</option>
+						<option value={EIGEN_ANTWOORD}>Eigen antwoord (genuanceerd)</option>
+						{opties.map((optie) => (
+							<option value={optie}>{optie}</option>
+						))}
+					</select>
+				</label>
+				<button type="submit">Antwoord vastleggen</button>
+			</div>
+			<div class="antwoordtoelichting">
+				<label data-help="antwoord-toelichting">
+					Toelichting of regel{eigen && ' (verplicht)'}
+					<textarea
+						ref={toelichtingveld}
+						rows={2}
+						value={toelichting}
+						placeholder={TOELICHTING_VOORBEELD}
+						aria-required={eigen}
+						aria-invalid={foutBijToelichting}
+						aria-describedby={foutBijToelichting ? `${hulp} ${id}-fout` : hulp}
+						onInput={(gebeurtenis) => zetToelichting(gebeurtenis.currentTarget.value)}
+					/>
+				</label>
+				<p class="veldhulp" id={`${id}-uitleg`}>
+					{TOELICHTING_UITLEG}
 				</p>
-			)}
+				{eigen && (
+					<p class="veldhulp" id={`${id}-eigen`}>
+						{eigenAntwoordUitleg(kanKiezen)}
+					</p>
+				)}
+			</div>
 			{fout !== '' && (
 				<p class="veldfout" id={`${id}-fout`} role="alert">
 					{fout}
 				</p>
 			)}
-			<div>
-				<button type="submit">Antwoord vastleggen</button>
-			</div>
 		</form>
 	);
 }
@@ -409,7 +414,7 @@ function GegevenAntwoord({ boek, vraag, antwoord, bestaandeKeuzes, acties, zetMe
 					{aanpassen && (
 						<form class="toelichtingaanpassen" id={`${id}-aanpassen`} noValidate onSubmit={bewaar}>
 							<label>
-								Toelichting of regel{eigen ? ' (verplicht)' : ' (optioneel)'}
+								Toelichting of regel{eigen && ' (verplicht)'}
 								<textarea
 									ref={veld}
 									rows={3}

@@ -189,10 +189,42 @@
 }
 
 .vertaalvragen .antwoordformulier {
+	display: grid;
+	grid-template-columns: minmax(14rem, 24rem) minmax(0, 1fr);
+	gap: .4rem 1.5rem;
+	align-items: start;
+}
+
+.vertaalvragen .antwoordkop,
+.vertaalvragen .antwoordformulier .veldfout {
+	grid-column: 1 / -1;
+}
+
+.vertaalvragen .antwoordkop {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .1rem .75rem;
+	align-items: baseline;
+}
+
+.vertaalvragen .antwoordkop h4 {
+	margin: 0;
+}
+
+.vertaalvragen .antwoordkeuze,
+.vertaalvragen .antwoordtoelichting {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: .5rem;
+	gap: .4rem;
+	min-width: 0;
+}
+
+/* Op een smal scherm staan keuze en toelichting weer onder elkaar. */
+@media (max-width: 48rem) {
+	.vertaalvragen .antwoordformulier {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
 
 .vertaalvragen .antwoordformulier label,
@@ -202,6 +234,14 @@
 	gap: .2rem;
 	font-size: .75rem;
 	width: min(40rem, 100%);
+}
+
+.vertaalvragen .antwoordformulier label {
+	width: 100%;
+}
+
+.vertaalvragen .antwoordtoelichting .veldhulp {
+	max-width: none;
 }
 
 .vertaalvragen .antwoordformulier select {
