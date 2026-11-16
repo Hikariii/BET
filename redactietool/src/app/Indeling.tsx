@@ -89,6 +89,7 @@ export function Indeling({ ontwerp, weergavebeheer, boek, referentie, pagina, hu
 				navigatie={
 					config.navigatie === 'strip' && metHoofdstukbalk ? <HoofdstukStrip boek={boek} referentie={referentie} huidigHoofdstuk={huidigHoofdstuk} /> : null
 				}
+				stripInHoofdstukbalk={config.stripPlek === 'hoofdstukbalk'}
 			/>
 			<div class={klassen.join(' ')}>
 				{config.navigatie === 'zijbalk' && (

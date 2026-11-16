@@ -1,0 +1,35 @@
+/*
+ * Variant v8e: v8d, maar de hoofdstukstrip staat in de hoofdstukbalk tussen de titel en de acties, zodat alles op één regel past.
+ * De strip neemt de ruimte die over is en schuift zijwaarts (pijltjes en muiswiel, zie HoofdstukStrip); de rij blijft één regel hoog.
+ * Wordt geladen bij ?ontwerp=v8e, na v7.css en v8d.css.
+ */
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-hoofdstukbalk {
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0 1.25rem;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel {
+	flex: none;
+	white-space: nowrap;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip {
+	flex: 1 1 auto;
+	min-width: 6rem;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-acties {
+	flex: none;
+}
+
+/* In de rij zonder eigen scrollbalk: de pijltjes en het wiel doen het schuiven. */
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstukstrip ul {
+	padding-bottom: 0;
+	scrollbar-width: none;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstukstrip ul::-webkit-scrollbar {
+	display: none;
+}

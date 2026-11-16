@@ -36,6 +36,7 @@ describe('leesOntwerp', () => {
 			boeknavigatie: 'knop',
 			grootteStandaard: 0,
 			zijbalkStandaardIngeklapt: false,
+			stripPlek: 'rij',
 		});
 		expect(config('?ontwerp=v2')).toEqual({ ...config('?ontwerp=v1'), bovenbalk: 'twee' });
 	});
@@ -52,7 +53,7 @@ describe('leesOntwerp', () => {
 	it('geeft alleen v6 een grotere standaardletter en een ingeklapte zijbalk', () => {
 		expect(config('?ontwerp=v6')).toMatchObject({ grootteStandaard: 1, zijbalkStandaardIngeklapt: true, status: 'tekst' });
 		for (const naam of ['v1', 'v2', 'v3', 'v4', 'v5', 'v7', 'v8a', 'v8b', 'v8c']) {
-			expect(config(`?ontwerp=${naam}`)).toMatchObject({ grootteStandaard: 0, zijbalkStandaardIngeklapt: false });
+			expect(config(`?ontwerp=${naam}`)).toMatchObject({ grootteStandaard: 0, zijbalkStandaardIngeklapt: false, stripPlek: 'rij' });
 		}
 	});
 
@@ -65,6 +66,7 @@ describe('leesOntwerp', () => {
 			boeknavigatie: 'knop',
 			grootteStandaard: 0,
 			zijbalkStandaardIngeklapt: false,
+			stripPlek: 'rij',
 		});
 	});
 
@@ -74,6 +76,7 @@ describe('leesOntwerp', () => {
 		expect(config('?ontwerp=v8b')).toEqual({ ...basis, boeknavigatie: 'menu' });
 		expect(config('?ontwerp=v8c')).toEqual({ ...basis, boeknavigatie: 'werkbalk', status: 'kort' });
 		expect(config('?ontwerp=v8d')).toEqual({ ...basis, boeknavigatie: 'tabbladen-iconen' });
+		expect(config('?ontwerp=v8e')).toEqual({ ...basis, boeknavigatie: 'tabbladen-iconen', stripPlek: 'hoofdstukbalk' });
 	});
 
 	it('geeft alleen v8a tot en met v8c een andere boeknavigatie dan de knop', () => {
@@ -87,6 +90,7 @@ describe('cssVanOntwerp', () => {
 		expect(cssVanOntwerp('v7')).toEqual(['v7']);
 		expect(cssVanOntwerp('v8b')).toEqual(['v7', 'v8b']);
 		expect(cssVanOntwerp('v8d')).toEqual(['v7', 'v8d']);
+		expect(cssVanOntwerp('v8e')).toEqual(['v7', 'v8d', 'v8e']);
 		expect(cssVanOntwerp('v3')).toEqual(['v3']);
 	});
 });

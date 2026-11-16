@@ -90,7 +90,17 @@ nav.zijbalk.zijbalk-ingeklapt .zijbalk-wissel {
 
 /* ---------- Hoofdstukstrip ---------- */
 
+/* De strip met pijltjes aan de randen; die staan er alleen als er die kant op iets te schuiven valt (`hidden`). */
+.hoofdstukstrip {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	min-width: 0;
+}
+
 .hoofdstukstrip ul {
+	flex: 1 1 auto;
+	min-width: 0;
 	display: flex;
 	gap: 0.15rem;
 	margin: 0;
@@ -119,4 +129,25 @@ nav.zijbalk.zijbalk-ingeklapt .zijbalk-wissel {
 	.indeling.zijbalk-ingeklapt {
 		grid-template-columns: minmax(0, 1fr);
 	}
+}
+
+.hoofdstukstrip .strip-pijl {
+	flex: none;
+	width: 1.6rem;
+	height: 1.6rem;
+	padding: 0;
+	background: #fff;
+	border: 1px solid var(--rand);
+	border-radius: 3px;
+	color: var(--tekst);
+	font-size: 1rem;
+	line-height: 1;
+}
+
+.hoofdstukstrip .strip-pijl:hover {
+	border-color: var(--rand-donker);
+}
+
+.hoofdstukstrip .strip-pijl[hidden] {
+	display: none;
 }

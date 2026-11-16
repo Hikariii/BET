@@ -18,13 +18,16 @@ type Props = {
 	grootte: ComponentChildren;
 	/** De hoofdstukstrip, voor de variant zonder zijbalk; `null` als er een zijbalk is. */
 	navigatie: ComponentChildren;
+	/** Bij twee balken: de strip in de hoofdstukbalk tussen titel en acties in plaats van in een eigen rij. */
+	stripInHoofdstukbalk: boolean;
 };
 
 /**
  * De balk bovenaan die blijft staan bij scrollen en niet meeklapt met de zijbalk.
  * Zet de hoogte als `--balk-hoogte` op `<html>`, zodat de zijbalk en `scroll-margin-top` eronder beginnen.
  */
-export function Bovenbalk({ uitvoering, boek, titel, acties, bewaarstatus, grootte, navigatie }: Props) {
+export function Bovenbalk({ uitvoering, boek, titel, acties, bewaarstatus, grootte, navigatie, stripInHoofdstukbalk }: Props) {
+	const stripInRij = uitvoering === 'twee' && stripInHoofdstukbalk && navigatie !== null;
 	const balk = useRef<HTMLElement>(null);
 	useLayoutEffect(() => {
 		const element = balk.current;
@@ -59,12 +62,13 @@ export function Bovenbalk({ uitvoering, boek, titel, acties, bewaarstatus, groot
 					{(titel !== null || acties !== null) && (
 						<div class="bovenbalk-rij bovenbalk-hoofdstukbalk">
 							<div class="bovenbalk-titel">{titel}</div>
+							{stripInRij && <div class="bovenbalk-strip">{navigatie}</div>}
 							<div class="bovenbalk-acties">{acties}</div>
 						</div>
 					)}
 				</>
 			)}
-			{navigatie !== null && <div class="bovenbalk-navigatie">{navigatie}</div>}
+			{navigatie !== null && !stripInRij && <div class="bovenbalk-navigatie">{navigatie}</div>}
 		</header>
 	);
 }
