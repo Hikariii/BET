@@ -43,7 +43,16 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] `redactietool/src/klembord/chromiumKlembord.mjs` (alleen macOS, gebruikt rolldown van Vite en Playwright uit `/tmp/pw`) opnemen in de tests of vervangen.
   - [ ] `document.title` per hoofdstuk zetten; Node-versie op één plek (nu `mise.toml` 26.13.1 en workflow `26`).
   - [ ] Pages aanzetten in de repo-instellingen (bron: GitHub Actions); daarna publiceert de workflow bij elke push naar `main`.
-- [ ] Redactietool: bewaarstatus zichtbaar, overzicht van wat er bewaard is, back-up downloaden en inladen (zie `redactietool/stap2-plan.md`, "Opslag zichtbaar").
+- [x] Redactietool: bewaarstatus zichtbaar, overzicht van wat er bewaard is, back-up downloaden en inladen (gebouwd in fase 7b, v8e).
+- [ ] Redactietool, uit de review van fase 7b (v8e):
+  - [ ] Back-up samenvoegen: per vers de nieuwste houden in plaats van "de back-up wint" (keuze eigenaar; `voorbeeldInladen` rekent `lokaalNieuwer` al uit).
+  - [ ] Overzicht Bewaard: "verouderd nog niet gecontroleerd" tonen zolang de hoofdstukken laden (`verouderdBekend`); in het voorbeeld van inladen ook verouderde verzen tonen; terug naar de repo per vers vanuit het overzicht.
+  - [ ] Bewaarstatus: een mislukte schrijfactie (opslag vol) ook bovenin melden, niet alleen bij het vers.
+  - [ ] Vervangen bij inladen: eerst automatisch een back-up van de huidige stand downloaden.
+  - [ ] Tests: foutpaden van back-up (terugzetten mislukt, keuzes niet bewaard); `toegepast` als datum controleren in `alsKeuze`; component- of Playwright-test voor de vaste vertaalregels bij een open naslagkaart en voor Escape/focus in het back-upvenster.
+  - [ ] Toegankelijkheid: `aria-label` van de groottes met het zichtbare label ("A+, groter"); skip-link langs de hoofdstukstrip; focus bij een verdwijnende strippijl.
+  - [ ] Opruimen: dubbele `--zijbalk-breedte`; `laadHoofdstukkenEenmalig` naar `gegevens.ts`; `statusKlasse` uit `Zijbalk.tsx` naar een neutrale plek; export `ZICHTBARE_REGELS`; `aantal.tekst` in `boekplekken.ts`; `--schaal` vóór de eerste render zetten; één telling voor open vragen (strip en tabblad).
+  - [ ] Meetdata `redactietool/ontwerp/v8e-omzetting/*.json` weghalen als ze niet meer nodig zijn.
 - [ ] Redactietool, uit de review van fase 7 (ontwerp):
   - [ ] Opmaakcontrole (`redactietool/ontwerp/opmaakcontrole.mjs`) uitbreiden: vet, cursief, onderstreept; vers-editor, naslagkaart, versvoorproef, Zoeken en vervangen; boek en hoofdstukken niet vast in het script; eventueel als test in de build.
   - [ ] Bewerken door klikken: de Bijbeltekst gewone tekst laten (geen `role="button"`), met een knop "Vers N bewerken" die bij focus zichtbaar wordt; testen met een schermlezer.

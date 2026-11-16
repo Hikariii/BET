@@ -51,7 +51,8 @@ export function BackupInladen({ boek, focusNaSluiten, invoer }: Props) {
 		const dialoog = venster.current;
 		if (dialoog === null) return;
 		if (toestand !== null && !dialoog.open) dialoog.showModal();
-		if (toestand !== null) dialoog.querySelector('button')?.focus();
+		// De veilige knop krijgt de focus: in het voorbeeld zou één Enter anders meteen samenvoegen en werk overschrijven.
+		if (toestand !== null) (dialoog.querySelector<HTMLElement>('[data-beginfocus]') ?? dialoog.querySelector('button'))?.focus();
 	}, [toestand?.soort]);
 
 	const leesGekozenBestand = async (gebeurtenis: Event) => {
@@ -161,7 +162,7 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 				<button type="button" onClick={() => onKies('vervangen')}>
 					Vervangen
 				</button>
-				<button type="button" onClick={onAnnuleer}>
+				<button type="button" data-beginfocus onClick={onAnnuleer}>
 					Annuleren
 				</button>
 			</p>
