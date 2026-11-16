@@ -1,0 +1,1513 @@
+{
+ "1440 #/lukas/1": {
+  "htmlFont": "13px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 77.9
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 41.1
+  },
+  "hoofdstukbalk": {
+   "x": 0,
+   "y": 41.1,
+   "w": 1440,
+   "h": 35.8
+  },
+  "titel": {
+   "x": 19.5,
+   "y": 51.2,
+   "w": 123.5,
+   "h": 15.6
+  },
+  "strip": {
+   "x": 156,
+   "y": 41.1,
+   "w": 841.9,
+   "h": 35.8
+  },
+  "stripKnoppen": 24,
+  "pijlen": [
+   {
+    "hidden": true,
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+   },
+   {
+    "hidden": false,
+    "x": 977.1,
+    "y": 48.6,
+    "w": 20.8,
+    "h": 20.8
+   }
+  ],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 77.6,
+    "y": 8.5,
+    "w": 94.8,
+    "h": 23.2
+   },
+   {
+    "x": 193.2,
+    "y": 8.5,
+    "w": 93.6,
+    "h": 23.2
+   },
+   {
+    "x": 307.6,
+    "y": 8.5,
+    "w": 79.2,
+    "h": 23.2
+   },
+   {
+    "x": 407.6,
+    "y": 8.5,
+    "w": 110.2,
+    "h": 23.2
+   },
+   {
+    "x": 538.6,
+    "y": 8.5,
+    "w": 131.6,
+    "h": 23.2
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1125.4,
+   "y": 7.1,
+   "w": 157.3,
+   "h": 25.8
+  },
+  "grootte": {
+   "x": 1308.6,
+   "y": 8.1,
+   "w": 111.9,
+   "h": 23.9
+  },
+  "acties": {
+   "x": 1010.9,
+   "y": 48,
+   "w": 409.6,
+   "h": 22
+  },
+  "indeling": {
+   "x": 0,
+   "y": 77.9,
+   "w": 1440,
+   "h": 4952
+  },
+  "main": {
+   "x": 0,
+   "y": 77.9,
+   "w": 1440,
+   "h": 4952
+  },
+  "cellen": [
+   409.6,
+   621.5,
+   339.1,
+   409.6,
+   621.5,
+   339.1
+  ],
+  "mainFont": {
+   "fontSize": "10.5625px",
+   "lineHeight": "15.3156px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "11.375px",
+   "lineHeight": "18.2px"
+  },
+  "regelsFont": {
+   "fontSize": "9.34375px"
+  },
+  "h1": null,
+  "h1Rect": null,
+  "aantalVerzen": 80,
+  "scrollBreedte": 1440,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 5029.9
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1440 #/lukas/4": {
+  "htmlFont": "13px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 77.9
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 41.1
+  },
+  "hoofdstukbalk": {
+   "x": 0,
+   "y": 41.1,
+   "w": 1440,
+   "h": 35.8
+  },
+  "titel": {
+   "x": 19.5,
+   "y": 51.2,
+   "w": 123.5,
+   "h": 15.6
+  },
+  "strip": {
+   "x": 156,
+   "y": 41.1,
+   "w": 841.9,
+   "h": 35.8
+  },
+  "stripKnoppen": 24,
+  "pijlen": [
+   {
+    "hidden": true,
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+   },
+   {
+    "hidden": false,
+    "x": 977.1,
+    "y": 48.6,
+    "w": 20.8,
+    "h": 20.8
+   }
+  ],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 77.6,
+    "y": 8.5,
+    "w": 94.8,
+    "h": 23.2
+   },
+   {
+    "x": 193.2,
+    "y": 8.5,
+    "w": 93.6,
+    "h": 23.2
+   },
+   {
+    "x": 307.6,
+    "y": 8.5,
+    "w": 79.2,
+    "h": 23.2
+   },
+   {
+    "x": 407.6,
+    "y": 8.5,
+    "w": 110.2,
+    "h": 23.2
+   },
+   {
+    "x": 538.6,
+    "y": 8.5,
+    "w": 131.6,
+    "h": 23.2
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1125.4,
+   "y": 7.1,
+   "w": 157.3,
+   "h": 25.8
+  },
+  "grootte": {
+   "x": 1308.6,
+   "y": 8.1,
+   "w": 111.9,
+   "h": 23.9
+  },
+  "acties": {
+   "x": 1010.9,
+   "y": 48,
+   "w": 409.6,
+   "h": 22
+  },
+  "indeling": {
+   "x": 0,
+   "y": 77.9,
+   "w": 1440,
+   "h": 3134.1
+  },
+  "main": {
+   "x": 0,
+   "y": 77.9,
+   "w": 1440,
+   "h": 3134.1
+  },
+  "cellen": [
+   409.6,
+   621.5,
+   339.1,
+   409.6,
+   621.5,
+   339.1
+  ],
+  "mainFont": {
+   "fontSize": "10.5625px",
+   "lineHeight": "15.3156px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "11.375px",
+   "lineHeight": "18.2px"
+  },
+  "regelsFont": {
+   "fontSize": "9.34375px"
+  },
+  "h1": null,
+  "h1Rect": null,
+  "aantalVerzen": 44,
+  "scrollBreedte": 1440,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 3211.9
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1440 #/lukas/22": {
+  "htmlFont": "13px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 77.9
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 41.1
+  },
+  "hoofdstukbalk": {
+   "x": 0,
+   "y": 41.1,
+   "w": 1440,
+   "h": 35.8
+  },
+  "titel": {
+   "x": 19.5,
+   "y": 51.2,
+   "w": 123.5,
+   "h": 15.6
+  },
+  "strip": {
+   "x": 156,
+   "y": 41.1,
+   "w": 841.9,
+   "h": 35.8
+  },
+  "stripKnoppen": 24,
+  "pijlen": [
+   {
+    "hidden": false,
+    "x": 156,
+    "y": 48.6,
+    "w": 20.8,
+    "h": 20.8
+   },
+   {
+    "hidden": false,
+    "x": 977.1,
+    "y": 48.6,
+    "w": 20.8,
+    "h": 20.8
+   }
+  ],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 77.6,
+    "y": 8.5,
+    "w": 94.8,
+    "h": 23.2
+   },
+   {
+    "x": 193.2,
+    "y": 8.5,
+    "w": 93.6,
+    "h": 23.2
+   },
+   {
+    "x": 307.6,
+    "y": 8.5,
+    "w": 79.2,
+    "h": 23.2
+   },
+   {
+    "x": 407.6,
+    "y": 8.5,
+    "w": 110.2,
+    "h": 23.2
+   },
+   {
+    "x": 538.6,
+    "y": 8.5,
+    "w": 131.6,
+    "h": 23.2
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1125.4,
+   "y": 7.1,
+   "w": 157.3,
+   "h": 25.8
+  },
+  "grootte": {
+   "x": 1308.6,
+   "y": 8.1,
+   "w": 111.9,
+   "h": 23.9
+  },
+  "acties": {
+   "x": 1010.9,
+   "y": 48,
+   "w": 409.6,
+   "h": 22
+  },
+  "indeling": {
+   "x": 0,
+   "y": 77.9,
+   "w": 1440,
+   "h": 4763.3
+  },
+  "main": {
+   "x": 0,
+   "y": 77.9,
+   "w": 1440,
+   "h": 4763.3
+  },
+  "cellen": [
+   409.6,
+   621.5,
+   339.1,
+   409.6,
+   621.5,
+   339.1
+  ],
+  "mainFont": {
+   "fontSize": "10.5625px",
+   "lineHeight": "15.3156px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "11.375px",
+   "lineHeight": "18.2px"
+  },
+  "regelsFont": {
+   "fontSize": "9.34375px"
+  },
+  "h1": null,
+  "h1Rect": null,
+  "aantalVerzen": 71,
+  "scrollBreedte": 1440,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 4841.2
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1440 #/lukas/begrippen/vragen": {
+  "htmlFont": "13px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 42.1
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 41.1
+  },
+  "hoofdstukbalk": null,
+  "titel": null,
+  "strip": null,
+  "stripKnoppen": 0,
+  "pijlen": [],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 77.6,
+    "y": 8.5,
+    "w": 92.7,
+    "h": 23.2
+   },
+   {
+    "x": 191.1,
+    "y": 8.5,
+    "w": 93.6,
+    "h": 23.2
+   },
+   {
+    "x": 305.5,
+    "y": 8.5,
+    "w": 79.2,
+    "h": 23.2
+   },
+   {
+    "x": 405.5,
+    "y": 8.5,
+    "w": 112.6,
+    "h": 23.2
+   },
+   {
+    "x": 539,
+    "y": 8.5,
+    "w": 131.6,
+    "h": 23.2
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1125.4,
+   "y": 7.1,
+   "w": 157.3,
+   "h": 25.8
+  },
+  "grootte": {
+   "x": 1308.6,
+   "y": 8.1,
+   "w": 111.9,
+   "h": 23.9
+  },
+  "acties": null,
+  "indeling": {
+   "x": 0,
+   "y": 42.1,
+   "w": 1440,
+   "h": 23843.5
+  },
+  "main": {
+   "x": 0,
+   "y": 42.1,
+   "w": 1440,
+   "h": 23843.5
+  },
+  "cellen": [],
+  "mainFont": {
+   "fontSize": "10.5625px",
+   "lineHeight": "15.3156px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": null,
+  "regelsFont": null,
+  "h1": {
+   "fontSize": "17.875px",
+   "marginTop": "9.75px"
+  },
+  "h1Rect": {
+   "x": 35.8,
+   "y": 81.1,
+   "w": 1368.5,
+   "h": 25.9
+  },
+  "aantalVerzen": 0,
+  "scrollBreedte": 1440,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 23885.6
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1440 #/lukas/bewaard": {
+  "htmlFont": "13px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 42.1
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 41.1
+  },
+  "hoofdstukbalk": null,
+  "titel": null,
+  "strip": null,
+  "stripKnoppen": 0,
+  "pijlen": [],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 77.6,
+    "y": 8.5,
+    "w": 92.7,
+    "h": 23.2
+   },
+   {
+    "x": 191.1,
+    "y": 8.5,
+    "w": 93.6,
+    "h": 23.2
+   },
+   {
+    "x": 305.5,
+    "y": 8.5,
+    "w": 79.2,
+    "h": 23.2
+   },
+   {
+    "x": 405.5,
+    "y": 8.5,
+    "w": 110.2,
+    "h": 23.2
+   },
+   {
+    "x": 536.5,
+    "y": 8.5,
+    "w": 131.6,
+    "h": 23.2
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1133.8,
+   "y": 7.1,
+   "w": 148.8,
+   "h": 25.8
+  },
+  "grootte": {
+   "x": 1308.6,
+   "y": 8.1,
+   "w": 111.9,
+   "h": 23.9
+  },
+  "acties": null,
+  "indeling": {
+   "x": 0,
+   "y": 42.1,
+   "w": 1440,
+   "h": 900
+  },
+  "main": {
+   "x": 0,
+   "y": 42.1,
+   "w": 1440,
+   "h": 900
+  },
+  "cellen": [],
+  "mainFont": {
+   "fontSize": "10.5625px",
+   "lineHeight": "15.3156px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": null,
+  "regelsFont": null,
+  "h1": {
+   "fontSize": "17.875px",
+   "marginTop": "0px"
+  },
+  "h1Rect": {
+   "x": 13,
+   "y": 58.4,
+   "w": 669.5,
+   "h": 25.9
+  },
+  "aantalVerzen": 0,
+  "scrollBreedte": 1440,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 942.1
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1440 #/galerij": {
+  "htmlFont": "13px",
+  "bovenbalk": null,
+  "boekbalk": null,
+  "hoofdstukbalk": null,
+  "titel": null,
+  "strip": null,
+  "stripKnoppen": 0,
+  "pijlen": [],
+  "tabbladen": [],
+  "tabbladRects": [],
+  "zijbalk": true,
+  "bewaard": null,
+  "grootte": null,
+  "acties": null,
+  "indeling": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 9130.2
+  },
+  "main": {
+   "x": 0,
+   "y": 0,
+   "w": 988,
+   "h": 9130.2
+  },
+  "cellen": [
+   240.1,
+   432.2,
+   236,
+   240.1,
+   432.2,
+   236
+  ],
+  "mainFont": {
+   "fontSize": "10.5625px",
+   "lineHeight": "15.3156px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "11.375px",
+   "lineHeight": "18.2px"
+  },
+  "regelsFont": {
+   "fontSize": "9.34375px"
+  },
+  "h1": {
+   "fontSize": "17.875px",
+   "marginTop": "0px"
+  },
+  "h1Rect": {
+   "x": 13,
+   "y": 6.5,
+   "w": 962,
+   "h": 21.4
+  },
+  "aantalVerzen": 19,
+  "scrollBreedte": 1440,
+  "galerijRect": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 9130.2
+  },
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 9130.2
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1920 #/lukas/1": {
+  "htmlFont": "17.28px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 100.3
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 51.8
+  },
+  "hoofdstukbalk": {
+   "x": 0,
+   "y": 51.8,
+   "w": 1920,
+   "h": 47.5
+  },
+  "titel": {
+   "x": 25.9,
+   "y": 65.2,
+   "w": 164.2,
+   "h": 20.7
+  },
+  "strip": {
+   "x": 207.3,
+   "y": 51.8,
+   "w": 1126.3,
+   "h": 47.5
+  },
+  "stripKnoppen": 24,
+  "pijlen": [
+   {
+    "hidden": true,
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+   },
+   {
+    "hidden": false,
+    "x": 1306,
+    "y": 61.8,
+    "w": 27.6,
+    "h": 27.6
+   }
+  ],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 103.1,
+    "y": 10.3,
+    "w": 126,
+    "h": 30.1
+   },
+   {
+    "x": 256.8,
+    "y": 10.3,
+    "w": 124.4,
+    "h": 30.1
+   },
+   {
+    "x": 408.9,
+    "y": 10.3,
+    "w": 105.3,
+    "h": 30.1
+   },
+   {
+    "x": 541.8,
+    "y": 10.3,
+    "w": 146.5,
+    "h": 30.1
+   },
+   {
+    "x": 715.9,
+    "y": 10.3,
+    "w": 174.9,
+    "h": 30.1
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1507.8,
+   "y": 10.3,
+   "w": 203.1,
+   "h": 30.1
+  },
+  "grootte": {
+   "x": 1745.4,
+   "y": 9.8,
+   "w": 148.7,
+   "h": 31.1
+  },
+  "acties": {
+   "x": 1350.9,
+   "y": 61.3,
+   "w": 543.2,
+   "h": 28.6
+  },
+  "indeling": {
+   "x": 0,
+   "y": 100.3,
+   "w": 1920,
+   "h": 6565.2
+  },
+  "main": {
+   "x": 0,
+   "y": 100.3,
+   "w": 1920,
+   "h": 6565.2
+  },
+  "cellen": [
+   546.3,
+   828.9,
+   452.5,
+   546.3,
+   828.9,
+   452.5
+  ],
+  "mainFont": {
+   "fontSize": "14.04px",
+   "lineHeight": "20.358px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "15.12px",
+   "lineHeight": "24.192px"
+  },
+  "regelsFont": {
+   "fontSize": "12.42px"
+  },
+  "h1": null,
+  "h1Rect": null,
+  "aantalVerzen": 80,
+  "scrollBreedte": 1920,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 6665.6
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1920 #/lukas/4": {
+  "htmlFont": "17.28px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 100.3
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 51.8
+  },
+  "hoofdstukbalk": {
+   "x": 0,
+   "y": 51.8,
+   "w": 1920,
+   "h": 47.5
+  },
+  "titel": {
+   "x": 25.9,
+   "y": 65.2,
+   "w": 164.2,
+   "h": 20.7
+  },
+  "strip": {
+   "x": 207.3,
+   "y": 51.8,
+   "w": 1126.3,
+   "h": 47.5
+  },
+  "stripKnoppen": 24,
+  "pijlen": [
+   {
+    "hidden": true,
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+   },
+   {
+    "hidden": false,
+    "x": 1306,
+    "y": 61.8,
+    "w": 27.6,
+    "h": 27.6
+   }
+  ],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 103.1,
+    "y": 10.3,
+    "w": 126,
+    "h": 30.1
+   },
+   {
+    "x": 256.8,
+    "y": 10.3,
+    "w": 124.4,
+    "h": 30.1
+   },
+   {
+    "x": 408.9,
+    "y": 10.3,
+    "w": 105.3,
+    "h": 30.1
+   },
+   {
+    "x": 541.8,
+    "y": 10.3,
+    "w": 146.5,
+    "h": 30.1
+   },
+   {
+    "x": 715.9,
+    "y": 10.3,
+    "w": 174.9,
+    "h": 30.1
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1507.8,
+   "y": 10.3,
+   "w": 203.1,
+   "h": 30.1
+  },
+  "grootte": {
+   "x": 1745.4,
+   "y": 9.8,
+   "w": 148.7,
+   "h": 31.1
+  },
+  "acties": {
+   "x": 1350.9,
+   "y": 61.3,
+   "w": 543.2,
+   "h": 28.6
+  },
+  "indeling": {
+   "x": 0,
+   "y": 100.3,
+   "w": 1920,
+   "h": 4133.4
+  },
+  "main": {
+   "x": 0,
+   "y": 100.3,
+   "w": 1920,
+   "h": 4133.4
+  },
+  "cellen": [
+   546.3,
+   828.9,
+   452.5,
+   546.3,
+   828.9,
+   452.5
+  ],
+  "mainFont": {
+   "fontSize": "14.04px",
+   "lineHeight": "20.358px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "15.12px",
+   "lineHeight": "24.192px"
+  },
+  "regelsFont": {
+   "fontSize": "12.42px"
+  },
+  "h1": null,
+  "h1Rect": null,
+  "aantalVerzen": 44,
+  "scrollBreedte": 1920,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 4233.7
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1920 #/lukas/22": {
+  "htmlFont": "17.28px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 100.3
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 51.8
+  },
+  "hoofdstukbalk": {
+   "x": 0,
+   "y": 51.8,
+   "w": 1920,
+   "h": 47.5
+  },
+  "titel": {
+   "x": 25.9,
+   "y": 65.2,
+   "w": 164.2,
+   "h": 20.7
+  },
+  "strip": {
+   "x": 207.3,
+   "y": 51.8,
+   "w": 1126.3,
+   "h": 47.5
+  },
+  "stripKnoppen": 24,
+  "pijlen": [
+   {
+    "hidden": false,
+    "x": 207.3,
+    "y": 61.8,
+    "w": 27.6,
+    "h": 27.6
+   },
+   {
+    "hidden": false,
+    "x": 1306,
+    "y": 61.8,
+    "w": 27.6,
+    "h": 27.6
+   }
+  ],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 103.1,
+    "y": 10.3,
+    "w": 126,
+    "h": 30.1
+   },
+   {
+    "x": 256.8,
+    "y": 10.3,
+    "w": 124.4,
+    "h": 30.1
+   },
+   {
+    "x": 408.9,
+    "y": 10.3,
+    "w": 105.3,
+    "h": 30.1
+   },
+   {
+    "x": 541.8,
+    "y": 10.3,
+    "w": 146.5,
+    "h": 30.1
+   },
+   {
+    "x": 715.9,
+    "y": 10.3,
+    "w": 174.9,
+    "h": 30.1
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1507.8,
+   "y": 10.3,
+   "w": 203.1,
+   "h": 30.1
+  },
+  "grootte": {
+   "x": 1745.4,
+   "y": 9.8,
+   "w": 148.7,
+   "h": 31.1
+  },
+  "acties": {
+   "x": 1350.9,
+   "y": 61.3,
+   "w": 543.2,
+   "h": 28.6
+  },
+  "indeling": {
+   "x": 0,
+   "y": 100.3,
+   "w": 1920,
+   "h": 6330.5
+  },
+  "main": {
+   "x": 0,
+   "y": 100.3,
+   "w": 1920,
+   "h": 6330.5
+  },
+  "cellen": [
+   546.3,
+   828.9,
+   452.5,
+   546.3,
+   828.9,
+   452.5
+  ],
+  "mainFont": {
+   "fontSize": "14.04px",
+   "lineHeight": "20.358px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "15.12px",
+   "lineHeight": "24.192px"
+  },
+  "regelsFont": {
+   "fontSize": "12.42px"
+  },
+  "h1": null,
+  "h1Rect": null,
+  "aantalVerzen": 71,
+  "scrollBreedte": 1920,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 6430.8
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1920 #/lukas/begrippen/vragen": {
+  "htmlFont": "17.28px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 52.8
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 51.8
+  },
+  "hoofdstukbalk": null,
+  "titel": null,
+  "strip": null,
+  "stripKnoppen": 0,
+  "pijlen": [],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 103.1,
+    "y": 10.3,
+    "w": 123.3,
+    "h": 30.1
+   },
+   {
+    "x": 254,
+    "y": 10.3,
+    "w": 124.4,
+    "h": 30.1
+   },
+   {
+    "x": 406.1,
+    "y": 10.3,
+    "w": 105.3,
+    "h": 30.1
+   },
+   {
+    "x": 539,
+    "y": 10.3,
+    "w": 149.7,
+    "h": 30.1
+   },
+   {
+    "x": 716.4,
+    "y": 10.3,
+    "w": 174.9,
+    "h": 30.1
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1507.8,
+   "y": 10.3,
+   "w": 203.1,
+   "h": 30.1
+  },
+  "grootte": {
+   "x": 1745.4,
+   "y": 9.8,
+   "w": 148.7,
+   "h": 31.1
+  },
+  "acties": null,
+  "indeling": {
+   "x": 0,
+   "y": 52.8,
+   "w": 1920,
+   "h": 31510.4
+  },
+  "main": {
+   "x": 0,
+   "y": 52.8,
+   "w": 1920,
+   "h": 31510.4
+  },
+  "cellen": [],
+  "mainFont": {
+   "fontSize": "14.04px",
+   "lineHeight": "20.358px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": null,
+  "regelsFont": null,
+  "h1": {
+   "fontSize": "23.76px",
+   "marginTop": "12.96px"
+  },
+  "h1Rect": {
+   "x": 47.5,
+   "y": 104.6,
+   "w": 1825,
+   "h": 34.5
+  },
+  "aantalVerzen": 0,
+  "scrollBreedte": 1920,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 31563.2
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1920 #/lukas/bewaard": {
+  "htmlFont": "17.28px",
+  "bovenbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 52.8
+  },
+  "boekbalk": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 51.8
+  },
+  "hoofdstukbalk": null,
+  "titel": null,
+  "strip": null,
+  "stripKnoppen": 0,
+  "pijlen": [],
+  "tabbladen": [
+   "Hoofdstukken",
+   "Vertaalkeuzes",
+   "Zo vertaald",
+   "Vertaalvragen17 open",
+   "Zoeken en vervangen"
+  ],
+  "tabbladRects": [
+   {
+    "x": 103.1,
+    "y": 10.3,
+    "w": 123.3,
+    "h": 30.1
+   },
+   {
+    "x": 254,
+    "y": 10.3,
+    "w": 124.4,
+    "h": 30.1
+   },
+   {
+    "x": 406.1,
+    "y": 10.3,
+    "w": 105.3,
+    "h": 30.1
+   },
+   {
+    "x": 539,
+    "y": 10.3,
+    "w": 146.5,
+    "h": 30.1
+   },
+   {
+    "x": 713.2,
+    "y": 10.3,
+    "w": 174.9,
+    "h": 30.1
+   }
+  ],
+  "zijbalk": false,
+  "bewaard": {
+   "x": 1519,
+   "y": 10.3,
+   "w": 191.9,
+   "h": 30.1
+  },
+  "grootte": {
+   "x": 1745.4,
+   "y": 9.8,
+   "w": 148.7,
+   "h": 31.1
+  },
+  "acties": null,
+  "indeling": {
+   "x": 0,
+   "y": 52.8,
+   "w": 1920,
+   "h": 900
+  },
+  "main": {
+   "x": 0,
+   "y": 52.8,
+   "w": 1920,
+   "h": 900
+  },
+  "cellen": [],
+  "mainFont": {
+   "fontSize": "14.04px",
+   "lineHeight": "20.358px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": null,
+  "regelsFont": null,
+  "h1": {
+   "fontSize": "23.76px",
+   "marginTop": "0px"
+  },
+  "h1Rect": {
+   "x": 17.3,
+   "y": 74.4,
+   "w": 889.9,
+   "h": 34.5
+  },
+  "aantalVerzen": 0,
+  "scrollBreedte": 1920,
+  "galerijRect": null,
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 952.8
+  },
+  "dataOntwerp": "v8e"
+ },
+ "1920 #/galerij": {
+  "htmlFont": "13px",
+  "bovenbalk": null,
+  "boekbalk": null,
+  "hoofdstukbalk": null,
+  "titel": null,
+  "strip": null,
+  "stripKnoppen": 0,
+  "pijlen": [],
+  "tabbladen": [],
+  "tabbladRects": [],
+  "zijbalk": true,
+  "bewaard": null,
+  "grootte": null,
+  "acties": null,
+  "indeling": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 9130.2
+  },
+  "main": {
+   "x": 0,
+   "y": 0,
+   "w": 988,
+   "h": 9130.2
+  },
+  "cellen": [
+   240.1,
+   432.2,
+   236,
+   240.1,
+   432.2,
+   236
+  ],
+  "mainFont": {
+   "fontSize": "10.5625px",
+   "lineHeight": "15.3156px",
+   "fontFamily": "\"Inter Variable\", system-ui, sans-serif"
+  },
+  "versFont": {
+   "fontSize": "11.375px",
+   "lineHeight": "18.2px"
+  },
+  "regelsFont": {
+   "fontSize": "9.34375px"
+  },
+  "h1": {
+   "fontSize": "17.875px",
+   "marginTop": "0px"
+  },
+  "h1Rect": {
+   "x": 13,
+   "y": 6.5,
+   "w": 962,
+   "h": 21.4
+  },
+  "aantalVerzen": 19,
+  "scrollBreedte": 1920,
+  "galerijRect": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 9130.2
+  },
+  "body": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 9130.2
+  },
+  "dataOntwerp": "v8e"
+ },
+ "fouten": []
+}
