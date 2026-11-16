@@ -14,6 +14,8 @@ type Invoer = {
 	naslagOpen: boolean;
 	/** De redacteur heeft het vak met de punaise vastgezet. */
 	vastgezet: boolean;
+	/** Alle vakken staan vast met de punaise in de kolomkop; de punaise per vak is dan overbodig. */
+	alleVast: boolean;
 	/** De regels passen niet in de hoogte van het vers. */
 	overloopt: boolean;
 	/** Het vak is aangewezen of heeft toetsenbordfocus. */
@@ -33,8 +35,8 @@ export function overloopNaMeting(vorige: boolean, vast: boolean, gemeten: boolea
  * Bepaalt hoe de cel Vertaalregels erbij staat: zolang de naslagkaart open is of het vak vastgezet is, staat hij vast en volledig,
  * anders zweeft hij en klapt hij open bij aanwijzen of toetsenbordfocus, maar alleen als de regels niet in de cel passen.
  */
-export function celToestand({ naslagOpen, vastgezet, overloopt, open }: Invoer): Celtoestand {
-	const vast = naslagOpen || vastgezet;
+export function celToestand({ naslagOpen, vastgezet, alleVast, overloopt, open }: Invoer): Celtoestand {
+	const vast = naslagOpen || vastgezet || alleVast;
 	const zwevendMetOverloop = !vast && overloopt;
 	const uitgeklapt = zwevendMetOverloop && open;
 	const klassen = ['zweefvak', vast && 'vast', zwevendMetOverloop && 'overloopt', uitgeklapt && 'open'];
@@ -42,6 +44,6 @@ export function celToestand({ naslagOpen, vastgezet, overloopt, open }: Invoer):
 		vast,
 		klassen: klassen.filter((naam) => naam !== false).join(' '),
 		focusbaar: zwevendMetOverloop,
-		punaise: vastgezet || naslagOpen || uitgeklapt,
+		punaise: !alleVast && (vastgezet || naslagOpen || uitgeklapt),
 	};
 }

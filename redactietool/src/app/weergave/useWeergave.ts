@@ -5,6 +5,7 @@ import { bewaarWeergave, leesWeergave, schaalVan, type Grootte, type Weergave } 
 export type Weergavebeheer = {
 	weergave: Weergave;
 	zetGrootte: (grootte: Grootte) => void;
+	wisselAlleRegelsVast: () => void;
 };
 
 /** De weergave-instellingen: zet `--schaal` op `<html>` en onthoudt de instelling in de browser. */
@@ -16,6 +17,7 @@ export function useWeergave(): Weergavebeheer {
 	}, [weergave]);
 	return {
 		weergave,
-		zetGrootte: (grootte) => zetWeergave({ grootte }),
+		zetGrootte: (grootte) => zetWeergave((huidig) => ({ ...huidig, grootte })),
+		wisselAlleRegelsVast: () => zetWeergave((huidig) => ({ ...huidig, alleRegelsVast: !huidig.alleRegelsVast })),
 	};
 }

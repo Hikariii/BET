@@ -26,6 +26,8 @@ Heeft een vers veel vertaalregels (meer dan drie), dan staan er eerst drie. De r
 
 Rechtsonder in een uitgeklapt vak staat een punaise. Met **Vertaalregels vastzetten** blijft het vak open in de kolom, met alle regels. Nog een klik maakt het weer los. Het vak blijft ook een moment open nadat je de muis ervan weghaalt, zodat je rustig kunt lezen.
 
+Wil je alle vertaalregels tegelijk vast, zoals in een gewone kolom? Klik dan op de punaise rechts in de kolomkop **Vertaalregels**. De tool onthoudt die keuze; nog een klik klapt alles weer in.
+
 {{wijs vertaalregels-kolom | Kolom Vertaalregels | Bovenaan de tabel, rechts van Vereenvoudigd.}}
 {{wijs nog-n-regels | nog N vertaalregels | In de kolom Vertaalregels bij een vers met veel vertaalregels.}}
 

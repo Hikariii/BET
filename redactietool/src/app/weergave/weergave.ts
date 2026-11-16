@@ -14,17 +14,19 @@ export function schaalVan(grootte: Grootte): number {
 /** Wat de gebruiker aan de weergave instelt en de browser onthoudt. */
 export type Weergave = {
 	grootte: Grootte;
+	/** Alle vertaalregels staan vast in hun kolom, zoals met de punaise per vers (de punaise in de kolomkop). */
+	alleRegelsVast: boolean;
 };
 
 const SLEUTEL = 'bet-weergave';
 
-const STANDAARD: Weergave = { grootte: 0 };
+const STANDAARD: Weergave = { grootte: 0, alleRegelsVast: false };
 
 function isGrootte(waarde: unknown): waarde is Grootte {
 	return GROOTTE_STAPPEN.some((stap) => stap === waarde);
 }
 
-/** Leest de onthouden weergave; wat ontbreekt of onleesbaar is, krijgt de standaardgrootte. */
+/** Leest de onthouden weergave; wat ontbreekt of onleesbaar is, krijgt de standaard (grootte 0, regels niet vast). */
 export function leesWeergave(opslag: Opslag): Weergave {
 	let json: unknown;
 	try {
@@ -35,7 +37,8 @@ export function leesWeergave(opslag: Opslag): Weergave {
 	}
 	if (typeof json !== 'object' || json === null) return STANDAARD;
 	const grootte: unknown = Reflect.get(json, 'grootte');
-	return { grootte: isGrootte(grootte) ? grootte : STANDAARD.grootte };
+	const alleRegelsVast: unknown = Reflect.get(json, 'alleRegelsVast');
+	return { grootte: isGrootte(grootte) ? grootte : STANDAARD.grootte, alleRegelsVast: alleRegelsVast === true };
 }
 
 /** Onthoudt de weergave; een weigerende opslag (privémodus, vol) laat de instelling alleen tot het herladen gelden. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { celToestand, overloopNaMeting } from './celToestand';
 
-const rust = { naslagOpen: false, vastgezet: false, overloopt: false, open: false };
+const rust = { naslagOpen: false, vastgezet: false, alleVast: false, overloopt: false, open: false };
 
 describe('celToestand', () => {
 	it('laat een cel waar alles in past een gewoon zweefvak zonder punaise, ook bij aanwijzen', () => {
@@ -42,5 +42,12 @@ describe('overloopNaMeting', () => {
 	it('houdt de uitkomst van vóór het vastzetten, ook als de vaste cel alles laat passen', () => {
 		expect(overloopNaMeting(true, true, false)).toBe(true);
 		expect(overloopNaMeting(false, true, true)).toBe(false);
+	});
+
+	it('zet met de punaise in de kolomkop elk vak vast, zonder punaise per vak, ook als het uitgeklapt of zelf vastgezet is', () => {
+		const verwacht = { vast: true, klassen: 'zweefvak vast', focusbaar: false, punaise: false };
+		expect(celToestand({ ...rust, alleVast: true })).toEqual(verwacht);
+		expect(celToestand({ ...rust, alleVast: true, overloopt: true, open: true })).toEqual(verwacht);
+		expect(celToestand({ ...rust, alleVast: true, vastgezet: true, naslagOpen: true })).toEqual(verwacht);
 	});
 });

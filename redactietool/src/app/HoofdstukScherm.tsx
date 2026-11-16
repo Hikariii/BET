@@ -15,7 +15,7 @@ import { Regels } from './Regels';
 import { vragenBijVers } from './vertaalvragen';
 import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
 import { VersTekst } from './VersTekst';
-import { VertaalregelsCel } from './verzen/VertaalregelsCel';
+import { PunaiseIcoon, VertaalregelsCel } from './verzen/VertaalregelsCel';
 
 const LABEL_GOEDGEKEURD = 'Goedgekeurd, referentie voor de rest van het boek. Wijzigingen gaan opnieuw langs de redactie.';
 
@@ -30,6 +30,9 @@ type Props = {
 	/** De tussenstand van dit hoofdstuk, door de pagina gelezen omdat de acties in de bovenbalk dezelfde stand nodig hebben. */
 	tussenstand: Tussenstand;
 	herlees: () => void;
+	/** De punaise in de kolomkop: alle vertaalregels vast in hun kolom. */
+	alleRegelsVast: boolean;
+	onWisselAlleRegelsVast: () => void;
 };
 
 /** Wat bij één vers hoort aan regels uit het log en vragen. */
@@ -55,6 +58,8 @@ export function HoofdstukScherm({
 	gekozenVers,
 	tussenstand,
 	herlees,
+	alleRegelsVast,
+	onWisselAlleRegelsVast,
 }: Props) {
 	const [bewerktAdres, zetBewerktAdres] = useState<string | null>(null);
 	const [geopendMetPijl, zetGeopendMetPijl] = useState(false);
@@ -98,8 +103,18 @@ export function HoofdstukScherm({
 						<th scope="col">Vers</th>
 						<th scope="col">Bron</th>
 						<th scope="col">Vereenvoudigd</th>
-						<th scope="col" data-help="vertaalregels-kolom">
-							Vertaalregels
+						<th scope="col" class="regelskop" data-help="vertaalregels-kolom">
+							<span>Vertaalregels</span>
+							<button
+								type="button"
+								class="punaise regels-allemaal"
+								aria-pressed={alleRegelsVast}
+								title={alleRegelsVast ? 'Vertaalregels weer inklappen' : 'Alle vertaalregels uitklappen en vastzetten'}
+								onClick={onWisselAlleRegelsVast}
+							>
+								<PunaiseIcoon vol={alleRegelsVast} />
+								<span class="alleen-lezers">Alle vertaalregels vastzetten</span>
+							</button>
 						</th>
 					</tr>
 				</thead>
@@ -125,6 +140,7 @@ export function HoofdstukScherm({
 							onSluit={() => zetBewerktAdres(null)}
 							onNaarBuur={(richting) => groep.nummer !== null && bewerkBuur(groep.nummer, richting)}
 							onOpslagGewijzigd={herlees}
+							alleRegelsVast={alleRegelsVast}
 						/>
 					))}
 				</tbody>
@@ -155,6 +171,7 @@ type VersRijProps = {
 	onSluit: () => void;
 	onNaarBuur: (richting: Richting) => void;
 	onOpslagGewijzigd: () => void;
+	alleRegelsVast: boolean;
 };
 
 export function VersRij({
@@ -174,6 +191,7 @@ export function VersRij({
 	onSluit,
 	onNaarBuur,
 	onOpslagGewijzigd,
+	alleRegelsVast,
 }: VersRijProps) {
 	const rijRef = useRef<HTMLTableRowElement>(null);
 	useEffect(() => {
@@ -239,7 +257,7 @@ export function VersRij({
 						/>
 					)}
 				</td>
-				<VertaalregelsCel nummer={nummer} naslagOpen={openNaslag !== null} regels={regels} />
+				<VertaalregelsCel nummer={nummer} naslagOpen={openNaslag !== null} alleVast={alleRegelsVast} regels={regels} />
 			</tr>
 			{openNaslag !== null && (
 				<tr class="naslagrij">

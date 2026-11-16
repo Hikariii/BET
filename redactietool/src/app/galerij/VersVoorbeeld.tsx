@@ -71,6 +71,7 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 					onBewerk={() => zetBewerken(true)}
 					onSluit={() => zetBewerken(false)}
 					onOpslagGewijzigd={herlees}
+					alleRegelsVast={false}
 				/>
 			</tbody>
 		</table>

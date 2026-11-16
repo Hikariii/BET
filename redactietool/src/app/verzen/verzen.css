@@ -105,3 +105,15 @@
 	outline: 2px solid var(--tekst);
 	outline-offset: 1px;
 }
+
+/* De punaise in de kolomkop zet alle vertaalregels vast; hij staat rechts in de kop. */
+.indeling table.verzen.verzen-dicht thead th.regelskop {
+	position: relative;
+}
+
+.verzen-dicht th.regelskop .regels-allemaal {
+	position: absolute;
+	top: 50%;
+	right: 0.5rem;
+	transform: translateY(-50%);
+}

@@ -8,6 +8,8 @@ type Props = {
 	nummer: number | null;
 	/** Of de naslagkaart onder dit vers open staat; de cel staat dan vast en volledig in de kolom. */
 	naslagOpen: boolean;
+	/** De punaise in de kolomkop zet alle vakken vast. */
+	alleVast: boolean;
 	/** De vertaalregels van het vers; `gekapt` bewaart na enkele regels de rest achter "nog N regels". */
 	regels: (gekapt: boolean) => ComponentChildren;
 };
@@ -17,13 +19,13 @@ type Props = {
  * Bij aanwijzen of toetsenbordfocus klapt het vak uit over de volgende verzen, zonder dat iets verschuift.
  * De punaise rechtsonder zet een uitgeklapt vak vast in de kolom met alle regels, net als zolang de naslagkaart onder het vers open staat.
  */
-export function VertaalregelsCel({ nummer, naslagOpen, regels }: Props) {
+export function VertaalregelsCel({ nummer, naslagOpen, alleVast, regels }: Props) {
 	const { open, handelers } = useAanwijzen();
 	const celRef = useRef<HTMLTableCellElement>(null);
 	const inhoudRef = useRef<HTMLDivElement>(null);
 	const [overloopt, zetOverloopt] = useState(false);
 	const [vastgezet, zetVastgezet] = useState(false);
-	const toestand = celToestand({ naslagOpen, vastgezet, overloopt, open });
+	const toestand = celToestand({ naslagOpen, vastgezet, alleVast, overloopt, open });
 	const vastRef = useRef(toestand.vast);
 	vastRef.current = toestand.vast;
 
@@ -62,17 +64,24 @@ function Punaise({ vastgezet, wissel }: { vastgezet: boolean; wissel: () => void
 	return (
 		<div class="punaisestrook">
 			<button type="button" class="punaise" aria-pressed={vastgezet} aria-label={label} title={label} onClick={wissel}>
-				<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
-					<path
-						d="M7.5 3h5 M8.5 3v5l-2.5 3h8l-2.5-3V3 M10 11v6"
-						fill={vastgezet ? 'currentColor' : 'none'}
-						stroke="currentColor"
-						stroke-width="1.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
+				<PunaiseIcoon vol={vastgezet} />
 			</button>
 		</div>
+	);
+}
+
+/** Het speldje van de punaise: gevuld als het vak (of de hele kolom) vaststaat. */
+export function PunaiseIcoon({ vol }: { vol: boolean }) {
+	return (
+		<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+			<path
+				d="M7.5 3h5 M8.5 3v5l-2.5 3h8l-2.5-3V3 M10 11v6"
+				fill={vol ? 'currentColor' : 'none'}
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+		</svg>
 	);
 }

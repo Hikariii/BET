@@ -150,6 +150,8 @@ function HoofdstukPagina({ weergavebeheer, boek, referentie, info, gekozenVers }
 				gekozenVers={gekozenVers}
 				tussenstand={tussenstand}
 				herlees={herlees}
+				alleRegelsVast={weergavebeheer.weergave.alleRegelsVast}
+				onWisselAlleRegelsVast={weergavebeheer.wisselAlleRegelsVast}
 			/>
 		);
 	}

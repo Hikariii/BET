@@ -10,14 +10,14 @@ describe('schaalVan', () => {
 
 describe('leesWeergave', () => {
 	it('geeft grootte 0 als er niets onthouden is', () => {
-		expect(leesWeergave(new GeheugenOpslag())).toEqual({ grootte: 0 });
+		expect(leesWeergave(new GeheugenOpslag())).toEqual({ grootte: 0, alleRegelsVast: false });
 	});
 
 	it('geeft terug wat bewaarWeergave onthield', () => {
 		const opslag = new GeheugenOpslag();
-		bewaarWeergave(opslag, { grootte: 2 });
+		bewaarWeergave(opslag, { grootte: 2, alleRegelsVast: true });
 
-		expect(leesWeergave(opslag)).toEqual({ grootte: 2 });
+		expect(leesWeergave(opslag)).toEqual({ grootte: 2, alleRegelsVast: true });
 	});
 
 	it.each([
@@ -28,21 +28,21 @@ describe('leesWeergave', () => {
 		const opslag = new GeheugenOpslag();
 		opslag.setItem('bet-weergave', tekst);
 
-		expect(leesWeergave(opslag)).toEqual({ grootte: 0 });
+		expect(leesWeergave(opslag)).toEqual({ grootte: 0, alleRegelsVast: false });
 	});
 
 	it('neemt een onbekende grootte niet over', () => {
 		const opslag = new GeheugenOpslag();
 		opslag.setItem('bet-weergave', JSON.stringify({ grootte: 9 }));
 
-		expect(leesWeergave(opslag)).toEqual({ grootte: 0 });
+		expect(leesWeergave(opslag)).toEqual({ grootte: 0, alleRegelsVast: false });
 	});
 
 	it('leest de grootte uit een oudere opslag met meer velden', () => {
 		const opslag = new GeheugenOpslag();
 		opslag.setItem('bet-weergave', JSON.stringify({ grootte: -1, zijbalkIngeklapt: true }));
 
-		expect(leesWeergave(opslag)).toEqual({ grootte: -1 });
+		expect(leesWeergave(opslag)).toEqual({ grootte: -1, alleRegelsVast: false });
 	});
 });
 
@@ -56,6 +56,6 @@ describe('bewaarWeergave', () => {
 			removeItem: () => {},
 		};
 
-		expect(() => bewaarWeergave(weigert, { grootte: 0 })).not.toThrow();
+		expect(() => bewaarWeergave(weigert, { grootte: 0, alleRegelsVast: false })).not.toThrow();
 	});
 });
