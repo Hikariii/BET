@@ -68,6 +68,16 @@ Kleine punten (toegankelijkheid, componenttests, rooktest, woordgrenzen bij een 
 - **Wissen**: opmaak van de selectie halen.
 - Alleen zichtbaar tijdens het bewerken van een vers; samen ontwerpen met het selectiebalkje uit het ontwerpspoor "Ingangen vanuit de tekst" (één balk voor opmaak en vertaalkeuzes). De bestaande opmaakwaarschuwing blijft.
 
+**Ontwerpideeën ronde 3 (eigenaar, 2026-11-16; nog niet ontworpen):**
+- **Hele schermbreedte gebruiken**, met de huidige verhouding van de kolommen (bron, vereenvoudigd, vertaalregels).
+  - Let op: dit gaat in tegen de maximale leesbreedte van ~65 tekens (keuze 2026-11-15, `--tabel-breedte` in `vormgeving.css`). Op 1920 px wordt de vereenvoudiging dan weer ~90 tekens per regel. Te kiezen: grotere letter op brede schermen (de tekst groeit mee), een ruimere grens, of de breedte laten zoals hij is.
+- **Navigatiekolom inklapbaar**, met een pijl onderaan.
+  - Ingeklapt alleen een smalle strook per hoofdstuk: nummer, vinkje voor goedgekeurd en het aantal vragen (bv. `1 ✓ 3?`).
+  - De drie andere kolommen worden dan naar verhouding breder.
+  - De keuze onthouden (in de browser) en toegankelijk maken (`aria-expanded`, toetsenbord).
+- **Bovenbalk los en sticky**: de knop Keuzes en vragen, de hoofdstuktitel en de acties (Hoofdstuktekst kopiëren voor Word, Export voor Claude) staan in een balk bovenaan die blijft staan bij scrollen en niet mee inklapt met de navigatiekolom.
+- **Kolom Vertaalregels inklappen**: twijfel. Er is al een schakelaar "Vertaalregels altijd tonen" (anders onder het gekozen vers); bekijken of een ingeklapte smalle kolom met alleen labels (§7A, precedent, vraag) beter is.
+
 **Werkwijze:**
 1. **Analyse.** Schermafbeeldingen van de huidige tool en de taken van de redacteur als verloop uitgeschreven (een vers aanpassen, een vertaalvraag beantwoorden, een hoofdstuk naar Word brengen). Wat werkt, wat schuurt, welke patronen ontbreken.
 2. **Richtingen met Claude Design.** Binnen de basis hierboven twee of drie typografische richtingen voor de schermen die het meest tellen: lezen en bewerken, het menu bij een woord, het voorbeeldvenster met varianten. Altijd met echte Lukas-tekst, ook uit een druk hoofdstuk. De eigenaar kiest, de redacteur reageert, daarna itereren.
