@@ -930,22 +930,6 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	font-weight: 600;
 }
 
-.vertaalvragen .vragenlijst {
-	gap: 0;
-}
-
-.vertaalvragen .registervraag,
-.vertaalvragen details {
-	padding: 0.75rem 0;
-	border: 0;
-	border-bottom: 1px solid #efefef;
-	border-radius: 0;
-}
-
-.vertaalvragen summary {
-	padding: 0;
-}
-
 .vertaalvragen summary:hover {
 	background: none;
 	text-decoration: underline;

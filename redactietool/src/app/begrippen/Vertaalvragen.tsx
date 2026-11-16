@@ -1,4 +1,4 @@
-import type { RefObject } from 'preact';
+import type { ComponentChildren, RefObject } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 import {
 	controleerKeuze,
@@ -72,6 +72,11 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	const register = overig.filter((vraag) => vraag.herkomst.soort === 'register');
 	const perHoofdstuk = groepeerLogVragen(overig);
 	const sleutel = (vraag: Vertaalvraag): string => sleutels.get(vraag) ?? '';
+	const isDoel = (vraag: Vertaalvraag): boolean => sleutel(vraag) === doelSleutel;
+	// Met een filter aan staan de lijsten onder de open vragen open: de lezer zoekt dan iets in die lijsten.
+	const groepOpen = filter !== GEEN_FILTER || alleenOnbeantwoord;
+	const uitlegBijOpen = open.some((vraag) => vraag.herkomst.soort === 'register');
+	const uitlegBijRegister = !uitlegBijOpen && register.length > 0;
 	const bestaandeKeuzes = useMemo(() => new Map(leesKeuzes(browseropslag(), boek.id).map((keuze) => [keuze.id, keuze])), [boek.id, opslagTeller]);
 	const hoofdstukVerzen = useMemo(
 		() => bouwHoofdstukVerzen(hoofdstukken, boek, (hoofdstuk) => leesTussenstand(browseropslag(), boek.id, hoofdstuk)),
@@ -83,7 +88,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 			key={sleutel(vraag)}
 			boek={boek.id}
 			vraag={vraag}
-			doel={sleutel(vraag) === doelSleutel}
+			doel={isDoel(vraag)}
 			antwoord={antwoorden.get(vraag.kwestie) ?? null}
 			bestaandeKeuzes={bestaandeKeuzes}
 			acties={acties}
@@ -138,6 +143,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 						Open vragen ({open.length}
 						{openBeantwoord > 0 && `, ${openBeantwoord} door jou beantwoord`})
 					</h2>
+					{uitlegBijOpen && <AntwoordUitleg />}
 					<ul class="vragenlijst">
 						{open.map((vraag) =>
 							vraag.herkomst.soort === 'register' ? (
@@ -151,17 +157,14 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 			)}
 
 			{register.length > 0 && (
-				<section aria-labelledby="register-titel">
-					<h2 id="register-titel">Vragen met een besluit ({register.length})</h2>
-					<ul class="vragenlijst">
-						{register.map(registervraag)}
-					</ul>
-				</section>
+				<Lijstgroep titelId="register-titel" titel={`Vragen met een besluit (${register.length})`} open={groepOpen || register.some(isDoel)}>
+					{uitlegBijRegister && <AntwoordUitleg />}
+					<ul class="vragenlijst">{register.map(registervraag)}</ul>
+				</Lijstgroep>
 			)}
 
 			{perHoofdstuk.length > 0 && (
-				<section aria-labelledby="logs-titel">
-					<h2 id="logs-titel">Opmerkingen van Claude per hoofdstuk</h2>
+				<Lijstgroep titelId="logs-titel" titel={`Opmerkingen van Claude per hoofdstuk (${overig.length - register.length})`} open={groepOpen || overig.some(isDoel)}>
 					{perHoofdstuk.map(({ hoofdstuk, vragen: hoofdstukVragen }) => (
 						<section key={hoofdstuk} aria-labelledby={`logs-hoofdstuk-${hoofdstuk}`}>
 							<h3 id={`logs-hoofdstuk-${hoofdstuk}`}>
@@ -169,12 +172,12 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 							</h3>
 							<ul class="vragenlijst">
 								{hoofdstukVragen.map((vraag) => (
-									<LogVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} open={false} doel={sleutel(vraag) === doelSleutel} />
+									<LogVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} open={false} doel={isDoel(vraag)} />
 								))}
 							</ul>
 						</section>
 					))}
-				</section>
+				</Lijstgroep>
 			)}
 
 			{getoond.length === 0 && <p class="melding">Geen vragen die bij deze filters passen.</p>}
@@ -225,55 +228,59 @@ function RegisterVraag({ boek, vraag, doel, antwoord, bestaandeKeuzes, acties }:
 
 	return (
 		<li class={doel ? 'registervraag vraag-doel' : 'registervraag'} ref={rij} tabIndex={doel ? -1 : undefined}>
-			<h3>{vraag.kwestie}</h3>
-			<Status vraag={vraag} />
-			<dl>
-				<dt>Nu in de tekst</dt>
-				<dd>{vraag.gekozen}</dd>
-				<dt>Andere opties</dt>
-				<dd>
-					{opties.length === 0 ? (
-						<span class="geen-verzen">geen opties</span>
-					) : (
-						<ul class="opties">
-							{optieActies.map(({ optie, actie }) => (
-								<li key={optie}>
-									<span class="optietekst">{optie}</span>
-									{actie === 'kiezen' && (
-										<button type="button" class="optieknop" data-help="vragen-kiezen" aria-label={`Kiezen: ${optie}`} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
-											Kiezen
-										</button>
-									)}
-									{actie === 'zoek-plekken' && (
-										<button
-											type="button"
-											class="optieknop"
-											data-help="vragen-zoek-plekken"
-											aria-label={`Zoek de plekken: ${optie}`}
-											onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}
-										>
-											Zoek de plekken
-										</button>
-									)}
-								</li>
-							))}
-						</ul>
+			<div class="vraaginhoud">
+				<h3>{vraag.kwestie}</h3>
+				<Status vraag={vraag} />
+				<dl>
+					<dt>Nu in de tekst</dt>
+					<dd>{vraag.gekozen}</dd>
+					<dt>Andere opties</dt>
+					<dd>
+						{opties.length === 0 ? (
+							<span class="geen-verzen">geen opties</span>
+						) : (
+							<ul class="opties">
+								{optieActies.map(({ optie, actie }) => (
+									<li key={optie}>
+										<span class="optietekst">{optie}</span>
+										{actie === 'kiezen' && (
+											<button type="button" class="optieknop" data-help="vragen-kiezen" aria-label={`Kiezen: ${optie}`} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
+												Kiezen
+											</button>
+										)}
+										{actie === 'zoek-plekken' && (
+											<button
+												type="button"
+												class="optieknop"
+												data-help="vragen-zoek-plekken"
+												aria-label={`Zoek de plekken: ${optie}`}
+												onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}
+											>
+												Zoek de plekken
+											</button>
+										)}
+									</li>
+								))}
+							</ul>
+						)}
+					</dd>
+					{vraag.tekst !== '' && (
+						<>
+							<dt>Besluit van de redactie</dt>
+							<dd>{vraag.tekst}</dd>
+						</>
 					)}
-				</dd>
-				{vraag.tekst !== '' && (
-					<>
-						<dt>Besluit van de redactie</dt>
-						<dd>{vraag.tekst}</dd>
-					</>
+					<dt>Verzen</dt>
+					<dd>{vraag.verzen.length === 0 ? <span class="geen-verzen">het hele boek</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}</dd>
+				</dl>
+			</div>
+			<div class="antwoordkolom">
+				{antwoord === null ? (
+					<AntwoordVak vraag={vraag} opties={opties} acties={acties} zetMelding={zetMelding} />
+				) : (
+					<GegevenAntwoord boek={boek} vraag={vraag} antwoord={antwoord} bestaandeKeuzes={bestaandeKeuzes} acties={acties} zetMelding={zetMelding} />
 				)}
-				<dt>Verzen</dt>
-				<dd>{vraag.verzen.length === 0 ? <span class="geen-verzen">het hele boek</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}</dd>
-			</dl>
-			{antwoord === null ? (
-				<AntwoordFormulier vraag={vraag} opties={opties} acties={acties} zetMelding={zetMelding} />
-			) : (
-				<GegevenAntwoord boek={boek} vraag={vraag} antwoord={antwoord} bestaandeKeuzes={bestaandeKeuzes} acties={acties} zetMelding={zetMelding} />
-			)}
+			</div>
 			<p role="status" class="vraagmelding" tabIndex={-1} ref={meldingvak}>
 				{melding}
 			</p>
@@ -282,14 +289,47 @@ function RegisterVraag({ boek, vraag, doel, antwoord, bestaandeKeuzes, acties }:
 }
 
 const GEEN_KEUZE = '';
-const TOELICHTING_UITLEG =
-	'Schrijf erbij wanneer je wat kiest. Claude maakt er een voorstel voor een vaste afspraak van; die geldt pas als de eigenaar akkoord geeft.';
 const TOELICHTING_VOORBEELD = 'Bijvoorbeeld: in een zaligspreking kiezen we genade; waar iemand een persoon prijst, laten we eeuwigleven staan.';
+/** Eén uitleg bovenaan de lijst; de toelichtingsvelden verwijzen er met `aria-describedby` naar. */
+const UITLEG_ID = 'antwoord-uitleg';
+
+function AntwoordUitleg() {
+	return (
+		<p class="veldhulp lijstuitleg" id={UITLEG_ID}>
+			Klik bij een vraag op Beantwoorden om je antwoord vast te leggen. Hoeft niet: een vraag mag ook open blijven. Schrijf bij je antwoord in de toelichting wanneer je wat kiest. Claude maakt er een voorstel
+			voor een vaste afspraak van; die geldt pas als de eigenaar akkoord geeft.
+		</p>
+	);
+}
 
 type FormulierProps = { vraag: Vertaalvraag; opties: readonly string[]; acties: Antwoordacties; zetMelding: (melding: string) => void };
 
-/** Legt een antwoord vast: een van de opties zonder wijziging in de tekst, of een eigen antwoord met toelichting. */
-function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps) {
+/** Het antwoordvak van een onbeantwoorde vraag: ingeklapt alleen de knop Beantwoorden, daarna het formulier. */
+function AntwoordVak(props: FormulierProps) {
+	const [open, zetOpen] = useState(false);
+	const knop = useRef<HTMLButtonElement>(null);
+
+	function sluit() {
+		zetOpen(false);
+		// De knop bestaat pas na de volgende render.
+		setTimeout(() => knop.current?.focus());
+	}
+
+	return (
+		<div class="antwoordvak" data-help="antwoord-formulier">
+			{open ? (
+				<AntwoordFormulier {...props} sluit={sluit} />
+			) : (
+				<button type="button" ref={knop} aria-label={`Beantwoorden: ${props.vraag.kwestie}`} onClick={() => zetOpen(true)}>
+					Beantwoorden
+				</button>
+			)}
+		</div>
+	);
+}
+
+/** Legt een antwoord vast: een van de opties zonder wijziging in de tekst, of een eigen antwoord met toelichting. Escape en Annuleren klappen het weer in. */
+function AntwoordFormulier({ vraag, opties, acties, zetMelding, sluit }: FormulierProps & { sluit: () => void }) {
 	const kanKiezen = opties.length > 0;
 	const [gekozen, zetGekozen] = useState(kanKiezen ? GEEN_KEUZE : EIGEN_ANTWOORD);
 	const [toelichting, zetToelichting] = useState('');
@@ -300,7 +340,11 @@ function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps
 	const eigen = gekozen === EIGEN_ANTWOORD;
 	const foutBijKeuze = fout !== '' && gekozen === GEEN_KEUZE;
 	const foutBijToelichting = fout !== '' && !foutBijKeuze;
-	const hulp = `${id}-uitleg${eigen ? ` ${id}-eigen` : ''}`;
+	const hulp = `${UITLEG_ID}${eigen ? ` ${id}-eigen` : ''}`;
+
+	useEffect(() => {
+		keuzeveld.current?.focus();
+	}, []);
 
 	function vastleggen(gebeurtenis: Event) {
 		gebeurtenis.preventDefault();
@@ -322,11 +366,17 @@ function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps
 	}
 
 	return (
-		<form class="antwoordformulier" data-help="antwoord-formulier" aria-label={`Antwoord vastleggen: ${vraag.kwestie}`} noValidate onSubmit={vastleggen}>
-			<div class="antwoordkop">
-				<h4>Antwoord vastleggen</h4>
-				<p class="veldhulp">Hoeft niet: een vraag mag ook open blijven.</p>
-			</div>
+		<form
+			class="antwoordformulier"
+			aria-label={`Antwoord vastleggen: ${vraag.kwestie}`}
+			noValidate
+			onSubmit={vastleggen}
+			onKeyDown={(gebeurtenis) => {
+				if (gebeurtenis.key !== 'Escape') return;
+				gebeurtenis.preventDefault();
+				sluit();
+			}}
+		>
 			<div class="antwoordkeuze">
 				<label>
 					Antwoord
@@ -350,7 +400,7 @@ function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps
 					Toelichting{eigen && ' (verplicht)'}
 					<textarea
 						ref={toelichtingveld}
-						rows={2}
+						rows={3}
 						value={toelichting}
 						placeholder={TOELICHTING_VOORBEELD}
 						aria-required={eigen}
@@ -359,15 +409,17 @@ function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps
 						onInput={(gebeurtenis) => zetToelichting(gebeurtenis.currentTarget.value)}
 					/>
 				</label>
-				<p class="veldhulp" id={`${id}-uitleg`}>
-					{TOELICHTING_UITLEG}
-				</p>
 				{eigen && (
 					<p class="veldhulp" id={`${id}-eigen`}>
 						{eigenAntwoordUitleg(kanKiezen)}
 					</p>
 				)}
-				<button type="submit">Antwoord vastleggen</button>
+				<div class="knoppen">
+					<button type="submit">Antwoord vastleggen</button>
+					<button type="button" onClick={sluit}>
+						Annuleren
+					</button>
+				</div>
 			</div>
 			{fout !== '' && (
 				<p class="veldfout" id={`${id}-fout`} role="alert">
@@ -473,13 +525,10 @@ function GegevenAntwoord({ boek, vraag, antwoord, bestaandeKeuzes, acties, zetMe
 									placeholder={TOELICHTING_VOORBEELD}
 									aria-required={eigen}
 									aria-invalid={fout !== ''}
-									aria-describedby={fout === '' ? `${id}-uitleg` : `${id}-uitleg ${id}-fout`}
+									aria-describedby={fout === '' ? UITLEG_ID : `${UITLEG_ID} ${id}-fout`}
 									onInput={(gebeurtenis) => zetConcept(gebeurtenis.currentTarget.value)}
 								/>
 							</label>
-							<p class="veldhulp" id={`${id}-uitleg`}>
-								{TOELICHTING_UITLEG}
-							</p>
 							{fout !== '' && (
 								<p class="veldfout" id={`${id}-fout`} role="alert">
 									{fout}
@@ -545,6 +594,20 @@ function GegevenAntwoord({ boek, vraag, antwoord, bestaandeKeuzes, acties, zetMe
 	);
 }
 
+type LijstgroepProps = { titelId: string; titel: string; open: boolean; children: ComponentChildren };
+
+/** Een lijst achter haar kop. `open` bepaalt alleen de beginstand; daarna beslist de lezer. */
+function Lijstgroep({ titelId, titel, open, children }: LijstgroepProps) {
+	return (
+		<details class="lijstgroep" open={open}>
+			<summary>
+				<h2 id={titelId}>{titel}</h2>
+			</summary>
+			{children}
+		</details>
+	);
+}
+
 /** `open` bepaalt alleen de beginstand; daarna beslist de lezer. */
 function LogVraag({ boek, vraag, open, doel }: { boek: string; vraag: Vertaalvraag; open: boolean; doel: boolean }) {
 	const rij = useDoel<HTMLLIElement>(doel);
@@ -603,6 +666,10 @@ function kortVersoverzicht(verzen: readonly VersRef[]): string {
 	if (verzen.length === 0) return GEEN_VERS_IN_KOP;
 	const eerste = verzen.slice(0, KORT_AANTAL_VERZEN).map(({ hoofdstuk, vers }) => `${hoofdstuk}:${vers}`);
 	return verzen.length > KORT_AANTAL_VERZEN ? `${eerste.join(', ')} en ${verzen.length - KORT_AANTAL_VERZEN} meer` : eerste.join(', ');
+}
+
+function filterAan(filter: VragenFilter): boolean {
+	return filter.status !== GEEN_FILTER.status || filter.herkomst !== GEEN_FILTER.herkomst || filter.hoofdstuk !== GEEN_FILTER.hoofdstuk || filter.zoekterm !== GEEN_FILTER.zoekterm;
 }
 
 function leesStatus(waarde: string): VragenFilter['status'] {

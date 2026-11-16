@@ -37,29 +37,75 @@
 	margin: .75rem 0 0;
 }
 
+/* Een lijst vragen: om en om een licht vlak, geen lijnen. */
 .vertaalvragen .vragenlijst {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	display: flex;
-	flex-direction: column;
-	gap: .4rem;
 }
 
+.vertaalvragen .vragenlijst > li {
+	padding: .9rem 1rem;
+}
+
+.vertaalvragen .vragenlijst > li:nth-child(even) {
+	background: var(--vlak);
+}
+
+/* Een lijst die achter haar kop staat: de kop is de samenvatting, met een pijltje dat de stand toont. */
+.vertaalvragen .lijstgroep > summary {
+	display: block;
+	cursor: pointer;
+	list-style: none;
+}
+
+.vertaalvragen .lijstgroep > summary::-webkit-details-marker {
+	display: none;
+}
+
+.vertaalvragen .lijstgroep > summary h2::before {
+	content: '▸' / '';
+	display: inline-block;
+	width: 1.1em;
+}
+
+.vertaalvragen .lijstgroep[open] > summary h2::before {
+	content: '▾' / '';
+}
+
+.vertaalvragen .lijstuitleg {
+	margin: 0 0 .6rem;
+	max-width: 60rem;
+}
+
+/* Een open vraag: links de vraag, rechts het antwoordvak. */
 .vertaalvragen .registervraag {
-	border: 1px solid var(--rand);
-	border-radius: .4rem;
-	padding: .5rem .75rem .75rem;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+	gap: .5rem 2rem;
+	align-items: start;
+}
+
+/* Onder 60rem (in pixels van de browser, niet van de tool) staat het antwoordvak onder de vraag. */
+@media (max-width: 60rem) {
+	.vertaalvragen .registervraag {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
 
 .vertaalvragen .registervraag h3 {
 	display: inline;
-	margin-right: .5rem;
+	margin: 0 .5rem 0 0;
+}
+
+.vertaalvragen .vraaginhoud,
+.vertaalvragen .antwoordkolom {
+	min-width: 0;
 }
 
 .vertaalvragen dl {
 	display: grid;
-	grid-template-columns: max-content 1fr;
+	grid-template-columns: 9rem minmax(0, 1fr);
 	gap: .2rem 1rem;
 	margin: .5rem 0 0;
 }
@@ -72,22 +118,18 @@
 	margin: 0;
 }
 
-.vertaalvragen details {
-	border: 1px solid var(--rand);
-	border-radius: .4rem;
+.vertaalvragen .vragenlijst details {
+	border: 0;
+	border-radius: 0;
 }
 
-.vertaalvragen summary {
+.vertaalvragen .vragenlijst summary {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: baseline;
 	gap: .25rem .75rem;
-	padding: .4rem .75rem;
+	padding: 0;
 	cursor: pointer;
-}
-
-.vertaalvragen summary:hover {
-	background: var(--vlak);
 }
 
 .vertaalvragen .kwestie {
@@ -101,8 +143,11 @@
 }
 
 .vertaalvragen .vraagtekst {
-	padding: 0 .75rem .5rem;
-	border-top: 1px solid var(--rand);
+	padding: .4rem 0 0;
+}
+
+.vertaalvragen .vraagtekst p {
+	margin: 0 0 .4rem;
 }
 
 .vertaalvragen .statuslabel {
@@ -152,7 +197,7 @@
 .vertaalvragen .opties li {
 	display: flex;
 	flex-wrap: wrap;
-	gap: .25rem .75rem;
+	gap: .25rem .6rem;
 	align-items: baseline;
 	padding: .15rem 0;
 }
@@ -163,17 +208,35 @@
 	max-width: 40rem;
 }
 
-/* Kiezen en Zoek de plekken staan direct achter de optie. */
+/* Kiezen en Zoek de plekken: een tekstlink direct achter de optie, zoals .verwijzing. */
 .vertaalvragen .optieknop {
-	padding: 0.1rem 0.6rem;
-	font-size: 0.75rem;
+	padding: 0;
+	background: none;
+	border: 0;
+	color: var(--tekst);
+	font-size: .75rem;
+	font-weight: 500;
+	text-decoration: underline;
+	text-decoration-color: var(--rand-donker);
+	text-decoration-thickness: 1px;
+	text-underline-offset: .2em;
+}
+
+.vertaalvragen .optieknop:hover:not(:disabled) {
+	background: none;
+	color: var(--tekst);
+	text-decoration-color: var(--tekst);
 }
 
 /* De vraag waar een `?` of VRAAG naartoe linkte: gemarkeerd, en niet onder de vaste balk (html heeft scroll-padding-top). */
 .vertaalvragen .vraag-doel {
 	scroll-margin-top: 0.5rem;
-	background: var(--vlak);
+	background: var(--gekozen);
 	box-shadow: inset 3px 0 0 var(--tekst);
+}
+
+.vertaalvragen .vragenlijst > li.vraag-doel:nth-child(even) {
+	background: var(--gekozen);
 }
 
 .vertaalvragen .vraag-doel:focus {
@@ -189,21 +252,38 @@
 	min-height: 2rem;
 }
 
+/* Het antwoordvak: ingeklapt alleen de knop Beantwoorden; open of beantwoord een wit vak met een dunne rand. */
 .vertaalvragen .antwoord,
 .vertaalvragen .antwoordformulier {
-	margin: .75rem 0 0;
-	padding-top: .5rem;
-	border-top: 1px solid var(--rand);
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+	padding: .6rem .75rem;
+	background: #fff;
+	border: 1px solid var(--rand);
 }
 
-.vertaalvragen .antwoord h4,
-.vertaalvragen .antwoordformulier h4 {
-	margin: 0 0 .4rem;
-	font-size: .9rem;
+.vertaalvragen .antwoord h4 {
+	margin: 0;
+	font-size: .75rem;
 }
 
 .vertaalvragen .antwoord dl {
-	margin-top: 0;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0;
+	margin: 0;
+}
+
+.vertaalvragen .antwoord dd {
+	margin-bottom: .4rem;
+}
+
+.vertaalvragen .antwoord dd > button {
+	margin-top: .3rem;
+}
+
+.vertaalvragen .antwoord > button {
+	align-self: flex-start;
 }
 
 .vertaalvragen .toelichting {
@@ -215,43 +295,12 @@
 	padding-left: 1.1rem;
 }
 
-.vertaalvragen .antwoordformulier {
-	display: grid;
-	grid-template-columns: minmax(14rem, 24rem) minmax(0, 1fr);
-	gap: .4rem 1.5rem;
-	align-items: start;
-}
-
-.vertaalvragen .antwoordkop,
-.vertaalvragen .antwoordformulier .veldfout {
-	grid-column: 1 / -1;
-}
-
-.vertaalvragen .antwoordkop {
-	display: flex;
-	flex-wrap: wrap;
-	gap: .1rem .75rem;
-	align-items: baseline;
-}
-
-.vertaalvragen .antwoordkop h4 {
-	margin: 0;
-}
-
 .vertaalvragen .antwoordkeuze,
 .vertaalvragen .antwoordtoelichting {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-start;
 	gap: .4rem;
 	min-width: 0;
-}
-
-/* Op een smal scherm staan keuze en toelichting weer onder elkaar. */
-@media (max-width: 48rem) {
-	.vertaalvragen .antwoordformulier {
-		grid-template-columns: minmax(0, 1fr);
-	}
 }
 
 .vertaalvragen .antwoordformulier label,
@@ -260,15 +309,6 @@
 	flex-direction: column;
 	gap: .2rem;
 	font-size: .75rem;
-	width: min(40rem, 100%);
-}
-
-.vertaalvragen .antwoordformulier label {
-	width: 100%;
-}
-
-.vertaalvragen .antwoordtoelichting .veldhulp {
-	max-width: none;
 }
 
 .vertaalvragen .antwoordformulier select {
@@ -290,15 +330,14 @@
 	margin-top: .5rem;
 }
 
-.vertaalvragen .toelichtingaanpassen .knoppen,
-.vertaalvragen .intrekbevestiging .knoppen {
+.vertaalvragen .knoppen {
 	display: flex;
+	flex-wrap: wrap;
 	gap: .5rem;
 }
 
 .vertaalvragen .veldhulp {
 	margin: 0;
-	max-width: 40rem;
 	color: var(--gedempt);
 	font-size: .75rem;
 }
@@ -311,7 +350,8 @@
 }
 
 .vertaalvragen .vraagmelding {
-	margin: .4rem 0 0;
+	grid-column: 1 / -1;
+	margin: 0;
 }
 
 .vertaalvragen .vraagmelding:empty {

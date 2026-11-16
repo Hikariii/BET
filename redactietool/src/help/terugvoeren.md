@@ -26,4 +26,4 @@ Schrijf bij een antwoord op een vertaalvraag in de toelichting wanneer je wat ki
 Bewust gemaakte keuzes laat Claude staan. Heb je een plek met de hand aangepast, of zelf uitgevinkt bij {{plek:vervangen}}, dan beschouwt Claude dat als een besluit en repareert hij het niet.
 
 {{wijs export-voor-claude | Export voor Claude | Rechtsboven in de balk van een hoofdstuk.}}
-{{wijs antwoord-toelichting | Toelichting | In het formulier Antwoord vastleggen bij {{plek:vragen}}.}}
+{{wijs antwoord-toelichting | Toelichting | In het formulier Antwoord vastleggen bij {{plek:vragen}}, na een klik op Beantwoorden.}}

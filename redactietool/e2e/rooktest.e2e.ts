@@ -67,6 +67,19 @@ test.describe('de gebouwde app', () => {
 		expect(fouten).toEqual([]);
 	});
 
+	test('Vertaalvragen: Beantwoorden klapt het antwoordformulier open en met Escape weer dicht', async ({ page }) => {
+		const fouten = volgFouten(page);
+		await page.goto('#/lukas/begrippen/vragen');
+		const vraag = page.locator('.registervraag').first();
+		await expect(vraag.locator('form.antwoordformulier')).toHaveCount(0);
+		await vraag.getByRole('button', { name: /^Beantwoorden/ }).click();
+		await expect(vraag.locator('form.antwoordformulier select')).toBeFocused();
+		await page.keyboard.press('Escape');
+		await expect(vraag.locator('form.antwoordformulier')).toHaveCount(0);
+		await expect(vraag.getByRole('button', { name: /^Beantwoorden/ })).toBeFocused();
+		expect(fouten).toEqual([]);
+	});
+
 	test('de galerij laadt zijn voorbeelden', async ({ page }) => {
 		const fouten = volgFouten(page);
 		await page.goto('#/galerij');
