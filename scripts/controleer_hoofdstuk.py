@@ -64,8 +64,16 @@ def lees_verzen(pad):
         stijl = TAG_OF_PSTYLE.get(alinea["pstyle"])
         voor_eerste_vers = True  # alleen witruimte of niets vóór het eerste versnummer van deze alinea
         stijl_geteld = False
-        vorige_tags = ()
-        for seg in alinea["segs"]:
+        openingen = list(alinea["openingen"])
+        segs = alinea["segs"]
+        for index in range(len(segs) + 1):
+            while openingen and openingen[0][0] == index:
+                _positie, opmaak = openingen.pop(0)
+                if huidig is not None:
+                    verzen[huidig]["tags"][opmaak] += 1
+            if index == len(segs):
+                break
+            seg = segs[index]
             if seg[0] == "vers":
                 huidig = seg[1]
                 if huidig in verzen:
@@ -77,7 +85,6 @@ def lees_verzen(pad):
                     verzen[huidig]["tags"]["@" + stijl] += 1
                     stijl_geteld = True
                 voor_eerste_vers = False
-                vorige_tags = ()
                 continue
             if voor_eerste_vers and seg[1].strip():
                 voor_eerste_vers = False
@@ -87,10 +94,6 @@ def lees_verzen(pad):
                 verzen[huidig]["tags"]["@" + stijl] += 1  # alinea begint midden in dit vers
                 stijl_geteld = True
             verzen[huidig]["ruw"].append(seg[1])
-            for opmaak in seg[2]:
-                if opmaak not in vorige_tags:
-                    verzen[huidig]["tags"][opmaak] += 1
-            vorige_tags = seg[2]
         if huidig is not None:
             verzen[huidig]["ruw"].append(" ")
     if volgorde != list(range(1, len(volgorde) + 1)):

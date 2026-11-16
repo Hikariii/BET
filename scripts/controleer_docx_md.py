@@ -13,254 +13,272 @@ Controles:
      docx (aaneengesloten tekstdragende runs met dezelfde opmaak; witruimte-runs tellen niet
      mee, versnummers en alineagrenzen breken een reeks);
   3. verzen: aantal en volgorde per hoofdstuk, tegenover de versindeling in boek.json;
-  4. structuur: nesting van tags, geen tag over een versgrens, hoogstens twee lege regels.
+  4. structuur: elk md-bestand volgens FORMAAT.md (parse_md), de kop en het einde van het bestand.
+
+Een afwijking in controle 2 die in controle.json onder `docx_geaccepteerd` staat (hoofdstuk, opmaak,
+reden) telt als GEACCEPTEERD en niet als probleem.
+Exitcode 0 zonder problemen, 1 met problemen, 2 bij een fout in de invoer.
 """
 import argparse
 import difflib
-import glob
 import os
 import re
 import subprocess
 import sys
-import zipfile
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import boek as boekmod  # noqa: E402
+from formaat import (  # noqa: E402
+    BOLD_PSTYLES, HIGHLIGHT, ITALIC_PSTYLES, ORDER, RED, TAG_OF_RSTYLE, TITLE_STYLES_READ, parse_md_text,
+)
 
 W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
-RSTYLE_TAG = {'eeuwigleven': 'eeuwigleven', 'genade': 'genade', 'geloof': 'geloof', 'oordeel': 'oordeel',
-              'rechtvaardig': 'rechtvaardig', 'zonde': 'zonde', 'Torah': 'torah', 'dag': 'dag'}
-TAGS = ['onderwijs', 'highlight', 'onderstreept', 'vet', 'cursief'] + sorted(set(RSTYLE_TAG.values()))
-ITALIC_P = {'engelenwoord', 'citaatOT', 'GodsStem'}
-TITLE_R = {'Bblhfdstk', 'HoofdsukChar'}
 
 
-def on(rpr, n):
-    el = rpr.find(W + n) if rpr is not None else None
-    return el is not None and el.get(W + 'val') not in ('0', 'false', 'off', 'none')
+def is_aan(eigenschappen, naam):
+    element = eigenschappen.find(W + naam) if eigenschappen is not None else None
+    return element is not None and element.get(W + 'val') not in ('0', 'false', 'off', 'none')
 
 
-def docx_runs(path, titel_re):
-    """-> lijst per hoofdstuk: lijst van reeksen; reeks-element = ('P',) barriere of (tekst, atoms)."""
-    root = ET.fromstring(zipfile.ZipFile(path).read('word/document.xml'))
-    chapters = {}
-    cur = None
-    for p in root.iter(W + 'p'):
-        ps = p.find(W + 'pPr/' + W + 'pStyle')
-        ps = ps.get(W + 'val') if ps is not None else None
-        entries = []
-        for r in p.iter(W + 'r'):
-            t = ''.join((c.text or '') for c in r if c.tag == W + 't')
-            if not t:
+def docx_runs(pad, titel_re):
+    """-> {hoofdstuk: lijst}; element = ('P',) alineagrens, ('V',) versnummer of (tekst, opmaak)."""
+    root = ET.fromstring(boekmod.lees_docx_onderdeel(pad, 'word/document.xml'))
+    hoofdstukken = {}
+    huidig = None
+    for alinea in root.iter(W + 'p'):
+        alineastijl = alinea.find(W + 'pPr/' + W + 'pStyle')
+        alineastijl = alineastijl.get(W + 'val') if alineastijl is not None else None
+        stukken = []
+        for run in alinea.iter(W + 'r'):
+            tekst = ''.join((c.text or '') for c in run if c.tag == W + 't')
+            if not tekst:
                 continue
-            rpr = r.find(W + 'rPr')
-            rs = rpr.find(W + 'rStyle') if rpr is not None else None
-            rs = rs.get(W + 'val') if rs is not None else None
-            va = rpr.find(W + 'vertAlign') if rpr is not None else None
-            sup = va is not None and va.get(W + 'val') == 'superscript'
-            atoms = set()
-            if rs in RSTYLE_TAG:
-                atoms.add(RSTYLE_TAG[rs])
-            col = rpr.find(W + 'color') if rpr is not None else None
-            if col is not None and (col.get(W + 'val') or '').upper() == 'FF0000':
-                atoms.add('onderwijs')
-            hl = rpr.find(W + 'highlight') if rpr is not None else None
-            if hl is not None and hl.get(W + 'val') == 'yellow':
-                atoms.add('highlight')
-            if on(rpr, 'u'):
-                atoms.add('onderstreept')
-            if rs is None and on(rpr, 'b') and ps != 'GodsStem':
-                atoms.add('vet')
-            if rs is None and on(rpr, 'i') and ps not in ITALIC_P:
-                atoms.add('cursief')
-            entries.append((t, atoms, sup, rs in TITLE_R))
-        # titel?
-        title = ''.join(e[0] for e in entries if e[3])
-        m = titel_re.match(title)
-        if m:
-            cur = int(m.group(1))
-            chapters[cur] = []
-            entries = [e for e in entries if not e[3]]
-        if cur is None:
+            eigenschappen = run.find(W + 'rPr')
+            tekenstijl = eigenschappen.find(W + 'rStyle') if eigenschappen is not None else None
+            tekenstijl = tekenstijl.get(W + 'val') if tekenstijl is not None else None
+            hoogte = eigenschappen.find(W + 'vertAlign') if eigenschappen is not None else None
+            superscript = hoogte is not None and hoogte.get(W + 'val') == 'superscript'
+            opmaak = set()
+            if tekenstijl in TAG_OF_RSTYLE:
+                opmaak.add(TAG_OF_RSTYLE[tekenstijl])
+            kleur = eigenschappen.find(W + 'color') if eigenschappen is not None else None
+            if kleur is not None and (kleur.get(W + 'val') or '').upper() == 'FF0000':
+                opmaak.add(RED)
+            markering = eigenschappen.find(W + 'highlight') if eigenschappen is not None else None
+            if markering is not None and markering.get(W + 'val') == 'yellow':
+                opmaak.add(HIGHLIGHT)
+            if is_aan(eigenschappen, 'u'):
+                opmaak.add('onderstreept')
+            if tekenstijl is None and is_aan(eigenschappen, 'b') and alineastijl not in BOLD_PSTYLES:
+                opmaak.add('vet')
+            if tekenstijl is None and is_aan(eigenschappen, 'i') and alineastijl not in ITALIC_PSTYLES:
+                opmaak.add('cursief')
+            stukken.append((tekst, opmaak, superscript, tekenstijl in TITLE_STYLES_READ))
+        titel = ''.join(s[0] for s in stukken if s[3])
+        gevonden = titel_re.match(titel)
+        if gevonden:
+            huidig = int(gevonden.group(1))
+            hoofdstukken[huidig] = []
+            stukken = [s for s in stukken if not s[3]]
+        if huidig is None:
             continue
-        chapters[cur].append(('P',))
-        for t, atoms, sup, _ in entries:
-            if not t.strip():
+        hoofdstukken[huidig].append(('P',))
+        for tekst, opmaak, superscript, _ in stukken:
+            if not tekst.strip():
                 continue
-            if sup and re.fullmatch(r'\s*\d+\s*', t):
-                chapters[cur].append(('V',))
+            if superscript and re.fullmatch(r'\s*\d+\s*', tekst):
+                hoofdstukken[huidig].append(('V',))
                 continue
-            chapters[cur].append((t, atoms))
-    return chapters
+            hoofdstukken[huidig].append((tekst, opmaak))
+    return hoofdstukken
 
 
-def count_runs(seq):
-    c = {a: 0 for a in TAGS}
-    prev = set()
-    for e in seq:
-        if len(e) == 1:
-            prev = set()
+def tel_reeksen(reeks):
+    """Aantal opmaakreeksen per opmaak in de runs van een hoofdstuk."""
+    aantallen = {opmaak: 0 for opmaak in ORDER}
+    vorige = set()
+    for element in reeks:
+        if len(element) == 1:
+            vorige = set()
             continue
-        for a in e[1]:
-            if a not in prev:
-                c[a] += 1
-        prev = e[1]
-    return c
+        for opmaak in element[1]:
+            if opmaak not in vorige:
+                aantallen[opmaak] += 1
+        vorige = element[1]
+    return aantallen
 
 
-def md_tags(text):
-    c = {a: 0 for a in TAGS}
-    for m in re.finditer(r'\{(\w+)\}', text):
-        if m.group(1) in c:
-            c[m.group(1)] += 1
-    c['highlight'] = text.count('==') // 2
-    return c
+def md_aantallen(alineas):
+    aantallen = {opmaak: 0 for opmaak in ORDER}
+    for alinea in alineas:
+        for _positie, opmaak in alinea['openingen']:
+            aantallen[opmaak] += 1
+    return aantallen
 
 
-def strip_md(text):
-    out = []
-    for ln in text.split('\n'):
-        ln = re.sub(r'^# ', '', ln)
-        ln = re.sub(r'^@(jezus|god|engel|citaat-ot) ', '', ln)
-        ln = re.sub(r'\{/?\w+\}', '', ln)
-        ln = ln.replace('==', '')
-        ln = re.sub(r'\[(\d+)\]', r'\1', ln)
-        out.append(ln)
-    return '\n'.join(out)
+def md_platte_tekst(alineas):
+    """De tekst van een hoofdstuk zonder tags, met [n] als n."""
+    regels = []
+    for alinea in alineas:
+        if alinea['soort'] == 'titel':
+            regels.append(alinea['titel'])
+        else:
+            regels.append(''.join(str(seg[1]) for seg in alinea['segs']))
+    return '\n'.join(regels)
 
 
-def docx_plain(path):
+def docx_platte_tekst(pad):
     try:
-        r = subprocess.run(['textutil', '-convert', 'txt', '-stdout', path], capture_output=True, check=True)
-        return r.stdout.decode('utf-8'), 'textutil'
-    except Exception:
-        root = ET.fromstring(zipfile.ZipFile(path).read('word/document.xml'))
-        paras = []
-        for p in root.iter(W + 'p'):
-            paras.append(''.join((c.text or '') for t in p.iter(W + 'r') for c in t if c.tag == W + 't'))
-        return '\n'.join(paras), 'eigen XML'
+        resultaat = subprocess.run(['textutil', '-convert', 'txt', '-stdout', pad], capture_output=True, check=True)
+        return resultaat.stdout.decode('utf-8'), 'textutil'
+    except (OSError, subprocess.CalledProcessError):
+        root = ET.fromstring(boekmod.lees_docx_onderdeel(pad, 'word/document.xml'))
+        alineas = [''.join((c.text or '') for t in p.iter(W + 'r') for c in t if c.tag == W + 't')
+                   for p in root.iter(W + 'p')]
+        return '\n'.join(alineas), 'eigen XML'
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('docx', nargs='?', help='standaard: het sjabloon uit boek.json')
-    ap.add_argument('mdmap', nargs='?', help='standaard: bijbel/<boek>/bron')
-    ap.add_argument('--vergelijk-met')
-    ap.add_argument('--boek', help='map in bijbel/ (mag weg als er maar één boek is)')
-    a = ap.parse_args()
-    try:
-        boek = boekmod.laad(a.boek)
-    except boekmod.BoekFout as e:
-        print('FOUT: %s' % e, file=sys.stderr)
-        return 2
-    if (a.docx is None) != (a.mdmap is None):
-        ap.error('geef <docx> en <mdmap> allebei op, of geen van beide')
-    if a.docx is None:
-        a.docx, a.mdmap = boek.sjabloon, os.path.join(boek.map, 'bron')
-    VERZEN = boek.verzen
-    naam = re.escape(boek.naam)
-    problems = 0
+def lees_hoofdstukken(boek, mdmap):
+    """{hoofdstuk: (ruwe tekst, alinea's of None bij een formaatfout, foutmelding)} voor de md-bestanden in mdmap."""
+    hoofdstukken = {}
+    for naam in sorted(os.listdir(mdmap)):
+        nummer = boek.nummer_uit_bestandsnaam(naam)
+        if nummer is None:
+            continue
+        tekst = boekmod.lees_tekst(os.path.join(mdmap, naam))
+        try:
+            hoofdstukken[nummer] = (tekst, parse_md_text(tekst, naam), None)
+        except boekmod.BoekFout as fout:
+            hoofdstukken[nummer] = (tekst, None, str(fout))
+    if not hoofdstukken:
+        raise boekmod.BoekFout(f"{mdmap} bevat geen {boek.prefix}-NN.md")
+    return hoofdstukken
 
-    files = sorted(glob.glob(os.path.join(a.mdmap, boek.prefix + '-*.md')))
-    md = {int(re.search(r'(\d+)', os.path.basename(f)).group(1)): open(f, encoding='utf-8').read() for f in files}
 
-    # 1. tekst
-    plain, bron = docx_plain(a.docx)
-    mdtext = '\n'.join(strip_md(md[k]) for k in sorted(md))
-    if len(md) < len(VERZEN):
-        # docx kan meer hoofdstukken hebben dan md (--max-hoofdstuk): knip bij het eerste ontbrekende hoofdstuk
-        nxt = max(md) + 1
-        m = re.search(r'^%s %d\b' % (naam, nxt), plain, re.M)
-        if m:
-            plain = plain[:m.start()]
-    sq = lambda s: re.sub(r'\s+', '', s.replace('​', ''))
-    same = sq(plain) == sq(mdtext)
-    print('TEKST (zonder witruimte, %s): %s' % (bron, 'GELIJK' if same else 'VERSCHIL'))
-    if not same:
-        problems += 1
-    wp, wm = plain.split(), mdtext.split()
-    print('  woorden docx %d, md %d' % (len(wp), len(wm)))
-    sm = difflib.SequenceMatcher(None, wp, wm, autojunk=False)
-    diffs = [o for o in sm.get_opcodes() if o[0] != 'equal']
-    print('  woordverschillen: %d' % len(diffs))
-    for tag, i1, i2, j1, j2 in diffs[:40]:
-        print('   ', tag, ' '.join(wp[i1:i2]), '=>', ' '.join(wm[j1:j2]))
+def zonder_witruimte(tekst):
+    return re.sub(r'\s+', '', tekst.replace('​', ''))
 
-    # 2. tags
-    dr = docx_runs(a.docx, boek.titel_re)
+
+def controleer_tekst(boek, docx, hoofdstukken):
+    """Controle 1; geeft het aantal problemen."""
+    platte_tekst, bron = docx_platte_tekst(docx)
+    md_tekst = '\n'.join(md_platte_tekst(alineas) for _, alineas, _ in
+                         (hoofdstukken[k] for k in sorted(hoofdstukken)) if alineas is not None)
+    if len(hoofdstukken) < boek.aantal_hoofdstukken:
+        # het docx kan meer hoofdstukken hebben dan md (--max-hoofdstuk): knip bij het eerste ontbrekende hoofdstuk
+        volgende = max(hoofdstukken) + 1
+        gevonden = re.search(r'^%s %d\b' % (re.escape(boek.naam), volgende), platte_tekst, re.M)
+        if gevonden:
+            platte_tekst = platte_tekst[:gevonden.start()]
+    gelijk = zonder_witruimte(platte_tekst) == zonder_witruimte(md_tekst)
+    print('TEKST (zonder witruimte, %s): %s' % (bron, 'GELIJK' if gelijk else 'VERSCHIL'))
+    woorden_docx, woorden_md = platte_tekst.split(), md_tekst.split()
+    print('  woorden docx %d, md %d' % (len(woorden_docx), len(woorden_md)))
+    vergelijking = difflib.SequenceMatcher(None, woorden_docx, woorden_md, autojunk=False)
+    verschillen = [o for o in vergelijking.get_opcodes() if o[0] != 'equal']
+    print('  woordverschillen: %d' % len(verschillen))
+    for soort, van1, van2, naar1, naar2 in verschillen[:40]:
+        print('   ', soort, ' '.join(woorden_docx[van1:van2]), '=>', ' '.join(woorden_md[naar1:naar2]))
+    return 0 if gelijk else 1
+
+
+def controleer_opmaak(boek, docx, hoofdstukken):
+    """Controle 2; geeft het aantal problemen."""
+    geaccepteerd = {(hoofdstuk, opmaak): reden for hoofdstuk, opmaak, reden in boek.docx_geaccepteerd}
+    docx_reeksen = docx_runs(docx, boek.titel_re)
     print('\nTAGS per hoofdstuk (md / docx), alleen afwijkingen en totaal:')
-    tot_md = {t: 0 for t in TAGS}
-    tot_dx = {t: 0 for t in TAGS}
-    for k in sorted(md):
-        cm = md_tags(md[k])
-        cd = count_runs(dr.get(k, []))
-        for t in TAGS:
-            tot_md[t] += cm[t]
-            tot_dx[t] += cd[t]
-            if cm[t] != cd[t]:
-                problems += 1
-                print('  AFWIJKING H%d %s: md %d, docx %d' % (k, t, cm[t], cd[t]))
-    print('  totaal: ' + ', '.join('%s %d/%d' % (t, tot_md[t], tot_dx[t]) for t in TAGS))
-
-    # 3. verzen
-    print('\nVERZEN:')
-    verses = {}
-    for k in sorted(md):
-        nums = [int(x) for x in re.findall(r'\[(\d+)\]', md[k])]
-        verses[k] = nums
-        ok_seq = nums == list(range(1, len(nums) + 1))
-        ref = VERZEN[k - 1] if k <= len(VERZEN) else None
-        flag = '' if ok_seq and ref == len(nums) else '  <-- AFWIJKING'
-        if flag:
-            problems += 1
-        print('  %s %d: %d verzen (verwacht %s), oplopend 1..n: %s%s' % (boek.naam, k, len(nums), ref, ok_seq, flag))
-    print('  totaal: %d' % sum(len(v) for v in verses.values()))
-    if a.vergelijk_met:
-        o = {int(re.search(r'(\d+)', os.path.basename(f)).group(1)): open(f, encoding='utf-8').read()
-             for f in sorted(glob.glob(os.path.join(a.vergelijk_met, boek.prefix + '-*.md')))}
-        for k in sorted(set(o) & set(md)):
-            on_ = [int(x) for x in re.findall(r'\[(\d+)\]', o[k])]
-            print('  vergelijk %s %d: %s' % (boek.naam, k, 'zelfde versnummers' if on_ == verses[k] else 'VERSCHIL'))
-            if on_ != verses[k]:
-                problems += 1
-
-    # 4. structuur
-    print('\nSTRUCTUUR:')
-    for k in sorted(md):
-        t = md[k]
-        if not t.startswith('# %s %d\n\n' % (boek.naam, k)):
-            print('  H%d: kop ontbreekt/onjuist' % k); problems += 1
-        if '\n\n\n\n' in t:
-            print('  H%d: meer dan twee lege regels op rij' % k); problems += 1
-        if not t.endswith('\n') or t.endswith('\n\n'):
-            print('  H%d: einde van bestand' % k); problems += 1
-        for n, ln in enumerate(t.split('\n'), 1):
-            stack = []
-            body = re.sub(r'^@\S+ ', '', ln)
-            for m in re.finditer(r'\{(/?)(\w+)\}|(==)|\[(\d+)\]', body):
-                if m.group(4):
-                    if stack:
-                        print('  H%d regel %d: tag %s open over versnummer %s' % (k, n, stack, m.group(4))); problems += 1
-                        stack = []
-                elif m.group(3):
-                    if stack and stack[-1] == '==':
-                        stack.pop()
-                    else:
-                        stack.append('==')
-                elif m.group(1) == '':
-                    stack.append(m.group(2))
-                else:
-                    if stack and stack[-1] == m.group(2):
-                        stack.pop()
-                    else:
-                        print('  H%d regel %d: tag {/%s} sluit niet netjes (stapel %s)' % (k, n, m.group(2), stack)); problems += 1
-                        break
+    totaal_md = {opmaak: 0 for opmaak in ORDER}
+    totaal_docx = {opmaak: 0 for opmaak in ORDER}
+    problemen = 0
+    for k in sorted(hoofdstukken):
+        alineas = hoofdstukken[k][1]
+        if alineas is None:
+            continue
+        in_md = md_aantallen(alineas)
+        in_docx = tel_reeksen(docx_reeksen.get(k, []))
+        for opmaak in ORDER:
+            totaal_md[opmaak] += in_md[opmaak]
+            totaal_docx[opmaak] += in_docx[opmaak]
+            if in_md[opmaak] == in_docx[opmaak]:
+                continue
+            verschil = 'H%d %s: md %d, docx %d' % (k, opmaak, in_md[opmaak], in_docx[opmaak])
+            reden = geaccepteerd.get((k, opmaak))
+            if reden is None:
+                problemen += 1
+                print('  AFWIJKING', verschil)
             else:
-                if stack:
-                    print('  H%d regel %d: tags niet gesloten %s' % (k, n, stack)); problems += 1
-    print('\nTOTAAL AANTAL PROBLEMEN: %d' % problems)
-    return 1 if problems else 0
+                print('  GEACCEPTEERD', verschil, '(%s)' % reden)
+    print('  totaal: ' + ', '.join('%s %d/%d' % (o, totaal_md[o], totaal_docx[o]) for o in ORDER))
+    return problemen
+
+
+def controleer_verzen(boek, hoofdstukken, vergelijk_map):
+    """Controle 3; geeft het aantal problemen."""
+    print('\nVERZEN:')
+    problemen = 0
+    versnummers = {}
+    for k in sorted(hoofdstukken):
+        nummers = [int(x) for x in re.findall(r'\[(\d+)\]', hoofdstukken[k][0])]
+        versnummers[k] = nummers
+        oplopend = nummers == list(range(1, len(nummers) + 1))
+        verwacht = boek.verzen[k - 1] if k <= boek.aantal_hoofdstukken else None
+        afwijking = not (oplopend and verwacht == len(nummers))
+        problemen += afwijking
+        print('  %s %d: %d verzen (verwacht %s), oplopend 1..n: %s%s'
+              % (boek.naam, k, len(nummers), verwacht, oplopend, '  <-- AFWIJKING' if afwijking else ''))
+    print('  totaal: %d' % sum(len(v) for v in versnummers.values()))
+    if vergelijk_map:
+        andere = lees_hoofdstukken(boek, vergelijk_map)
+        for k in sorted(set(andere) & set(hoofdstukken)):
+            andere_nummers = [int(x) for x in re.findall(r'\[(\d+)\]', andere[k][0])]
+            gelijk = andere_nummers == versnummers[k]
+            print('  vergelijk %s %d: %s' % (boek.naam, k, 'zelfde versnummers' if gelijk else 'VERSCHIL'))
+            problemen += not gelijk
+    return problemen
+
+
+def controleer_structuur(boek, hoofdstukken):
+    """Controle 4; geeft het aantal problemen."""
+    print('\nSTRUCTUUR:')
+    problemen = 0
+    for k in sorted(hoofdstukken):
+        tekst, _alineas, formaatfout = hoofdstukken[k]
+        if formaatfout:
+            print('  H%d: %s' % (k, formaatfout))
+            problemen += 1
+        if not tekst.startswith('# %s %d\n\n' % (boek.naam, k)):
+            print('  H%d: kop ontbreekt/onjuist' % k)
+            problemen += 1
+        if not tekst.endswith('\n') or tekst.endswith('\n\n'):
+            print('  H%d: einde van bestand' % k)
+            problemen += 1
+    return problemen
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description='Controleert de Markdown-uitvoer van docx_naar_md.py tegen het Word-bestand.')
+    parser.add_argument('docx', nargs='?', help='standaard: het sjabloon uit boek.json')
+    parser.add_argument('mdmap', nargs='?', help='standaard: bijbel/<boek>/bron')
+    parser.add_argument('--vergelijk-met')
+    parser.add_argument('--boek', help='map in bijbel/ (mag weg als er maar één boek is)')
+    argumenten = parser.parse_args(argv)
+    if (argumenten.docx is None) != (argumenten.mdmap is None):
+        parser.error('geef <docx> en <mdmap> allebei op, of geen van beide')
+    try:
+        boek = boekmod.laad(argumenten.boek)
+        if argumenten.docx is None:
+            argumenten.docx, argumenten.mdmap = boek.sjabloon, os.path.join(boek.map, 'bron')
+        hoofdstukken = lees_hoofdstukken(boek, argumenten.mdmap)
+        problemen = controleer_tekst(boek, argumenten.docx, hoofdstukken)
+        problemen += controleer_opmaak(boek, argumenten.docx, hoofdstukken)
+        problemen += controleer_verzen(boek, hoofdstukken, argumenten.vergelijk_met)
+        problemen += controleer_structuur(boek, hoofdstukken)
+    except (boekmod.BoekFout, ET.ParseError) as fout:
+        print('FOUT: %s' % fout, file=sys.stderr)
+        return 2
+    print('\nTOTAAL AANTAL PROBLEMEN: %d' % problemen)
+    return 1 if problemen else 0
 
 
 if __name__ == '__main__':

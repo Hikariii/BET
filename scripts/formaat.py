@@ -89,8 +89,11 @@ def open_tag(opmaak):
 # Parsen van de Markdown
 # ---------------------------------------------------------------------------
 # Een alinea = {"soort": "leeg"|"tekst"|"titel", "pstyle": str|None,
-#               "segs": [("tekst", tekst, tags) | ("vers", n, tags)], "regel": int}
+#               "segs": [("tekst", tekst, tags) | ("vers", n, tags)], "regel": int,
+#               "openingen": [(positie in segs, opmaak)]}
 # `tags` is een tuple van actieve opmaak van buiten naar binnen; een versnummer heeft nooit tags.
+# `openingen` noemt elke geopende tag, ook twee aansluitende van dezelfde opmaak, met de positie van het
+# segment dat erna komt.
 
 MAX_BLANK_LINES = 2
 TAG_RE = re.compile(r"\{(/?)([^{}\s]*)\}|==|\[(\d+)\]")
@@ -113,7 +116,9 @@ def _tags_tekst(tags):
 
 
 def parse_inline(tekst, naam, regelnr):
+    """Geeft (segs, openingen) van één regel."""
     segs = []
+    openingen = []
     open_ = []
     pos = 0
 
@@ -130,6 +135,7 @@ def parse_inline(tekst, naam, regelnr):
         if open_ and nesting_level(open_[-1]) > nesting_level(opmaak):
             raise _fout(naam, regelnr, f"{open_tag(opmaak)} hoort buiten {open_tag(open_[-1])}")
         open_.append(opmaak)
+        openingen.append((len(segs), opmaak))
 
     for m in TAG_RE.finditer(tekst):
         if m.start() > pos:
@@ -156,21 +162,22 @@ def parse_inline(tekst, naam, regelnr):
         segs.append(("tekst", tekst[pos:], tuple(open_)))
     if open_:
         raise _fout(naam, regelnr, f"tag(s) niet gesloten aan het eind van de alinea: {_tags_tekst(open_)}")
-    return segs
+    return segs, openingen
 
 
 def _parse_regel(regel, naam, nr):
     if INVALID_XML_RE.search(regel):
         raise _fout(naam, nr, "bevat een ongeldig stuurteken")
     if regel == "":
-        return {"soort": "leeg", "pstyle": None, "segs": [], "regel": nr}
+        return {"soort": "leeg", "pstyle": None, "segs": [], "regel": nr, "openingen": []}
     if regel.strip() == "":
         raise _fout(naam, nr, "regel met alleen witruimte; een lege regel is helemaal leeg")
     if regel.startswith("#"):
         kop = TITLE_LINE_RE.match(regel)
         if not kop:
             raise _fout(naam, nr, "alleen '# Titel' wordt ondersteund (bv. '# Lukas 1')")
-        return {"soort": "titel", "pstyle": None, "titel": kop.group(1), "segs": [], "regel": nr}
+        return {"soort": "titel", "pstyle": None, "titel": kop.group(1), "segs": [], "regel": nr,
+                "openingen": []}
     pstyle = None
     stijl = PSTYLE_RE.match(regel)
     if stijl:
@@ -180,7 +187,8 @@ def _parse_regel(regel, naam, nr):
         if stijl.group(2) is not None and (regel == "" or regel[0].isspace()):
             raise _fout(naam, nr, f"na '@{tag}' hoort precies één spatie en dan tekst")
         pstyle = PARA_STYLES[tag]
-    return {"soort": "tekst", "pstyle": pstyle, "segs": parse_inline(regel, naam, nr), "regel": nr}
+    segs, openingen = parse_inline(regel, naam, nr)
+    return {"soort": "tekst", "pstyle": pstyle, "segs": segs, "regel": nr, "openingen": openingen}
 
 
 def parse_md_text(tekst, naam):
@@ -201,18 +209,6 @@ def parse_md_text(tekst, naam):
 def parse_md(pad):
     """Geeft de lijst alinea's van een md-bestand."""
     return parse_md_text(lees_tekst(pad), str(pad))
-
-
-def count_openings(segs):
-    """Hoe vaak elke opmaak opent in de segmenten van één alinea (aaneengesloten stukken tellen als één)."""
-    aantallen = {}
-    vorige = ()
-    for seg in segs:
-        for opmaak in seg[2]:
-            if opmaak not in vorige:
-                aantallen[opmaak] = aantallen.get(opmaak, 0) + 1
-        vorige = seg[2]
-    return aantallen
 
 
 # ---------------------------------------------------------------------------
