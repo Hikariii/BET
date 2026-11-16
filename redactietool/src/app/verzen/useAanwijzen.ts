@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 const AANWIJSVERTRAGING_MS = 180;
 
 /** Zo lang blijft het vak open nadat de aanwijzer het verlaat, zodat wie net over de rand schuift het niet kwijtraakt. */
-const VERLAATVERTRAGING_MS = 600;
+const VERLAATVERTRAGING_MS = 400;
 
 type Aanwijshandelers = {
 	onPointerEnter: () => void;
