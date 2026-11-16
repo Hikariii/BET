@@ -321,12 +321,13 @@
 	border: 0;
 }
 
-.hoofdstukstrip .hoofdstuk-kort[aria-current='page'] {
-	background: none;
+/* Het open hoofdstuk krijgt hetzelfde vak als de hover, in rood met witte tekst. */
+.hoofdstukstrip .hoofdstuk-kort[aria-current='page'],
+.hoofdstukstrip .hoofdstuk-kort[aria-current='page']:hover {
+	background: var(--rood);
 }
 
-.hoofdstukstrip .hoofdstuk-kort[aria-current='page'] .hoofdstuk-kort-nummer {
-	background: var(--rood);
+.hoofdstukstrip .hoofdstuk-kort[aria-current='page'] > * {
 	color: #fff;
 }
 
