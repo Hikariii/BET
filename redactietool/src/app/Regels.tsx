@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import type { LogVers, OpenVraag, Verwijzing } from '../data/types';
-import { kapRegels, ZICHTBARE_REGELS } from './kapRegels';
+import { kapRegels } from './kapRegels';
 import { InlineMarkdown } from './Markdownweergave';
 import { zelfdeNaslag, type Naslag } from './naslag';
 import { isOpen } from './vertaalvragen';
@@ -11,8 +11,8 @@ export type RegelsProps = {
 	logVerzen: readonly LogVers[];
 	/** De vertaalvragen uit de referentie die aan dit vers hangen. */
 	vragen: readonly OpenVraag[];
-	/** In de smalle kolom: na zoveel regels staat de rest achter "nog N regels"; `null` toont alles. */
-	kapNa: number | null;
+	/** In de smalle kolom: na enkele regels staat de rest achter "nog N regels"; anders staan alle regels er. */
+	gekapt: boolean;
 	/** De naslagkaart die onder dit vers open staat; die verwijzing meldt `aria-expanded`. */
 	openNaslag: Naslag | null;
 	/** Het element van de naslagkaart onder dit vers, voor `aria-controls`. */
@@ -20,12 +20,11 @@ export type RegelsProps = {
 	onOpenNaslag: (naslag: Naslag, verwijzing: HTMLElement) => void;
 };
 
-export function Regels({ logVerzen, vragen, kapNa, openNaslag, kaartId, onOpenNaslag }: RegelsProps) {
+export function Regels({ logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenNaslag }: RegelsProps) {
 	const [uitgeklapt, zetUitgeklapt] = useState(false);
-	const zichtbaar = kapNa ?? ZICHTBARE_REGELS;
 	const aantalPerBlok = logVerzen.map((logVers) => logVers.wijzigingen.length);
-	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || kapNa === null, zichtbaar);
-	const inklapbaar = kapNa === null ? 0 : kapRegels(aantalPerBlok, false, kapNa).verborgen;
+	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || !gekapt);
+	const inklapbaar = gekapt ? kapRegels(aantalPerBlok, false).verborgen : 0;
 	const logVragen = logVerzen.flatMap((logVers) => logVers.vragen);
 	const heeftRegels = logVerzen.some((logVers) => logVers.wijzigingen.length > 0);
 	return (

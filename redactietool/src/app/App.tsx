@@ -14,8 +14,6 @@ import { useAdres, useLaden } from './hooks';
 import { Indeling, type Pagina } from './Indeling';
 import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { leesOntwerp, type Ontwerp } from './ontwerpProef';
-import { leesDichtheid, type Dichtheid } from './verzen/dichtheid';
-import { VerzenKeuze } from './verzen/VerzenKeuze';
 import { useWeergave, type Weergavebeheer } from './weergave/useWeergave';
 import { statusKlasse } from './Zijbalk';
 
@@ -27,7 +25,6 @@ function laadBoekMetReferentie(boekId: string): Promise<BoekMetReferentie> {
 
 /** Uit het adres bij het laden van de pagina; de keuzestrook wisselt van variant door de pagina opnieuw te laden. */
 const ONTWERP = leesOntwerp(window.location.search);
-const VERZEN = leesDichtheid(window.location.search);
 
 export function App() {
 	const boeken = useLaden(laadBoeken, []);
@@ -63,9 +60,8 @@ export function App() {
 	}
 	return (
 		<>
-			<BoekScherm adres={huidig} boeken={boeken.waarde} ontwerp={ONTWERP} verzen={VERZEN} weergavebeheer={weergavebeheer} />
+			<BoekScherm adres={huidig} boeken={boeken.waarde} ontwerp={ONTWERP} weergavebeheer={weergavebeheer} />
 			<OntwerpKeuze ontwerp={ONTWERP} />
-			{(ONTWERP.variant !== null || VERZEN !== null) && <VerzenKeuze dichtheid={VERZEN} />}
 		</>
 	);
 }
@@ -75,9 +71,9 @@ function standaardAdres(boeken: BoekLijst): BoekAdres | null {
 	return eerste === undefined ? null : { soort: 'hoofdstuk', boek: eerste.id, hoofdstuk: 1, vers: null };
 }
 
-type BoekSchermProps = { adres: BoekAdres; boeken: BoekLijst; ontwerp: Ontwerp; verzen: Dichtheid | null; weergavebeheer: Weergavebeheer };
+type BoekSchermProps = { adres: BoekAdres; boeken: BoekLijst; ontwerp: Ontwerp; weergavebeheer: Weergavebeheer };
 
-function BoekScherm({ adres, boeken, ontwerp, verzen, weergavebeheer }: BoekSchermProps) {
+function BoekScherm({ adres, boeken, ontwerp, weergavebeheer }: BoekSchermProps) {
 	const [regelsAltijdZichtbaar, zetRegelsAltijdZichtbaar] = useState(true);
 	const boekGegevens = useLaden(() => laadBoekMetReferentie(adres.boek), [adres.boek]);
 
@@ -122,7 +118,6 @@ function BoekScherm({ adres, boeken, ontwerp, verzen, weergavebeheer }: BoekSche
 		<HoofdstukPagina
 			{...gedeeld}
 			info={info}
-			verzen={verzen}
 			gekozenVers={adres.vers}
 			regelsAltijdZichtbaar={regelsAltijdZichtbaar}
 			onWisselRegels={() => zetRegelsAltijdZichtbaar(!regelsAltijdZichtbaar)}
@@ -146,7 +141,6 @@ type HoofdstukPaginaProps = {
 	boek: BoekData;
 	referentie: Referentie;
 	info: HoofdstukInfo;
-	verzen: Dichtheid | null;
 	gekozenVers: number | null;
 	regelsAltijdZichtbaar: boolean;
 	onWisselRegels: () => void;
@@ -156,7 +150,7 @@ type HoofdstukPaginaProps = {
  * Laadt het hoofdstuk en bouwt de pagina. Bij een ontwerpvariant staan titel en acties in de bovenbalk, daarom lezen we de tussenstand hier
  * en niet pas in het hoofdstuk: balk en tekst delen dezelfde stand.
  */
-function HoofdstukPagina({ ontwerp, weergavebeheer, boek, referentie, info, verzen, gekozenVers, regelsAltijdZichtbaar, onWisselRegels }: HoofdstukPaginaProps) {
+function HoofdstukPagina({ ontwerp, weergavebeheer, boek, referentie, info, gekozenVers, regelsAltijdZichtbaar, onWisselRegels }: HoofdstukPaginaProps) {
 	const nummer = info.nummer;
 	const hoofdstuk = useLaden(() => laadHoofdstuk(boek.id, nummer), [boek.id, nummer]);
 	const { tussenstand, herlees } = useTussenstand(boek.id, nummer);
@@ -183,7 +177,6 @@ function HoofdstukPagina({ ontwerp, weergavebeheer, boek, referentie, info, verz
 				referentie={referentie}
 				hoofdstuk={hoofdstuk.waarde}
 				info={info}
-				dichtheid={verzen}
 				gekozenVers={gekozenVers}
 				regelsAltijdZichtbaar={regelsAltijdZichtbaar}
 				onWisselRegels={onWisselRegels}

@@ -1,4 +1,4 @@
-import { klapRegelsUit, openParagraaf, openPrecedent, openVraag, wijzigTekstInEditor } from './naPlaatsen';
+import { openParagraaf, openPrecedent, openVraag, wijsRegelsAan, wijzigTekstInEditor } from './naPlaatsen';
 import type { NaPlaatsen } from './VersVoorbeeld';
 import { VERZEN, type Vers } from './voorbeelden';
 
@@ -38,8 +38,15 @@ export const BIJBELTEKST: VersOnderdeel = {
 export const VERSRIJ: VersOnderdeel = {
 	titel: 'Versrij en kolom Regels',
 	toestanden: [
-		toestand('Veel regels, ingeklapt', VERZEN.veelRegels, 'Na drie regels staat de rest achter ‘nog N regels’.'),
-		toestand('Veel regels, uitgeklapt', VERZEN.veelRegels, 'Hetzelfde vers na een klik op ‘nog N regels’.', 'gewoon', klapRegelsUit),
+		toestand('Veel regels, ingeklapt', VERZEN.veelRegels, 'De cel is hoogstens zo hoog als het vers; wat niet past vervaagt onderaan.'),
+		toestand('Veel regels, aangewezen', VERZEN.veelRegels, 'Hetzelfde vers na aanwijzen: het vak klapt uit over de volgende verzen. Toetsenbordfocus doet hetzelfde.', 'gewoon', wijsRegelsAan),
+		toestand(
+			'Veel regels, vast bij open naslagkaart',
+			VERZEN.veelRegels,
+			'Zolang de naslagkaart onder het vers open staat, staat de cel vast met alle regels en groeit de rij mee.',
+			'gewoon',
+			openParagraaf,
+		),
 		toestand('Met een vraag', VERZEN.metVraag, 'De vraag staat dicht achter ‘vraag’.'),
 		toestand('Met een open vraag', VERZEN.metOpenVraag, 'De vraag staat nog open en is uitgeklapt.', 'gewoon', openVraag),
 		toestand('Zonder regels', VERZEN.zonderRegels, 'Het log zegt niets over dit vers.'),

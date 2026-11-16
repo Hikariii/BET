@@ -43,7 +43,7 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 	if (groep === undefined) throw new Error(`Vers ${hoofdstuk.nummer}:${vers} staat niet in de gegevens.`);
 
 	return (
-		<table class="verzen" ref={tabel}>
+		<table class="verzen verzen-dicht" ref={tabel}>
 			<thead>
 				<tr>
 					<th scope="col">Vers</th>
@@ -55,7 +55,6 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 			<tbody>
 				<VersRij
 					groep={groep}
-					dichtheid={null}
 					boek={boek}
 					hoofdstuk={hoofdstuk}
 					referentie={referentie}

@@ -2,8 +2,6 @@ import { render } from 'preact';
 import { App } from './App';
 import { laadOntwerpCss } from './laadOntwerpCss';
 import { leesOntwerp } from './ontwerpProef';
-import { leesDichtheid } from './verzen/dichtheid';
-import { laadVerzenCss } from './verzen/laadVerzenCss';
 import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
 import '@fontsource-variable/atkinson-hyperlegible-next/wght-italic.css';
 import '@fontsource-variable/inter/wght.css';
@@ -17,6 +15,4 @@ if (wortel === null) {
 }
 const ontwerp = leesOntwerp(window.location.search);
 if (ontwerp.variant !== null) await laadOntwerpCss(ontwerp.variant);
-const verzen = leesDichtheid(window.location.search);
-if (verzen !== null) await laadVerzenCss(verzen);
 render(<App />, wortel);

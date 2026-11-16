@@ -11,17 +11,17 @@ export type GekapteRegels = {
 };
 
 /**
- * Kapt de regels van een vers af na de eerste `zichtbaar` regels, geteld over alle logblokken heen.
+ * Kapt de regels van een vers af na de eerste `ZICHTBARE_REGELS` regels, geteld over alle logblokken heen.
  * Blijft er maar één regel over, dan blijft die zichtbaar: "nog 1 regel" is geen winst.
  */
-export function kapRegels(aantalPerBlok: readonly number[], uitgeklapt: boolean, zichtbaar: number): GekapteRegels {
+export function kapRegels(aantalPerBlok: readonly number[], uitgeklapt: boolean): GekapteRegels {
 	const totaal = aantalPerBlok.reduce((som, aantal) => som + aantal, 0);
-	const kapt = !uitgeklapt && totaal - zichtbaar >= MINIMAAL_VERBORGEN;
-	let over = kapt ? zichtbaar : totaal;
+	const kapt = !uitgeklapt && totaal - ZICHTBARE_REGELS >= MINIMAAL_VERBORGEN;
+	let over = kapt ? ZICHTBARE_REGELS : totaal;
 	const zichtbaarPerBlok = aantalPerBlok.map((aantal) => {
 		const zichtbaar = Math.min(aantal, over);
 		over -= zichtbaar;
 		return zichtbaar;
 	});
-	return { zichtbaarPerBlok, verborgen: kapt ? totaal - zichtbaar : 0 };
+	return { zichtbaarPerBlok, verborgen: kapt ? totaal - ZICHTBARE_REGELS : 0 };
 }

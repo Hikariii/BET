@@ -1,5 +1,7 @@
 # Verzen dicht op elkaar (ronde 3)
 
+**Gekozen (2026-11-16): d4 is de vaste weergave. d1 tot d3, de parameter `?verzen=` en de keuzestrook zijn verwijderd; de code staat nu in `src/app/verzen/` (`VertaalregelsCel.tsx`, `verzen.css`). Hieronder staat de afweging zoals ze toen was.**
+
 Wisselen met `?verzen=d1`, `d2` of `d3`, ook naast `?ontwerp=v1` tot `v6`. Een keuzestrook staat rechtsonder boven die van de ontwerpen; `ruim` is de huidige indeling. Schermafbeeldingen: `d1-1440-lezen.png` enzovoort, met `nu-` ter vergelijking.
 
 **Gemeenschappelijk (alle drie).** Minder witruimte in de rijen (`verzen/dicht.css`): de gemiddelde rij in Lukas 22 gaat van 159 naar 76 px, de totale hoogte van 11.296 naar 5.390 px. De rijhoogte komt nu van bron en vereenvoudiging, niet van de vertaalregels. Bewerken, de naslagkaart onder het vers, de vraagmarkering en Escape werken in alle drie.

@@ -1,8 +1,8 @@
 import type { NaPlaatsen } from './VersVoorbeeld';
 
-/** Klapt "nog N regels" uit zoals een klik van de redacteur dat doet. */
-export const klapRegelsUit: NaPlaatsen = (tabel) => {
-	tabel.querySelector<HTMLButtonElement>('button.meerregels')?.click();
+/** Wijst de cel Vertaalregels aan zoals de redacteur met de muis doet, zodat het vak uitklapt. */
+export const wijsRegelsAan: NaPlaatsen = (tabel) => {
+	tabel.querySelector('td.regels')?.dispatchEvent(new PointerEvent('pointerenter'));
 };
 
 /** Klikt de eerste verwijzing met dit opschrift, zoals de redacteur doet om de naslagkaart te openen. */

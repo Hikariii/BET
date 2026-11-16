@@ -1,0 +1,77 @@
+/*
+ * De verzen dicht op elkaar, met de vertaalregels als zwevend vak.
+ *
+ * Weinig witruimte tussen de rijen, zodat de vereenvoudiging bijna als lopende tekst leest.
+ * De rijhoogte komt van bron en vereenvoudiging; de cel Vertaalregels (VertaalregelsCel) is hoogstens zo hoog als het vers.
+ * Wat niet past vervaagt onderaan. Bij aanwijzen of toetsenbordfocus klapt het vak uit over de volgende verzen, zonder dat iets verschuift.
+ * Zolang de naslagkaart onder het vers open staat, zweeft de cel niet: hij staat vast in de kolom met alle regels en de rij groeit mee.
+ *
+ * De tabel heeft de klassen verzen en verzen-dicht.
+ */
+
+.indeling table.verzen.verzen-dicht td,
+.indeling table.verzen.verzen-dicht th.versnummer {
+	padding-top: 0.5rem;
+	padding-bottom: 0.55rem;
+}
+
+/* De acties onder de vereenvoudiging (gewijzigd, terug naar de repo) hebben alleen ruimte nodig bij een gewijzigd vers. */
+.indeling table.verzen.verzen-dicht td:nth-child(3) {
+	padding-bottom: 0.55rem;
+}
+
+.indeling table.verzen.verzen-dicht td:nth-child(3):has(.versacties .versmarkering) {
+	padding-bottom: 1.9rem;
+}
+
+/* De koptekst blijft boven de zwevende vakken. */
+.indeling table.verzen.verzen-dicht thead th {
+	z-index: 3;
+}
+
+/* Specifieker dan de ontwerpvarianten (`.indeling.ontwerp-v6 table.verzen td.regels`), die later geladen worden. */
+.indeling table.verzen.verzen-dicht tr.vers > td.regels {
+	position: relative;
+	padding: 0;
+}
+
+/* Ook dichtgeklapt heeft het vak een rand van dezelfde dikte, onzichtbaar, zodat de tekst bij het openklappen niet verschuift. */
+.verzen-dicht .zweefvak {
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	max-height: 100%;
+	padding: 0.6rem calc(0.75rem - 1px) 0 calc(1.25rem - 1px);
+	overflow: hidden;
+	border: 1px solid transparent;
+}
+
+.verzen-dicht .zweefvak.overloopt:not(.open) {
+	-webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.75rem), transparent);
+	mask-image: linear-gradient(to bottom, #000 calc(100% - 1.75rem), transparent);
+}
+
+.verzen-dicht .zweefvak.open {
+	z-index: 2;
+	max-height: min(75vh, 36rem);
+	padding-bottom: 0.6rem;
+	overflow-y: auto;
+	background: #fff;
+	border-color: var(--tekst);
+}
+
+/* Toolkleur in plaats van het rood van de gewone focus: rood hoort niet in of rond de tekstkolommen. */
+.verzen-dicht .zweefvak:focus-visible {
+	outline: 2px solid var(--tekst);
+	outline-offset: -2px;
+}
+
+.verzen-dicht .zweefvak.vast {
+	position: static;
+	max-height: none;
+	padding-bottom: 0.6rem;
+	overflow: visible;
+	-webkit-mask-image: none;
+	mask-image: none;
+}

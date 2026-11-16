@@ -39,6 +39,11 @@
 	margin-top: 1.5rem;
 }
 
+/* Een uitgeklapt zweefvak ligt over wat eronder staat; deze ruimte houdt de volgende toestand leesbaar. */
+.galerij-toestand:has(.zweefvak.open) {
+	margin-bottom: 14rem;
+}
+
 .galerij-toestand > h3 {
 	margin: 0;
 	font-size: 0.6875rem;
