@@ -1,6 +1,6 @@
 import type { HoofdstukData } from '../data/types';
 import { serialiseerHoofdstuk } from '../formaat/serialiseer';
-import { isVerouderd, pastOpRepo } from '../bewerken/tussenstand';
+import { isBewerkingVerouderd } from '../bewerken/tussenstand';
 import type { Tussenstand, VersInhoud } from '../bewerken/types';
 import { knipVers } from '../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../bewerken/waarschuwingen';
@@ -30,7 +30,7 @@ function gewijzigdVers(nummer: number, invoer: ExportInvoer): GewijzigdVers | nu
 	const repo = knipVers(invoer.hoofdstuk.vereenvoudigd, nummer);
 	const bron = knipVers(invoer.hoofdstuk.bron, nummer);
 	// Een vers dat uit de repo verdwenen is of een andere indeling heeft, geeft Claude de bewerking zonder plek: verouderd.
-	const verouderd = repo === null || !pastOpRepo(repo, bewerkt) || isVerouderd(repo, bewerkt.basis);
+	const verouderd = isBewerkingVerouderd(repo, bewerkt);
 	return {
 		vers: nummer,
 		repo: repo === null ? [] : opFormaatRegels(repo),

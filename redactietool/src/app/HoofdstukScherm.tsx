@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData, HoofdstukInfo, LogVers, OpenVraag, Referentie } from '../data/types';
 import { pasTussenstandToe } from '../bewerken/tussenstand';
-import type { BewerktVers } from '../bewerken/types';
+import type { BewerktVers, Tussenstand } from '../bewerken/types';
 import { versAdres } from './adres';
 import { groepeerPerVers, type VersGroep } from './groepeerPerVers';
 import { Naslagkaart } from './Naslagkaart';
@@ -10,7 +10,6 @@ import { Regels } from './Regels';
 import { statusKlasse } from './Zijbalk';
 import { vragenBijVers } from './vertaalvragen';
 import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
-import { useTussenstand } from './bewerken/useTussenstand';
 import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { VersTekst } from './VersTekst';
 
@@ -26,6 +25,11 @@ type Props = {
 	gekozenVers: number | null;
 	regelsAltijdZichtbaar: boolean;
 	onWisselRegels: () => void;
+	/** De tussenstand van dit hoofdstuk, door de pagina gelezen omdat de acties in de bovenbalk dezelfde stand nodig hebben. */
+	tussenstand: Tussenstand;
+	herlees: () => void;
+	/** `volledig`: titel, status en acties staan in het hoofdstuk. `in-balk`: die staan in de bovenbalk en het hoofdstuk toont alleen de melding bij een goedgekeurd hoofdstuk. */
+	kop: 'volledig' | 'in-balk';
 };
 
 /** Wat bij één vers hoort aan regels uit het log en vragen. */
@@ -43,8 +47,18 @@ function versRegels(groep: VersGroep, hoofdstuk: HoofdstukData, referentie: Refe
 	return { logVerzen, vragen, heeftVraag };
 }
 
-export function HoofdstukScherm({ boek, referentie, hoofdstuk, info, gekozenVers, regelsAltijdZichtbaar, onWisselRegels }: Props) {
-	const { tussenstand, herlees } = useTussenstand(boek.id, hoofdstuk.nummer);
+export function HoofdstukScherm({
+	boek,
+	referentie,
+	hoofdstuk,
+	info,
+	gekozenVers,
+	regelsAltijdZichtbaar,
+	onWisselRegels,
+	tussenstand,
+	herlees,
+	kop,
+}: Props) {
 	const [bewerktAdres, zetBewerktAdres] = useState<string | null>(null);
 	const [openNaslag, zetOpenNaslag] = useState<OpenNaslag | null>(null);
 	const verwijzing = useRef<HTMLElement | null>(null);
@@ -63,17 +77,25 @@ export function HoofdstukScherm({ boek, referentie, hoofdstuk, info, gekozenVers
 
 	return (
 		<article class="hoofdstuk">
-			<header>
-				<h1>
-					{boek.naam} {hoofdstuk.nummer}
-				</h1>
-				<p class="hoofdstukstatus">
-					<span class={`status status-${statusKlasse(info.status)}`}>{info.status}</span>
-					{info.versie !== '' && <span class="versie">{info.versie}</span>}
-				</p>
-				{info.status === 'goedgekeurd' && <p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>}
-				<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} tussenstand={tussenstand} />
-			</header>
+			{kop === 'volledig' ? (
+				<header>
+					<h1>
+						{boek.naam} {hoofdstuk.nummer}
+					</h1>
+					<p class="hoofdstukstatus">
+						<span class={`status status-${statusKlasse(info.status)}`}>{info.status}</span>
+						{info.versie !== '' && <span class="versie">{info.versie}</span>}
+					</p>
+					{info.status === 'goedgekeurd' && <p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>}
+					<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} tussenstand={tussenstand} />
+				</header>
+			) : (
+				info.status === 'goedgekeurd' && (
+					<header>
+						<p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>
+					</header>
+				)
+			)}
 			<table class="verzen">
 				<thead>
 					<tr>

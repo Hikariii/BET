@@ -153,7 +153,7 @@ function ZijbalkItems({ boek, referentie }: { boek: BoekData; referentie: Refere
 				notitie={`De eerste ${AANTAL_HOOFDSTUKKEN_IN_ZIJBALK} hoofdstukken zoals ze zijn. De gewone status staat niet bij elk hoofdstuk; hoofdstuk ${huidig} is open.`}
 			>
 				<div class="galerij-zijbalk">
-					<Zijbalk boek={echt} referentie={referentie} huidigHoofdstuk={huidig} begrippenOpen={false} />
+					<Zijbalk boek={echt} referentie={referentie} huidigHoofdstuk={huidig} begrippenOpen={false} inklapbaar={false} />
 				</div>
 			</Toestand>
 			<Toestand
@@ -161,7 +161,7 @@ function ZijbalkItems({ boek, referentie }: { boek: BoekData; referentie: Refere
 				notitie="Dezelfde zijbalk met een andere status per hoofdstuk, zodat elke status voorkomt. Het scherm Begrippen is actief."
 			>
 				<div class="galerij-zijbalk">
-					<Zijbalk boek={gemengd} referentie={referentie} huidigHoofdstuk={null} begrippenOpen />
+					<Zijbalk boek={gemengd} referentie={referentie} huidigHoofdstuk={null} begrippenOpen inklapbaar={false} />
 				</div>
 			</Toestand>
 		</Onderdeel>

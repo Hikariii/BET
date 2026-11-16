@@ -4,7 +4,7 @@ export type Tabblad = (typeof TABBLADEN)[number];
 
 /**
  * Het adres in de browser.
- * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden; `#/galerij` is de galerij met de componenten. Een slash achteraan mag.
+ * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden; `#/lukas/bewaard` is het overzicht van wat de browser bewaart; `#/galerij` is de galerij met de componenten. Een slash achteraan mag.
  */
 export type Adres = BoekAdres | { soort: 'galerij' };
 
@@ -17,10 +17,12 @@ export type BoekAdres =
 			/** `null` als het adres naar het hele hoofdstuk wijst. */
 			vers: number | null;
 	  }
-	| { soort: 'begrippen'; boek: string; tabblad: Tabblad };
+	| { soort: 'begrippen'; boek: string; tabblad: Tabblad }
+	| { soort: 'bewaard'; boek: string };
 
 const HOOFDSTUK = /^#\/([^/]+)\/(\d+)(?:\/(\d+))?\/?$/;
 const BEGRIPPEN = /^#\/([^/]+)\/begrippen(?:\/([a-z]+))?\/?$/;
+const BEWAARD = /^#\/([^/]+)\/bewaard\/?$/;
 const GALERIJ = /^#\/galerij\/?$/;
 
 /** Geeft `null` voor een leeg of onbegrijpelijk adres. */
@@ -41,6 +43,11 @@ export function leesAdres(hash: string): Adres | null {
 		if (tabblad === undefined) return { soort: 'begrippen', boek: boekNaam, tabblad: 'besloten' };
 		return isTabblad(tabblad) ? { soort: 'begrippen', boek: boekNaam, tabblad } : null;
 	}
+	const bewaard = BEWAARD.exec(hash);
+	if (bewaard !== null) {
+		const boekNaam = decodeerBoek(bewaard[1] ?? '');
+		return boekNaam === null ? null : { soort: 'bewaard', boek: boekNaam };
+	}
 	return null;
 }
 
@@ -50,6 +57,7 @@ export function maakAdres(adres: Adres): string {
 	if (adres.soort === 'begrippen') {
 		return `${boek}/begrippen/${adres.tabblad}`;
 	}
+	if (adres.soort === 'bewaard') return `${boek}/bewaard`;
 	const hoofdstukAdres = `${boek}/${adres.hoofdstuk}`;
 	return adres.vers === null ? hoofdstukAdres : `${hoofdstukAdres}/${adres.vers}`;
 }

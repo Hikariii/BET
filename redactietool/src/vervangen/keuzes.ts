@@ -19,7 +19,8 @@ type KeuzeVers = { hoofdstuk: number; vers: number; voor: VersInhoud; na: VersIn
 
 export type ToepasUitkomst = { keuze: StructureleKeuze; meldingen: string[] };
 
-function sleutel(boek: string): string {
+/** De sleutel waaronder de keuzes van een boek in de opslag staan. */
+export function keuzesSleutel(boek: string): string {
 	return `bet-keuzes/${boek}`;
 }
 
@@ -37,7 +38,8 @@ function alsKeuzeVers(waarde: unknown): KeuzeVers | null {
 	return { hoofdstuk, vers, voor, na };
 }
 
-function alsKeuze(waarde: unknown): StructureleKeuze | null {
+/** Leest één keuze uit opgeslagen JSON; `null` bij een onbruikbare vorm. */
+export function alsKeuze(waarde: unknown): StructureleKeuze | null {
 	if (!isObject(waarde) || !Array.isArray(waarde['verzen'])) return null;
 	const { id, zoekterm, nieuw, toegepast } = waarde;
 	if (typeof id !== 'string' || typeof zoekterm !== 'string' || typeof nieuw !== 'string' || typeof toegepast !== 'string') return null;
@@ -53,7 +55,7 @@ function alsKeuze(waarde: unknown): StructureleKeuze | null {
 /** Alle bewaarde keuzes op volgorde van toepassen (oudste eerst); onleesbare opslag geeft een lege lijst. */
 function leesOpVolgorde(opslag: Opslag, boek: string): StructureleKeuze[] {
 	try {
-		const tekst = opslag.getItem(sleutel(boek));
+		const tekst = opslag.getItem(keuzesSleutel(boek));
 		if (tekst === null) return [];
 		const json: unknown = JSON.parse(tekst);
 		if (!Array.isArray(json)) return [];
@@ -64,10 +66,10 @@ function leesOpVolgorde(opslag: Opslag, boek: string): StructureleKeuze[] {
 }
 
 /** Schrijft de lijst terug; zonder keuzes verdwijnt de sleutel. Geeft `false` als de opslag het weigert. */
-function schrijfKeuzes(opslag: Opslag, boek: string, keuzes: readonly StructureleKeuze[]): boolean {
+export function schrijfKeuzes(opslag: Opslag, boek: string, keuzes: readonly StructureleKeuze[]): boolean {
 	try {
-		if (keuzes.length === 0) opslag.removeItem(sleutel(boek));
-		else opslag.setItem(sleutel(boek), JSON.stringify(keuzes));
+		if (keuzes.length === 0) opslag.removeItem(keuzesSleutel(boek));
+		else opslag.setItem(keuzesSleutel(boek), JSON.stringify(keuzes));
 		return true;
 	} catch {
 		return false;

@@ -1,0 +1,122 @@
+/* De ingeklapte zijbalk en de hoofdstukstrip: per hoofdstuk nummer, vinkje en aantal vragen (`1 ✓ 3?`). */
+
+.hoofdstuk-kort {
+	display: grid;
+	grid-template-columns: 1.65rem 0.9rem 1.6rem;
+	align-items: center;
+	gap: 0.15rem;
+	padding: 0.15rem 0.3rem;
+	border: 1px solid transparent;
+	color: var(--tekst);
+	font-size: 0.75rem;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.hoofdstuk-kort .hoofdstuk-kort-nummer {
+	display: grid;
+	place-items: center;
+	height: 1.5rem;
+	background: #fff;
+	border: 1px solid var(--rand);
+	font-variant-numeric: tabular-nums;
+	font-weight: 500;
+}
+
+.hoofdstuk-kort:hover .hoofdstuk-kort-nummer {
+	border-color: var(--rand-donker);
+}
+
+.hoofdstuk-kort[aria-current='page'] .hoofdstuk-kort-nummer {
+	background: var(--rood);
+	border-color: var(--rood);
+	color: #fff;
+}
+
+.hoofdstuk-kort .hoofdstuk-kort-vinkje {
+	font-weight: 700;
+	text-align: center;
+}
+
+.hoofdstuk-kort .hoofdstuk-kort-vragen {
+	color: var(--gedempt);
+	font-size: 0.6875rem;
+	font-variant-numeric: tabular-nums;
+	font-weight: 500;
+}
+
+/* ---------- Ingeklapte zijbalk ---------- */
+
+.indeling.zijbalk-ingeklapt {
+	grid-template-columns: var(--zijbalk-breedte-ingeklapt, 5.25rem) minmax(0, 1fr);
+}
+
+nav.zijbalk.zijbalk-ingeklapt {
+	padding: 0.75rem 0 0.5rem;
+}
+
+nav.zijbalk.zijbalk-ingeklapt ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+nav.zijbalk.zijbalk-ingeklapt .hoofdstuk-kort {
+	justify-content: center;
+}
+
+/* ---------- Pijl onderaan de zijbalk ---------- */
+
+.indeling.met-bovenbalk .zijbalk {
+	top: var(--balk-hoogte, 0px);
+	height: calc(100vh - var(--balk-hoogte, 0px));
+	display: flex;
+	flex-direction: column;
+}
+
+nav.zijbalk .zijbalk-wissel {
+	position: sticky;
+	bottom: 0.5rem;
+	flex-shrink: 0;
+	margin: auto 0.75rem 0 auto;
+	padding: 0.1rem 0.6rem;
+	font-size: 1.125rem;
+	line-height: 1.2;
+}
+
+nav.zijbalk.zijbalk-ingeklapt .zijbalk-wissel {
+	margin: auto auto 0;
+}
+
+/* ---------- Hoofdstukstrip ---------- */
+
+.hoofdstukstrip ul {
+	display: flex;
+	gap: 0.15rem;
+	margin: 0;
+	padding: 0 0 0.25rem;
+	overflow-x: auto;
+	list-style: none;
+}
+
+.hoofdstukstrip .hoofdstuk-kort {
+	grid-template-columns: 1.65rem auto auto;
+}
+
+.hoofdstukstrip .hoofdstuk-kort span:empty {
+	display: none;
+}
+
+.indeling.navigatie-strip {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 60rem) {
+	.indeling.met-bovenbalk .zijbalk {
+		height: auto;
+	}
+
+	.indeling.zijbalk-ingeklapt {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'preact/hooks';
+import { meldendeOpslag, meldOpslagGewijzigd } from '../../bewaren/wijziging';
 import { leesTussenstand, type Opslag } from '../../bewerken/tussenstand';
 import type { Tussenstand } from '../../bewerken/types';
+import { useOpslagTeller } from '../bewaren/useOpslagTeller';
 
 /** Opslag die niets bewaart en bij bewaren een fout geeft, voor een browser die localStorage weigert (bv. in privémodus). */
 const GEWEIGERDE_OPSLAG: Opslag = {
@@ -11,7 +13,8 @@ const GEWEIGERDE_OPSLAG: Opslag = {
 	removeItem: () => {},
 };
 
-export function browseropslag(): Opslag {
+/** De opslag van de browser zonder meldingen, voor instellingen die geen bewaarde tekst zijn. */
+export function ruweBrowseropslag(): Opslag {
 	try {
 		return window.localStorage;
 	} catch {
@@ -19,9 +22,15 @@ export function browseropslag(): Opslag {
 	}
 }
 
+/** De opslag van de browser; elke schrijf- of wisactie laat de bewaarstatus en de open hoofdstukken opnieuw lezen. */
+export function browseropslag(): Opslag {
+	return meldendeOpslag(ruweBrowseropslag(), meldOpslagGewijzigd);
+}
+
 /** De tussenstand van een hoofdstuk, altijd vers uit de opslag gelezen; `herlees` na elke wijziging in de opslag. */
 export function useTussenstand(boek: string, hoofdstuk: number): { tussenstand: Tussenstand; herlees: () => void } {
 	const [versie, zetVersie] = useState(0);
-	const tussenstand = useMemo(() => leesTussenstand(browseropslag(), boek, hoofdstuk), [boek, hoofdstuk, versie]);
+	const opslagTeller = useOpslagTeller();
+	const tussenstand = useMemo(() => leesTussenstand(ruweBrowseropslag(), boek, hoofdstuk), [boek, hoofdstuk, versie, opslagTeller]);
 	return { tussenstand, herlees: () => zetVersie((vorige) => vorige + 1) };
 }

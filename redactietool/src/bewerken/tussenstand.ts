@@ -6,7 +6,8 @@ import { knipVers, vervangVers } from './versknip';
 /** Het deel van de browseropslag dat de tussenstand gebruikt; in tests een eenvoudige vervanger. */
 export type Opslag = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
-function sleutel(boek: string, hoofdstuk: number): string {
+/** De sleutel waaronder de tussenstand van een hoofdstuk in de opslag staat. */
+export function tussenstandSleutel(boek: string, hoofdstuk: number): string {
 	return `bet-tussenstand/${boek}/${hoofdstuk}`;
 }
 
@@ -57,7 +58,8 @@ export function alsInhoud(waarde: unknown): VersInhoud | null {
 	return { delen };
 }
 
-function alsBewerktVers(waarde: unknown): BewerktVers | null {
+/** Leest één bewerkt vers uit opgeslagen JSON; `null` bij een onbruikbare vorm. */
+export function alsBewerktVers(waarde: unknown): BewerktVers | null {
 	if (!isObject(waarde) || typeof waarde['bewaard'] !== 'string') return null;
 	const inhoud = alsInhoud(waarde['inhoud']);
 	const basis = alsInhoud(waarde['basis']);
@@ -76,7 +78,7 @@ export function leesTussenstand(opslag: Opslag, boek: string, hoofdstuk: number)
 	const leeg: Tussenstand = { verzen: {} };
 	let tekst: string | null;
 	try {
-		tekst = opslag.getItem(sleutel(boek, hoofdstuk));
+		tekst = opslag.getItem(tussenstandSleutel(boek, hoofdstuk));
 	} catch {
 		return leeg;
 	}
@@ -103,7 +105,7 @@ function schrijfVers(opslag: Opslag, boek: string, hoofdstuk: number, vers: numb
 	const tussenstand = leesTussenstand(opslag, boek, hoofdstuk);
 	tussenstand.verzen[vers] = bewerkt;
 	try {
-		opslag.setItem(sleutel(boek, hoofdstuk), JSON.stringify(tussenstand));
+		opslag.setItem(tussenstandSleutel(boek, hoofdstuk), JSON.stringify(tussenstand));
 		return { gelukt: true };
 	} catch {
 		return {
@@ -191,10 +193,10 @@ export function wisVers(opslag: Opslag, boek: string, hoofdstuk: number, vers: n
 	if (!(vers in tussenstand.verzen)) return;
 	delete tussenstand.verzen[vers];
 	if (Object.keys(tussenstand.verzen).length === 0) {
-		opslag.removeItem(sleutel(boek, hoofdstuk));
+		opslag.removeItem(tussenstandSleutel(boek, hoofdstuk));
 		return;
 	}
-	opslag.setItem(sleutel(boek, hoofdstuk), JSON.stringify(tussenstand));
+	opslag.setItem(tussenstandSleutel(boek, hoofdstuk), JSON.stringify(tussenstand));
 }
 
 function opmaakSleutel(stuk: Tekststuk): string {
@@ -240,6 +242,11 @@ export function zelfdeInhoud(a: VersInhoud, b: VersInhoud): boolean {
 /** Of de repo-inhoud van een bewaard vers niet meer gelijk is aan de basis van de bewerking (stijl, tekst en opmaak per stuk). */
 export function isVerouderd(repo: VersInhoud, basis: VersInhoud): boolean {
 	return !zelfdeInhoud(repo, basis);
+}
+
+/** Of een bewaarde bewerking verouderd is: het vers is uit de repo verdwenen (`repo` is `null`), heeft een andere indeling of heeft een andere tekst dan waarop de bewerking begon. */
+export function isBewerkingVerouderd(repo: VersInhoud | null, bewerkt: BewerktVers): boolean {
+	return repo === null || !pastOpRepo(repo, bewerkt) || isVerouderd(repo, bewerkt.basis);
 }
 
 /** Het hoofdstuk met de bewerkte verzen uit de tussenstand erin; een vers dat niet bestaat of een ander aantal delen heeft, blijft zoals het was. */

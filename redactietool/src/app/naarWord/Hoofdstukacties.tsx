@@ -2,9 +2,9 @@ import { useMemo, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData } from '../../data/types';
 import type { Tussenstand } from '../../bewerken/types';
 import { exportBestandsnaam, maakExport } from '../../export/maakExport';
-import type { RedactieExport } from '../../export/types';
 import type { Hoofdstuk } from '../../formaat/types';
 import { maakKlembordInhoud, vulKopieerGebeurtenis } from '../../klembord/kopieer';
+import { downloadAlsJson } from '../downloadBestand';
 import './hoofdstukacties.css';
 
 type Props = {
@@ -54,18 +54,6 @@ function kopieerNaarKlembord(weergave: Hoofdstuk, boek: BoekData, tussenstand: T
 	return melding === null ? { soort: 'gekopieerd', van: tussenstand } : { soort: 'mislukt', melding };
 }
 
-function downloadAlsBestand(bestandsnaam: string, uitvoer: RedactieExport): void {
-	const bestand = new Blob([`${JSON.stringify(uitvoer, null, 2)}\n`], { type: 'application/json' });
-	const adres = URL.createObjectURL(bestand);
-	const koppeling = document.createElement('a');
-	koppeling.href = adres;
-	koppeling.download = bestandsnaam;
-	document.body.append(koppeling);
-	koppeling.click();
-	koppeling.remove();
-	URL.revokeObjectURL(adres);
-}
-
 /** Knoppen bovenaan het hoofdstuk: Hoofdstuktekst kopiëren voor Word (met de waarschuwing in Safari) en Export voor Claude. */
 export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
 	const [kopie, zetKopie] = useState<KopieUitkomst | null>(null);
@@ -82,7 +70,7 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
 	const kopieer = () => zetKopie(kopieerNaarKlembord(weergave, boek, tussenstand));
 	const download = (gebeurtenis: SubmitEvent) => {
 		gebeurtenis.preventDefault();
-		downloadAlsBestand(exportBestandsnaam(boek.prefix, repo.nummer), bouwExport(toelichting));
+		downloadAlsJson(exportBestandsnaam(boek.prefix, repo.nummer), bouwExport(toelichting));
 	};
 
 	return (

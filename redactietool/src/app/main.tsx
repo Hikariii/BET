@@ -1,5 +1,7 @@
 import { render } from 'preact';
 import { App } from './App';
+import { laadOntwerpCss } from './laadOntwerpCss';
+import { leesOntwerp } from './ontwerpProef';
 import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
 import '@fontsource-variable/atkinson-hyperlegible-next/wght-italic.css';
 import '@fontsource-variable/inter/wght.css';
@@ -11,4 +13,6 @@ const wortel = document.getElementById('app');
 if (wortel === null) {
 	throw new Error('index.html mist het element #app');
 }
+const ontwerp = leesOntwerp(window.location.search);
+if (ontwerp.variant !== null) await laadOntwerpCss(ontwerp.variant);
 render(<App />, wortel);
