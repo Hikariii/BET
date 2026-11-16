@@ -180,7 +180,6 @@ table.verzen td > p + p {
 }
 
 tr.vers {
-	cursor: pointer;
 	scroll-margin-top: 3rem;
 }
 
