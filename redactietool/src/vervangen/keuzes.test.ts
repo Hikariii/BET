@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { bewaarOfWis, leesTussenstand } from '../bewerken/tussenstand';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
@@ -10,40 +10,7 @@ import type { Opmaak } from '../formaat/types';
 import { alsKeuze, draaiKeuzeTerug, draaiVersTerug, leesKeuzes, pasKeuzeToe, pasOpdrachtToe, type StructureleKeuze, type Toepassing } from './keuzes';
 import type { HoofdstukVerzen, Vondst } from './types';
 import { zoekVondsten } from './zoekEnVervang';
-import type { Plek, Zoekopdracht } from './zoekopdracht';
-
-/**
- * Een eenvoudige eigen versie van `wijzigVers` voor deze tests: vervangt of wisselt per plek binnen één tekststuk.
- * De echte versie komt uit `zoekopdracht.ts`; deze mock kan weg zodra die gebouwd is.
- */
-function eenvoudigeWijzigVers(inhoud: VersInhoud, plekken: readonly Plek[], opdracht: Zoekopdracht, variantVervangingen: ReadonlyMap<string, string>): VersInhoud {
-	const delen = inhoud.delen.map((deel, deelIndex) => {
-		let begin = 0;
-		const bereiken = deel.stukken.map((stuk) => ({ stuk, van: begin, tot: (begin += stuk.tekst.length) }));
-		const nieuweStukken = deel.stukken.map((stuk) => ({ ...stuk }));
-		const dezePlekken = plekken.filter((plek) => plek.deel === deelIndex).sort((a, b) => b.van - a.van);
-		for (const plek of dezePlekken) {
-			const index = bereiken.findIndex((bereik) => bereik.van <= plek.van && plek.tot <= bereik.tot);
-			const bereik = bereiken[index];
-			const stuk = nieuweStukken[index];
-			if (bereik === undefined || stuk === undefined) continue;
-			if (opdracht.soort === 'markering') {
-				nieuweStukken[index] = { ...stuk, opmaak: stuk.opmaak.map((opmaak) => (opmaak === opdracht.van ? opdracht.naar : opmaak)) };
-				continue;
-			}
-			const vervanging = plek.variant === null ? opdracht.nieuw : (variantVervangingen.get(plek.variant) ?? '');
-			if (vervanging === '') continue;
-			nieuweStukken[index] = { ...stuk, tekst: stuk.tekst.slice(0, plek.van - bereik.van) + vervanging + stuk.tekst.slice(plek.tot - bereik.van) };
-		}
-		return { ...deel, stukken: nieuweStukken };
-	});
-	return { delen };
-}
-
-vi.mock('./zoekopdracht', async (origineel) => ({
-	...(await origineel<typeof import('./zoekopdracht')>()),
-	wijzigVers: eenvoudigeWijzigVers,
-}));
+import type { Plek } from './zoekopdracht';
 
 class GeheugenOpslag implements Opslag {
 	readonly items = new Map<string, string>();
