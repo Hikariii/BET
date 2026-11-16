@@ -11,16 +11,12 @@ html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-hoofdstukbalk {
 }
 
 /*
- * Titelblok met vaste breedte: hoofdstuk bovenaan, status en versie klein eronder.
+ * Titelblok met vaste breedte: hoofdstuk met de status als pictogram ernaast (zie onder).
  * Zo begint de strip altijd op dezelfde plek, ook als de status wisselt (review, goedgekeurd v1.0).
  * Een dunne lijn scheidt het blok van de strip.
  */
 html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel {
 	flex: none;
-	display: grid;
-	grid-template-columns: auto 1fr;
-	align-content: center;
-	column-gap: 0.35rem;
 	width: 9.5rem;
 	padding-right: 1rem;
 	border-right: 1px solid var(--rand);
@@ -29,28 +25,9 @@ html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel {
 }
 
 html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .bovenbalk-hoofdstuktitel {
-	grid-column: 1 / -1;
+	min-width: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel :is(.status, .versie) {
-	font-size: 0.6875rem;
-	color: var(--gedempt);
-}
-
-html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .versie {
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip {
-	flex: 1 1 auto;
-	min-width: 6rem;
-}
-
-html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-acties {
-	flex: none;
 }
 
 /* In de rij zonder eigen scrollbalk: de pijltjes en het wiel doen het schuiven. */
@@ -61,4 +38,120 @@ html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstukstrip ul {
 
 html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstukstrip ul::-webkit-scrollbar {
 	display: none;
+}
+
+/*
+ * Status als vast pictogram achter het hoofdstuk, op één regel; het woord en de versie staan in de tooltip en zijn er voor schermlezers.
+ * Pictogrammen: goedgekeurd vinkje in cirkel, review oog, bij editor pen, verwerkt postvak, concept stippelcirkel, nog niet begonnen lege cirkel.
+ */
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status {
+	flex: none;
+	width: 1.05rem;
+	height: 1.05rem;
+	overflow: hidden;
+	color: var(--gedempt);
+	font-size: 0;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status::before {
+	content: '';
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: currentColor;
+	-webkit-mask: var(--statusicoon) center / contain no-repeat;
+	mask: var(--statusicoon) center / contain no-repeat;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status-goedgekeurd {
+	color: var(--tekst);
+}
+
+/* De versie alleen voor schermlezers; zichtbaar staat hij in de tooltip van het pictogram. */
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .versie {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status-goedgekeurd {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='10' r='7.5'/%3E%3Cpath d='M6.5 10.2l2.4 2.4 4.6-5'/%3E%3C/svg%3E");
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status-review {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z'/%3E%3Ccircle cx='10' cy='10' r='2.3'/%3E%3C/svg%3E");
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status-bij-editor {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13.5 3.5l3 3L7 16H4v-3z'/%3E%3Cpath d='M11.5 5.5l3 3'/%3E%3C/svg%3E");
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status-verwerkt {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5h3.5l1.2 2h4.6l1.2-2H17'/%3E%3Cpath d='M3 11.5L5 4.5h10l2 7V16H3z'/%3E%3Cpath d='M10 6.5v4M8.2 8.8l1.8 1.8 1.8-1.8'/%3E%3C/svg%3E");
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status-concept {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='10' r='7.5' stroke-dasharray='2.2 2.2'/%3E%3C/svg%3E");
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-titel .status-nog-niet-begonnen {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='10' r='7.5' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/*
+ * De hoofdstukken klikbaar over de hele hoogte van de hoofdstukbalk, zodat je niet misklikt:
+ * de balk zelf heeft geen ruimte boven en onder; titel en acties krijgen die zelf, de strip rekt mee.
+ */
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-hoofdstukbalk {
+	align-items: stretch;
+	min-height: 2.75rem;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-hoofdstukbalk > :is(.bovenbalk-titel, .bovenbalk-acties) {
+	align-self: center;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip,
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstukstrip,
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstukstrip ul {
+	display: flex;
+	align-items: stretch;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstukstrip li {
+	display: flex;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .hoofdstuk-kort {
+	align-content: center;
+	align-items: center;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-strip .strip-pijl {
+	align-self: center;
+}
+
+/* De strip neemt alleen de ruimte die over is; de acties blijven op één regel. */
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-strip {
+	flex: 1 1 0;
+	min-width: 6rem;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-acties {
+	flex: 0 0 auto;
+}
+
+html[data-ontwerp='v8e'] .bovenbalk .bovenbalk-acties .hoofdstukacties-knoppen {
+	flex-wrap: nowrap;
+	white-space: nowrap;
 }

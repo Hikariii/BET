@@ -215,7 +215,9 @@ function HoofdstukTitel({ boek, info }: { boek: BoekData; info: HoofdstukInfo })
 			<h1 class="bovenbalk-hoofdstuktitel">
 				{boek.naam} {info.nummer}
 			</h1>
-			<span class={`status status-${statusKlasse(info.status)}`}>{info.status}</span>
+			<span class={`status status-${statusKlasse(info.status)}`} title={info.versie === '' ? info.status : `${info.status} ${info.versie}`}>
+				{info.status}
+			</span>
 			{info.versie !== '' && <span class="versie">{info.versie}</span>}
 		</>
 	);
