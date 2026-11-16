@@ -6,7 +6,7 @@ Het Word-bestand dat je aanlevert is de definitieve tekst. Het maakt niet uit of
 
 ## Wat Claude doet
 
-Op verzoek van de eigenaar leest Claude je Word-bestand terug in de repo, één hoofdstuk per keer, met de opmaak. Daarna:
+Op verzoek van de eigenaar neemt Claude je Word-bestand over in zijn eigen bestanden, één hoofdstuk per keer, met de opmaak. Daarna:
 
 1. Claude werkt de wijzigingslog bij: per vers wat er verschilt tussen Claudes concept en jouw tekst.
 2. Keuzes van jou die afwijken van de richtlijn of van eerdere vertaalkeuzes worden een voorstel: een precedent vast maken, een nieuw precedent, of een regel in de richtlijn aanpassen.

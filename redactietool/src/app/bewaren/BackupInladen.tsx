@@ -125,7 +125,7 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 		<>
 			<p>
 				<strong>{toestand.bestandsnaam}</strong>, gemaakt op {tijdVan(backup.gemaakt)}
-				{backup.repoCommit !== null && <>, repo-versie {backup.repoCommit.slice(0, 7)}</>}.
+				{backup.repoCommit !== null && <>, versie van de teksten {backup.repoCommit.slice(0, 7)}</>}.
 			</p>
 			<ul class="bewaren-voorbeeld-telling">
 				<li>{meervoud(telling.nieuw, 'vers komt', 'verzen komen')} erbij.</li>

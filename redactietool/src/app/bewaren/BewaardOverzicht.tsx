@@ -47,7 +47,7 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 			)}
 			{overzicht.totaal.verouderd > 0 && (
 				<p class="bewaard-verouderd">
-					{meervoud(overzicht.totaal.verouderd, 'bewerking is', 'bewerkingen zijn')} verouderd: de repo is sinds de bewerking veranderd. Kijk die
+					{meervoud(overzicht.totaal.verouderd, 'bewerking is', 'bewerkingen zijn')} verouderd: Claude heeft de tekst na je bewerking veranderd. Kijk die
 					verzen na voordat je ze naar Word brengt.
 				</p>
 			)}

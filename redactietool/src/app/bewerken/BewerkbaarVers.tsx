@@ -117,16 +117,16 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 					</span>
 				)}
 				{bewerkt !== null && (
-					<button type="button" data-help="terug-naar-de-repo" onClick={terugNaarRepo} aria-label={`Terug naar de repo, vers ${nummer}`}>
-						Terug naar de repo
+					<button type="button" data-help="terug-naar-de-repo" onClick={terugNaarRepo} aria-label={`Herstel de vereenvoudiging van vers ${nummer}`}>
+						Herstel vereenvoudiging
 					</button>
 				)}
 			</div>
 			{bewerkingPastNiet && bewerkt !== null && (
 				<div class="versverouderd" role="status">
 					<p>
-						Deze bewerking kan niet worden toegepast: de indeling in alinea's is in de repo veranderd. Je eerdere tekst staat hieronder; kopieer
-						hem als je hem wilt houden, want opnieuw bewerken of Terug naar de repo overschrijft hem.
+						Deze bewerking kan niet worden toegepast: Claude heeft de indeling in alinea's veranderd. Je eerdere tekst staat hieronder; kopieer
+						hem als je hem wilt houden, want opnieuw bewerken of Herstel vereenvoudiging overschrijft hem.
 					</p>
 					{bewerkt.inhoud.delen.map((deel) => (
 						<p class="eerdere-tekst">{deel.stukken.map((stuk) => stuk.tekst).join('').trim()}</p>
@@ -135,7 +135,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 			)}
 			{verouderd && (
 				<p class="versverouderd" role="status">
-					De repo is veranderd sinds je dit vers bewerkte. Je wijziging bouwt op de oude versie; controleer hem voor je hem gebruikt.
+					Claude heeft dit vers veranderd nadat jij het bewerkte. Je wijziging bouwt op de oude tekst; lees hem na voor je hem gebruikt.
 				</p>
 			)}
 			{opslagmelding !== null && (

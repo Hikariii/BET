@@ -129,7 +129,7 @@ describe('pasKeuzeToe', () => {
 
 		const { keuze, meldingen } = pasKeuzeToe(opslag, 'lukas', hoofdstukken(opslag), 'harde', 'scherpe', zoekVondsten(hoofdstukken(opslag), 'harde'), NU);
 
-		expect(meldingen).toEqual(['Vers 6:22 is overgeslagen: de bewerking hoort bij een oudere repo-tekst. Kijk het vers eerst na.']);
+		expect(meldingen).toEqual(['Vers 6:22 is overgeslagen: de bewerking hoort bij een oudere tekst van Claude. Kijk het vers eerst na.']);
 		expect(keuze.verzen.map((vers) => vers.vers)).toEqual([23]);
 		expect(huidig(opslag, 22)).toEqual(inhoud(eigen));
 	});
@@ -143,7 +143,7 @@ describe('pasKeuzeToe', () => {
 
 		const { keuze, meldingen } = pasToe(opslag);
 
-		expect(meldingen).toEqual(['Vers 6:22 is overgeslagen: de bewerking hoort bij een oudere repo-tekst. Kijk het vers eerst na.']);
+		expect(meldingen).toEqual(['Vers 6:22 is overgeslagen: de bewerking hoort bij een oudere tekst van Claude. Kijk het vers eerst na.']);
 		expect(keuze.verzen.map((vers) => vers.vers)).toEqual([23]);
 		expect(huidig(opslag, 22)).toEqual(inhoud(VERS_22));
 		expect(huidig(opslag, 23)).toEqual(inhoud(' Daarna zweeg hij, scherpe man.'));

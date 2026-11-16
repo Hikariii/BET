@@ -145,7 +145,7 @@ export function bewaarKeuzeVers(
 	if (bestaand !== undefined && (!pastOpRepo(repo, bestaand) || isVerouderd(repo, bestaand.basis))) {
 		return {
 			gelukt: false,
-			melding: `Vers ${hoofdstuk}:${vers} is overgeslagen: de bewerking hoort bij een oudere repo-tekst. Kijk het vers eerst na.`,
+			melding: `Vers ${hoofdstuk}:${vers} is overgeslagen: de bewerking hoort bij een oudere tekst van Claude. Kijk het vers eerst na.`,
 		};
 	}
 	const basis = bestaand === undefined ? repo : bestaand.basis;

@@ -254,7 +254,7 @@ function draaiKeuzeVersTerug(opslag: Opslag, boek: string, keuzes: readonly Stru
 	const { hoofdstuk, vers, voor, na } = keuzeVers;
 	const naam = versNaam(hoofdstuk, vers);
 	const bewerkt = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
-	if (bewerkt === undefined) return { melding: `Vers ${naam} staat al weer op de repo-tekst.`, blijftBijKeuze: false };
+	if (bewerkt === undefined) return { melding: `Vers ${naam} staat al weer op de vereenvoudiging van Claude.`, blijftBijKeuze: false };
 	const latereKeuze = keuzes.find((k) => k.id === bewerkt.keuzeId && k.id !== keuze.id);
 	if (latereKeuze !== undefined) {
 		return { melding: `Vers ${naam} is daarna veranderd door de keuze "${latereKeuze.zoekterm}"; draai die eerst terug.`, blijftBijKeuze: true };

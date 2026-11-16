@@ -115,7 +115,7 @@ export function leesBackup(tekst: string, boek: string): LeesUitkomst {
 	}
 	const { gemaakt, repoCommit, tussenstanden: ruweStanden, keuzes: ruweKeuzes } = json;
 	if (typeof gemaakt !== 'string' || Number.isNaN(Date.parse(gemaakt))) return fout('In de back-up ontbreekt een geldige datum.');
-	if (repoCommit !== null && typeof repoCommit !== 'string') return fout('In de back-up is de repo-commit onleesbaar.');
+	if (repoCommit !== null && typeof repoCommit !== 'string') return fout('In de back-up is de versie van de teksten onleesbaar.');
 	if (!Array.isArray(ruweStanden) || !Array.isArray(ruweKeuzes)) return fout('In de back-up ontbreken de bewerkte verzen of de keuzes.');
 
 	const tussenstanden: BackupHoofdstuk[] = [];

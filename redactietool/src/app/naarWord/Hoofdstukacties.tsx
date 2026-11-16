@@ -106,8 +106,8 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 			</div>
 			{aantalVerouderd > 0 && (
 				<p class="hoofdstukacties-verouderd" role="status">
-					{meervoud(aantalVerouderd, 'bewerking is', 'bewerkingen zijn')} verouderd: de repo is sinds de bewerking veranderd. Controleer
-					{aantalVerouderd === 1 ? ' die' : ' ze'} voordat je kopieert.
+					{meervoud(aantalVerouderd, 'bewerking is', 'bewerkingen zijn')} verouderd: Claude heeft de tekst na je bewerking veranderd. Lees
+					{aantalVerouderd === 1 ? ' die' : ' ze'} na voordat je kopieert.
 				</p>
 			)}
 			{exportOpen && (

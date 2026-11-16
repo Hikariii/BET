@@ -87,7 +87,7 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 				<button type="button" onClick={onSluit}>
 					Klaar
 				</button>
-				<span class="verseditor-tip"> Escape sluit ook. Enter doet niets: alinea's blijven zoals in de repo.</span>
+				<span class="verseditor-tip"> Escape sluit ook. Enter doet niets: alinea's blijven zoals Claude ze maakte.</span>
 			</p>
 		</div>
 	);

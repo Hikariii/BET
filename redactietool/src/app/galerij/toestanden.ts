@@ -67,11 +67,11 @@ export const BEWERKEN: VersOnderdeel = {
 	toestanden: [
 		toestand('Editor open met een opmaakwaarschuwing', VERZEN.editorMetWaarschuwing, 'De bewerking mist de markeringen zonde en genade uit de bron.', 'bewerken'),
 		toestand(
-			'Gewijzigd, met Terug naar de repo',
+			'Gewijzigd, met Herstel vereenvoudiging',
 			VERZEN.gewijzigd,
-			'De marker en de knop staan onder de tekst. Terug naar de repo wist de bewerking uit het geheugen van deze pagina.',
+			'De marker en de knop staan onder de tekst. Herstel vereenvoudiging wist de bewerking uit het geheugen van deze pagina.',
 		),
-		toestand('Bewerking op een oudere repo', VERZEN.verouderd, 'De repo is veranderd sinds de bewerking begon.'),
+		toestand('Bewerking op een oudere tekst van Claude', VERZEN.verouderd, 'Claude heeft het vers veranderd sinds de bewerking begon.'),
 		toestand(
 			'Opslag vol',
 			VERZEN.opslagVol,
