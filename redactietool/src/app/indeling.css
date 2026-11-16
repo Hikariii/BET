@@ -309,10 +309,21 @@
 	text-overflow: ellipsis;
 }
 
+/* Het pijltje is ongeveer zo hoog als de letters van de titel en draait om als het raster open is. */
 .bovenbalk .hoofdstukkeuze-pijl {
 	flex: none;
+	width: 1em;
+	height: 1em;
 	color: var(--gedempt);
-	font-size: 0.75rem;
+	transition: transform 0.15s ease;
+}
+
+.bovenbalk .hoofdstukkeuze-knop:hover .hoofdstukkeuze-pijl {
+	color: var(--tekst);
+}
+
+.bovenbalk .hoofdstukkeuze-knop[aria-expanded='true'] .hoofdstukkeuze-pijl {
+	transform: rotate(180deg);
 }
 
 /* Het raster hangt direct onder de balk; bij veel hoofdstukken scrolt het zelf. */

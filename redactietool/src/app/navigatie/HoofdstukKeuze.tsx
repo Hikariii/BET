@@ -105,9 +105,9 @@ export function HoofdstukKeuze({ boek, referentie, info }: Props) {
 						<span class="hoofdstukkeuze-naam">
 							{boek.naam} {info.nummer}
 						</span>
-						<span class="hoofdstukkeuze-pijl" aria-hidden="true">
-							▾
-						</span>
+						<svg class="hoofdstukkeuze-pijl" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+							<path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
 					</button>
 				</h1>
 				<span data-help="hoofdstuk-status" class={`status status-${statusKlasse(info.status)}`} title={info.versie === '' ? info.status : `${info.status} ${info.versie}`}>
