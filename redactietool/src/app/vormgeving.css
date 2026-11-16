@@ -640,7 +640,7 @@ table.verzen > tbody > tr.naslagrij > td {
 
 .naslagkaart {
 	max-height: 30rem;
-	padding: 1rem 1.25rem 1.25rem;
+	padding: 0 1.25rem 1.25rem;
 	overflow-y: auto;
 	background: #fff;
 	border: 1px solid var(--tekst);
@@ -648,13 +648,20 @@ table.verzen > tbody > tr.naslagrij > td {
 	line-height: 1.6;
 }
 
+/* De kop met titel en Sluiten blijft bovenaan staan terwijl de inhoud eronder scrolt; een lijn scheidt wat blijft van wat scrolt. */
 .naslagkaart header {
+	position: sticky;
+	top: 0;
+	z-index: 1;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding-bottom: 0.6rem;
+	margin-bottom: 0.75rem;
+	padding: 1rem 0 0.6rem;
+	background: #fff;
+	border-bottom: 1px solid var(--rand);
 }
 
 .naslagkaart h2 {
