@@ -7,10 +7,8 @@ import { groepeerPerVers, type VersGroep } from './groepeerPerVers';
 import { Naslagkaart } from './Naslagkaart';
 import { wisselNaslag, type Naslag, type OpenNaslag } from './naslag';
 import { Regels } from './Regels';
-import { statusKlasse } from './Zijbalk';
 import { vragenBijVers } from './vertaalvragen';
 import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
-import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { VersTekst } from './VersTekst';
 import { VertaalregelsCel } from './verzen/VertaalregelsCel';
 
@@ -29,8 +27,6 @@ type Props = {
 	/** De tussenstand van dit hoofdstuk, door de pagina gelezen omdat de acties in de bovenbalk dezelfde stand nodig hebben. */
 	tussenstand: Tussenstand;
 	herlees: () => void;
-	/** `volledig`: titel, status en acties staan in het hoofdstuk. `in-balk`: die staan in de bovenbalk en het hoofdstuk toont alleen de melding bij een goedgekeurd hoofdstuk. */
-	kop: 'volledig' | 'in-balk';
 };
 
 /** Wat bij één vers hoort aan regels uit het log en vragen. */
@@ -58,7 +54,6 @@ export function HoofdstukScherm({
 	onWisselRegels,
 	tussenstand,
 	herlees,
-	kop,
 }: Props) {
 	const [bewerktAdres, zetBewerktAdres] = useState<string | null>(null);
 	const [openNaslag, zetOpenNaslag] = useState<OpenNaslag | null>(null);
@@ -78,24 +73,10 @@ export function HoofdstukScherm({
 
 	return (
 		<article class="hoofdstuk">
-			{kop === 'volledig' ? (
+			{info.status === 'goedgekeurd' && (
 				<header>
-					<h1>
-						{boek.naam} {hoofdstuk.nummer}
-					</h1>
-					<p class="hoofdstukstatus">
-						<span class={`status status-${statusKlasse(info.status)}`}>{info.status}</span>
-						{info.versie !== '' && <span class="versie">{info.versie}</span>}
-					</p>
-					{info.status === 'goedgekeurd' && <p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>}
-					<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} tussenstand={tussenstand} />
+					<p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>
 				</header>
-			) : (
-				info.status === 'goedgekeurd' && (
-					<header>
-						<p class="goedgekeurd">{LABEL_GOEDGEKEURD}</p>
-					</header>
-				)
 			)}
 			<table class="verzen verzen-dicht">
 				<thead>

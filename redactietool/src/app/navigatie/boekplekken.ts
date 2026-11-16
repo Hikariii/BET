@@ -18,21 +18,11 @@ type Aantal = { getal: number; tekst: string };
 
 export type BoekPlek = {
 	plek: Plek;
-	/** De volledige naam, voor tabbladen, tooltips en schermlezers. */
+	/** De volledige naam, voor de tabbladen. */
 	naam: string;
-	/** Het korte woord naast het pictogram (variant met werkbalk). */
-	kort: string;
 	adres: string;
 	/** Het aantal en wat het telt, bv. `17 open vragen`; `null` als een telling hier niets zegt of nog niet bekend is. */
 	aantal: Aantal | null;
-};
-
-const KORT: Record<Plek, string> = {
-	hoofdstukken: 'Lezen',
-	besloten: 'Keuzes',
-	gevonden: 'Zo vertaald',
-	vragen: 'Vragen',
-	vervangen: 'Zoeken',
 };
 
 function aantalVan(getal: number, enkelvoud: string, meervoudsvorm: string): Aantal {
@@ -62,11 +52,10 @@ export function boekPlekken(
 		vervangen: null,
 	};
 	return [
-		{ plek: 'hoofdstukken', naam: 'Hoofdstukken', kort: KORT.hoofdstukken, adres: versAdres(boek, laatsteHoofdstuk), aantal: null },
+		{ plek: 'hoofdstukken', naam: 'Hoofdstukken', adres: versAdres(boek, laatsteHoofdstuk), aantal: null },
 		...TABBLADEN.map((tabblad) => ({
 			plek: tabblad,
 			naam: TABBLADTITEL[tabblad],
-			kort: KORT[tabblad],
 			adres: maakAdres({ soort: 'begrippen', boek, tabblad }),
 			aantal: aantallen[tabblad],
 		})),

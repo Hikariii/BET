@@ -29,7 +29,6 @@
 	z-index: 3;
 }
 
-/* Specifieker dan de ontwerpvarianten (`.indeling.ontwerp-v6 table.verzen td.regels`), die later geladen worden. */
 .indeling table.verzen.verzen-dicht tr.vers > td.regels {
 	position: relative;
 	padding: 0;

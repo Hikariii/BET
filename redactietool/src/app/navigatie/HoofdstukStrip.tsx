@@ -20,7 +20,7 @@ function centreerHuidig(lijst: HTMLElement): void {
 }
 
 /**
- * Alle hoofdstukken als horizontale strip, met dezelfde informatie als de ingeklapte zijbalk. Voor de variant zonder zijbalk.
+ * Alle hoofdstukken als horizontale strip in de hoofdstukbalk: per hoofdstuk nummer, vinkje en aantal open vragen.
  * Past hij niet, dan schuift hij zijwaarts: met pijltjes aan de randen (alleen als ze iets doen) of met het muiswiel.
  */
 export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {

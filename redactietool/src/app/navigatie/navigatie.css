@@ -1,4 +1,4 @@
-/* De ingeklapte zijbalk en de hoofdstukstrip: per hoofdstuk nummer, vinkje en aantal vragen (`1 ✓ 3?`). */
+/* De hoofdstukstrip: per hoofdstuk nummer, vinkje en aantal vragen (`1 ✓ 3?`). */
 
 .hoofdstuk-kort {
 	display: grid;
@@ -45,49 +45,6 @@
 	font-weight: 500;
 }
 
-/* ---------- Ingeklapte zijbalk ---------- */
-
-.indeling.zijbalk-ingeklapt {
-	grid-template-columns: var(--zijbalk-breedte-ingeklapt, 5.25rem) minmax(0, 1fr);
-}
-
-nav.zijbalk.zijbalk-ingeklapt {
-	padding: 0.75rem 0 0.5rem;
-}
-
-nav.zijbalk.zijbalk-ingeklapt ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-nav.zijbalk.zijbalk-ingeklapt .hoofdstuk-kort {
-	justify-content: center;
-}
-
-/* ---------- Pijl onderaan de zijbalk ---------- */
-
-.indeling.met-bovenbalk .zijbalk {
-	top: var(--balk-hoogte, 0px);
-	height: calc(100vh - var(--balk-hoogte, 0px));
-	display: flex;
-	flex-direction: column;
-}
-
-nav.zijbalk .zijbalk-wissel {
-	position: sticky;
-	bottom: 0.5rem;
-	flex-shrink: 0;
-	margin: auto 0.75rem 0 auto;
-	padding: 0.1rem 0.6rem;
-	font-size: 1.125rem;
-	line-height: 1.2;
-}
-
-nav.zijbalk.zijbalk-ingeklapt .zijbalk-wissel {
-	margin: auto auto 0;
-}
-
 /* ---------- Hoofdstukstrip ---------- */
 
 /* De strip met pijltjes aan de randen; die staan er alleen als er die kant op iets te schuiven valt (`hidden`). */
@@ -115,20 +72,6 @@ nav.zijbalk.zijbalk-ingeklapt .zijbalk-wissel {
 
 .hoofdstukstrip .hoofdstuk-kort span:empty {
 	display: none;
-}
-
-.indeling.navigatie-strip {
-	grid-template-columns: minmax(0, 1fr);
-}
-
-@media (max-width: 60rem) {
-	.indeling.met-bovenbalk .zijbalk {
-		height: auto;
-	}
-
-	.indeling.zijbalk-ingeklapt {
-		grid-template-columns: minmax(0, 1fr);
-	}
 }
 
 .hoofdstukstrip .strip-pijl {

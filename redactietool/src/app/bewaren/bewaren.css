@@ -1,4 +1,4 @@
-/* Bewaarstatus, het venster Back-up inladen en de overzichtspagina. Basisopmaak; de varianten verfijnen. */
+/* Bewaarstatus, het venster Back-up inladen en de overzichtspagina. Basisopmaak; indeling.css verfijnt. */
 
 .bewaren-bestandsveld {
 	display: none;
@@ -14,7 +14,6 @@
 	font-size: 0.75rem;
 }
 
-.bewaarstatus .bewaarstatus-knop,
 .bewaarstatus.bewaarstatus-pagina {
 	display: inline-flex;
 	align-items: center;
@@ -29,9 +28,7 @@
 	text-decoration: none;
 }
 
-.bewaarstatus .bewaarstatus-knop:hover:not(:disabled),
-.bewaarstatus.bewaarstatus-pagina:hover,
-.bewaarstatus .bewaarstatus-knop[aria-expanded='true'] {
+.bewaarstatus.bewaarstatus-pagina:hover {
 	background: var(--vlak);
 	border-color: var(--rand-donker);
 	color: var(--tekst);
@@ -43,43 +40,9 @@
 	white-space: nowrap;
 }
 
-.bewaarstatus .bewaarstatus-aantal {
-	font-variant-numeric: tabular-nums;
-	font-weight: 600;
-}
-
 .bewaarstatus.bewaarstatus-pagina[aria-current='page'] {
 	border-bottom-color: var(--tekst);
 	color: var(--tekst);
-}
-
-.bewaarstatus .bewaarstatus-venster {
-	position: absolute;
-	top: calc(100% + 0.25rem);
-	right: 0;
-	z-index: 30;
-	width: 21rem;
-	max-width: 85vw;
-	padding: 0.75rem;
-	background: #fff;
-	border: 1px solid var(--rand-donker);
-	font-size: 0.8125rem;
-}
-
-.bewaarstatus .bewaarstatus-venster[hidden] {
-	display: none;
-}
-
-.bewaarstatus-uitleg {
-	margin: 0 0 0.6rem;
-}
-
-.bewaarstatus-acties {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem 0.75rem;
-	align-items: center;
-	margin: 0;
 }
 
 .bewaarstatus-melding {

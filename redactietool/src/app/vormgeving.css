@@ -287,19 +287,6 @@ main {
 	padding-bottom: 0.5rem;
 }
 
-.hoofdstuk h1 {
-	font-size: 1.375rem;
-	font-weight: 600;
-	letter-spacing: -0.015em;
-	line-height: 1.2;
-}
-
-.hoofdstukstatus {
-	display: flex;
-	gap: 0.75rem;
-	margin: 0;
-}
-
 .versie {
 	color: var(--zacht);
 	font-size: 0.6875rem;
@@ -763,33 +750,6 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	letter-spacing: -0.015em;
 }
 
-.tabbladen {
-	gap: 1.75rem;
-	margin-bottom: 1.5rem;
-	border-bottom: 1px solid var(--rand);
-}
-
-.tabbladen a {
-	margin-bottom: -1px;
-	padding: 0.4rem 0 0.45rem;
-	border: 0;
-	border-bottom: 2px solid transparent;
-	border-radius: 0;
-	color: var(--gedempt);
-	font-weight: 500;
-}
-
-.tabbladen a:hover {
-	color: var(--tekst);
-}
-
-.tabbladen a[aria-current='page'] {
-	background: none;
-	border-bottom-color: var(--rood);
-	color: var(--tekst);
-	font-weight: 600;
-}
-
 .uitleg {
 	color: var(--gedempt);
 }
@@ -1090,28 +1050,11 @@ h3,
 	color: #000;
 }
 
-/* ---------- Leesbreedte: tabel en kop houden een maximale breedte, de rest van de pagina is wit ---------- */
-
-.hoofdstuk {
-	/* Ongeveer 65 tekens per regel in bron en vereenvoudiging, gemeten op Lukas 4; een rem is hier 13px. */
-	--tabel-breedte: 62rem;
-	--vertaalregels-breedte: 24rem;
-	--inhoud-breedte: calc(var(--tabel-breedte) + var(--vertaalregels-breedte));
-}
-
-.hoofdstuk > header,
-.hoofdstuk .regelsschakelaar {
-	max-width: var(--inhoud-breedte);
-}
+/* ---------- Kolommen van de verzentabel: de hele breedte ---------- */
 
 .hoofdstuk table.verzen {
 	width: 100%;
-	max-width: var(--tabel-breedte);
 	table-layout: fixed;
-}
-
-.hoofdstuk table.verzen:has(> thead > tr > th:nth-child(4)) {
-	max-width: var(--inhoud-breedte);
 }
 
 .hoofdstuk table.verzen > thead > tr > th:nth-child(2) {
@@ -1135,32 +1078,7 @@ h3,
 	padding-left: 1.25rem;
 }
 
-/* ---------- Breedte: twee manieren, gekozen met een klasse op .indeling ---------- */
-
 /* Een vers dat de balk bovenaan sticky maakt mag er niet onder verdwijnen bij het scrollen naar een gekozen vers. */
 tr.vers {
 	scroll-margin-top: calc(var(--balk-hoogte, 0px) + 0.5rem);
-}
-
-/*
- * breedte-tekens: de tabel is zo breed als een vast aantal tekens, gemeten in ch van de toolletter op .hoofdstuk.
- * ch groeit mee met de lettergrootte (--schaal), dus de kolom wordt breder bij een grotere letter en houdt ongeveer 65 tekens per regel.
- * 121ch en 47ch zijn bij schaal 1 gelijk aan de 62rem en 24rem die de tool zonder klasse gebruikt (gemeten: 1ch = 0,512rem).
- */
-.indeling.breedte-tekens .hoofdstuk {
-	--tabel-breedte: 121ch;
-	--vertaalregels-breedte: 47ch;
-}
-
-/*
- * breedte-vol: de hele breedte met de kolomverhouding van nu. De letter groeit mee met de schermbreedte:
- * 13px tot ongeveer 1440 px breed, 15,6px op 1920 px, hoogstens 17px.
- */
-.indeling.breedte-vol .hoofdstuk {
-	--tabel-breedte: none;
-	--inhoud-breedte: none;
-}
-
-:root:has(.indeling.breedte-vol) {
-	font-size: calc(clamp(0.8125rem, 0.5vw + 0.375rem, 1.0625rem) * var(--schaal, 1));
 }

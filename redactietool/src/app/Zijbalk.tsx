@@ -1,7 +1,5 @@
-import { useEffect, useRef } from 'preact/hooks';
 import type { BoekData, Referentie, Status } from '../data/types';
 import { maakAdres, versAdres } from './adres';
-import { KortHoofdstuk } from './navigatie/KortHoofdstuk';
 import { aantalOpenVragen } from './vertaalvragen';
 import './Zijbalk.css';
 
@@ -12,59 +10,13 @@ type Props = {
 	huidigHoofdstuk: number | null;
 	/** Of het scherm Begrippen open staat. */
 	begrippenOpen: boolean;
-	/** `false`: de zijbalk is altijd uitgeklapt. Anders staat hij ingeklapt of niet en wisselt `onWissel` dat. */
-	inklapbaar: false | { ingeklapt: boolean; onWissel: () => void };
 };
 
-export const ZIJBALK_ID = 'zijbalk';
-
-function Inklapknop({ ingeklapt, onWissel }: { ingeklapt: boolean; onWissel: () => void }) {
-	return (
-		<button
-			type="button"
-			class="zijbalk-wissel"
-			aria-expanded={!ingeklapt}
-			aria-controls={ZIJBALK_ID}
-			aria-label={ingeklapt ? 'Hoofdstukken uitklappen' : 'Hoofdstukken inklappen'}
-			title={ingeklapt ? 'Hoofdstukken uitklappen' : 'Hoofdstukken inklappen'}
-			onClick={onWissel}
-		>
-			<span aria-hidden="true">{ingeklapt ? '\u203a' : '\u2039'}</span>
-		</button>
-	);
-}
-
-export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen, inklapbaar }: Props) {
-	const ingeklapt = inklapbaar !== false && inklapbaar.ingeklapt;
-	const eersteRender = useRef(true);
-	useEffect(() => {
-		// De knop staat na het wisselen in een andere nav; de focus gaat mee zodat het toetsenbord op dezelfde knop blijft.
-		if (!eersteRender.current) document.getElementById(ZIJBALK_ID)?.querySelector<HTMLElement>('.zijbalk-wissel')?.focus();
-		eersteRender.current = false;
-	}, [ingeklapt]);
+export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen }: Props) {
 	const gewoneStatus = gewoneStatusVan(boek.hoofdstukken.map((hoofdstuk) => hoofdstuk.status));
 	const heeftAfwijkingen = boek.hoofdstukken.some((hoofdstuk) => hoofdstuk.status !== gewoneStatus);
-	if (inklapbaar !== false && ingeklapt) {
-		return (
-			<nav id={ZIJBALK_ID} class="zijbalk zijbalk-ingeklapt" aria-label={`Hoofdstukken van ${boek.naam}`}>
-				<ul>
-					{boek.hoofdstukken.map((hoofdstuk) => (
-						<li>
-							<KortHoofdstuk
-								boek={boek.id}
-								hoofdstuk={hoofdstuk}
-								aantalOpenVragen={aantalOpenVragen(referentie.openVragen, hoofdstuk.nummer)}
-								huidig={hoofdstuk.nummer === huidigHoofdstuk}
-							/>
-						</li>
-					))}
-				</ul>
-				<Inklapknop ingeklapt onWissel={inklapbaar.onWissel} />
-			</nav>
-		);
-	}
 	return (
-		<nav id={ZIJBALK_ID} class="zijbalk" aria-label={`Hoofdstukken van ${boek.naam}`}>
+		<nav class="zijbalk" aria-label={`Hoofdstukken van ${boek.naam}`}>
 			<h2>{boek.naam}</h2>
 			<a class="naar-begrippen" href={maakAdres({ soort: 'begrippen', boek: boek.id, tabblad: 'besloten' })} aria-current={begrippenOpen ? 'page' : undefined}>
 				<span class="naar-begrippen-titel">Keuzes en vragen</span>
@@ -102,7 +54,6 @@ export function Zijbalk({ boek, referentie, huidigHoofdstuk, begrippenOpen, inkl
 					);
 				})}
 			</ul>
-			{inklapbaar !== false && <Inklapknop ingeklapt={false} onWissel={inklapbaar.onWissel} />}
 		</nav>
 	);
 }

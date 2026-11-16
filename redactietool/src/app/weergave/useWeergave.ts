@@ -5,22 +5,17 @@ import { bewaarWeergave, leesWeergave, schaalVan, type Grootte, type Weergave } 
 export type Weergavebeheer = {
 	weergave: Weergave;
 	zetGrootte: (grootte: Grootte) => void;
-	wisselZijbalk: () => void;
 };
 
-/**
- * De weergave-instellingen: zet `--schaal` op `<html>` en onthoudt de instelling in de browser.
- * Wat nog niet onthouden is, krijgt `standaard`; `variant` houdt de instellingen van een ontwerpvariant gescheiden.
- */
-export function useWeergave(variant: string | null, standaard: Weergave): Weergavebeheer {
-	const [weergave, zetWeergave] = useState(() => leesWeergave(ruweBrowseropslag(), variant, standaard));
+/** De weergave-instellingen: zet `--schaal` op `<html>` en onthoudt de instelling in de browser. */
+export function useWeergave(): Weergavebeheer {
+	const [weergave, zetWeergave] = useState(() => leesWeergave(ruweBrowseropslag()));
 	useEffect(() => {
 		document.documentElement.style.setProperty('--schaal', String(schaalVan(weergave.grootte)));
-		bewaarWeergave(ruweBrowseropslag(), variant, weergave);
-	}, [weergave, variant]);
+		bewaarWeergave(ruweBrowseropslag(), weergave);
+	}, [weergave]);
 	return {
 		weergave,
-		zetGrootte: (grootte) => zetWeergave((vorige) => ({ ...vorige, grootte })),
-		wisselZijbalk: () => zetWeergave((vorige) => ({ ...vorige, zijbalkIngeklapt: !vorige.zijbalkIngeklapt })),
+		zetGrootte: (grootte) => zetWeergave({ grootte }),
 	};
 }

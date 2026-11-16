@@ -1,9 +1,5 @@
 /* De galerij gebruikt de kleuren en variabelen van vormgeving.css en voegt alleen indeling en kopjes toe; geen rood, geen regel op de Bijbeltekst. */
 
-.indeling.galerij {
-	grid-template-columns: minmax(0, 1fr);
-}
-
 .galerij main {
 	max-width: 76rem;
 }

@@ -41,7 +41,7 @@ button {
 
 .indeling {
 	display: grid;
-	grid-template-columns: var(--zijbalk-breedte) minmax(0, 1fr);
+	grid-template-columns: minmax(0, 1fr);
 	min-height: 100vh;
 }
 
@@ -121,16 +121,6 @@ button {
 main {
 	min-width: 0;
 	padding: 1rem 1.5rem 3rem;
-}
-
-.hoofdstuk h1 {
-	margin: 0;
-}
-
-.hoofdstukstatus {
-	display: flex;
-	gap: 0.5rem;
-	margin: 0.25rem 0 0;
 }
 
 .goedgekeurd {
@@ -286,10 +276,6 @@ tr.regels-onder td {
 }
 
 @media (max-width: 60rem) {
-	.indeling {
-		grid-template-columns: minmax(0, 1fr);
-	}
-
 	.zijbalk {
 		position: static;
 		height: auto;

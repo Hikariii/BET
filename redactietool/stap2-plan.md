@@ -91,6 +91,8 @@ Kleine punten (toegankelijkheid, componenttests, rooktest, woordgrenzen bij een 
 - **Back-up inladen**: bestand kiezen, eerst een voorbeeld (wat komt erin, wat wordt overschreven, wat is verouderd), dan kiezen tussen samenvoegen en vervangen. Geldt als herstel en om op een andere computer verder te werken.
 - Past binnen U4 (geen opslag op een server): het bestand is van de vertaler. Neemt het risico "tussenstand in de browser gewist" grotendeels weg.
 
+**Gekozen (2026-11-16): v8e.** De eigenaar kiest de boekbalk met de plekken als tabbladen met pictogrammen en Bewaard rechts, één hoofdstukbalk met titelblok (status als pictogram), hoofdstukstrip met pijltjes en de acties, geen zijbalk, de hele breedte met een letter die meegroeit, en de dichte verzen (d4). Dit is nu de tool zonder parameter; de proef (v1 tot v8d, `?ontwerp=`, de keuzestrook) is opgeruimd. De css staat in `src/app/indeling.css`. Verslag van de ronde: `ontwerp/ronde4/v7-v8.md`; de omzetting is gemeten in `ontwerp/v8e-omzetting/`.
+
 **Werkwijze:**
 1. **Analyse.** Schermafbeeldingen van de huidige tool en de taken van de redacteur als verloop uitgeschreven (een vers aanpassen, een vertaalvraag beantwoorden, een hoofdstuk naar Word brengen). Wat werkt, wat schuurt, welke patronen ontbreken.
 2. **Richtingen met Claude Design.** Binnen de basis hierboven twee of drie typografische richtingen voor de schermen die het meest tellen: lezen en bewerken, het menu bij een woord, het voorbeeldvenster met varianten. Altijd met echte Lukas-tekst, ook uit een druk hoofdstuk. De eigenaar kiest, de redacteur reageert, daarna itereren.

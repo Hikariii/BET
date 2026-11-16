@@ -1,6 +1,5 @@
 /*
- * Basisopmaak van de bovenbalk, de grootte-keuze en de keuzestrook voor de ontwerpvarianten.
- * Eenvoudig en in de stijl van vormgeving.css; de varianten (src/app/ontwerp/v1.css tot v6.css) verfijnen dit.
+ * Basisopmaak van de bovenbalk en de grootte-keuze; indeling.css verfijnt dit.
  * Geen rood in de balk behalve wat vormgeving.css al voor de hoofdactie doet.
  */
 
@@ -36,23 +35,6 @@
 	text-decoration: none;
 }
 
-.bovenbalk .bovenbalk-keuzes {
-	padding: 0.2rem 0.7rem;
-	border: 1px solid var(--tekst);
-	font-weight: 500;
-	text-decoration: none;
-}
-
-.bovenbalk .bovenbalk-keuzes:hover {
-	background: var(--tekst);
-	color: #fff;
-}
-
-.bovenbalk .bovenbalk-keuzes[aria-current='page'] {
-	background: var(--tekst);
-	color: #fff;
-}
-
 .bovenbalk .bovenbalk-hoofdstuktitel {
 	margin: 0;
 	font-size: 1.125rem;
@@ -60,12 +42,6 @@
 	letter-spacing: -0.015em;
 }
 
-.bovenbalk .bovenbalk-paginatitel {
-	font-size: 1.125rem;
-	font-weight: 600;
-}
-
-.bovenbalk-een .bovenbalk-acties,
 .bovenbalk .bovenbalk-boekbalk .bovenbalk-bewaarstatus,
 .bovenbalk .bovenbalk-hoofdstukbalk .bovenbalk-acties {
 	margin-left: auto;
@@ -73,10 +49,6 @@
 
 .bovenbalk .bovenbalk-acties:empty {
 	display: none;
-}
-
-.bovenbalk .bovenbalk-navigatie {
-	padding: 0 1.25rem 0.5rem;
 }
 
 /*
@@ -151,46 +123,4 @@
 .grootte-keuze .grootte-stap[aria-pressed='true']:hover:not(:disabled) {
 	background: var(--tekst);
 	color: #fff;
-}
-
-/* ---------- Keuzestrook rechtsonder (alleen met ?ontwerp=) ---------- */
-
-.ontwerpkeuze {
-	position: fixed;
-	right: 0.75rem;
-	bottom: 0.75rem;
-	z-index: 40;
-	padding: 0.35rem 0.5rem;
-	background: #fff;
-	border: 1px solid var(--rand-donker);
-	font-size: 0.75rem;
-}
-
-.ontwerpkeuze ul {
-	display: flex;
-	gap: 0.15rem;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.ontwerpkeuze a {
-	display: block;
-	padding: 0.1rem 0.4rem;
-	text-decoration: none;
-}
-
-.ontwerpkeuze a:hover {
-	background: var(--vlak);
-}
-
-.ontwerpkeuze a[aria-current='true'] {
-	background: var(--tekst);
-	color: #fff;
-}
-
-.ontwerpkeuze .ontwerpkeuze-titel {
-	margin: 0.2rem 0 0;
-	color: var(--gedempt);
-	text-align: center;
 }

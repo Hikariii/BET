@@ -1,33 +1,27 @@
 import type { ComponentChildren } from 'preact';
 import { useLayoutEffect, useRef } from 'preact/hooks';
-import type { OntwerpConfig } from '../ontwerpProef';
 import './bovenbalk.css';
 
 type Props = {
-	/** `een`: alles in één balk. `twee`: een boekbalk (boek, bewaarstatus, grootte) met daaronder een hoofdstukbalk (titel, acties). */
-	uitvoering: OntwerpConfig['bovenbalk'];
-	/** Het boek: de naam en, als de zijbalk het niet toont, de knop Keuzes en vragen. */
+	/** Het boek: de naam en de plekken in het boek als tabbladen. */
 	boek: ComponentChildren;
-	/** De hoofdstuktitel met status; zonder titel en acties (`null`) heeft de variant met twee balken geen hoofdstukbalk. */
+	/** De hoofdstuktitel met status; zonder titel en acties (`null`) heeft de pagina geen hoofdstukbalk. */
 	titel: ComponentChildren;
 	/** Hoofdstuk kopiëren voor Word en Export voor Claude; `null` buiten een hoofdstuk. */
 	acties: ComponentChildren;
-	/** De bewaarstatus in de vorm van de variant. */
+	/** De bewaarstatus: een link naar de pagina Bewaard. */
 	bewaarstatus: ComponentChildren;
 	/** Het grootte-keuzeblok. */
 	grootte: ComponentChildren;
-	/** De hoofdstukstrip, voor de variant zonder zijbalk; `null` als er een zijbalk is. */
-	navigatie: ComponentChildren;
-	/** Bij twee balken: de strip in de hoofdstukbalk tussen titel en acties in plaats van in een eigen rij. */
-	stripInHoofdstukbalk: boolean;
+	/** De hoofdstukstrip in de hoofdstukbalk tussen titel en acties; `null` buiten een hoofdstuk. */
+	strip: ComponentChildren;
 };
 
 /**
- * De balk bovenaan die blijft staan bij scrollen en niet meeklapt met de zijbalk.
- * Zet de hoogte als `--balk-hoogte` op `<html>`, zodat de zijbalk en `scroll-margin-top` eronder beginnen.
+ * De balk bovenaan die blijft staan bij scrollen: een boekbalk (boek, bewaarstatus, grootte) met daaronder een hoofdstukbalk (titel, strip, acties).
+ * Zet de hoogte als `--balk-hoogte` op `<html>`, zodat `scroll-margin-top` en de pagina Bewaard eronder beginnen.
  */
-export function Bovenbalk({ uitvoering, boek, titel, acties, bewaarstatus, grootte, navigatie, stripInHoofdstukbalk }: Props) {
-	const stripInRij = uitvoering === 'twee' && stripInHoofdstukbalk && navigatie !== null;
+export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, strip }: Props) {
 	const balk = useRef<HTMLElement>(null);
 	useLayoutEffect(() => {
 		const element = balk.current;
@@ -43,32 +37,19 @@ export function Bovenbalk({ uitvoering, boek, titel, acties, bewaarstatus, groot
 	}, []);
 
 	return (
-		<header class={`bovenbalk bovenbalk-${uitvoering}`} ref={balk}>
-			{uitvoering === 'een' ? (
-				<div class="bovenbalk-rij">
-					<div class="bovenbalk-boek">{boek}</div>
+		<header class="bovenbalk" ref={balk}>
+			<div class="bovenbalk-rij bovenbalk-boekbalk">
+				<div class="bovenbalk-boek">{boek}</div>
+				<div class="bovenbalk-bewaarstatus">{bewaarstatus}</div>
+				<div class="bovenbalk-grootte">{grootte}</div>
+			</div>
+			{(titel !== null || acties !== null) && (
+				<div class="bovenbalk-rij bovenbalk-hoofdstukbalk">
 					<div class="bovenbalk-titel">{titel}</div>
+					{strip !== null && <div class="bovenbalk-strip">{strip}</div>}
 					<div class="bovenbalk-acties">{acties}</div>
-					<div class="bovenbalk-bewaarstatus">{bewaarstatus}</div>
-					<div class="bovenbalk-grootte">{grootte}</div>
 				</div>
-			) : (
-				<>
-					<div class="bovenbalk-rij bovenbalk-boekbalk">
-						<div class="bovenbalk-boek">{boek}</div>
-						<div class="bovenbalk-bewaarstatus">{bewaarstatus}</div>
-						<div class="bovenbalk-grootte">{grootte}</div>
-					</div>
-					{(titel !== null || acties !== null) && (
-						<div class="bovenbalk-rij bovenbalk-hoofdstukbalk">
-							<div class="bovenbalk-titel">{titel}</div>
-							{stripInRij && <div class="bovenbalk-strip">{navigatie}</div>}
-							<div class="bovenbalk-acties">{acties}</div>
-						</div>
-					)}
-				</>
 			)}
-			{navigatie !== null && !stripInRij && <div class="bovenbalk-navigatie">{navigatie}</div>}
 		</header>
 	);
 }

@@ -6,7 +6,8 @@ De broncode van de tool. Het plan staat in [`stap1-plan.md`](stap1-plan.md) (afg
 |---|---|
 | `src/formaat/` | parser en serializer voor het Markdown-formaat uit [`../FORMAAT.md`](../FORMAAT.md) |
 | `src/bouw/` | bouwscript: zet `bijbel/` en de richtlijn om naar JSON in `public/data/` |
-| `src/app/` | de Preact-app die die JSON toont |
+| `src/app/` | de Preact-app die die JSON toont. De boekpagina heeft een bovenbalk (boekbalk met de plekken van het boek als tabbladen, Bewaard en de grootte; hoofdstukbalk met titel, hoofdstukstrip en acties). De css daarvan staat in `src/app/indeling.css`, die `main.tsx` na `vormgeving.css` laadt |
+| `ontwerp/` | analyse en ontwerpvarianten van fase 7 (schermafbeeldingen, `opmaakcontrole.mjs`, de meting van de omzetting naar v8e in `v8e-omzetting/`); geen onderdeel van de build |
 | `src/data/` | het gegevenscontract (types) tussen bouwscript en app |
 | `src/log/`, `src/referentie/`, `src/sjabloon/` | de lezers voor wijzigingslogs, referentiebestanden, `STATUS.md`, richtlijn en Word-stijlen |
 | `src/begrippen/` | rekenfuncties voor het scherm Begrippen: precedenten tellen (`telPrecedenten`) en vertaalvragen verzamelen (`verzamelVragen`) |
@@ -30,7 +31,7 @@ mise x -- npm run data      # alleen de data opnieuw bouwen
 
 Een hoofdstuk zonder `vereenvoudigd/`- of logbestand toont de bron met lege kolommen. Een hoofdstuk zonder rij in `STATUS.md` heeft de status `nog niet begonnen`.
 
-Adressen: `#/lukas/9` is hoofdstuk 9, `#/lukas/9/22` vers 22 (dat vers wordt gekozen en in beeld gebracht). `#/lukas/begrippen` opent het scherm Begrippen en vragen (tabblad Besloten); `#/lukas/begrippen/gevonden` en `#/lukas/begrippen/vragen` de andere tabbladen. Dat scherm laadt alle hoofdstukken en rekent in de browser.
+Adressen: `#/lukas/9` is hoofdstuk 9, `#/lukas/9/22` vers 22 (dat vers wordt gekozen en in beeld gebracht). `#/lukas/begrippen` opent het scherm Keuzes en vragen (tabblad Vertaalkeuzes); `#/lukas/begrippen/gevonden` en `#/lukas/begrippen/vragen` de andere tabbladen. Dat scherm laadt alle hoofdstukken en rekent in de browser. `#/lukas/bewaard` toont wat de browser bewaard heeft (met back-up downloaden en inladen); `#/galerij` toont de componenten in hun lastige toestanden.
 
 De site gaat via GitHub Actions (`../.github/workflows/pages.yml`) naar Pages. Eenmalig in de repo-instellingen: Pages, bron "GitHub Actions". Het basispad `/BET/` staat in `vite.config.ts`.
 

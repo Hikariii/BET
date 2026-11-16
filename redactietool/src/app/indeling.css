@@ -1,0 +1,608 @@
+/*
+ * De indeling van de boekpagina: de bovenbalk (boekbalk met de plekken als tabbladen, hoofdstukbalk met titel, hoofdstukstrip en acties),
+ * de hele breedte met een letter die meegroeit met het scherm, en de pagina Bewaard.
+ * Wordt na vormgeving.css geladen (zie main.tsx) en wint daarom bij gelijke specificiteit.
+ * Geen rood in of rond de tekstkolommen; rood alleen op de actieve plek, de hoofdactie en focus (vormgeving.css).
+ * Geen kleur, achtergrond, gewicht of onderstreping op de Bijbeltekst: die komt uit het Word-sjabloon.
+ */
+
+/* ---------- Letter: 13px tot 1440 px breed, 17,3px op 1920 px, hoogstens 19px ---------- */
+
+:root:has(.bovenbalk) {
+	font-size: calc(clamp(0.8125rem, 0.9vw, 1.1875rem) * var(--schaal, 1));
+}
+
+/* ---------- Boekbalk: naam, plekken, bewaarstatus en grootte ---------- */
+
+.bovenbalk .bovenbalk-boekbalk {
+	min-height: 3rem;
+	padding: 0.55rem 1.5rem;
+	gap: 0.4rem 2rem;
+	border-bottom: 1px solid var(--rand);
+}
+
+.bovenbalk .bovenbalk-boek {
+	gap: 0.25rem 1.1rem;
+}
+
+.bovenbalk .bovenbalk-boeknaam {
+	font-size: 1rem;
+	letter-spacing: 0;
+}
+
+.bovenbalk .bovenbalk-hoofdstuktitel {
+	font-size: 1rem;
+}
+
+/* ---------- Plekken in het boek: tabbladen met pictogram ---------- */
+
+.bovenbalk .boekplek-icoon {
+	flex: none;
+	width: 1.05rem;
+	height: 1.05rem;
+	margin-right: 0.1rem;
+	opacity: 0.85;
+}
+
+.bovenbalk .boekplek {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.25rem 0.1rem 0.2rem;
+	border-bottom: 2px solid transparent;
+	font-size: 0.8125rem;
+	font-weight: 500;
+}
+
+.bovenbalk .boekplekken ul {
+	gap: 1.6rem;
+	margin-left: 0.5rem;
+}
+
+.bovenbalk .boekplek:hover {
+	border-bottom-color: var(--rand-donker);
+}
+
+.bovenbalk .boekplek[aria-current='page'] {
+	border-bottom-color: var(--rood);
+	font-weight: 700;
+}
+
+.bovenbalk .boekplek-aantal {
+	color: var(--gedempt);
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+
+/* ---------- Grootte: vier letters met een streep onder de gekozen, geen kaders ---------- */
+
+.grootte-keuze .grootte-stap,
+.grootte-keuze .grootte-stap:last-child {
+	min-width: 0;
+	padding: 0.1rem 0.45rem;
+	background: none;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--gedempt);
+}
+
+.grootte-keuze .grootte-stap:hover:not(:disabled) {
+	background: var(--vlak);
+	color: var(--tekst);
+}
+
+.grootte-keuze .grootte-stap[aria-pressed='true'],
+.grootte-keuze .grootte-stap[aria-pressed='true']:hover:not(:disabled) {
+	background: none;
+	border-bottom-color: var(--tekst);
+	color: var(--tekst);
+	font-weight: 700;
+}
+
+/* ---------- Bewaarstatus in de balk: een korte link naar de pagina Bewaard ---------- */
+
+.bewaarstatus.bewaarstatus-pagina {
+	gap: 0.45rem;
+	padding: 0.25rem 0.1rem 0.2rem;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--tekst);
+	font-size: 0.8125rem;
+	font-weight: 500;
+}
+
+.bewaarstatus.bewaarstatus-pagina:hover {
+	background: none;
+	border-bottom-color: var(--rand-donker);
+}
+
+.bewaarstatus.bewaarstatus-pagina[aria-current='page'] {
+	border-bottom-color: var(--rood);
+	font-weight: 600;
+}
+
+.bewaarstatus.bewaarstatus-pagina::after {
+	content: '\203A';
+	margin-left: -0.1rem;
+	color: var(--gedempt);
+	font-size: 1rem;
+	line-height: 1;
+}
+
+.bewaarstatus.bewaarstatus-pagina[aria-current='page']::after {
+	content: none;
+}
+
+/* ---------- Hoofdstukbalk: titelblok, hoofdstukstrip en acties op één regel ---------- */
+
+/*
+ * De hoofdstukken zijn klikbaar over de hele hoogte van de balk, zodat je niet misklikt:
+ * de balk zelf heeft geen ruimte boven en onder; titel en acties krijgen die zelf, de strip rekt mee.
+ */
+.bovenbalk .bovenbalk-hoofdstukbalk {
+	flex-wrap: nowrap;
+	align-items: stretch;
+	gap: 0 1rem;
+	min-height: 2.75rem;
+	padding: 0 1.5rem;
+}
+
+.bovenbalk .bovenbalk-hoofdstukbalk > :is(.bovenbalk-titel, .bovenbalk-acties) {
+	align-self: center;
+}
+
+/*
+ * Titelblok met vaste breedte: hoofdstuk met de status als pictogram ernaast (zie onder).
+ * Zo begint de strip altijd op dezelfde plek, ook als de status wisselt (review, goedgekeurd v1.0).
+ * Een dunne lijn scheidt het blok van de strip.
+ */
+.bovenbalk .bovenbalk-titel {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: 0.4rem;
+	width: 9.5rem;
+	padding-right: 1rem;
+	border-right: 1px solid var(--rand);
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+.bovenbalk .bovenbalk-titel .bovenbalk-hoofdstuktitel {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/*
+ * Status als vast pictogram achter het hoofdstuk, op één regel; het woord en de versie staan in de tooltip en zijn er voor schermlezers.
+ * Pictogrammen: goedgekeurd vinkje in cirkel, review oog, bij editor pen, verwerkt postvak, concept stippelcirkel, nog niet begonnen lege cirkel.
+ */
+.bovenbalk .bovenbalk-titel .status {
+	flex: none;
+	width: 1.05rem;
+	height: 1.05rem;
+	overflow: hidden;
+	color: var(--gedempt);
+	font-size: 0;
+}
+
+.bovenbalk .bovenbalk-titel .status::before {
+	content: '';
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: currentColor;
+	-webkit-mask: var(--statusicoon) center / contain no-repeat;
+	mask: var(--statusicoon) center / contain no-repeat;
+}
+
+/* De versie alleen voor schermlezers; zichtbaar staat hij in de tooltip van het pictogram. */
+.bovenbalk .bovenbalk-titel .versie {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+
+.bovenbalk .bovenbalk-titel .status-goedgekeurd {
+	color: var(--tekst);
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='10' r='7.5'/%3E%3Cpath d='M6.5 10.2l2.4 2.4 4.6-5'/%3E%3C/svg%3E");
+}
+
+.bovenbalk .bovenbalk-titel .status-review {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z'/%3E%3Ccircle cx='10' cy='10' r='2.3'/%3E%3C/svg%3E");
+}
+
+.bovenbalk .bovenbalk-titel .status-bij-editor {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13.5 3.5l3 3L7 16H4v-3z'/%3E%3Cpath d='M11.5 5.5l3 3'/%3E%3C/svg%3E");
+}
+
+.bovenbalk .bovenbalk-titel .status-verwerkt {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5h3.5l1.2 2h4.6l1.2-2H17'/%3E%3Cpath d='M3 11.5L5 4.5h10l2 7V16H3z'/%3E%3Cpath d='M10 6.5v4M8.2 8.8l1.8 1.8 1.8-1.8'/%3E%3C/svg%3E");
+}
+
+.bovenbalk .bovenbalk-titel .status-concept {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='10' r='7.5' stroke-dasharray='2.2 2.2'/%3E%3C/svg%3E");
+}
+
+.bovenbalk .bovenbalk-titel .status-nog-niet-begonnen {
+	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='10' r='7.5' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* ---------- De hoofdstukstrip ---------- */
+
+/* Eén rij die zijwaarts schuift; ook bij 150 hoofdstukken blijft de balk even hoog. */
+.hoofdstukstrip ul {
+	gap: 0;
+	padding: 0 0 0.15rem;
+	scrollbar-color: var(--rand-donker) transparent;
+	scrollbar-width: thin;
+}
+
+.hoofdstukstrip li {
+	flex: none;
+}
+
+/* Een dun streepje scheidt de hoofdstukken, zodat `12 2? 13` niet als `2? 13` leest. */
+.hoofdstukstrip li + li {
+	border-left: 1px solid var(--rand);
+}
+
+.hoofdstukstrip .hoofdstuk-kort {
+	display: flex;
+	align-items: baseline;
+	gap: 0.3rem;
+	padding: 0.05rem 0.55rem;
+	border: 0;
+}
+
+.hoofdstukstrip .hoofdstuk-kort:hover {
+	background: var(--vlak);
+}
+
+.hoofdstukstrip .hoofdstuk-kort-nummer {
+	display: block;
+	min-width: 1.4rem;
+	height: auto;
+	padding: 0.05rem 0.3rem;
+	background: none;
+	border: 0;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	text-align: center;
+}
+
+.hoofdstukstrip .hoofdstuk-kort:hover .hoofdstuk-kort-nummer {
+	border: 0;
+}
+
+.hoofdstukstrip .hoofdstuk-kort[aria-current='page'] {
+	background: none;
+}
+
+.hoofdstukstrip .hoofdstuk-kort[aria-current='page'] .hoofdstuk-kort-nummer {
+	background: var(--rood);
+	color: #fff;
+}
+
+/* Het vinkje is een feit, het aantal vragen een bijzaak. */
+.hoofdstukstrip .hoofdstuk-kort-vinkje {
+	color: var(--tekst);
+}
+
+/* In de rij zonder eigen scrollbalk: de pijltjes en het wiel doen het schuiven. */
+.bovenbalk .bovenbalk-strip .hoofdstukstrip ul {
+	padding-bottom: 0;
+	scrollbar-width: none;
+}
+
+.bovenbalk .bovenbalk-strip .hoofdstukstrip ul::-webkit-scrollbar {
+	display: none;
+}
+
+.bovenbalk .bovenbalk-strip,
+.bovenbalk .bovenbalk-strip .hoofdstukstrip,
+.bovenbalk .bovenbalk-strip .hoofdstukstrip ul {
+	display: flex;
+	align-items: stretch;
+}
+
+.bovenbalk .bovenbalk-strip .hoofdstukstrip li {
+	display: flex;
+}
+
+.bovenbalk .bovenbalk-strip .hoofdstuk-kort {
+	align-content: center;
+	align-items: center;
+}
+
+.bovenbalk .bovenbalk-strip .strip-pijl {
+	align-self: center;
+}
+
+/* De strip neemt alleen de ruimte die over is; de acties blijven op één regel. */
+.bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-strip {
+	flex: 1 1 0;
+	min-width: 6rem;
+}
+
+.bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-acties {
+	flex: 0 0 auto;
+}
+
+.bovenbalk .bovenbalk-acties .hoofdstukacties-knoppen {
+	flex-wrap: nowrap;
+	white-space: nowrap;
+}
+
+@property --strip-vervaag-links {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --strip-vervaag-rechts {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+
+@keyframes strip-vervaag {
+	0% {
+		--strip-vervaag-links: 0px;
+		--strip-vervaag-rechts: 2rem;
+	}
+	4% {
+		--strip-vervaag-links: 2rem;
+		--strip-vervaag-rechts: 2rem;
+	}
+	96% {
+		--strip-vervaag-links: 2rem;
+		--strip-vervaag-rechts: 2rem;
+	}
+	100% {
+		--strip-vervaag-links: 2rem;
+		--strip-vervaag-rechts: 0px;
+	}
+}
+
+@supports (animation-timeline: scroll()) {
+	.hoofdstukstrip ul {
+		animation: strip-vervaag linear both;
+		animation-timeline: scroll(self inline);
+		mask-image: linear-gradient(to right, transparent, #000 var(--strip-vervaag-links), #000 calc(100% - var(--strip-vervaag-rechts)), transparent);
+	}
+}
+
+/* ---------- Inhoud: de hele breedte, smalle marges ---------- */
+
+.indeling main {
+	padding: 0.5rem 1rem 3rem;
+}
+
+/* Keuzes en vragen: de kop is de naam van het gekozen onderdeel. */
+.begrippen h1 {
+	margin-top: 0.75rem;
+}
+
+/* ---------- Overzichtspagina Bewaard: kop en samenvatting links, back-up rechts ---------- */
+
+.indeling main:has(.bewaard-overzicht) {
+	padding: 1.25rem 1rem 3rem;
+}
+
+.indeling .bewaard-overzicht {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 17rem;
+	column-gap: 3.5rem;
+	max-width: 72rem;
+}
+
+.indeling .bewaard-overzicht > :not(.bewaard-acties) {
+	grid-column: 1;
+}
+
+.indeling .bewaard-overzicht h1 {
+	margin: 0 0 0.35rem;
+	font-size: 1.375rem;
+	font-weight: 600;
+	letter-spacing: -0.015em;
+}
+
+.indeling .bewaard-overzicht .bewaard-regel {
+	margin: 0 0 1.75rem;
+	color: var(--gedempt);
+	font-size: 0.9375rem;
+}
+
+/* De back-up: een vaste kolom naast de lijst, zonder kader, met een dunne lijn aan de linkerkant. */
+.indeling .bewaard-overzicht .bewaard-acties {
+	position: sticky;
+	top: calc(var(--balk-hoogte, 0px) + 1rem);
+	grid-column: 2;
+	grid-row: 1 / span 99;
+	flex-direction: column;
+	align-items: stretch;
+	align-self: start;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0 0 0 1.5rem;
+	border-left: 1px solid var(--rand);
+}
+
+.indeling .bewaard-acties::before {
+	content: 'Back-up';
+	margin-bottom: 0.15rem;
+	color: var(--zacht);
+	font-size: 0.6875rem;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.indeling .bewaard-acties::after {
+	content: 'Eén bestand met je bewerkte verzen en keuzes. Laad het in op een andere computer, of als je browser leeg is gemaakt.';
+	margin-top: 0.35rem;
+	color: var(--gedempt);
+	font-size: 0.8125rem;
+	line-height: 1.5;
+}
+
+.indeling .bewaard-acties button {
+	padding: 0.4rem 0.75rem;
+	text-align: left;
+}
+
+.indeling .bewaard-acties button:first-child {
+	background: var(--rood);
+	border-color: var(--rood);
+	color: #fff;
+}
+
+.indeling .bewaard-acties button:first-child:hover:not(:disabled) {
+	background: #7e1210;
+	border-color: #7e1210;
+}
+
+.indeling .bewaard-overzicht .bewaarstatus-melding {
+	margin: -0.75rem 0 1.5rem;
+	padding-left: 0.6rem;
+	border-left: 2px solid var(--tekst);
+	color: var(--tekst);
+}
+
+.indeling .bewaard-overzicht .melding {
+	padding: 0;
+	font-size: 0.9375rem;
+}
+
+.indeling .bewaard-overzicht .bewaard-verouderd {
+	margin: 0 0 1.75rem;
+	padding: 0.5rem 0.75rem;
+	background: var(--vlak);
+	border-left: 3px solid var(--tekst);
+}
+
+/* Hoofdstukken en keuzes: dunne lijnen zoals de tabellen bij Keuzes en vragen. */
+.indeling .bewaard-overzicht h2 {
+	margin: 0;
+	padding: 0 0 0.45rem;
+	border-bottom: 1px solid var(--rand-donker);
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.indeling .bewaard-overzicht h2 a {
+	text-decoration: none;
+}
+
+.indeling .bewaard-overzicht h2 a:hover {
+	text-decoration: underline;
+}
+
+.indeling .bewaard-hoofdstuk,
+.indeling .bewaard-keuzes {
+	margin-bottom: 1.75rem;
+}
+
+.indeling .bewaard-verzen li {
+	display: grid;
+	grid-template-columns: 4.5rem minmax(0, 1fr) auto auto;
+	align-items: baseline;
+	gap: 0 1rem;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid #efefef;
+}
+
+.indeling .bewaard-verzen li:hover {
+	background: var(--vlak);
+}
+
+.indeling .bewaard-verzen li > a {
+	font-variant-numeric: tabular-nums;
+	font-weight: 500;
+}
+
+.indeling .bewaard-tijd {
+	color: var(--gedempt);
+	font-size: 0.75rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.indeling .bewaard-label {
+	grid-column: auto;
+	padding: 0.05rem 0.45rem;
+	color: var(--gedempt);
+	font-size: 0.6875rem;
+	letter-spacing: 0.02em;
+}
+
+.indeling .bewaard-label-verouderd {
+	background: var(--tekst);
+	border-color: var(--tekst);
+	color: #fff;
+}
+
+.indeling .bewaard-keuzes li {
+	padding: 0.6rem 0;
+	border-bottom: 1px solid #efefef;
+}
+
+.indeling .bewaard-keuzes p {
+	margin: 0.75rem 0 0;
+	color: var(--gedempt);
+}
+
+/* Bij een smal scherm komt de back-up boven de lijst. */
+@media (max-width: 64rem) {
+	.indeling .bewaard-overzicht {
+		display: block;
+	}
+
+	.indeling .bewaard-overzicht .bewaard-acties {
+		position: static;
+		flex-direction: row;
+		flex-wrap: wrap;
+		margin: 0 0 1.75rem;
+		padding: 0;
+		border-left: 0;
+	}
+
+	.indeling .bewaard-acties::before,
+	.indeling .bewaard-acties::after {
+		content: none;
+	}
+}
+
+/* ---------- Venster Back-up inladen ---------- */
+
+.indeling .bewaren-venster {
+	width: min(38rem, 92vw);
+}
+
+.indeling .bewaren-venster .bewaren-venster-inhoud {
+	padding: 1.5rem 1.75rem 1.75rem;
+}
+
+.indeling .bewaren-venster h2 {
+	margin: 0 0 1rem;
+	padding: 0 0 0.5rem;
+	border-bottom: 1px solid var(--rand-donker);
+	font-size: 1.125rem;
+	font-weight: 600;
+}
+
+.indeling .bewaren-venster .bewaren-venster-knoppen {
+	margin-top: 1.25rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--rand);
+}
+
+/* Beneden 60rem staan de kolommen in vormgeving.css al onder elkaar; de marges mogen dan nog smaller. */
+@media (max-width: 60rem) {
+	.indeling main {
+		padding-inline: 0.75rem;
+	}
+}

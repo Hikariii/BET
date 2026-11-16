@@ -7,29 +7,6 @@
 	margin: 1rem 0 .5rem;
 }
 
-.tabbladen {
-	display: flex;
-	gap: .25rem;
-	border-bottom: 1px solid var(--rand, #d0d7de);
-	margin-bottom: 1rem;
-}
-
-.tabbladen a {
-	padding: .5rem .9rem;
-	border: 1px solid transparent;
-	border-bottom: none;
-	border-radius: .4rem .4rem 0 0;
-	text-decoration: none;
-	color: inherit;
-}
-
-.tabbladen a[aria-current='page'] {
-	border-color: var(--rand, #d0d7de);
-	background: var(--achtergrond, #fff);
-	margin-bottom: -1px;
-	font-weight: bold;
-}
-
 .verslinks a {
 	white-space: nowrap;
 }

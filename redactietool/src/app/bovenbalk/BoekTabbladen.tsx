@@ -1,4 +1,3 @@
-import type { ComponentChildren } from 'preact';
 import type { BoekPlek, Plek } from '../navigatie/boekplekken';
 import './boekplekken.css';
 
@@ -7,8 +6,6 @@ type Props = {
 	plekken: readonly BoekPlek[];
 	/** De plek die open staat; `null` op de pagina Bewaard of een onbekend adres. */
 	huidig: Plek | null;
-	/** `tabbladen`: de volledige namen. `tabbladen-iconen`: de volledige namen met een pictogram ervoor. `werkbalk`: een pictogram met een kort woord, de volledige naam als tooltip en voor schermlezers. */
-	vorm: 'tabbladen' | 'werkbalk' | 'tabbladen-iconen';
 };
 
 /** Alleen bij de vragen telt een getal mee in de balk; de andere aantallen staan op het scherm zelf. */
@@ -32,51 +29,28 @@ function PlekIcoon({ plek }: { plek: Plek }) {
 	);
 }
 
-function Inhoud({ plek, vorm }: { plek: BoekPlek; vorm: Props['vorm'] }): ComponentChildren {
-	const aantal = toonAantal(plek);
-	const aantalTekst =
-		aantal === null ? null : (
-			<span class="boekplek-aantal">
-				{aantal}
-				<span class="alleen-lezers"> open</span>
-			</span>
-		);
-	if (vorm === 'tabbladen' || vorm === 'tabbladen-iconen') {
-		return (
-			<>
-				{vorm === 'tabbladen-iconen' && <PlekIcoon plek={plek.plek} />}
-				{plek.naam}
-				{aantalTekst}
-			</>
-		);
-	}
+/** De plekken in een boek als tabbladen met een pictogram naast elkaar in de boekbalk; de open plek heeft `aria-current="page"`. */
+export function BoekTabbladen({ boekNaam, plekken, huidig }: Props) {
 	return (
-		<>
-			<PlekIcoon plek={plek.plek} />
-			<span aria-hidden="true">{plek.kort}</span>
-			<span class="alleen-lezers">{plek.naam}</span>
-			{aantalTekst}
-		</>
-	);
-}
-
-/** De plekken in een boek als links naast elkaar in de boekbalk; de open plek heeft `aria-current="page"`. */
-export function BoekTabbladen({ boekNaam, plekken, huidig, vorm }: Props) {
-	return (
-		<nav class={`boekplekken boekplekken-${vorm}`} aria-label={`Plekken in ${boekNaam}`}>
+		<nav class="boekplekken" aria-label={`Plekken in ${boekNaam}`}>
 			<ul>
-				{plekken.map((plek) => (
-					<li>
-						<a
-							class="boekplek"
-							href={plek.adres}
-							aria-current={plek.plek === huidig ? 'page' : undefined}
-							title={vorm === 'werkbalk' ? [plek.naam, plek.aantal?.tekst].filter((deel) => deel !== undefined).join(', ') : undefined}
-						>
-							<Inhoud plek={plek} vorm={vorm} />
-						</a>
-					</li>
-				))}
+				{plekken.map((plek) => {
+					const aantal = toonAantal(plek);
+					return (
+						<li>
+							<a class="boekplek" href={plek.adres} aria-current={plek.plek === huidig ? 'page' : undefined}>
+								<PlekIcoon plek={plek.plek} />
+								{plek.naam}
+								{aantal !== null && (
+									<span class="boekplek-aantal">
+										{aantal}
+										<span class="alleen-lezers"> open</span>
+									</span>
+								)}
+							</a>
+						</li>
+					);
+				})}
 			</ul>
 		</nav>
 	);
