@@ -24,9 +24,11 @@
 /* ---------- Venster ---------- */
 
 .helpvenster {
-	width: min(48rem, 94vw);
-	height: min(40rem, 88vh);
-	max-height: 88vh;
+	/* 80% van het scherm, maar nooit kleiner dan het oude venster zolang het scherm dat toelaat. */
+	width: max(80vw, min(48rem, 94vw));
+	height: max(80vh, min(40rem, 88vh));
+	max-width: none;
+	max-height: none;
 	padding: 0;
 	background: #fff;
 	border: 1px solid var(--tekst);
@@ -138,7 +140,7 @@
 	line-height: 1.55;
 }
 
-.helpinhoud:focus {
+.helpinhoud:focus-visible {
 	outline: 2px solid var(--tekst);
 	outline-offset: 2px;
 }
@@ -156,7 +158,14 @@
 .helpinhoud p,
 .helpinhoud ul,
 .helpinhoud ol {
+	max-width: 42rem;
 	margin: 0.4rem 0;
+}
+
+/* Tabellen en voorbeelden mogen breder dan de lopende tekst, maar niet over het hele brede venster. */
+.helpinhoud table,
+.helpinhoud .help-wijsrij {
+	max-width: 56rem;
 }
 
 .helpinhoud li + li {
