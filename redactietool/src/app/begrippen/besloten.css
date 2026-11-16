@@ -10,7 +10,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
-	font-size: var(--t-basis);
+	font-size: 0.9rem;
 }
 
 .besloten-filters input,
@@ -26,14 +26,14 @@
 .besloten-samenvatting {
 	margin: 0.5rem 0;
 	color: var(--gedempt, #59636e);
-	font-size: var(--t-basis);
+	font-size: 0.9rem;
 }
 
 .besloten-tabel {
 	width: 100%;
 	table-layout: fixed;
 	border-collapse: collapse;
-	font-size: var(--t-basis);
+	font-size: 0.9rem;
 }
 
 .besloten-tabel th,
@@ -72,7 +72,7 @@
 .besloten-tabel .onzeker {
 	margin: 0.25rem 0 0;
 	color: var(--gedempt, #59636e);
-	font-size: var(--t-klein);
+	font-size: 0.85em;
 }
 
 /*

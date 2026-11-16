@@ -29,7 +29,7 @@
 }
 
 .bovenbalk .bovenbalk-boeknaam {
-	font-size: var(--t-kop2);
+	font-size: 1.125rem;
 	font-weight: 600;
 	letter-spacing: -0.01em;
 	text-decoration: none;
@@ -37,7 +37,7 @@
 
 .bovenbalk .bovenbalk-hoofdstuktitel {
 	margin: 0;
-	font-size: var(--t-kop2);
+	font-size: 1.125rem;
 	font-weight: 600;
 	letter-spacing: -0.015em;
 }
@@ -89,7 +89,7 @@
 .hoofdstukacties-hulp {
 	margin: 0.5rem 0 0;
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 .bovenbalk .hoofdstukacties-verouderd {
@@ -113,20 +113,16 @@
 	border-right-width: 1px;
 }
 
-.grootte-keuze .grootte-stap-0 {
-	font-size: var(--t-basis);
-}
-
 .grootte-keuze .grootte-stap-min {
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 .grootte-keuze .grootte-stap-1 {
-	font-size: var(--t-kop3);
+	font-size: 0.9375rem;
 }
 
 .grootte-keuze .grootte-stap-2 {
-	font-size: var(--t-kop2);
+	font-size: 1.0625rem;
 }
 
 .grootte-keuze .grootte-stap[aria-pressed='true'],

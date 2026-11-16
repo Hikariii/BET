@@ -34,7 +34,7 @@ export type LeesUitkomst = { gelukt: true; backup: Backup } | { gelukt: false; m
 
 export type InlaadModus = 'samenvoegen' | 'vervangen';
 
-/** De bestandsnaam van de back-up, bv. `lukas.bet-bewaard.json`. */
+/** De basis van de bestandsnaam van de back-up, bv. `lukas.bet-bewaard.json`; bij het downloaden komen datum en tijd erbij. */
 export function backupBestandsnaam(boek: string): string {
 	return `${boek}.bet-bewaard.json`;
 }
@@ -61,7 +61,7 @@ function isObject(waarde: unknown): waarde is Record<string, unknown> {
 	return typeof waarde === 'object' && waarde !== null && !Array.isArray(waarde);
 }
 
-const GEEN_BACKUP = 'Dit is geen back-up van deze tool. Kies het bestand dat je met Back-up downloaden hebt gemaakt; de naam eindigt op .bet-bewaard.json.';
+const GEEN_BACKUP = 'Dit is geen back-up van deze tool. Kies het bestand dat je met Back-up downloaden hebt gemaakt; de naam begint met de naam van het boek en bevat .bet-bewaard, bijvoorbeeld lukas.bet-bewaard-2026-11-16-1103.json.';
 const TE_OUD = 'Deze back-up komt van een oudere versie van de tool en kan niet meer worden ingeladen. Vraag de eigenaar om hulp.';
 const TE_NIEUW = 'Deze back-up komt van een nieuwere versie van de tool. Ververs de pagina om de nieuwste versie te laden en probeer het opnieuw.';
 const BESCHADIGD = 'Deze back-up is beschadigd en kan niet worden ingeladen. Maak met Back-up downloaden een nieuwe, of kies een eerdere back-up.';

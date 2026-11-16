@@ -11,7 +11,7 @@
 	border: 0;
 	border-bottom: 2px solid transparent;
 	color: var(--tekst);
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 	font-weight: 500;
 }
 
@@ -32,7 +32,7 @@
 	border: 1px solid var(--tekst);
 	color: var(--toolkleur);
 	font-family: var(--tool);
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 	overflow: hidden;
 }
 
@@ -56,7 +56,7 @@
 
 .helpvenster-kop h2 {
 	margin: 0;
-	font-size: var(--t-kop2);
+	font-size: 1.125rem;
 }
 
 .helpvenster-lijf {
@@ -84,7 +84,7 @@
 .helpnav-kop {
 	margin: 0.9rem 0.6rem 0.25rem;
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	font-weight: 600;
 }
 
@@ -145,12 +145,12 @@
 
 .helpinhoud h3 {
 	margin: 0.75rem 0 0.5rem;
-	font-size: var(--t-lees);
+	font-size: 1.25rem;
 }
 
 .helpinhoud h4 {
 	margin: 1.25rem 0 0.25rem;
-	font-size: var(--t-kop3);
+	font-size: 0.9375rem;
 }
 
 .helpinhoud p,
@@ -177,7 +177,7 @@
 }
 
 .helpinhoud code {
-	font-size: var(--t-klein);
+	font-size: 0.9em;
 }
 
 /* ---------- Een onderdeel aanwijzen ---------- */
@@ -248,7 +248,7 @@
 
 .help-legenda-voorbeeld {
 	font-family: var(--boek);
-	font-size: var(--t-kop3);
+	font-size: 0.9375rem;
 }
 
 /* ---------- Oplichten op de pagina ---------- */

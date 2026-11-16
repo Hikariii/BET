@@ -15,8 +15,8 @@ const ITEM_ALGEMENE_VRAAG = /^(?:\d+\.|[-*])\s+(.*)$/;
 const VELD = /^[-*]\s+\*\*(.+?):?\*\*:?\s*(.*)$/;
 const SUBITEM = /^\s+[-*]\s+(.*)$/;
 
-/** Vraagwaarden die "geen vraag" betekenen, na weghalen van haakjes en spaties. */
-const LEGE_VRAGEN = ['', 'optioneel', 'geen', 'nee', 'n.v.t.', 'nvt', '-', AANDACHTSSTREEP];
+/** Vraagwaarden die "geen vraag" betekenen, na weghalen van haakjes, punten en spaties aan begin en eind ("Geen." is geen vraag). */
+const LEGE_VRAGEN = ['', 'optioneel', 'geen', 'nee', 'n.v.t', 'nvt', '-', AANDACHTSSTREEP];
 
 /** Een paragraafverwijzing (`§7A`) of het woord precedent(en), in volgorde van voorkomen. */
 const VERWIJZING = /§(\d+[A-Z]?)|\b[Pp]recedent(?:en)?\b/g;
@@ -74,7 +74,7 @@ function voegVoortzettingToe(regels: string[], tekst: string): void {
 }
 
 function isLegeVraag(vraag: string): boolean {
-	return LEGE_VRAGEN.includes(vraag.replace(/^[() ]+|[() ]+$/g, '').toLowerCase());
+	return LEGE_VRAGEN.includes(vraag.replace(/^[(). ]+|[(). ]+$/g, '').toLowerCase());
 }
 
 function leesSectie(sectie: Sectie): LogVers {

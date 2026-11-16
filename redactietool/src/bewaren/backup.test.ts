@@ -56,7 +56,7 @@ function weigering(tekst: string, boek = 'lukas'): string {
 	return weigeringMetDetails(tekst, boek).melding;
 }
 
-const GEEN_BACKUP = 'Dit is geen back-up van deze tool. Kies het bestand dat je met Back-up downloaden hebt gemaakt; de naam eindigt op .bet-bewaard.json.';
+const GEEN_BACKUP = 'Dit is geen back-up van deze tool. Kies het bestand dat je met Back-up downloaden hebt gemaakt; de naam begint met de naam van het boek en bevat .bet-bewaard, bijvoorbeeld lukas.bet-bewaard-2026-11-16-1103.json.';
 const BESCHADIGD = 'Deze back-up is beschadigd en kan niet worden ingeladen. Maak met Back-up downloaden een nieuwe, of kies een eerdere back-up.';
 
 describe('maakBackup', () => {

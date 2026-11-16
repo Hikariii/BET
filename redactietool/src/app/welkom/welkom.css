@@ -6,7 +6,7 @@
 	border-bottom: 1px solid var(--rand-donker);
 	color: var(--tekst);
 	font-family: var(--tool);
-	font-size: var(--t-basis);
+	font-size: 0.875rem;
 	line-height: 1.5;
 }
 
@@ -17,7 +17,7 @@
 
 .welkom h2 {
 	margin: 0 0 0.2rem;
-	font-size: var(--t-kop3);
+	font-size: 1rem;
 	font-weight: 600;
 }
 

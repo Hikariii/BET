@@ -47,7 +47,7 @@
 }
 
 body {
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 }
 
 a {
@@ -88,7 +88,7 @@ button {
 	border-radius: 0;
 	color: var(--tekst);
 	font-family: var(--tool);
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 	font-weight: 500;
 	line-height: 1.4;
 }
@@ -131,7 +131,7 @@ textarea {
 	border-radius: 0;
 	color: var(--tekst);
 	font-family: var(--tool);
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 }
 
 input:focus,
@@ -160,7 +160,7 @@ input[type='radio'] {
 	background: none;
 	border: 0;
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	font-weight: 500;
 	text-decoration: underline;
 	text-decoration-color: var(--rand-donker);
@@ -182,13 +182,13 @@ input[type='radio'] {
 	padding: 1.75rem 0 2rem;
 	background: var(--vlak);
 	border-right: 0;
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 }
 
 .zijbalk h2 {
 	margin: 0 0 0.5rem;
 	padding: 0 1rem;
-	font-size: var(--t-kop2);
+	font-size: 1.125rem;
 	font-weight: 600;
 	letter-spacing: -0.01em;
 }
@@ -252,7 +252,7 @@ input[type='radio'] {
 	border: 0;
 	border-radius: 0;
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 400;
 	letter-spacing: 0.01em;
 }
@@ -278,7 +278,7 @@ input[type='radio'] {
 
 .open-vragen {
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-variant-numeric: tabular-nums;
 	font-weight: 500;
 	white-space: nowrap;
@@ -300,12 +300,12 @@ main {
 
 .versie {
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 }
 
 .hoofdstukacties {
 	margin: 0 0 0 auto;
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 .hoofdstukacties-knoppen {
@@ -335,7 +335,7 @@ main {
 	background: none;
 	border-left: 2px solid var(--tekst);
 	color: var(--tekst);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 .hoofdstukacties-export {
@@ -354,7 +354,7 @@ main {
 	background: none;
 	border-left: 2px solid var(--tekst);
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 /* De werktabel */
@@ -368,7 +368,7 @@ table.verzen thead th {
 	background: #fff;
 	border-bottom: 1px solid var(--rand-donker);
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 500;
 	letter-spacing: 0.08em;
 }
@@ -400,7 +400,7 @@ table.verzen th.versnummer {
 	padding-left: calc(1rem - 3px);
 	border-left: 3px solid transparent;
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	font-variant-numeric: tabular-nums;
 	font-weight: 500;
 	line-height: 2;
@@ -433,7 +433,7 @@ table.verzen th.versnummer a.vraagmarkering:hover {
 	border: 0;
 	border-radius: 0;
 	color: var(--tekst);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	font-weight: 700;
 	line-height: 1.2;
 }
@@ -442,7 +442,7 @@ table.verzen th.versnummer a.vraagmarkering:hover {
 /* Bron: referentie. Kleiner, rustig. */
 table.verzen td:nth-child(2) {
 	color: #000;
-	font-size: var(--t-basis);
+	font-size: 0.875rem;
 	line-height: 1.6;
 }
 
@@ -454,7 +454,7 @@ table.verzen td:nth-child(3) {
 	padding-left: 1.5rem;
 	border-left: 0;
 	color: #000;
-	font-size: var(--t-lees);
+	font-size: 1.1875rem;
 	line-height: 1.55;
 }
 
@@ -490,7 +490,7 @@ table.verzen td:nth-child(3) .versacties {
 	margin: 0;
 	opacity: 0;
 	font-family: var(--tool);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 tr.vers:hover td .versacties,
@@ -505,7 +505,7 @@ table.verzen td:nth-child(3) .versacties:has(.versmarkering) {
 	border: 0;
 	border-radius: 0;
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-style: italic;
 }
 
@@ -513,7 +513,7 @@ table.verzen td:nth-child(3) .verswaarschuwingen,
 table.verzen td:nth-child(3) .versverouderd,
 table.verzen td:nth-child(3) .versopslagfout {
 	font-family: var(--tool);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	line-height: 1.4;
 }
 
@@ -555,7 +555,7 @@ table.verzen td.regels :is(.meerregels, .vraagkoppeling-link, .verwijzing) {
 .logbereik,
 .geen-regels {
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 500;
 }
 
@@ -569,7 +569,7 @@ table.verzen td.regels :is(.meerregels, .vraagkoppeling-link, .verwijzing) {
 
 .vraagkoppeling-link {
 	margin: 0.3rem 0 0;
-	font-size: var(--t-basis);
+	font-size: 0.75rem;
 }
 
 .vraag {
@@ -581,7 +581,7 @@ table.verzen td.regels :is(.meerregels, .vraagkoppeling-link, .verwijzing) {
 
 .vraag summary {
 	color: var(--tekst);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -589,7 +589,7 @@ table.verzen td.regels :is(.meerregels, .vraagkoppeling-link, .verwijzing) {
 
 .vraag dt {
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 500;
 	letter-spacing: 0.04em;
 }
@@ -619,7 +619,7 @@ table.verzen td.regels :is(.meerregels, .vraagkoppeling-link, .verwijzing) {
 .verseditor-acties {
 	margin: 0.9rem 0 0;
 	font-family: var(--tool);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 .verseditor-tip {
@@ -644,7 +644,7 @@ table.verzen > tbody > tr.naslagrij > td {
 	overflow-y: auto;
 	background: #fff;
 	border: 1px solid var(--tekst);
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 	line-height: 1.6;
 }
 
@@ -659,7 +659,7 @@ table.verzen > tbody > tr.naslagrij > td {
 
 .naslagkaart h2 {
 	margin: 0;
-	font-size: var(--t-kop3);
+	font-size: 1rem;
 	font-weight: 600;
 }
 
@@ -685,7 +685,7 @@ table.verzen > tbody > tr.naslagrij > td {
 
 .sectietitel {
 	margin: 1.25rem 0 0.5rem;
-	font-size: var(--t-kop3);
+	font-size: 0.9375rem;
 	font-weight: 600;
 }
 
@@ -702,7 +702,7 @@ table.verzen > tbody > tr.naslagrij > td {
 table.verzen .naslagkaart table {
 	width: 100%;
 	border-collapse: collapse;
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 table.verzen .naslagkaart td,
@@ -714,14 +714,14 @@ table.verzen .naslagkaart th {
 	border-left: 0;
 	color: var(--toolkleur);
 	font-family: var(--tool);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	line-height: 1.6;
 }
 
 table.verzen .naslagkaart th {
 	border-bottom-color: #c4c4c4;
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 500;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
@@ -738,7 +738,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(2),
 table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	color: #000;
 	font-family: var(--boek);
-	font-size: var(--t-basis);
+	font-size: 0.875rem;
 }
 
 /* De precedententabel over de kaartbreedte: vaste kolombreedtes, zodat de rijen niet onnodig hoog worden. */
@@ -770,7 +770,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 
 .begrippen h1 {
 	margin: 0 0 1rem;
-	font-size: var(--t-kop1);
+	font-size: 1.375rem;
 	font-weight: 600;
 	letter-spacing: -0.015em;
 }
@@ -782,11 +782,6 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 .vervangen .uitleg,
 .gevonden .uitleg {
 	max-width: 46rem;
-}
-
-.verslinks a,
-.verslinks .meer {
-	font-size: var(--t-basis);
 }
 
 .verslinks a {
@@ -806,7 +801,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 
 .besloten-tabel,
 .gevonden table {
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 }
 
 .besloten-tabel th,
@@ -822,7 +817,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	background: #fff;
 	border-bottom: 1px solid var(--rand-donker);
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 500;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -831,7 +826,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 .besloten-tabel tbody th,
 .gevonden tbody th,
 .besloten-tabel tbody td:nth-child(2) {
-	font-size: var(--t-kop3);
+	font-size: 0.9375rem;
 	font-weight: 600;
 }
 
@@ -856,7 +851,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 .vertaalvragen .aantal,
 .vervangen-samenvatting {
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 .besloten-filters,
@@ -869,7 +864,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 .besloten-filters label,
 .vertaalvragen .filters label,
 .vervangen-formulier label {
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	gap: 0.2rem;
 }
 
@@ -894,7 +889,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	display: flex;
 	flex-direction: column;
 	gap: 0.2rem;
-	font-size: var(--t-basis);
+	font-size: 0.8125rem;
 }
 
 .besloten-filters input,
@@ -922,7 +917,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	margin: 2rem 0 0.5rem;
 	padding-bottom: 0.3rem;
 	border-bottom: 1px solid var(--rand);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -931,7 +926,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 .vertaalvragen h3,
 .vervangen h3 {
 	margin: 1rem 0 0.2rem;
-	font-size: var(--t-klein);
+	font-size: 0.8125rem;
 	font-weight: 600;
 }
 
@@ -964,13 +959,13 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 
 .vertaalvragen .versjes {
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	font-variant-numeric: tabular-nums;
 }
 
 .vertaalvragen dt {
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 }
 
 /* Status in vragen: zelfde stilte als in de zijbalk; open valt op door gewicht */
@@ -980,7 +975,7 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	border: 0;
 	border-radius: 0;
 	color: var(--zacht);
-	font-size: var(--t-klein);
+	font-size: 0.6875rem;
 	font-weight: 400;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
@@ -1019,13 +1014,13 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 }
 
 .vervangen .vondst .context {
-	font-size: var(--t-kop3);
+	font-size: 1rem;
 	line-height: 1.45;
 }
 
 .vervangen .vondst a {
 	color: var(--gedempt);
-	font-size: var(--t-klein);
+	font-size: 0.75rem;
 	font-variant-numeric: tabular-nums;
 }
 

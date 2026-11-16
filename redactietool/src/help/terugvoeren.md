@@ -8,7 +8,7 @@ Het Word-bestand dat je aanlevert is de definitieve tekst. Het maakt niet uit of
 
 Op verzoek van de eigenaar neemt Claude je Word-bestand over (dat heet terugvoeren) in zijn eigen bestanden, één hoofdstuk per keer, met de opmaak. Daarna:
 
-1. Claude werkt de wijzigingslog bij: per vers wat er verschilt tussen Claudes concept en jouw tekst.
+1. Claude werkt de opmerkingen bij het hoofdstuk bij: per vers wat er verschilt tussen Claudes concept en jouw tekst.
 2. Wat jij anders doet dan de richtlijn of eerdere vertaalkeuzes zeggen, wordt een voorstel: een vertaalkeuze vastleggen, een nieuwe vertaalkeuze, of een regel in de richtlijn aanpassen.
 3. Markeringen uit de bron die in jouw tekst ontbreken, komen terug als voorstel. Zijn de woorden gelijk gebleven, dan is dat één lijst om in één keer goed te keuren. Zijn de woorden herschreven, dan krijg je per stuk een vraag met bron en nieuwe tekst naast elkaar.
 4. Pas als de eigenaar akkoord geeft, worden voorstellen een regel of vertaalkeuze en geldt het hoofdstuk als voorbeeld voor de rest van het boek.

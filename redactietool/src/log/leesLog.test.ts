@@ -165,6 +165,7 @@ describe('secties per vers', () => {
 				'## Vers 5',
 				'- **Twijfel / vraag aan redactie:** (optioneel)',
 				'- **Twijfel:** Geen',
+				'- **Twijfel:** Geen.',
 				'- **Twijfel:** nee',
 				'- **Twijfel:** n.v.t.',
 				'- **Twijfel:** NVT',
