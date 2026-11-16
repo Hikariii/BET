@@ -8,11 +8,31 @@ Klik in de vereenvoudigde tekst van het vers en typ. Met het toetsenbord ga je m
 
 De tool slaat je wijziging meteen op. Bij een gewijzigd vers staat het woord *gewijzigd*. Met **Vers terugzetten** zet je de vereenvoudiging van Claude terug; je wijzigingen in dat vers gaan weg.
 
-De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een markering uit de bron uit het vers, dan waarschuwt de tool en zegt wat je kunt doen: de markering in Word zetten, of het vers terugzetten. Zie *Kleuren en markeringen*.
+De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een markering uit de bron uit het vers, dan waarschuwt de tool en zegt wat je kunt doen: de markering terugzetten met de opmaakbalk, of het vers terugzetten. Een verdwenen alineastijl zet je in Word terug. Zie *Kleuren en markeringen*.
 
 {{wijs vers-bewerken | Een vers bewerken | Klik in de vereenvoudigde tekst van een vers.}}
 {{wijs vers-gewijzigd | gewijzigd | Verschijnt onder een vers dat je hebt aangepast.}}
 {{wijs terug-naar-de-repo | Vers terugzetten | Verschijnt onder een vers dat je hebt aangepast.}}
+
+## Opmaak zetten met de balk
+
+Terwijl je een vers bewerkt, staat boven de tekst een balk met vijf knoppen. Selecteer eerst de woorden en kies dan:
+
+- **B** zet vet aan of uit (Ctrl+B).
+- **U** onderstreept de woorden of haalt het weg (Ctrl+U).
+- **Markeren** geeft de woorden de gele markering of haalt hem weg.
+- **Kleur ▾** opent een lijst met de begripsdomeinen en Onderwijs, elk met zijn kleur uit het Word-sjabloon. Een woord heeft één kleur: een nieuwe keuze vervangt de oude. Kies dezelfde kleur nog eens, of **Geen kleur**, om hem weg te halen. Alt+K opent de lijst met het toetsenbord.
+- **Wissen** haalt alle opmaak van de selectie weg (Ctrl+Spatie). De alineastijl, zoals de woorden van Jezus, blijft.
+
+Op een Mac staat ⌘ voor Ctrl en ⌥ voor Alt. Daar wist ⌘+\ de opmaak, want ⌘+Spatie is van Spotlight. Een knop die aan staat, is gevuld. De tooltip noemt de sneltoets, of waarom een knop nu niet werkt.
+
+Selecteer je niets, dan geldt je keuze voor wat je daarna typt. Spaties aan het begin en eind van je selectie krijgen geen opmaak, want in de tekst van de repo staan ze buiten de markering. Cursief is er niet: dat doe je in Word.
+
+Een begripsdomein en Stem van God zijn al vet. Daar is **B** uitgeschakeld (*Al vet door de stijl*), en een domein kiezen haalt een eerder vet weg. Typ je direct achter een gekleurd woord verder, dan krijgt de nieuwe tekst dezelfde kleur; kies dan **Geen kleur**.
+
+Met het toetsenbord is de balk één tabstop: Shift+Tab vanuit de tekst brengt je erheen. Met pijl links en rechts, Home en End loop je langs de knoppen, en Enter of de spatiebalk kiest. In de kleurenlijst gebruik je pijl omhoog en omlaag, Home, End en Enter. Na een keuze staat de cursor weer in de tekst. Escape op de balk of in de lijst brengt je terug in de tekst zonder de editor te sluiten. Een klik buiten de lijst, of Tab, sluit de lijst.
+
+{{wijs opmaakwerkbalk | De opmaakbalk | Boven het vers terwijl je het bewerkt.}}
 
 ## Met het toetsenbord
 

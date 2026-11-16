@@ -31,11 +31,11 @@ describe('buurVers', () => {
 	});
 });
 
-function doel(tagName: string, opties: { bewerkbaar?: boolean; inVenster?: boolean } = {}): Toetsdoel {
+function doel(tagName: string, opties: { bewerkbaar?: boolean; inVenster?: boolean; inEditor?: boolean } = {}): Toetsdoel {
 	return {
 		tagName,
 		isContentEditable: opties.bewerkbaar ?? false,
-		closest: (selector) => (opties.inVenster === true && selector.includes('dialog') ? {} : null),
+		closest: (selector) => ((opties.inVenster === true && selector.includes('dialog')) || (opties.inEditor === true && selector.includes('verseditor')) ? {} : null),
 	};
 }
 
@@ -71,6 +71,10 @@ describe('sprongRichting', () => {
 
 	it('negeert j en k in een venster dat open staat', () => {
 		expect(sprongRichting(toets('j'), doel('BUTTON', { inVenster: true }))).toBeNull();
+	});
+
+	it('negeert j en k op een knop van de werkbalk van de editor', () => {
+		expect(sprongRichting(toets('k'), doel('BUTTON', { inEditor: true }))).toBeNull();
 	});
 });
 

@@ -1,5 +1,5 @@
 import type { WordStijl } from '../data/types';
-import { DOMEINEN, type Alineastijl, type Opmaak, type Tekststuk } from '../formaat/types';
+import { isDomein, type Alineastijl, type Opmaak, type Tekststuk } from '../formaat/types';
 import {
 	ALINEASTIJL_NAAR_WORD,
 	DOMEIN_NAAR_WORD,
@@ -34,10 +34,6 @@ function zoekStijl(stijlen: readonly WordStijl[], id: string): WordStijl | null 
 
 export function alineaOpmaakstijl(stijl: Alineastijl | null, stijlen: readonly WordStijl[]): Opmaakstijl {
 	return stijl === null ? {} : opmaakstijlVan(zoekStijl(stijlen, ALINEASTIJL_NAAR_WORD[stijl]));
-}
-
-function isDomein(opmaak: Opmaak): opmaak is (typeof DOMEINEN)[number] {
-	return (DOMEINEN as readonly string[]).includes(opmaak);
 }
 
 function enkeleOpmaakstijl(opmaak: Opmaak, stijlen: readonly WordStijl[]): Opmaakstijl {

@@ -1,9 +1,5 @@
 import { Schema, type MarkSpec } from 'prosemirror-model';
-import { DOMEINEN, OPMAAK_VOLGORDE, type Opmaak } from '../formaat/types';
-
-function isDomein(opmaak: Opmaak): boolean {
-	return (DOMEINEN as readonly string[]).includes(opmaak);
-}
+import { DOMEINEN, isDomein, OPMAAK_VOLGORDE } from '../formaat/types';
 
 /**
  * ProseMirror geeft elke mark een rang op volgorde van deze lijst en sorteert de marks van een stuk tekst daarop.

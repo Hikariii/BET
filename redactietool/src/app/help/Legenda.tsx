@@ -1,18 +1,7 @@
 import type { BoekData } from '../../data/types';
-import { ALINEASTIJL_NAAR_WORD, DOMEIN_NAAR_WORD } from '../../data/stijlkoppeling';
-import { ALINEASTIJLEN, DOMEINEN, type Domein, type Opmaak } from '../../formaat/types';
+import { ALINEASTIJLEN, DOMEINEN } from '../../formaat/types';
 import { alineaOpmaakstijl, tekststukOpmaakstijl, type Opmaakstijl } from '../stijl';
-
-/** Opmaak zonder eigen Word-stijl: directe opmaak in Word. De naam staat hier, want het sjabloon kent hem niet. */
-type DirecteOpmaak = Exclude<Opmaak, Domein>;
-
-const DIRECTE_OPMAAK: Record<DirecteOpmaak, string> = {
-	onderwijs: 'Onderwijs (rode letters)',
-	highlight: 'Gele markering',
-	onderstreept: 'Onderstreept',
-	vet: 'Vet',
-	cursief: 'Cursief',
-};
+import { alineastijlNaam, DIRECTE_OPMAAK, domeinNaam, type DirecteOpmaak } from '../opmaakNamen';
 
 function Rij({ naam, stijl, soort }: { naam: string; stijl: Opmaakstijl; soort: string }) {
 	return (
@@ -29,7 +18,6 @@ function Rij({ naam, stijl, soort }: { naam: string; stijl: Opmaakstijl; soort: 
 
 /** De opmaak van de Bijbeltekst zoals Word hem toont: namen en kleuren uit het Word-sjabloon van het boek (`boek.stijlen`). */
 export function Legenda({ boek }: { boek: BoekData }) {
-	const naamVan = (id: string) => boek.stijlen.find((stijl) => stijl.id === id)?.naam ?? id;
 	return (
 		<div class="tabelrand help-legenda">
 			<table>
@@ -42,11 +30,11 @@ export function Legenda({ boek }: { boek: BoekData }) {
 				</thead>
 				<tbody>
 					{ALINEASTIJLEN.map((stijl) => (
-						<Rij naam={naamVan(ALINEASTIJL_NAAR_WORD[stijl])} stijl={alineaOpmaakstijl(stijl, boek.stijlen)} soort="Hele alinea" />
+						<Rij naam={alineastijlNaam(stijl, boek.stijlen)} stijl={alineaOpmaakstijl(stijl, boek.stijlen)} soort="Hele alinea" />
 					))}
 					{DOMEINEN.map((domein) => (
 						<Rij
-							naam={naamVan(DOMEIN_NAAR_WORD[domein])}
+							naam={domeinNaam(domein, boek.stijlen)}
 							stijl={tekststukOpmaakstijl({ soort: 'tekst', tekst: '', opmaak: [domein] }, boek.stijlen)}
 							soort="Woorden in de tekst"
 						/>

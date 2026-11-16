@@ -13,6 +13,10 @@ export const DOMEINEN = [
 ] as const;
 export type Domein = (typeof DOMEINEN)[number];
 
+export function isDomein(waarde: string): waarde is Domein {
+	return (DOMEINEN as readonly string[]).includes(waarde);
+}
+
 /** Opmaak van buiten naar binnen, de volgorde waarin FORMAAT.md de tags nest. Alle domeinen horen bij het binnenste niveau. */
 export const OPMAAK_VOLGORDE = ['onderwijs', 'highlight', 'onderstreept', 'vet', 'cursief', ...DOMEINEN] as const;
 export type Opmaak = (typeof OPMAAK_VOLGORDE)[number];

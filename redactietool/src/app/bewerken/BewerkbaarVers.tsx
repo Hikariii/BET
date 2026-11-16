@@ -5,6 +5,7 @@ import { bewaarOfWis, terugNaarRepo } from '../../bewerken/terugNaarRepo';
 import type { BewerktVers, VersInhoud } from '../../bewerken/types';
 import { knipVers } from '../../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../../bewerken/waarschuwingen';
+import { ALINEASTIJLEN } from '../../formaat/types';
 import type { VersDeel } from '../groepeerPerVers';
 import { VersTekst } from '../VersTekst';
 import { browseropslag } from './useTussenstand';
@@ -164,7 +165,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 				<ul class="verswaarschuwingen" aria-label={`Waarschuwingen bij vers ${nummer}`}>
 					{waarschuwingen.map((waarschuwing) => (
 						<li>
-							{waarschuwing.tekst} Zet de markering in Word, of kies Vers terugzetten.
+							{waarschuwing.tekst} {(ALINEASTIJLEN as readonly string[]).includes(waarschuwing.opmaak) ? 'Zet de alineastijl in Word' : 'Open het vers en zet de markering terug met de opmaakbalk'}, of kies Vers terugzetten.
 						</li>
 					))}
 				</ul>

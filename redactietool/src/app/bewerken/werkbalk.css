@@ -1,0 +1,78 @@
+.werkbalk {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	align-items: center;
+	margin: 0 0 0.9rem;
+}
+
+.werkbalk-knop {
+	min-width: 2rem;
+	padding: 0.2rem 0.6rem;
+}
+
+/* Aan: gevuld, zoals een knop die ingedrukt staat. */
+.werkbalk-knop[aria-pressed='true'],
+.werkbalk-knop[aria-expanded='true'] {
+	background: var(--tekst);
+	color: #fff;
+}
+
+.werkbalk-knop:focus-visible,
+.werkbalk-menuregel:focus-visible {
+	outline: 2px solid var(--tekst);
+	outline-offset: 2px;
+}
+
+.werkbalk-markering {
+	padding: 0 0.15rem;
+	color: #000;
+}
+
+.werkbalk-kleur {
+	position: relative;
+}
+
+.werkbalk-kleurvlak {
+	display: inline-block;
+	width: 0.7rem;
+	height: 0.7rem;
+	margin-right: 0.4rem;
+	border: 1px solid var(--tekst);
+	vertical-align: -0.05rem;
+}
+
+.werkbalk-kleurvlak-geen {
+	background: linear-gradient(to top right, transparent calc(50% - 0.5px), var(--rood) 50%, transparent calc(50% + 0.5px));
+}
+
+.werkbalk-menu {
+	position: absolute;
+	top: calc(100% + 0.2rem);
+	left: 0;
+	z-index: 30;
+	display: grid;
+	min-width: 13rem;
+	padding: 0.25rem;
+	background: #fff;
+	border: 1px solid var(--rand-donker);
+	box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 0.12);
+}
+
+.werkbalk-menuregel {
+	display: flex;
+	align-items: center;
+	padding: 0.25rem 0.5rem;
+	border: 0;
+	font-weight: 400;
+	text-align: left;
+}
+
+.werkbalk-menuregel[aria-checked='true'] {
+	background: var(--gekozen);
+	font-weight: 600;
+}
+
+.werkbalk-menuregel[aria-checked='true']:hover:not(:disabled) {
+	background: var(--tekst);
+}

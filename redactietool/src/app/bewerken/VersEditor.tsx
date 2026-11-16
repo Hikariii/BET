@@ -1,13 +1,17 @@
 import { EditorState } from 'prosemirror-state';
 import { EditorView, type MarkViewConstructor, type NodeViewConstructor } from 'prosemirror-view';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import type { WordStijl } from '../../data/types';
 import type { VersInhoud } from '../../bewerken/types';
 import { documentNaarVersInhoud, versInhoudNaarDocument } from '../../editor/versDocument';
 import { versEditorPlugins, type Richting } from '../../editor/versEditorPlugins';
+import { vetteOpmaakVan } from '../../editor/vetteOpmaak';
+import { commandVoorActie, werkbalkToestand, type WerkbalkActie } from '../../editor/werkbalk';
 import { OPMAAK_VOLGORDE, type Alineastijl } from '../../formaat/types';
 import { alineaOpmaakstijl, tekststukOpmaakstijl, type Opmaakstijl } from '../stijl';
 import { selectieBijPlek, type KlikPlek } from './klikPlek';
+import { opMac, sneltoetsTekst } from './sneltoetsen';
+import { Werkbalk } from './Werkbalk';
 import './verseditor.css';
 
 type Props = {
@@ -50,26 +54,35 @@ function opmaakViews(stijlen: readonly WordStijl[]): Record<string, MarkViewCons
 	);
 }
 
-/** ProseMirror-editor voor één vers, met een alinea per deel. */
+/** ProseMirror-editor voor één vers, met een alinea per deel en de opmaakwerkbalk erboven. */
 export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSluit, onNaarBuur }: Props) {
 	const houder = useRef<HTMLDivElement>(null);
+	const weergave = useRef<EditorView | null>(null);
 	const laatsteOnWijzig = useRef(onWijzig);
 	const laatsteOnSluit = useRef(onSluit);
 	laatsteOnWijzig.current = onWijzig;
 	laatsteOnSluit.current = onSluit;
 	const laatsteOnNaarBuur = useRef(onNaarBuur);
 	laatsteOnNaarBuur.current = onNaarBuur;
+	const [vette] = useState(() => vetteOpmaakVan(stijlen));
+	const [mac] = useState(opMac);
+	const [kleurmenuOpen, zetKleurmenuOpen] = useState(false);
+	const [beginstand] = useState(() => {
+		const startDocument = versInhoudNaarDocument(inhoud);
+		const acties = {
+			onSluit: () => laatsteOnSluit.current(),
+			naarBuur: (richting: Richting) => laatsteOnNaarBuur.current(richting),
+			openKleurmenu: () => zetKleurmenuOpen(true),
+		};
+		return EditorState.create({ doc: startDocument, plugins: versEditorPlugins(acties, vette), selection: selectieBijPlek(startDocument, startPlek) });
+	});
+	const [toestand, zetToestand] = useState(() => werkbalkToestand(beginstand, vette));
 
 	useEffect(() => {
 		const doel = houder.current;
 		if (doel === null) return;
-		const startDocument = versInhoudNaarDocument(inhoud);
 		const view = new EditorView(doel, {
-			state: EditorState.create({
-				doc: startDocument,
-				plugins: versEditorPlugins(() => laatsteOnSluit.current(), (richting) => laatsteOnNaarBuur.current(richting)),
-				selection: selectieBijPlek(startDocument, startPlek),
-			}),
+			state: beginstand,
 			nodeViews: { alinea: alineaView(stijlen) },
 			markViews: opmaakViews(stijlen),
 			attributes: { role: 'textbox', 'aria-multiline': 'true', 'aria-label': label, spellcheck: 'true', lang: 'nl' },
@@ -77,16 +90,38 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 				const oud = view.state;
 				const nieuw = oud.apply(transactie);
 				view.updateState(nieuw);
-				if (nieuw.doc !== oud.doc) laatsteOnWijzig.current(documentNaarVersInhoud(nieuw.doc));
+				zetToestand(werkbalkToestand(nieuw, vette));
+				if (nieuw.doc !== oud.doc) laatsteOnWijzig.current(documentNaarVersInhoud(nieuw.doc, vette));
 			},
 		});
+		weergave.current = view;
 		view.focus();
 		doel.scrollIntoView({ block: 'nearest' });
-		return () => view.destroy();
+		return () => {
+			weergave.current = null;
+			view.destroy();
+		};
 	}, []);
+
+	const voerActieUit = (actie: WerkbalkActie) => {
+		const view = weergave.current;
+		if (view === null) return;
+		commandVoorActie(actie, vette)(view.state, view.dispatch, view);
+		zetKleurmenuOpen(false);
+		view.focus();
+	};
 
 	return (
 		<div class="verseditor">
+			<Werkbalk
+				toestand={toestand}
+				stijlen={stijlen}
+				mac={mac}
+				kleurmenuOpen={kleurmenuOpen}
+				onKleurmenu={zetKleurmenuOpen}
+				onActie={voerActieUit}
+				onTerugNaarEditor={() => weergave.current?.focus()}
+			/>
 			<div ref={houder} />
 			<p class="verseditor-acties">
 				<button type="button" onClick={onSluit}>
@@ -94,7 +129,8 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 				</button>
 				<span class="verseditor-tip">
 					{' '}
-					Escape sluit ook. Alt+pijl omlaag of omhoog gaat naar het volgende of vorige vers. Enter doet niets: alinea's blijven zoals Claude ze maakte.
+					Escape sluit ook. Alt+pijl omlaag of omhoog gaat naar het volgende of vorige vers. Enter doet niets: alinea's blijven zoals Claude ze maakte. Opmaak zet je met de balk: {sneltoetsTekst('vet', mac)} voor vet,{' '}
+					{sneltoetsTekst('onderstreept', mac)} voor onderstreept, {sneltoetsTekst('kleur', mac)} voor een kleur.
 				</span>
 			</p>
 		</div>

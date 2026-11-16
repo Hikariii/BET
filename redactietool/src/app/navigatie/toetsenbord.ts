@@ -30,6 +30,8 @@ export type Toets = {
 
 const INVOERVELDEN = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
 const VENSTER = 'dialog, [role="dialog"]';
+/** De editor met zijn werkbalk: een letter op een knop van de werkbalk is geen sprong naar een ander vers. */
+const VERSEDITOR = '.verseditor';
 
 /** Of een letter die typt (zoals `j`) hier gewoon tekst is en dus niet als sneltoets telt. */
 function typtTekst(doel: Toetsdoel | null): boolean {
@@ -39,11 +41,11 @@ function typtTekst(doel: Toetsdoel | null): boolean {
 
 /**
  * De sprong op de pagina: `j` naar het volgende vers, `k` naar het vorige.
- * Geen sprong met een hulptoets erbij, in een invoerveld of de editor, of in een venster dat open staat.
+ * Geen sprong met een hulptoets erbij, in een invoerveld, in de editor of zijn werkbalk, of in een venster dat open staat.
  */
 export function sprongRichting(toets: Toets, doel: Toetsdoel | null): Richting | null {
 	if (toets.altKey || toets.ctrlKey || toets.metaKey || toets.shiftKey) return null;
-	if (typtTekst(doel) || (doel !== null && doel.closest(VENSTER) !== null)) return null;
+	if (typtTekst(doel) || (doel !== null && (doel.closest(VENSTER) !== null || doel.closest(VERSEDITOR) !== null))) return null;
 	if (toets.key === 'j') return 1;
 	if (toets.key === 'k') return -1;
 	return null;
