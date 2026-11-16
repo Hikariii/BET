@@ -1,19 +1,48 @@
+/*
+ * Eén aaneengesloten balk, vast boven het tekstveld en even breed.
+ * De editor (vormgeving.css) steekt met een negatieve marge 0.35rem boven en 0.5rem opzij uit, zodat de tekst op zijn plek blijft;
+ * de balk steekt opzij net zo ver uit en de editor schuift er met zijn bovenmarge tegenaan.
+ * Rand en omlijning zijn die van de editor met focus; de bovenrand van de editor scheidt de balk van de tekst.
+ */
 .werkbalk {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.35rem;
-	align-items: center;
-	margin: 0 0 0.9rem;
+	align-items: stretch;
+	margin: 0 -0.5rem 0.35rem;
+	background: var(--vlak);
+	border: 1px solid var(--tekst);
+	border-bottom: 0;
+	outline: 1px solid var(--tekst);
+	outline-offset: 0;
+}
+
+.werkbalk > :not(:first-child) {
+	border-left: 1px solid var(--rand);
+}
+
+.werkbalk-kleur {
+	position: relative;
+	display: flex;
 }
 
 .werkbalk-knop {
 	min-width: 2rem;
-	padding: 0.2rem 0.6rem;
+	padding: 0.25rem 0.65rem;
+	background: none;
+	border: 0;
+	border-radius: 0;
+}
+
+.werkbalk-knop:hover:not(:disabled) {
+	background: var(--vlak);
+	color: var(--tekst);
 }
 
 /* Aan: gevuld, zoals een knop die ingedrukt staat. */
 .werkbalk-knop[aria-pressed='true'],
-.werkbalk-knop[aria-expanded='true'] {
+.werkbalk-knop[aria-expanded='true'],
+.werkbalk-knop[aria-pressed='true']:hover:not(:disabled),
+.werkbalk-knop[aria-expanded='true']:hover:not(:disabled) {
 	background: var(--tekst);
 	color: #fff;
 }
@@ -21,7 +50,7 @@
 .werkbalk-knop:focus-visible,
 .werkbalk-menuregel:focus-visible {
 	outline: 2px solid var(--tekst);
-	outline-offset: 2px;
+	outline-offset: -2px;
 }
 
 .werkbalk-markering {
@@ -29,9 +58,7 @@
 	color: #000;
 }
 
-.werkbalk-kleur {
-	position: relative;
-}
+
 
 .werkbalk-kleurvlak {
 	display: inline-block;

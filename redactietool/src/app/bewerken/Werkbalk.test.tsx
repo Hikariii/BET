@@ -78,7 +78,7 @@ describe('Werkbalk', () => {
 		const { acties } = toonWerkbalk();
 		fireEvent.click(knop('Vet'));
 		fireEvent.click(knop('Markeren'));
-		fireEvent.click(knop('Wissen'));
+		fireEvent.click(knop('Opmaak wissen'));
 		expect(acties).toEqual([{ soort: 'vet' }, { soort: 'markeren' }, { soort: 'wissen' }]);
 	});
 

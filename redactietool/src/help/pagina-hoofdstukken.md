@@ -22,7 +22,7 @@ Terwijl je een vers bewerkt, staat boven de tekst een balk met vijf knoppen. Sel
 - **U** onderstreept de woorden of haalt het weg (Ctrl+U).
 - **Markeren** geeft de woorden de gele markering of haalt hem weg.
 - **Kleur ▾** opent een lijst met de begripsdomeinen en Onderwijs, elk met zijn kleur uit het Word-sjabloon. Een woord heeft één kleur: een nieuwe keuze vervangt de oude. Kies dezelfde kleur nog eens, of **Geen kleur**, om hem weg te halen. Alt+K opent de lijst met het toetsenbord.
-- **Wissen** haalt alle opmaak van de selectie weg (Ctrl+Spatie). De alineastijl, zoals de woorden van Jezus, blijft.
+- **Opmaak wissen** haalt alle opmaak van de selectie weg (Ctrl+Spatie). De alineastijl, zoals de woorden van Jezus, blijft.
 
 Op een Mac staat ⌘ voor Ctrl en ⌥ voor Alt. Daar wist ⌘+\ de opmaak, want ⌘+Spatie is van Spotlight. Een knop die aan staat, is gevuld. De tooltip noemt de sneltoets, of waarom een knop nu niet werkt.
 

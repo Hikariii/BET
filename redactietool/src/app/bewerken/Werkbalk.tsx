@@ -43,7 +43,7 @@ function menuregels(menu: HTMLElement | null): HTMLElement[] {
 }
 
 /**
- * De opmaakknoppen boven de editor: B, U, Markeren, Kleur ▾ en Wissen.
+ * De opmaakknoppen boven de editor: B, U, Markeren, Kleur ▾ en Opmaak wissen.
  * De balk is één tabstop; met de pijltjes, Home en End loop je langs de knoppen.
  * De knoppen nemen de focus niet bij een muisklik, zodat de selectie in de editor blijft.
  * Het kleurmenu sluit met Escape (de focus gaat terug naar de editor), een klik buiten, Tab naar buiten of een gekozen kleur.
@@ -208,7 +208,7 @@ export function Werkbalk({ toestand, stijlen, mac, kleurmenuOpen, onKleurmenu, o
 					</div>
 				)}
 			</span>
-			{gewoneKnop('wissen', 'Opmaak wissen', null, 'Wissen')}
+			{gewoneKnop('wissen', 'Opmaak wissen', null, 'Opmaak wissen')}
 		</div>
 	);
 }
