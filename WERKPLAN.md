@@ -192,10 +192,15 @@ De export heeft `versie: 3` (exports met een andere versie worden niet meer gele
 | Veld | Betekenis |
 |---|---|
 | `structureleKeuzes` | de hele keuze met de plekken van dit hoofdstuk, toegepast en overgeslagen (met reden) |
+| `reactiesOpOpmerkingen` | per reactie op een opmerking van Claude uit dit hoofdstuk: `nr` (het O-nummer), `kwestie` (de korte tekst van de opmerking), `tekst` (de reactie van de vertaler; mag leeg), `wordtVraag` (de vertaler wil er een vertaalvraag van) en `gegeven` (ISO-tijd), plus de `verzen` van de opmerking als `hoofdstuk:vers` |
 | `beantwoordeVragen` | per antwoord: `kwestie`, `optie` (de gekozen optietekst, of `eigen antwoord`), `toelichting` (de regel of uitleg van de vertaler; mag leeg), `keuzeIds` (de toegepaste keuzes onder het antwoord die dit hoofdstuk raken; geen, één of meer) en de `verzen` van de vraag |
 | per vers | het `keuzeId` en de herkomst |
 
 Een antwoord met keuzes staat in de export van elk hoofdstuk dat een van die keuzes raakt. Een antwoord zonder (bestaande) keuze staat alleen in de export van een hoofdstuk dat in de verzen van de vraag voorkomt, of van elk hoofdstuk als de vraag geen verzen heeft. Bij een keuze staat `vraag` alleen als het antwoord op die vraag die keuze nog noemt.
+
+Een reactie op een opmerking staat in de export van het hoofdstuk waar de opmerking in het wijzigingslog staat. Het O-nummer is afgeleid van de plek in het log en kan verschuiven als het log verandert; controleer daarom eerst of `kwestie` nog bij de opmerking met dat nummer past, en zoek anders de opmerking op de kwestie.
+
+Wat Claude met een reactie doet: lezen en verwerken in het wijzigingslog of in de tekst, in de volgende werkronde en na akkoord van de eigenaar (net als bij een toelichting). Een reactie is een mening of aanwijzing van de vertaler, nooit een bron van tekst. Is `wordtVraag` waar, dan zet Claude van de opmerking een nieuwe vraag in `bijbel/<boek>/referentie/open-vragen.md`, met het volgende vrije V-nummer en het O-nummer als herkomst (bijvoorbeeld in de kolom Plaats of in de besluittekst). Ook dat pas na akkoord van de eigenaar. De tool past `open-vragen.md` zelf nooit aan. Is `wordtVraag` waar en de tekst leeg, dan formuleert Claude de vraag uit de opmerking zelf.
 
 De toelichting is input voor regels of precedentvoorstellen (stap D2), nooit een besluit: Claude neemt ze mee bij volgende hoofdstukken zodra de eigenaar ze heeft goedgekeurd, via `precedenten.md` of de richtlijn. Een toelichting die nog niet goedgekeurd is, geldt niet als regel. Een overgeslagen plek met reden `uitgevinkt`, `goedgekeurd` of `met de hand` is een bewust besluit; `variant niet toegepast` is dat niet (de vorm is niet gekozen) en `teruggedraaid` betekent dat het vers na het toepassen is teruggedraaid: ook dat is bewust anders en wordt niet gerepareerd.
 

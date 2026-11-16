@@ -13,6 +13,7 @@ import {
 	type Antwoord,
 	type Uitkomst,
 } from '../../antwoorden/antwoorden';
+import { leesReacties, type Reactie } from '../../reacties/reacties';
 import { leesKeuzes, type StructureleKeuze } from '../../vervangen/keuzes';
 import { isHoudOptie, maakVoorstel, splitsOpties } from '../../begrippen/opties';
 import { deelVragenIn, filterVragen, FILTERSTATUSSEN, GEEN_FILTER, groepeerLogVragen, type VragenFilter } from '../../begrippen/vragenOverzicht';
@@ -27,6 +28,7 @@ import { maakAdres } from '../adres';
 import { useAdres } from '../hooks';
 import { eigenAntwoordUitleg, eigenAntwoordVastgelegd } from './antwoordTeksten';
 import { optieActie, type OptieActie } from './optieActie';
+import { ReactieVak } from './ReactieVak';
 import { browseropslag } from '../bewerken/useTussenstand';
 import { useOpslagTeller } from '../bewaren/useOpslagTeller';
 import type { TabbladProps } from './tabbladProps';
@@ -61,6 +63,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	const [alleenOnbeantwoord, zetAlleenOnbeantwoord] = useState(false);
 	const opslagTeller = useOpslagTeller();
 	const antwoorden = useMemo(() => new Map(leesAntwoorden(browseropslag(), boek.id).map((antwoord) => [antwoord.kwestie, antwoord])), [boek.id, opslagTeller]);
+	const reacties = useMemo(() => new Map(leesReacties(browseropslag(), boek.id).map((reactie) => [reactie.nr, reactie])), [boek.id, opslagTeller]);
 	const getoond = useMemo(
 		() => filterVragen(vragen, filter).filter((vraag) => !alleenOnbeantwoord || !antwoorden.has(vraag.kwestie) || vraag.herkomst.soort !== 'register'),
 		[vragen, filter, alleenOnbeantwoord, antwoorden],
@@ -165,7 +168,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 							<h3 id="twijfels-titel">Waar Claude nog twijfelde ({twijfels.length})</h3>
 							<ul class="vragenlijst">
 								{twijfels.map((vraag) => (
-									<LogVraag key={vraag.nr} boek={boek.id} vraag={vraag} doel={isDoel(vraag)} />
+									<LogVraag key={vraag.nr} boek={boek.id} vraag={vraag} doel={isDoel(vraag)} reactie={reacties.get(vraag.nr) ?? null} />
 								))}
 							</ul>
 						</section>
@@ -183,7 +186,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 									</h3>
 									<ul class="vragenlijst">
 										{hoofdstukVragen.map((vraag) => (
-											<LogVraag key={vraag.nr} boek={boek.id} vraag={vraag} doel={isDoel(vraag)} />
+											<LogVraag key={vraag.nr} boek={boek.id} vraag={vraag} doel={isDoel(vraag)} reactie={reacties.get(vraag.nr) ?? null} />
 										))}
 									</ul>
 								</section>
@@ -624,7 +627,7 @@ function Lijstgroep({ titelId, titel, open, children }: LijstgroepProps) {
 }
 
 /** Een opmerking van Claude uit een log: ingeklapt, tenzij een link naar dit nummer hier uitkomt. */
-function LogVraag({ boek, vraag, doel }: { boek: string; vraag: Vertaalvraag; doel: boolean }) {
+function LogVraag({ boek, vraag, doel, reactie }: { boek: string; vraag: Vertaalvraag; doel: boolean; reactie: Reactie | null }) {
 	const rij = useDoel<HTMLLIElement>(doel);
 	return (
 		<li class={doel ? 'vraag-doel' : undefined} ref={rij} tabIndex={doel ? -1 : undefined}>
@@ -633,6 +636,7 @@ function LogVraag({ boek, vraag, doel }: { boek: string; vraag: Vertaalvraag; do
 					<span class="vraagnr">{vraag.nr}</span>
 					<span class="kwestie">{vraag.kwestie}</span>
 					<Status vraag={vraag} />
+					{reactie !== null && <ReactieLabel reactie={reactie} />}
 					<span class="versjes">{kortVersoverzicht(vraag.verzen)}</span>
 				</summary>
 				<div class="vraagtekst">
@@ -642,9 +646,22 @@ function LogVraag({ boek, vraag, doel }: { boek: string; vraag: Vertaalvraag; do
 					<p>
 						{vraag.verzen.length === 0 ? <span class="geen-verzen">{GEEN_VERS_IN_KOP}</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}
 					</p>
+					{vraag.herkomst.soort !== 'register' && (
+						<ReactieVak boek={boek} opmerking={{ nr: vraag.nr, hoofdstuk: vraag.herkomst.hoofdstuk, kwestie: vraag.kwestie }} reactie={reactie} />
+					)}
 				</div>
 			</details>
 		</li>
+	);
+}
+
+/** In de rij van een opmerking: "gereageerd", en "wordt vraag" als het vinkje aan staat. */
+function ReactieLabel({ reactie }: { reactie: Reactie }) {
+	return (
+		<span class="statuslabel">
+			<span class="status status-reactie">gereageerd</span>
+			{reactie.wordtVraag && <span class="status status-reactie">wordt vraag</span>}
+		</span>
 	);
 }
 

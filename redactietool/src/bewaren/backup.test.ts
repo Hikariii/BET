@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { bewaarVers, leesTussenstand, tussenstandSleutel } from '../bewerken/tussenstand';
 import { antwoordenSleutel, bewaarAntwoord, leesAntwoorden, type Antwoord } from '../antwoorden/antwoorden';
+import { bewaarReactie, leesReacties, reactiesSleutel, type Reactie } from '../reacties/reacties';
 import { keuzesSleutel, leesKeuzes, pasKeuzeToe, type StructureleKeuze } from '../vervangen/keuzes';
 import { zoekVondsten } from '../vervangen/zoekEnVervang';
 import type { HoofdstukVerzen } from '../vervangen/types';
@@ -15,13 +16,16 @@ const KEUZE_VERZEN: HoofdstukVerzen[] = [
 
 const ANTWOORD: Antwoord = { kwestie: 'Harde man', optie: 'a) zachte', toelichting: 'Zachte man waar het over karakter gaat.', keuzeIds: ['wordt-ingevuld'], gegeven: '2026-11-15T09:01:00.000Z' };
 
-/** Een opslag met twee bewerkte verzen in hoofdstuk 1, één keuze in hoofdstuk 2 en het antwoord op een vraag, dat bij die keuze hoort. */
+const REACTIE: Reactie = { nr: 'O1.1', hoofdstuk: 1, kwestie: 'Vrije weergave', tekst: 'Liever dichter bij de bron.', wordtVraag: true, gegeven: '2026-11-15T09:30:00.000Z' };
+
+/** Een opslag met twee bewerkte verzen in hoofdstuk 1, één keuze in hoofdstuk 2, het antwoord op een vraag, dat bij die keuze hoort, en een reactie op een opmerking. */
 function gevuldeOpslag(): GeheugenOpslag {
 	const opslag = new GeheugenOpslag();
 	bewaarVers(opslag, 'lukas', 1, 1, inhoud(' eerste'), inhoud(' oud een'));
 	bewaarVers(opslag, 'lukas', 1, 2, inhoud(' tweede'), inhoud(' oud twee'));
 	const { keuze } = pasKeuzeToe(opslag, 'lukas', KEUZE_VERZEN, 'harde', 'zachte', zoekVondsten(KEUZE_VERZEN, 'harde'), new Date('2026-11-15T09:00:00.000Z'));
 	bewaarAntwoord(opslag, 'lukas', { ...ANTWOORD, keuzeIds: [keuze.id] });
+	bewaarReactie(opslag, 'lukas', REACTIE);
 	return opslag;
 }
 
@@ -70,6 +74,7 @@ describe('maakBackup', () => {
 		]);
 		expect(backup.keuzes).toMatchObject([{ zoekterm: 'harde', nieuw: 'zachte' }]);
 		expect(backup.antwoorden).toEqual([{ ...ANTWOORD, keuzeIds: backup.keuzes.map((keuze) => keuze.id) }]);
+		expect(backup.reacties).toEqual([REACTIE]);
 	});
 
 	it('laat een hoofdstuk zonder bewerkingen en de opslag van een ander boek weg', () => {
@@ -160,6 +165,18 @@ describe('leesBackup', () => {
 		expect(weigering(JSON.stringify(basis))).toBe(BESCHADIGD);
 	});
 
+	it('leest een back-up zonder reacties als een lege lijst, en weigert een onleesbare reactie of twee reacties op dezelfde opmerking', () => {
+		const { reacties, ...basis } = maakBackup(gevuldeOpslag(), BOEK, null, NU);
+		expect(reacties).toEqual([REACTIE]);
+		const details = (tekst: string) => weigeringMetDetails(tekst).details;
+
+		const zonder = leesBackup(JSON.stringify(basis), 'lukas');
+		expect(zonder.gelukt && zonder.backup.reacties).toEqual([]);
+		expect(details(JSON.stringify({ ...basis, reacties: 'veel' }))).toBe('De reacties in de back-up hebben een onbekende vorm.');
+		expect(details(JSON.stringify({ ...basis, reacties: [{ nr: 'O1.1' }] }))).toBe('Een reactie in de back-up is onleesbaar.');
+		expect(details(JSON.stringify({ ...basis, reacties: [REACTIE, { ...REACTIE, tekst: 'anders' }] }))).toBe('Opmerking O1.1 heeft in de back-up twee reacties.');
+	});
+
 	it('houdt een keuze met markering, varianten, overgeslagen plekken en vraag intact door de back-up heen', () => {
 		const bron = new GeheugenOpslag();
 		bron.setItem(keuzesSleutel('lukas'), JSON.stringify([MARKERINGSKEUZE]));
@@ -248,8 +265,9 @@ describe('voorbeeldInladen', () => {
 		expect(leesKeuzes(doel, 'lukas')).toHaveLength(2);
 
 		bewaarAntwoord(doel, 'lukas', { kwestie: 'Alleen lokaal', optie: 'x', toelichting: '', keuzeIds: [], gegeven: NU.toISOString() });
+		bewaarReactie(doel, 'lukas', { ...REACTIE, nr: 'O9.9', hoofdstuk: 9 });
 
-		expect(voorbeeldInladen(doel, BOEK, backup).vervangenWist).toEqual({ verzen: 1, keuzes: 1, antwoorden: 1 });
+		expect(voorbeeldInladen(doel, BOEK, backup).vervangenWist).toEqual({ verzen: 1, keuzes: 1, antwoorden: 1, reacties: 1 });
 	});
 
 	it('zegt per antwoord of het nieuw, gelijk of nieuwer of ouder is dan het lokale antwoord op dezelfde vraag', () => {
@@ -266,6 +284,21 @@ describe('voorbeeldInladen', () => {
 		expect(soortMetLokaal(uitBackup)).toBe('gelijk');
 		expect(soortMetLokaal({ ...uitBackup, optie: 'b)', gegeven: '2026-11-15T09:00:00.000Z' })).toBe('overschrijft');
 		expect(soortMetLokaal({ ...uitBackup, optie: 'b)', gegeven: '2026-11-15T09:02:00.000Z' })).toBe('jouwe-blijft');
+	});
+
+	it('zegt per reactie of die nieuw, gelijk, nieuwer of ouder is dan de lokale reactie op dezelfde opmerking', () => {
+		const backup = teruglezen(gevuldeOpslag());
+		const soortMetLokaal = (lokaal: Reactie | null) => {
+			const doel = new GeheugenOpslag();
+			if (lokaal !== null) bewaarReactie(doel, 'lukas', lokaal);
+			return voorbeeldInladen(doel, BOEK, backup).reacties;
+		};
+
+		expect(soortMetLokaal(null)).toEqual([{ nr: 'O1.1', soort: 'nieuw' }]);
+		expect(voorbeeldInladen(new GeheugenOpslag(), BOEK, backup).telling.reactiesNieuw).toBe(1);
+		expect(soortMetLokaal(REACTIE)).toEqual([{ nr: 'O1.1', soort: 'gelijk' }]);
+		expect(soortMetLokaal({ ...REACTIE, tekst: 'ouder', gegeven: '2026-11-15T09:00:00.000Z' })).toEqual([{ nr: 'O1.1', soort: 'overschrijft' }]);
+		expect(soortMetLokaal({ ...REACTIE, tekst: 'nieuwer', gegeven: '2026-11-15T10:00:00.000Z' })).toEqual([{ nr: 'O1.1', soort: 'jouwe-blijft' }]);
 	});
 
 	it('schrijft niets', () => {
@@ -297,7 +330,7 @@ describe('pasBackupToe', () => {
 
 		const uitkomst = pasBackupToe(doel, BOEK, backup, 'samenvoegen');
 
-		expect(uitkomst).toEqual({ geschreven: { verzen: 3, keuzes: 1, antwoorden: 1 }, meldingen: [] });
+		expect(uitkomst).toEqual({ geschreven: { verzen: 3, keuzes: 1, antwoorden: 1, reacties: 1 }, meldingen: [] });
 		expect(leesTussenstand(doel, 'lukas', 1).verzen[2]?.inhoud).toEqual(inhoud(' tweede'));
 		expect(leesTussenstand(doel, 'lukas', 1).verzen[1]?.inhoud).toEqual(inhoud(' eerste'));
 		expect(leesTussenstand(doel, 'lukas', 2).verzen[7]).toBeDefined();
@@ -325,7 +358,7 @@ describe('pasBackupToe', () => {
 		pasBackupToe(doel, BOEK, backup, 'samenvoegen');
 		const uitkomst = pasBackupToe(doel, BOEK, backup, 'samenvoegen');
 
-		expect(uitkomst).toEqual({ geschreven: { verzen: 0, keuzes: 0, antwoorden: 0 }, meldingen: [] });
+		expect(uitkomst).toEqual({ geschreven: { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 }, meldingen: [] });
 		expect(leesKeuzes(doel, 'lukas')).toHaveLength(1);
 	});
 
@@ -338,7 +371,7 @@ describe('pasBackupToe', () => {
 
 		const uitkomst = pasBackupToe(doel, BOEK, backup, 'vervangen');
 
-		expect(uitkomst).toEqual({ geschreven: { verzen: 3, keuzes: 1, antwoorden: 1 }, meldingen: [] });
+		expect(uitkomst).toEqual({ geschreven: { verzen: 3, keuzes: 1, antwoorden: 1, reacties: 1 }, meldingen: [] });
 		expect(leesTussenstand(doel, 'lukas', 3).verzen).toEqual({});
 		expect(leesKeuzes(doel, 'lukas').map((keuze) => keuze.zoekterm)).toEqual(['harde']);
 		expect(teruglezen(doel).tussenstanden).toEqual(backup.tussenstanden);
@@ -377,6 +410,45 @@ describe('pasBackupToe', () => {
 		expect(eerste.geschreven.antwoorden).toBe(1);
 		expect(leesAntwoorden(doel, 'lukas')).toEqual([{ ...uitBackup, keuzeIds: ['lokale-keuze', ...uitBackup.keuzeIds] }]);
 		expect(pasBackupToe(doel, BOEK, backup, 'samenvoegen').geschreven.antwoorden).toBe(0);
+	});
+
+	it('samenvoegen houdt per opmerking de nieuwste reactie en zet reacties die er nog niet zijn erbij', () => {
+		const backup = teruglezen(gevuldeOpslag());
+		const alleenLokaal: Reactie = { ...REACTIE, nr: 'O3.1', hoofdstuk: 3, kwestie: 'Alleen lokaal' };
+		const nieuwerLokaal: Reactie = { ...REACTIE, tekst: 'lokaal nieuwer', wordtVraag: false, gegeven: '2026-11-15T10:00:00.000Z' };
+		const ouderLokaal: Reactie = { ...REACTIE, tekst: 'lokaal ouder', wordtVraag: false, gegeven: '2026-11-15T09:00:00.000Z' };
+
+		const doelNieuwer = new GeheugenOpslag();
+		bewaarReactie(doelNieuwer, 'lukas', alleenLokaal);
+		bewaarReactie(doelNieuwer, 'lukas', nieuwerLokaal);
+		const metNieuwerLokaal = pasBackupToe(doelNieuwer, BOEK, backup, 'samenvoegen');
+		expect(metNieuwerLokaal.geschreven.reacties).toBe(0);
+		expect(leesReacties(doelNieuwer, 'lukas')).toEqual([alleenLokaal, nieuwerLokaal]);
+
+		const doelOuder = new GeheugenOpslag();
+		bewaarReactie(doelOuder, 'lukas', alleenLokaal);
+		bewaarReactie(doelOuder, 'lukas', ouderLokaal);
+		expect(pasBackupToe(doelOuder, BOEK, backup, 'samenvoegen').geschreven.reacties).toBe(1);
+		expect(leesReacties(doelOuder, 'lukas')).toEqual([alleenLokaal, REACTIE]);
+
+		const doelLeeg = new GeheugenOpslag();
+		expect(pasBackupToe(doelLeeg, BOEK, backup, 'samenvoegen').geschreven.reacties).toBe(1);
+		expect(pasBackupToe(doelLeeg, BOEK, backup, 'samenvoegen').geschreven.reacties).toBe(0);
+	});
+
+	it('vervangen wist de lokale reacties die niet in de back-up staan, en zet ze terug als het schrijven niet lukt', () => {
+		const backup = teruglezen(gevuldeOpslag());
+		const lokaal: Reactie = { ...REACTIE, nr: 'O3.1', hoofdstuk: 3, kwestie: 'Alleen lokaal' };
+		const doel = new GeheugenOpslag();
+		bewaarReactie(doel, 'lukas', lokaal);
+		pasBackupToe(doel, BOEK, backup, 'vervangen');
+		expect(leesReacties(doel, 'lukas')).toEqual([REACTIE]);
+
+		const vol = new OpslagMetVolleSleutel(reactiesSleutel('lukas'));
+		bewaarVers(vol, 'lukas', 3, 4, inhoud(' alleen lokaal'), inhoud(' oud'));
+		const uitkomst = pasBackupToe(vol, BOEK, backup, 'vervangen');
+		expect(uitkomst.meldingen).toEqual([expect.stringContaining('reacties konden niet'), 'Er is niets veranderd: de oude stand is teruggezet.']);
+		expect(leesTussenstand(vol, 'lukas', 3).verzen[4]).toBeDefined();
 	});
 
 	it('vervangen wist de lokale antwoorden die niet in de back-up staan', () => {
@@ -430,7 +502,7 @@ describe('pasBackupToe', () => {
 
 		const uitkomst = pasBackupToe(doel, BOEK, backup, 'vervangen');
 
-		expect(uitkomst.geschreven).toEqual({ verzen: 0, keuzes: 0, antwoorden: 0 });
+		expect(uitkomst.geschreven).toEqual({ verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 });
 		expect(uitkomst.meldingen).toEqual([expect.stringContaining('Hoofdstuk 2 kon niet'), 'Er is niets veranderd: de oude stand is teruggezet.']);
 		expect(doel.getItem(tussenstandSleutel('lukas', 3))).toBe(voor);
 		expect(doel.getItem(tussenstandSleutel('lukas', 1))).toBeNull();
@@ -444,7 +516,7 @@ describe('pasBackupToe', () => {
 		const uitkomst = pasBackupToe(doel, BOEK, backup, 'samenvoegen');
 
 		expect(uitkomst.meldingen).toEqual([expect.stringContaining('Hoofdstuk 1 kon niet')]);
-		expect(uitkomst.geschreven).toEqual({ verzen: 1, keuzes: 1, antwoorden: 1 });
+		expect(uitkomst.geschreven).toEqual({ verzen: 1, keuzes: 1, antwoorden: 1, reacties: 1 });
 		expect(leesTussenstand(doel, 'lukas', 2).verzen[7]).toBeDefined();
 	});
 });

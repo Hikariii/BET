@@ -5,8 +5,9 @@ import { isBewerkingVerouderd } from '../bewerken/tussenstand';
 import type { Tussenstand, VersInhoud } from '../bewerken/types';
 import { knipVers } from '../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../bewerken/waarschuwingen';
+import type { Reactie } from '../reacties/reacties';
 import type { StructureleKeuze } from '../vervangen/keuzes';
-import type { ExportAntwoord, ExportKeuze, GewijzigdVers, RedactieExport } from './types';
+import type { ExportAntwoord, ExportKeuze, ExportReactie, GewijzigdVers, RedactieExport } from './types';
 
 export type ExportInvoer = {
 	boek: string;
@@ -17,6 +18,10 @@ export type ExportInvoer = {
 	keuzes: readonly StructureleKeuze[];
 	/** Alle antwoorden van het boek. */
 	antwoorden: readonly Antwoord[];
+	/** Alle reacties van het boek; de export neemt die op opmerkingen uit dit hoofdstuk. */
+	reacties: readonly Reactie[];
+	/** De verzen per opmerking (`O`-nummer) uit het log van dit hoofdstuk; een nummer dat hier niet in staat, geeft een reactie zonder verzen. */
+	opmerkingVerzen: ReadonlyMap<string, readonly VersRef[]>;
 	/** Nummer en verzen per kwestie uit de ingelezen open vragen; een kwestie die er niet in staat, heeft geen nummer en geen verzen. */
 	vragen: ReadonlyMap<string, { nr: string; verzen: readonly VersRef[] }>;
 	repoCommit: string | null;
@@ -99,6 +104,11 @@ function exportAntwoord(antwoord: Antwoord, keuzeIds: ReadonlySet<string>, besta
 	return hier.length > 0 ? { ...antwoord, keuzeIds: hier, nr, verzen } : null;
 }
 
+function exportReactie({ nr, kwestie, tekst, wordtVraag, gegeven }: Reactie, invoer: ExportInvoer): ExportReactie {
+	const verzen = (invoer.opmerkingVerzen.get(nr) ?? []).map(({ hoofdstuk, vers }) => plekNaam(hoofdstuk, vers));
+	return { nr, kwestie, tekst, wordtVraag, gegeven, verzen };
+}
+
 /** Maakt de export voor Claude uit de bewerkte verzen van een hoofdstuk, op oplopend versnummer. */
 export function maakExport(invoer: ExportInvoer): RedactieExport {
 	// Sleutels die gehele getallen zijn, komen in JavaScript altijd oplopend terug.
@@ -119,6 +129,7 @@ export function maakExport(invoer: ExportInvoer): RedactieExport {
 		verzen,
 		structureleKeuzes,
 		beantwoordeVragen: invoer.antwoorden.flatMap((antwoord) => exportAntwoord(antwoord, keuzeIds, bestaandeKeuzes, invoer) ?? []),
+		reactiesOpOpmerkingen: invoer.reacties.filter((reactie) => reactie.hoofdstuk === invoer.hoofdstuk.nummer).map((reactie) => exportReactie(reactie, invoer)),
 	};
 }
 

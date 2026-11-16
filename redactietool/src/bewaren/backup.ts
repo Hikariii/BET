@@ -2,6 +2,7 @@ import { alsBewerktVers, leesTussenstand, tussenstandSleutel, zelfdeInhoud } fro
 import type { Opslag } from '../bewerken/tussenstand';
 import type { BewerktVers } from '../bewerken/types';
 import { alsAntwoord, antwoordenSleutel, leesAntwoorden, schrijfAntwoorden, type Antwoord } from '../antwoorden/antwoorden';
+import { alsReactie, leesReacties, reactiesSleutel, schrijfReacties, type Reactie } from '../reacties/reacties';
 import { alsKeuze, keuzesSleutel, leesKeuzes, schrijfKeuzes, type StructureleKeuze } from '../vervangen/keuzes';
 import type { BoekMetHoofdstukken } from './types';
 
@@ -25,6 +26,8 @@ export type Backup = {
 	keuzes: StructureleKeuze[];
 	/** Antwoorden op vertaalvragen, op volgorde van bewaren, met toelichting en `keuzeIds`. */
 	antwoorden: Antwoord[];
+	/** Reacties op opmerkingen van Claude, op volgorde van bewaren. Een back-up zonder dit veld is geldig: een lege lijst. */
+	reacties: Reactie[];
 };
 
 /**
@@ -54,6 +57,7 @@ export function maakBackup(opslag: Opslag, boek: BoekMetHoofdstukken, repoCommit
 		tussenstanden,
 		keuzes: leesKeuzes(opslag, boek.id).reverse(),
 		antwoorden: leesAntwoorden(opslag, boek.id),
+		reacties: leesReacties(opslag, boek.id),
 	};
 }
 
@@ -99,6 +103,19 @@ function leesAntwoordenUitBackup(waarde: unknown): Antwoord[] | string {
 		antwoorden.push(antwoord);
 	}
 	return antwoorden;
+}
+
+function leesReactiesUitBackup(waarde: unknown): Reactie[] | string {
+	if (waarde === undefined) return [];
+	if (!Array.isArray(waarde)) return 'De reacties in de back-up hebben een onbekende vorm.';
+	const reacties: Reactie[] = [];
+	for (const ruw of waarde) {
+		const reactie = alsReactie(ruw);
+		if (reactie === null) return 'Een reactie in de back-up is onleesbaar.';
+		if (reacties.some((bestaand) => bestaand.nr === reactie.nr)) return `Opmerking ${reactie.nr} heeft in de back-up twee reacties.`;
+		reacties.push(reactie);
+	}
+	return reacties;
 }
 
 /**
@@ -148,7 +165,9 @@ export function leesBackup(tekst: string, boek: string): LeesUitkomst {
 	}
 	const antwoorden = leesAntwoordenUitBackup(json['antwoorden']);
 	if (typeof antwoorden === 'string') return beschadigd(antwoorden);
-	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 3, boek, gemaakt, repoCommit, tussenstanden, keuzes, antwoorden } };
+	const reacties = leesReactiesUitBackup(json['reacties']);
+	if (typeof reacties === 'string') return beschadigd(reacties);
+	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 3, boek, gemaakt, repoCommit, tussenstanden, keuzes, antwoorden, reacties } };
 }
 
 /**
@@ -161,15 +180,19 @@ type KeuzeVergelijking = { id: string; zoekterm: string; nieuw: string; soort: '
 
 type AntwoordVergelijking = { kwestie: string; optie: string; soort: 'nieuw' | 'overschrijft' | 'jouwe-blijft' | 'gelijk' };
 
+type ReactieVergelijking = { nr: string; soort: 'nieuw' | 'overschrijft' | 'jouwe-blijft' | 'gelijk' };
+
 export type InlaadVoorbeeld = {
 	/** Per vers in de back-up wat inladen ermee doet, op oplopend hoofdstuk en vers. */
 	verzen: VersVergelijking[];
 	keuzes: KeuzeVergelijking[];
 	/** Per antwoord in de back-up wat inladen ermee doet. */
 	antwoorden: AntwoordVergelijking[];
-	telling: { nieuw: number; overschrijft: number; jouweBlijft: number; gelijk: number; keuzesNieuw: number; antwoordenNieuw: number };
+	/** Per reactie in de back-up wat inladen ermee doet. */
+	reacties: ReactieVergelijking[];
+	telling: { nieuw: number; overschrijft: number; jouweBlijft: number; gelijk: number; keuzesNieuw: number; antwoordenNieuw: number; reactiesNieuw: number };
 	/** Wat Vervangen wist omdat het niet in de back-up staat. */
-	vervangenWist: { verzen: number; keuzes: number; antwoorden: number };
+	vervangenWist: { verzen: number; keuzes: number; antwoorden: number; reacties: number };
 };
 
 function zelfdeBewerking(lokaal: BewerktVers, uitBackup: BewerktVers): boolean {
@@ -202,6 +225,15 @@ function lokaalAntwoordIsNieuwer(lokaal: Antwoord, uitBackup: Antwoord): boolean
 function voegAntwoordenSamen(lokaal: Antwoord, uitBackup: Antwoord): Antwoord {
 	const winnaar = lokaalAntwoordIsNieuwer(lokaal, uitBackup) ? lokaal : uitBackup;
 	return { ...winnaar, keuzeIds: [...new Set([...lokaal.keuzeIds, ...uitBackup.keuzeIds])] };
+}
+
+function zelfdeReactie(lokaal: Reactie, uitBackup: Reactie): boolean {
+	return lokaal.tekst === uitBackup.tekst && lokaal.wordtVraag === uitBackup.wordtVraag && lokaal.kwestie === uitBackup.kwestie && lokaal.gegeven === uitBackup.gegeven;
+}
+
+/** Bij samenvoegen wint per nummer de nieuwste reactie; bij gelijke tijd de back-up. */
+function lokaleReactieIsNieuwer(lokaal: Reactie, uitBackup: Reactie): boolean {
+	return Date.parse(lokaal.gegeven) > Date.parse(uitBackup.gegeven);
 }
 
 /** Hoofdstukken waar de opslag of de back-up iets voor heeft, op oplopend nummer. */
@@ -241,11 +273,19 @@ export function voorbeeldInladen(opslag: Opslag, boek: BoekMetHoofdstukken, back
 		if (zelfdeAntwoord(eigen, uitBackup)) return { kwestie, optie, soort: 'gelijk' };
 		return { kwestie, optie, soort: lokaalAntwoordIsNieuwer(eigen, uitBackup) ? 'jouwe-blijft' : 'overschrijft' };
 	});
+	const lokaleReacties = leesReacties(opslag, boek.id);
+	const reacties = backup.reacties.map((uitBackup): ReactieVergelijking => {
+		const eigen = lokaleReacties.find((lokaal) => lokaal.nr === uitBackup.nr);
+		if (eigen === undefined) return { nr: uitBackup.nr, soort: 'nieuw' };
+		if (zelfdeReactie(eigen, uitBackup)) return { nr: uitBackup.nr, soort: 'gelijk' };
+		return { nr: uitBackup.nr, soort: lokaleReactieIsNieuwer(eigen, uitBackup) ? 'jouwe-blijft' : 'overschrijft' };
+	});
 	const soortAantal = (soort: VersVergelijking['soort']) => verzen.filter((vers) => vers.soort === soort).length;
 	return {
 		verzen,
 		keuzes,
 		antwoorden,
+		reacties,
 		telling: {
 			nieuw: soortAantal('nieuw'),
 			overschrijft: soortAantal('overschrijft'),
@@ -253,18 +293,20 @@ export function voorbeeldInladen(opslag: Opslag, boek: BoekMetHoofdstukken, back
 			gelijk: soortAantal('gelijk'),
 			keuzesNieuw: keuzes.filter((keuze) => keuze.soort === 'nieuw').length,
 			antwoordenNieuw: antwoorden.filter((antwoord) => antwoord.soort === 'nieuw').length,
+			reactiesNieuw: reacties.filter((reactie) => reactie.soort === 'nieuw').length,
 		},
 		vervangenWist: {
 			verzen: wistVerzen,
 			keuzes: lokaleKeuzes.filter((lokaal) => !backup.keuzes.some((keuze) => keuze.id === lokaal.id)).length,
 			antwoorden: lokaleAntwoorden.filter((lokaal) => !backup.antwoorden.some((antwoord) => antwoord.kwestie === lokaal.kwestie)).length,
+			reacties: lokaleReacties.filter((lokaal) => !backup.reacties.some((reactie) => reactie.nr === lokaal.nr)).length,
 		},
 	};
 }
 
 export type InlaadUitkomst = {
-	/** Het aantal verzen, keuzes en antwoorden dat nu in de opslag staat dankzij het inladen. */
-	geschreven: { verzen: number; keuzes: number; antwoorden: number };
+	/** Het aantal verzen, keuzes, antwoorden en reacties dat nu in de opslag staat dankzij het inladen. */
+	geschreven: { verzen: number; keuzes: number; antwoorden: number; reacties: number };
 	/** Leeg als alles gelukt is. */
 	meldingen: string[];
 };
@@ -287,10 +329,11 @@ function nietBewaard(hoofdstuk: number): string {
 
 const KEUZES_NIET_BEWAARD = `De vervangingen konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
 const ANTWOORDEN_NIET_BEWAARD = `De antwoorden konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
+const REACTIES_NIET_BEWAARD = `De reacties konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
 
 function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst {
 	const meldingen: string[] = [];
-	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0 };
+	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 };
 	for (const { hoofdstuk, verzen: uitBackup } of backup.tussenstanden) {
 		const verzen = leesTussenstand(opslag, boek, hoofdstuk).verzen;
 		let veranderd = 0;
@@ -329,16 +372,30 @@ function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst
 		if (schrijfAntwoorden(opslag, boek, samenAntwoorden)) geschreven.antwoorden += veranderdeAntwoorden;
 		else meldingen.push(ANTWOORDEN_NIET_BEWAARD);
 	}
+	const samenReacties = leesReacties(opslag, boek);
+	let veranderdeReacties = 0;
+	for (const reactie of backup.reacties) {
+		const index = samenReacties.findIndex((eigen) => eigen.nr === reactie.nr);
+		const eigen = samenReacties[index];
+		if (eigen === undefined) samenReacties.push(reactie);
+		else if (zelfdeReactie(eigen, reactie) || lokaleReactieIsNieuwer(eigen, reactie)) continue;
+		else samenReacties[index] = reactie;
+		veranderdeReacties++;
+	}
+	if (veranderdeReacties > 0) {
+		if (schrijfReacties(opslag, boek, samenReacties)) geschreven.reacties += veranderdeReacties;
+		else meldingen.push(REACTIES_NIET_BEWAARD);
+	}
 	return { geschreven, meldingen };
 }
 
 function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): InlaadUitkomst {
-	const sleutels = [...betrokkenHoofdstukken(boek, backup).map((hoofdstuk) => tussenstandSleutel(boek.id, hoofdstuk)), keuzesSleutel(boek.id), antwoordenSleutel(boek.id)];
+	const sleutels = [...betrokkenHoofdstukken(boek, backup).map((hoofdstuk) => tussenstandSleutel(boek.id, hoofdstuk)), keuzesSleutel(boek.id), antwoordenSleutel(boek.id), reactiesSleutel(boek.id)];
 	const oudeWaarden = new Map(sleutels.map((sleutel) => [sleutel, opslag.getItem(sleutel)]));
 	for (const sleutel of sleutels) opslag.removeItem(sleutel);
 
 	const meldingen: string[] = [];
-	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0 };
+	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 };
 	for (const { hoofdstuk, verzen } of backup.tussenstanden) {
 		if (schrijfHoofdstuk(opslag, boek.id, hoofdstuk, verzen)) geschreven.verzen += Object.keys(verzen).length;
 		else meldingen.push(nietBewaard(hoofdstuk));
@@ -351,6 +408,10 @@ function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): Inl
 		if (schrijfAntwoorden(opslag, boek.id, backup.antwoorden)) geschreven.antwoorden = backup.antwoorden.length;
 		else meldingen.push(ANTWOORDEN_NIET_BEWAARD);
 	}
+	if (backup.reacties.length > 0) {
+		if (schrijfReacties(opslag, boek.id, backup.reacties)) geschreven.reacties = backup.reacties.length;
+		else meldingen.push(REACTIES_NIET_BEWAARD);
+	}
 	if (meldingen.length === 0) return { geschreven, meldingen };
 
 	try {
@@ -358,7 +419,7 @@ function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): Inl
 			if (waarde === null) opslag.removeItem(sleutel);
 			else opslag.setItem(sleutel, waarde);
 		}
-		return { geschreven: { verzen: 0, keuzes: 0, antwoorden: 0 }, meldingen: [...meldingen, 'Er is niets veranderd: de oude stand is teruggezet.'] };
+		return { geschreven: { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 }, meldingen: [...meldingen, 'Er is niets veranderd: de oude stand is teruggezet.'] };
 	} catch {
 		return { geschreven, meldingen: [...meldingen, 'De oude stand kon niet worden teruggezet. Laad de back-up opnieuw of kopieer je tekst.'] };
 	}
@@ -368,6 +429,7 @@ function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): Inl
  * Schrijft de back-up in de opslag.
  * Samenvoegen houdt wat er is; bij een vers wint het nieuwste, bij gelijke tijd de back-up; keuzes die al bestaan blijven.
  * Een antwoord in beide krijgt optie en toelichting van het nieuwste (bij gelijke tijd de back-up) en de keuzes van beide.
+ * Een reactie op dezelfde opmerking: de nieuwste blijft staan (bij gelijke tijd de back-up).
  * Vervangen wist eerst alles van dit boek; lukt het schrijven niet helemaal, dan komt de oude stand terug.
  */
 export function pasBackupToe(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup, modus: InlaadModus): InlaadUitkomst {

@@ -16,7 +16,7 @@ function verouderdeVerzen(overzicht: BewaardOverzicht, boekNaam: string): string
 	return overzicht.hoofdstukken.flatMap(({ hoofdstuk, verzen }) => verzen.filter((vers) => vers.verouderd).map((vers) => `${boekNaam} ${hoofdstuk}:${vers.vers}`));
 }
 
-/** De pagina `#/<boek>/opgeslagen`: wat de browser bewaart per hoofdstuk, de toegepaste vervangingen, de antwoorden en de back-upknoppen. */
+/** De pagina `#/<boek>/opgeslagen`: wat de browser bewaart per hoofdstuk, de toegepaste vervangingen, de antwoorden, de reacties en de back-upknoppen. */
 export function BewaardOverzicht({ boek, openVragen }: { boek: BoekData; openVragen: readonly OpenVraag[] }) {
 	const overzicht = useBewaardOverzicht(boek);
 	const backup = useBackupStand(boek.id, overzicht);
@@ -43,9 +43,9 @@ export function BewaardOverzicht({ boek, openVragen }: { boek: BoekData; openVra
 				{melding}
 			</p>
 			<BackupInladen boek={boek} focusNaSluiten={inladenKnop} invoer={invoer} />
-			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && overzicht.totaal.antwoorden === 0 && (
+			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && overzicht.totaal.antwoorden === 0 && overzicht.totaal.reacties === 0 && (
 				<div class="bewaard-leeg">
-					<p class="melding">Er is niets opgeslagen. Bewerk een vers, pas een vervanging toe of beantwoord een vertaalvraag en het staat hier.</p>
+					<p class="melding">Er is niets opgeslagen. Bewerk een vers, pas een vervanging toe, beantwoord een vertaalvraag of reageer op een opmerking van Claude en het staat hier.</p>
 					<p class="bewaard-leeg-tip">Werkte je eerder in een andere browser of op een andere computer? Laad dan je back-up in.</p>
 					<p>
 						<button type="button" onClick={() => invoer.current?.click()}>
@@ -97,6 +97,20 @@ export function BewaardOverzicht({ boek, openVragen }: { boek: BoekData; openVra
 							<li>
 								<AntwoordKop boekId={boek.id} kwestie={antwoord.kwestie} nummers={nummers} />: <strong>{kortUit(optieOmschrijving(antwoord.optie), 80)}</strong>, gegeven{' '}
 								{tijdVan(antwoord.gegeven)}.
+							</li>
+						))}
+					</ul>
+				</section>
+			)}
+			{overzicht.reacties.length > 0 && (
+				<section class="bewaard-antwoorden" aria-labelledby="bewaard-reacties-titel">
+					<h2 id="bewaard-reacties-titel">Reacties op opmerkingen van Claude</h2>
+					<ul>
+						{overzicht.reacties.map((reactie) => (
+							<li>
+								<span class="vraagnr">{reactie.nr}</span> <a href={vraagAdres(boek.id, reactie.nr)}>{kortUit(reactie.kwestie, 80)}</a>, gegeven {tijdVan(reactie.gegeven)}
+								{reactie.heeftTekst ? '.' : ', zonder tekst.'}
+								{reactie.wordtVraag && <span class="bewaard-label">wordt vraag</span>}
 							</li>
 						))}
 					</ul>

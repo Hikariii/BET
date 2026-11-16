@@ -15,9 +15,10 @@ De broncode van de tool. Het plan staat in [`stap1-plan.md`](stap1-plan.md) (afg
 | `src/begrippen/` | rekenfuncties voor het scherm Keuzes en vragen: vertaalkeuzes tellen (`telPrecedenten`), vertaalvragen verzamelen (`verzamelVragen`) en de opties van een vraag (`opties`) |
 | `src/vervangen/` | zoeken en vervangen: de zoekopdracht, het voorstel per plek en de bewaarde keuzes met terugdraaien |
 | `src/bewerken/` | de tussenstand per vers in de browser (`localStorage`), de opmaakwaarschuwing en het knippen van een bewerkt vers |
-| `src/antwoorden/` | de antwoorden op vertaalvragen, inclusief het genuanceerde antwoord |
-| `src/bewaren/` | wat de browser bewaart: overzicht, back-up (download en inladen, versie 3) en de meldingen bij een wijziging |
-| `src/export/` | Export voor Claude (`<prefix>-NN.redactie.json`, versie 3) |
+| `src/antwoorden/` | de antwoorden op vertaalvragen, inclusief het genuanceerde antwoord (opslagsleutel `bet-antwoorden/<boek>`) |
+| `src/reacties/` | de reacties op opmerkingen van Claude, met het vinkje "Maak hier een vertaalvraag van" (opslagsleutel `bet-reacties/<boek>`, sleutel per reactie het O-nummer met de kwestie erbij, omdat O-nummers kunnen verschuiven) |
+| `src/bewaren/` | wat de browser bewaart: overzicht, back-up (download en inladen, versie 3; bevat tussenstanden, keuzes, antwoorden en reacties, en een back-up zonder reacties is geldig) en de meldingen bij een wijziging |
+| `src/export/` | Export voor Claude (`<prefix>-NN.redactie.json`, versie 3; met `reactiesOpOpmerkingen`, de reacties op opmerkingen uit dat hoofdstuk, zie `WERKPLAN.md` stap D) |
 | `src/uitlijning/` | woorduitlijning bron ↔ vereenvoudigd per vers en "Gevonden": hoe bronwoorden vertaald zijn (voor het begrippenoverzicht) |
 | `src/editor/` | ProseMirror-schema, omzetting en toetsen voor de vers-editor (`src/app/bewerken/VersEditor.tsx`) |
 | `src/klembord/` | Word-HTML voor kopiëren naar Word met de echte stijlnamen, en de copy-handler (knop Hoofdstuktekst kopiëren voor Word) |
@@ -78,8 +79,8 @@ De rooktest (`npm run test:e2e`) opent de gebouwde app met `vite preview` in Chr
 | `src/editor/*.test.ts` | md → ProseMirror → md byte-gelijk voor alle 48 bestanden; opmaak blijft bij bewerken; versnummers zonder opmaak |
 | `src/bewerken/*.test.ts` | Tussenstand bewaren, terugzetten en verouderen; een bewerkt vers knippen; de opmaakwaarschuwing |
 | `src/vervangen/*.test.ts` | Zoeken, het voorstel per plek en toepassen en terugdraaien van keuzes, ook op de echte hoofdstukken van Lukas |
-| `src/antwoorden/*.test.ts`, `src/bewaren/*.test.ts`, `src/export/*.test.ts` | Antwoorden, het overzicht van wat bewaard is, back-up (voorbeeld, samenvoegen, vervangen) en de export |
-| `src/**/*.test.tsx` | Componenten in happy-dom: Back-up inladen (voorbeeld, Escape, focus) en het bewerken van een vers (typen, Enter, Escape, bewaren, Vers terugzetten) |
+| `src/antwoorden/*.test.ts`, `src/reacties/*.test.ts`, `src/bewaren/*.test.ts`, `src/export/*.test.ts` | Antwoorden, het overzicht van wat bewaard is, back-up (voorbeeld, samenvoegen, vervangen) en de export |
+| `src/**/*.test.tsx` | Componenten in happy-dom: Back-up inladen (voorbeeld, Escape, focus), het vak Reageren bij een opmerking van Claude en het bewerken van een vers (typen, Enter, Escape, bewaren, Vers terugzetten) |
 | `e2e/rooktest.e2e.ts` | De gebouwde app in Chromium, zonder console- en paginafouten: Lukas 1 toont alle versrijen, een bewerkt vers staat er na herladen nog en Vers terugzetten haalt het weg, Vertaalvragen en de galerij openen, Export voor Claude downloadt, Hoofdstuktekst kopiëren zet HTML met alle Word-stijlnamen op het klembord, de Bijbeltekst heeft in elk hoofdstuk alleen opmaak uit het sjabloon (`e2e/opmaakcontrole.ts`), en de versrijen komen overeen met `boek.json` |
 | `../scripts/test_scripts.py` | De Python-scripts op een nep-boek "1 Johannes" in een tijdelijke map: omzetten, controles en export werken voor elk boek via `--boek` |
 | `src/uitlijning/*.test.ts` | Uitlijning op kleine handgemaakte verzen en bekende vervangingen op Lukas (Heere → Heer, Zoon des mensen → Mensenzoon); rekentijd |
@@ -99,6 +100,7 @@ Eén naam per begrip, in de schermen, de Help en de documenten. Namen in de code
 | Vers terugzetten | de bewerking van een vers weghalen, zodat de tekst van Claude weer staat | De knop onder een bewerkt vers. |
 | Opgeslagen | de pagina met wat de browser bewaart | De adressen en bestandsnamen houden de oude naam Bewaard. |
 | antwoord | wat je op een vertaalvraag kiest of schrijft | |
+| reactie | wat je zelf bij een opmerking van Claude schrijft, met eventueel het vinkje "Maak hier een vertaalvraag van" | Geen antwoord: een antwoord hoort bij een vraag met opties. |
 | toelichting | de uitleg die je zelf bij een antwoord of in Export voor Claude schrijft | |
 
 ## Gegevensmodel

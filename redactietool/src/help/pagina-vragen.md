@@ -14,6 +14,14 @@ De status zegt waar de vraag staat. **open**: er is nog geen besluit; dat staat 
 
 {{wijs vragen-filters | Filters | Bovenaan de pagina.}}
 
+## Reageren op een opmerking van Claude
+
+Klap een opmerking van Claude open: onder de tekst en de verzen staat de knop **Reageren**. Schrijf in **Je reactie voor Claude** wat je ervan vindt, bijvoorbeeld dat Claude het zo moet laten of juist anders moet doen, en kies **Opslaan**. Met **Weghalen** haal je je reactie weer weg en met **Annuleren** of de toets Escape klapt het vak dicht zonder iets te bewaren. Een opmerking waarop je gereageerd hebt, herken je aan het label *gereageerd* in de lijst.
+
+Zet je het vinkje **Maak hier een vertaalvraag van** aan, dan staat er ook het label *wordt vraag*. Je hoeft er dan geen tekst bij te schrijven. Claude zet de vraag in de lijst met open vragen als je de export teruggeeft, en pas na akkoord van de eigenaar. Je reactie en het vinkje veranderen de tekst en de lijst met vragen niet zelf; ze gaan mee in de Export voor Claude van het hoofdstuk en in de back-up.
+
+{{wijs reactie-vak | Reageren | Onder de tekst van een opmerking van Claude, nadat je die hebt opengeklapt.}}
+
 ## Kiezen en Zoek de plekken
 
 Heeft een vraag opties, dan staat achter elke optie een link.

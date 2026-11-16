@@ -15,9 +15,13 @@ Op verzoek van de eigenaar neemt Claude je Word-bestand over (dat heet terugvoer
 
 ## Waarvoor de export dient
 
-**Export voor Claude** is uitleg. Hij bevat wel de tekst van de verzen die je hebt bewerkt, maar Claude gebruikt die nooit als bron voor de tekst: de tekst komt altijd uit Word. Hij laat Claude zien welke verzen je hebt bewerkt, welke vervangingen je hebt toegepast en welke vragen je hebt beantwoord, met je toelichting. Verschilt de tekst in de export van die in Word, dan volgt Claude Word en meldt het verschil.
+**Export voor Claude** is uitleg. Hij bevat wel de tekst van de verzen die je hebt bewerkt, maar Claude gebruikt die nooit als bron voor de tekst: de tekst komt altijd uit Word. Hij laat Claude zien welke verzen je hebt bewerkt, welke vervangingen je hebt toegepast, welke vragen je hebt beantwoord (met je toelichting) en waar je hebt gereageerd op een opmerking van Claude. Verschilt de tekst in de export van die in Word, dan volgt Claude Word en meldt het verschil.
 
 De export is niet nodig: Word alleen is genoeg. Hij helpt Claude wel om te begrijpen waarom je iets hebt gedaan.
+
+## Je reactie op een opmerking van Claude
+
+Heb je bij {{plek:vragen}} gereageerd op een opmerking van Claude uit dit hoofdstuk, dan staat die reactie in de export. Claude leest hem en verwerkt hem, in de tekst of bij de opmerkingen van het hoofdstuk, pas na akkoord van de eigenaar. Heb je het vinkje **Maak hier een vertaalvraag van** aangezet, dan zet Claude de opmerking als nieuwe vraag in de lijst met open vragen, ook na akkoord van de eigenaar.
 
 ## Je toelichting wordt een regel, na akkoord
 

@@ -80,6 +80,29 @@ test.describe('de gebouwde app', () => {
 		expect(fouten).toEqual([]);
 	});
 
+	test('Reageren op een opmerking van Claude: opslaan, label in de lijst en terug in de Export voor Claude', async ({ page }) => {
+		const fouten = volgFouten(page);
+		await page.goto('#/lukas/begrippen/vragen/O1.1');
+		const opmerking = page.locator('li.vraag-doel');
+		await opmerking.getByRole('button', { name: /^Reageren op O1\.1/ }).click();
+		await expect(opmerking.getByLabel('Je reactie voor Claude')).toBeFocused();
+		await page.keyboard.type('Rooktest-reactie');
+		await opmerking.getByLabel('Maak hier een vertaalvraag van').check();
+		await opmerking.getByRole('button', { name: 'Opslaan' }).click();
+		await expect(opmerking.getByText('gereageerd')).toBeVisible();
+		await expect(opmerking.getByText('wordt vraag')).toBeVisible();
+
+		await wachtOpHoofdstuk(page, 1);
+		await page.locator('[data-help="export-voor-claude"]').click();
+		const downloadWacht = page.waitForEvent('download');
+		await page.locator('.hoofdstukacties-export button[type="submit"]').click();
+		const download = await downloadWacht;
+		const uitvoer = JSON.parse(readFileSync(await download.path(), 'utf-8')) as { reactiesOpOpmerkingen: { nr: string; tekst: string; wordtVraag: boolean }[] };
+
+		expect(uitvoer.reactiesOpOpmerkingen).toMatchObject([{ nr: 'O1.1', tekst: 'Rooktest-reactie', wordtVraag: true }]);
+		expect(fouten).toEqual([]);
+	});
+
 	test('de galerij laadt zijn voorbeelden', async ({ page }) => {
 		const fouten = volgFouten(page);
 		await page.goto('#/galerij');

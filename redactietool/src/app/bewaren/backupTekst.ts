@@ -29,12 +29,13 @@ export function laatsteBackupRegel(laatsteBackup: string | null, nu: Date): stri
 	return `Laatste back-up: ${laatsteBackup === null ? 'nooit' : `${tijdGeleden(laatsteBackup, nu)} (${tijdVan(laatsteBackup, nu)})`}`;
 }
 
-/** Het moment van elke bewerkte vers, elke toegepaste vervanging en elk antwoord. */
+/** Het moment van elke bewerkte vers, elke toegepaste vervanging, elk antwoord en elke reactie. */
 function bewerkingTijden(overzicht: BewaardOverzicht): number[] {
 	return [
 		...overzicht.hoofdstukken.flatMap((hoofdstuk) => hoofdstuk.verzen.map((vers) => Date.parse(vers.bewaard))),
 		...overzicht.keuzes.map((keuze) => Date.parse(keuze.toegepast)),
 		...overzicht.antwoorden.map((antwoord) => Date.parse(antwoord.gegeven)),
+		...overzicht.reacties.map((reactie) => Date.parse(reactie.gegeven)),
 	].filter((tijd) => !Number.isNaN(tijd));
 }
 

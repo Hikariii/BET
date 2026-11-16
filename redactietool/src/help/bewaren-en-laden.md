@@ -2,7 +2,7 @@
 
 ## Wat de tool opslaat
 
-De tool heeft geen server en geen account. Alles wat je doet, slaat de browser op, **alleen op deze computer, in deze browser**: je bewerkte verzen, de vervangingen die je toepast en je antwoorden op vertaalvragen. Dat gaat vanzelf; je hoeft nergens op te klikken.
+De tool heeft geen server en geen account. Alles wat je doet, slaat de browser op, **alleen op deze computer, in deze browser**: je bewerkte verzen, de vervangingen die je toepast, je antwoorden op vertaalvragen en je reacties op opmerkingen van Claude. Dat gaat vanzelf; je hoeft nergens op te klikken.
 
 ## Wat blijft er staan?
 
@@ -21,7 +21,7 @@ De tool heeft geen server en geen account. Alles wat je doet, slaat de browser o
 | Bestand | Waarvoor | Wie leest het |
 |---|---|---|
 | **Word** | De definitieve tekst van een hoofdstuk. Je maakt het met **Hoofdstuktekst kopiëren voor Word** en plakken in Word. | De redactie, en Claude als hij je werk overneemt. Dit is het bestand dat telt. |
-| **Export voor Claude** | Wat je in een hoofdstuk hebt bewerkt (ook de tekst van die verzen), welke vervangingen en antwoorden erbij horen, met je toelichting. Bijvoorbeeld {{exportbestand}}. | Alleen Claude. Hij leest de uitleg; de tekst zelf haalt Claude altijd uit Word. |
+| **Export voor Claude** | Wat je in een hoofdstuk hebt bewerkt (ook de tekst van die verzen), welke vervangingen en antwoorden erbij horen (met je toelichting) en je reacties op opmerkingen van Claude. Bijvoorbeeld {{exportbestand}}. | Alleen Claude. Hij leest de uitleg; de tekst zelf haalt Claude altijd uit Word. |
 | **Back-up** | Alles wat de browser van het boek opslaat, om later terug te zetten. Bijvoorbeeld {{back-upbestand}}; de naam heeft de datum en tijd van de back-up. | Alleen deze tool, als je hem inlaadt. Claude gebruikt hem niet. |
 
 ## Maak een back-up aan het eind van elke werksessie

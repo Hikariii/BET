@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { bewaarAntwoord } from '../antwoorden/antwoorden';
+import { bewaarReactie } from '../reacties/reacties';
 import { bewaarVers } from '../bewerken/tussenstand';
 import { knipVers } from '../bewerken/versknip';
 import { pasKeuzeToe } from '../vervangen/keuzes';
@@ -25,7 +26,7 @@ describe('bewaardOverzicht', () => {
 		expect(overzicht.hoofdstukken).toEqual([]);
 		expect(overzicht.keuzes).toEqual([]);
 		expect(overzicht.antwoorden).toEqual([]);
-		expect(overzicht.totaal).toEqual({ verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0 });
+		expect(overzicht.totaal).toEqual({ verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0 });
 		expect(overzicht.laatstBewaard).toBeNull();
 	});
 
@@ -114,6 +115,22 @@ describe('bewaardOverzicht', () => {
 		expect(overzicht.laatstBewaard).toBe('2099-01-01T00:00:00.000Z');
 	});
 
+	it('toont de reacties op opmerkingen, nieuwste eerst, zonder de tekst, en telt ze mee in het laatste bewaarmoment', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarVers(opslag, 'lukas', 1, 1, inhoud(' a'), inhoud(' b'));
+		bewaarReactie(opslag, 'lukas', { nr: 'O1.1', hoofdstuk: 1, kwestie: 'Vrije weergave', tekst: 'Liever dichter bij de bron.', wordtVraag: false, gegeven: '2026-11-16T09:00:00.000Z' });
+		bewaarReactie(opslag, 'lukas', { nr: 'O2.1', hoofdstuk: 2, kwestie: 'Naam van de stad', tekst: '', wordtVraag: true, gegeven: '2099-01-01T00:00:00.000Z' });
+
+		const overzicht = bewaardOverzicht(opslag, BOEK, REPO);
+
+		expect(overzicht.reacties).toEqual([
+			{ nr: 'O2.1', hoofdstuk: 2, kwestie: 'Naam van de stad', wordtVraag: true, heeftTekst: false, gegeven: '2099-01-01T00:00:00.000Z' },
+			{ nr: 'O1.1', hoofdstuk: 1, kwestie: 'Vrije weergave', wordtVraag: false, heeftTekst: true, gegeven: '2026-11-16T09:00:00.000Z' },
+		]);
+		expect(overzicht.totaal).toMatchObject({ verzen: 1, reacties: 2 });
+		expect(overzicht.laatstBewaard).toBe('2099-01-01T00:00:00.000Z');
+	});
+
 	it('toont niets van een ander boek', () => {
 		const opslag = new GeheugenOpslag();
 		bewaarVers(opslag, 'johannes', 1, 1, inhoud(' a'), inhoud(' b'));
@@ -122,6 +139,6 @@ describe('bewaardOverzicht', () => {
 
 		const overzicht = bewaardOverzicht(opslag, BOEK, REPO);
 
-		expect(overzicht.totaal).toMatchObject({ verzen: 0, antwoorden: 0 });
+		expect(overzicht.totaal).toMatchObject({ verzen: 0, antwoorden: 0, reacties: 0 });
 	});
 });

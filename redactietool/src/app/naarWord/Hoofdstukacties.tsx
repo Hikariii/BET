@@ -5,6 +5,8 @@ import { leesAntwoorden } from '../../antwoorden/antwoorden';
 import { exportBestandsnaam, maakExport } from '../../export/maakExport';
 import type { Hoofdstuk } from '../../formaat/types';
 import { maakKlembordInhoud, vulKopieerGebeurtenis } from '../../klembord/kopieer';
+import { leesReacties } from '../../reacties/reacties';
+import { verzamelVragen } from '../../begrippen/verzamelVragen';
 import { leesKeuzes } from '../../vervangen/keuzes';
 import { meervoud, verouderdMelding } from '../bewaren/bewaarTekst';
 import { browseropslag } from '../bewerken/useTussenstand';
@@ -70,14 +72,16 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 			tussenstand,
 			keuzes: leesKeuzes(browseropslag(), boek.id),
 			antwoorden: leesAntwoorden(browseropslag(), boek.id),
+			reacties: leesReacties(browseropslag(), boek.id),
+			opmerkingVerzen: new Map(verzamelVragen([], [repo]).map((vraag) => [vraag.nr, vraag.verzen])),
 			vragen: new Map(openVragen.map((vraag) => [vraag.kwestie, { nr: vraag.nr, verzen: vraag.verzen }])),
 			repoCommit: __REPO_COMMIT__,
 			toelichting: tekst,
 			nu: new Date(),
 		});
-	const { aantalBewerkt, verouderdeVerzen } = useMemo(() => {
-		const verzen = bouwExport('').verzen;
-		return { aantalBewerkt: verzen.length, verouderdeVerzen: verzen.filter((vers) => vers.verouderd).map((vers) => `vers ${vers.vers}`) };
+	const { aantalBewerkt, aantalReacties, verouderdeVerzen } = useMemo(() => {
+		const { verzen, reactiesOpOpmerkingen } = bouwExport('');
+		return { aantalBewerkt: verzen.length, aantalReacties: reactiesOpOpmerkingen.length, verouderdeVerzen: verzen.filter((vers) => vers.verouderd).map((vers) => `vers ${vers.vers}`) };
 	}, [boek.id, repo, tussenstand]);
 
 	const kopieer = () => {
@@ -125,7 +129,7 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 						onInput={(gebeurtenis) => zetToelichting(gebeurtenis.currentTarget.value)}
 					/>
 					<p class="hoofdstukacties-hulp">Dit bestand is uitleg bij je Word-bestand. Lever het samen met dat bestand aan.</p>
-					{aantalBewerkt === 0 && <p role="status">Niets gewijzigd in dit hoofdstuk.</p>}
+					{aantalBewerkt === 0 && aantalReacties === 0 && <p role="status">Niets gewijzigd in dit hoofdstuk.</p>}
 					<button type="submit">Downloaden</button>
 				</form>
 			)}

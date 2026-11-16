@@ -3,6 +3,7 @@ import type { BewerktVers, Tussenstand, VersInhoud } from '../bewerken/types';
 import type { HoofdstukData, VersRef } from '../data/types';
 import { EIGEN_ANTWOORD, type Antwoord } from '../antwoorden/antwoorden';
 import { parseerHoofdstuk } from '../formaat/parseer';
+import type { Reactie } from '../reacties/reacties';
 import type { StructureleKeuze } from '../vervangen/keuzes';
 import { exportBestandsnaam, maakExport } from './maakExport';
 import type { ExportInvoer } from './maakExport';
@@ -51,8 +52,22 @@ function invoer(
 	keuzes: StructureleKeuze[] = [],
 	antwoorden: Antwoord[] = [],
 	vragen: Record<string, { nr: string; verzen: VersRef[] }> = {},
+	reacties: Reactie[] = [],
+	opmerkingVerzen: Record<string, VersRef[]> = {},
 ): ExportInvoer {
-	return { boek: 'lukas', hoofdstuk: HOOFDSTUK, tussenstand, keuzes, antwoorden, vragen: new Map(Object.entries(vragen)), repoCommit: 'abc123', toelichting, nu: NU };
+	return {
+		boek: 'lukas',
+		hoofdstuk: HOOFDSTUK,
+		tussenstand,
+		keuzes,
+		antwoorden,
+		reacties,
+		opmerkingVerzen: new Map(Object.entries(opmerkingVerzen)),
+		vragen: new Map(Object.entries(vragen)),
+		repoCommit: 'abc123',
+		toelichting,
+		nu: NU,
+	};
 }
 
 describe('maakExport', () => {
@@ -68,6 +83,7 @@ describe('maakExport', () => {
 			verzen: [],
 			structureleKeuzes: [],
 			beantwoordeVragen: [],
+			reactiesOpOpmerkingen: [],
 		});
 	});
 
@@ -343,6 +359,35 @@ describe('maakExport met beantwoorde vragen', () => {
 
 		expect(hier).toEqual([{ ...verdwenen, keuzeIds: [], nr: 'V12', verzen: ['4:1'] }]);
 		expect(elders).toEqual([]);
+	});
+});
+
+describe('maakExport met reacties op opmerkingen', () => {
+	const IN_DIT_HOOFDSTUK: Reactie = { nr: 'O4.2', hoofdstuk: 4, kwestie: 'Vrije weergave in 4:12', tekst: 'Liever dichter bij de bron.', wordtVraag: false, gegeven: '2026-11-15T10:00:00.000Z' };
+	const ALS_VRAAG: Reactie = { nr: 'O4.3', hoofdstuk: 4, kwestie: 'Naam van de stad', tekst: '', wordtVraag: true, gegeven: '2026-11-15T10:05:00.000Z' };
+	const ANDER_HOOFDSTUK: Reactie = { nr: 'O6.1', hoofdstuk: 6, kwestie: 'Elders', tekst: 'Iets.', wordtVraag: false, gegeven: '2026-11-15T10:10:00.000Z' };
+
+	it('neemt alleen de reacties op uit dit hoofdstuk, met de verzen van de opmerking als hoofdstuk:vers', () => {
+		const { reactiesOpOpmerkingen } = maakExport(
+			invoer({ verzen: {} }, '', [], [], {}, [IN_DIT_HOOFDSTUK, ANDER_HOOFDSTUK, ALS_VRAAG], {
+				'O4.2': [
+					{ hoofdstuk: 4, vers: 12 },
+					{ hoofdstuk: 4, vers: 13 },
+				],
+			}),
+		);
+
+		expect(reactiesOpOpmerkingen).toEqual([
+			{ nr: 'O4.2', kwestie: 'Vrije weergave in 4:12', tekst: 'Liever dichter bij de bron.', wordtVraag: false, gegeven: '2026-11-15T10:00:00.000Z', verzen: ['4:12', '4:13'] },
+			{ nr: 'O4.3', kwestie: 'Naam van de stad', tekst: '', wordtVraag: true, gegeven: '2026-11-15T10:05:00.000Z', verzen: [] },
+		]);
+	});
+
+	it('geeft een export met alleen een reactie, zonder bewerkte verzen', () => {
+		const uitkomst = maakExport(invoer({ verzen: {} }, '', [], [], {}, [ALS_VRAAG]));
+
+		expect(uitkomst.verzen).toEqual([]);
+		expect(uitkomst.reactiesOpOpmerkingen.map((reactie) => reactie.nr)).toEqual(['O4.3']);
 	});
 });
 

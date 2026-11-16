@@ -1,10 +1,11 @@
 import type { Antwoord } from '../antwoorden/antwoorden';
+import type { Reactie } from '../reacties/reacties';
 import type { Domein } from '../formaat/types';
 import type { KeuzeVariant, StructureleKeuze } from '../vervangen/keuzes';
 
 /**
  * Het bestand `<prefix>-NN.redactie.json` dat de vertaler aan Claude geeft; een toelichting, nooit een bron van tekst.
- * Alleen versie 3 bestaat: elk antwoord heeft een `toelichting` en `keuzeIds` (nul of meer keuzes).
+ * Alleen versie 3 bestaat; `reactiesOpOpmerkingen` is er later aan toegevoegd. Elk antwoord heeft een `toelichting` en `keuzeIds` (nul of meer keuzes).
  */
 export type RedactieExport = {
 	formaat: 'bet-redactie-export';
@@ -24,6 +25,18 @@ export type RedactieExport = {
 	 * op een vraag die dit hoofdstuk in haar verzen heeft (of helemaal geen verzen heeft).
 	 */
 	beantwoordeVragen: ExportAntwoord[];
+	/** De reacties van de vertaler op opmerkingen van Claude (`O`-nummers) uit de wijzigingslog van dit hoofdstuk. */
+	reactiesOpOpmerkingen: ExportReactie[];
+};
+
+/**
+ * Een reactie op een opmerking van Claude.
+ * `wordtVraag`: de vertaler wil dat Claude er een vertaalvraag van maakt in het register, pas na akkoord van de eigenaar.
+ * `nr` is afgeleid van de plek in het log en kan verschuiven; `kwestie` laat zien welke opmerking bedoeld was.
+ */
+export type ExportReactie = Omit<Reactie, 'hoofdstuk'> & {
+	/** De verzen van de opmerking, als `hoofdstuk:vers`; leeg als de opmerking niet (meer) in het log van dit hoofdstuk staat of geen verzen heeft. */
+	verzen: string[];
 };
 
 /**
