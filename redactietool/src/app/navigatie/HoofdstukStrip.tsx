@@ -3,7 +3,7 @@ import type { BoekData, Referentie } from '../../data/types';
 import { aantalOpenVragen } from '../vertaalvragen';
 import { KortHoofdstuk } from './KortHoofdstuk';
 import { stripStop } from './toetsenbord';
-import { schuifAfstand, schuifstand, type Schuifstand } from './stripSchuiven';
+import { schuifAfstand, schuifstand, scrollVoorHuidig, type Schuifstand } from './stripSchuiven';
 
 type Props = {
 	boek: BoekData;
@@ -18,6 +18,15 @@ function centreerHuidig(lijst: HTMLElement): void {
 	if (huidig === null) return;
 	const links = huidig.getBoundingClientRect().left - lijst.getBoundingClientRect().left + lijst.scrollLeft;
 	lijst.scrollLeft = links - (lijst.clientWidth - huidig.offsetWidth) / 2;
+}
+
+/** Schuift de strip alleen als het open hoofdstuk niet goed in beeld staat; één hoofdstukbreedte vanaf de rand telt als vervaagd. */
+function houdHuidigInBeeld(lijst: HTMLElement): void {
+	const huidig = lijst.querySelector<HTMLElement>('[aria-current="page"]');
+	if (huidig === null) return;
+	const links = huidig.getBoundingClientRect().left - lijst.getBoundingClientRect().left + lijst.scrollLeft;
+	const nieuw = scrollVoorHuidig(lijst.scrollLeft, lijst.clientWidth, { links, breedte: huidig.offsetWidth }, huidig.offsetWidth);
+	if (nieuw !== null) lijst.scrollLeft = nieuw;
 }
 
 /**
@@ -36,9 +45,12 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 		const element = lijst.current;
 		if (element === null) return;
 		const meet = () => zetStand(schuifstand(element.scrollLeft, element.clientWidth, element.scrollWidth));
-		// Een andere venster- of lettergrootte verschuift het open hoofdstuk; de strip zet het dan opnieuw in het midden.
+		// Bij het openen en bij een andere venster- of lettergrootte komt het open hoofdstuk in het midden; verandert alleen een hoofdstuk van maat, dan blijft de strip staan als het kan.
+		let vorigeBreedte = 0;
 		const waarnemer = new ResizeObserver(() => {
-			if (element.clientWidth > 0) centreerHuidig(element);
+			if (element.clientWidth > 0 && element.clientWidth !== vorigeBreedte) centreerHuidig(element);
+			else houdHuidigInBeeld(element);
+			vorigeBreedte = element.clientWidth;
 			meet();
 		});
 		waarnemer.observe(element);
@@ -59,7 +71,7 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 	}, []);
 
 	useEffect(() => {
-		if (lijst.current !== null) centreerHuidig(lijst.current);
+		if (lijst.current !== null) houdHuidigInBeeld(lijst.current);
 		zetTabstop(huidigeIndex);
 	}, [huidigHoofdstuk]);
 
