@@ -90,10 +90,12 @@ describe('bewaardOverzicht', () => {
 		const verzen: HoofdstukVerzen[] = [
 			{ hoofdstuk: 2, goedgekeurd: false, verzen: [{ vers: 5, inhoud: repoVers(HOOFDSTUK_2, 5), repo: repoVers(HOOFDSTUK_2, 5) }] },
 		];
-		pasKeuzeToe(opslag, 'lukas', verzen, 'ander', 'tweede', zoekVondsten(verzen, 'ander'), new Date('2026-11-16T15:00:00.000Z'));
+		// Het vers dat de keuze verandert, krijgt de echte tijd; de keuze ligt erna, zodat haar tijd de laatste is.
+		const toegepast = new Date(Date.now() + 60_000);
+		pasKeuzeToe(opslag, 'lukas', verzen, 'ander', 'tweede', zoekVondsten(verzen, 'ander'), toegepast);
 
 		const overzicht = bewaardOverzicht(opslag, BOEK, REPO);
-		expect(overzicht.laatstBewaard).toBe('2026-11-16T15:00:00.000Z');
+		expect(overzicht.laatstBewaard).toBe(toegepast.toISOString());
 		expect(overzicht.keuzes).toMatchObject([{ zoekterm: 'ander', nieuw: 'tweede', aantalVerzen: 1 }]);
 		expect(overzicht.hoofdstukken.find((h) => h.hoofdstuk === 2)?.verzen[0]?.herkomst).toBe('structurele keuze');
 	});
