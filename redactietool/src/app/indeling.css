@@ -273,7 +273,7 @@
 	align-items: center;
 	align-self: stretch;
 	gap: 0.4rem;
-	margin-left: -0.5rem;
+	margin-left: 0;
 }
 
 .bovenbalk .hoofdstukkeuze .bovenbalk-hoofdstuktitel {
@@ -281,32 +281,47 @@
 	align-self: stretch;
 }
 
-/* Vaste breedte: de knop en alles ernaast blijven op dezelfde plek, ook bij hoofdstuk 1 of 24. */
+/*
+ * De titel is een knop over de hele hoogte van de balk, met een licht vlak en lijnen opzij, en het pijltje direct achter de tekst:
+ * zo is hij als keuzelijst herkenbaar en anders dan de knoppen naar het vorige en volgende hoofdstuk.
+ * De naam heeft de breedte van het langste nummer (`data-maat`), zodat de knop en alles ernaast niet verspringen tussen hoofdstuk 9 en 10.
+ */
 .bovenbalk .hoofdstukkeuze-knop {
 	display: flex;
 	align-items: center;
-	gap: 0.35rem;
-	width: 8.5rem;
-	padding: 0 0.5rem;
-	background: none;
+	gap: 0.45rem;
+	padding: 0 0.85rem 0 1rem;
+	background: var(--vlak);
 	border: 0;
+	border-right: 1px solid var(--rand);
+	border-left: 1px solid var(--rand);
 	color: inherit;
 	font: inherit;
+	font-variant-numeric: tabular-nums;
 	text-align: left;
 	cursor: pointer;
 }
 
 .bovenbalk .hoofdstukkeuze-knop:hover,
 .bovenbalk .hoofdstukkeuze-knop[aria-expanded='true'] {
-	background: var(--vlak);
+	background: var(--gekozen);
 	color: inherit;
 }
 
 .bovenbalk .hoofdstukkeuze-naam {
-	flex: 1 1 auto;
-	min-width: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	display: grid;
+	justify-items: start;
+}
+
+.bovenbalk .hoofdstukkeuze-naam::before,
+.bovenbalk .hoofdstukkeuze-naam > span {
+	grid-area: 1 / 1;
+	white-space: nowrap;
+}
+
+.bovenbalk .hoofdstukkeuze-naam::before {
+	content: attr(data-maat);
+	visibility: hidden;
 }
 
 /* Het pijltje is ongeveer zo hoog als de letters van de titel en draait om als het raster open is. */

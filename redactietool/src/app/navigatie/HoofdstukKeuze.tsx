@@ -102,8 +102,10 @@ export function HoofdstukKeuze({ boek, referentie, info }: Props) {
 						onClick={() => (open ? zetOpen(false) : openRaster())}
 						onKeyDown={bijToetsOpKnop}
 					>
-						<span class="hoofdstukkeuze-naam">
-							{boek.naam} {info.nummer}
+						<span class="hoofdstukkeuze-naam" data-maat={`${boek.naam} ${breedsteNummer(boek)}`}>
+							<span>
+								{boek.naam} {info.nummer}
+							</span>
 						</span>
 						<svg class="hoofdstukkeuze-pijl" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
 							<path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
@@ -141,6 +143,11 @@ export function HoofdstukKeuze({ boek, referentie, info }: Props) {
 	);
 }
 
+/** Het hoogste hoofdstuknummer van het boek met elk cijfer als 0, als maat voor een vaste breedte ("24" wordt "00"). */
+function breedsteNummer(boek: BoekData): string {
+	return String(Math.max(...boek.hoofdstukken.map((hoofdstuk) => hoofdstuk.nummer))).replace(/\d/g, '0');
+}
+
 type BladerKnopProps = {
 	boek: BoekData;
 	/** Het hoofdstuk waar de knop heen gaat; `null` aan het begin of eind van het boek, dan is de knop onzichtbaar maar houdt hij zijn plek. */
@@ -158,13 +165,12 @@ function bladerTekst(richting: BladerKnopProps['richting'], nummer: string): str
  * zodat de titel en de knoppen niet verspringen tussen "Hoofdstuk 9" en "Hoofdstuk 10".
  */
 export function BladerKnop({ boek, hoofdstuk, richting }: BladerKnopProps) {
-	const breedsteNummer = String(Math.max(...boek.hoofdstukken.map((kandidaat) => kandidaat.nummer))).replace(/\d/g, '0');
 	return (
 		<button
 			type="button"
 			class={`hoofdstuk-blader${hoofdstuk === null ? ' hoofdstuk-blader-leeg' : ''}`}
 			disabled={hoofdstuk === null}
-			data-maat={bladerTekst(richting, breedsteNummer)}
+			data-maat={bladerTekst(richting, breedsteNummer(boek))}
 			title={hoofdstuk === null ? undefined : `${boek.naam} ${hoofdstuk.nummer}`}
 			onClick={() => hoofdstuk !== null && (window.location.hash = versAdres(boek.id, hoofdstuk.nummer))}
 		>
