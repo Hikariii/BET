@@ -104,3 +104,124 @@
 	padding: .35rem 0;
 	border-bottom: 1px solid var(--rand, #d1d9e0);
 }
+
+.vervangen .soortkeuze {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .25rem 1.25rem;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.vervangen .soortkeuze legend {
+	padding: 0;
+	margin-bottom: .2rem;
+	font-size: .75rem;
+}
+
+.vervangen .soortkeuze label {
+	flex-direction: row;
+	align-items: center;
+	gap: .4rem;
+}
+
+.vervangen .domeinkeuze {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+}
+
+.vervangen .domeinkeuze select {
+	min-width: 11rem;
+}
+
+.vervangen .markering {
+	padding: 0 .15em;
+}
+
+.vervangen .markering-pijl {
+	color: var(--zacht, #59636e);
+}
+
+.vervangen .vraagkoppeling {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem 1rem;
+	align-items: baseline;
+	margin: .75rem 0;
+	padding: .5rem .75rem;
+	border-left: 2px solid var(--rood, #a61816);
+	background: var(--vlak, #f5f5f5);
+}
+
+.vervangen .vraagkoppeling p {
+	margin: 0;
+	font-weight: 600;
+}
+
+.vervangen .bereik {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .25rem 1rem;
+	align-items: center;
+	margin: .25rem 0;
+	font-size: .8125rem;
+}
+
+.vervangen .variant {
+	margin-bottom: 1rem;
+}
+
+.vervangen .variantinvoer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .2rem .75rem;
+	align-items: center;
+	margin: .25rem 0 .4rem;
+	font-size: .75rem;
+}
+
+.vervangen .vervangen-meldingen:focus {
+	outline: none;
+}
+
+.toegepaste-keuzes li {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: .5rem 1rem;
+	align-items: start;
+}
+
+.toegepaste-keuzes details {
+	min-width: 0;
+}
+
+.toegepaste-keuzes summary {
+	cursor: pointer;
+}
+
+.toegepaste-keuzes .keuzeverzen {
+	margin: .4rem 0 .2rem;
+}
+
+.toegepaste-keuzes .keuzeverzen li {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem 1rem;
+	align-items: baseline;
+	padding: .25rem 0;
+	border-bottom: 0;
+}
+
+.toegepaste-keuzes .keuzevraag,
+.toegepaste-keuzes .keuzeovergeslagen {
+	margin: .3rem 0 0;
+	font-size: .8125rem;
+}
+
+.vervangen .soortkeuze input,
+.vervangen .bereik input {
+	min-width: 0;
+	margin: 0;
+}

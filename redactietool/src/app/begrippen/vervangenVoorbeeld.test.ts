@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { Tussenstand, VersInhoud } from '../../bewerken/types';
 import type { BoekData, HoofdstukData, Status } from '../../data/types';
 import type { Hoofdstuk } from '../../formaat/types';
-import type { Vondst } from '../../vervangen/types';
-import { bouwHoofdstukVerzen, groepeerVondsten, plekken, standaardAangevinkt, vondstSleutel } from './vervangenVoorbeeld';
+import type { Plek } from '../../vervangen/zoekopdracht';
+import { bouwHoofdstukVerzen, groepeerPlekken, keuzeBeschrijving, kiesBereik, kortUit, plekken, standaardAangevinkt, vondstSleutel, verdeelPlekken } from './vervangenVoorbeeld';
 
 const GEEN_TUSSENSTAND: Tussenstand = { verzen: {} };
 
@@ -80,7 +80,7 @@ describe('bouwHoofdstukVerzen', () => {
 	});
 });
 
-function vondst(hoofdstukNummer: number, vers: number, opties: Partial<Vondst> = {}): Vondst {
+function plek(hoofdstukNummer: number, vers: number, opties: Partial<Plek> = {}): Plek {
 	return {
 		hoofdstuk: hoofdstukNummer,
 		vers,
@@ -92,47 +92,152 @@ function vondst(hoofdstukNummer: number, vers: number, opties: Partial<Vondst> =
 		erna: '',
 		vervangbaar: true,
 		goedgekeurd: false,
+		variant: null,
 		...opties,
 	};
 }
 
-describe('groepeerVondsten', () => {
-	const gewoon1 = vondst(1, 1);
-	const gewoon1b = vondst(1, 4);
-	const goedgekeurd2 = vondst(2, 1, { goedgekeurd: true });
-	const gewoon3 = vondst(3, 2);
-	const handGoedgekeurd = vondst(2, 5, { goedgekeurd: true, vervangbaar: false });
-	const hand3 = vondst(3, 7, { vervangbaar: false });
-	const groepen = groepeerVondsten([gewoon1, gewoon1b, goedgekeurd2, handGoedgekeurd, gewoon3, hand3]);
+describe('groepeerPlekken', () => {
+	const gewoon1 = plek(1, 1);
+	const gewoon1b = plek(1, 4);
+	const goedgekeurd2 = plek(2, 1, { goedgekeurd: true });
+	const gewoon3 = plek(3, 2);
+	const handGoedgekeurd = plek(2, 5, { goedgekeurd: true, vervangbaar: false });
+	const hand3 = plek(3, 7, { vervangbaar: false });
+	const variantEen = plek(1, 2, { variant: 'zegende' });
+	const variantTwee = plek(3, 3, { variant: 'zegende', goedgekeurd: true });
+	const variantAnders = plek(2, 2, { variant: 'gezegenden' });
+	const variantHand = plek(2, 3, { variant: 'zegende', vervangbaar: false });
+	const groepen = groepeerPlekken([gewoon1, variantEen, gewoon1b, goedgekeurd2, variantAnders, variantHand, handGoedgekeurd, gewoon3, variantTwee, hand3]);
 
-	it('groepeert vervangbare vondsten van open hoofdstukken per hoofdstuk', () => {
+	it('groepeert vervangbare plekken van de zoekterm in open hoofdstukken per hoofdstuk', () => {
 		expect(groepen.open).toEqual([
-			{ hoofdstuk: 1, vondsten: [gewoon1, gewoon1b] },
-			{ hoofdstuk: 3, vondsten: [gewoon3] },
+			{ hoofdstuk: 1, plekken: [gewoon1, gewoon1b] },
+			{ hoofdstuk: 3, plekken: [gewoon3] },
 		]);
 	});
 
-	it('zet vervangbare vondsten van goedgekeurde hoofdstukken in een eigen groep', () => {
-		expect(groepen.goedgekeurd).toEqual([{ hoofdstuk: 2, vondsten: [goedgekeurd2] }]);
+	it('zet vervangbare plekken van goedgekeurde hoofdstukken in een eigen groep', () => {
+		expect(groepen.goedgekeurd).toEqual([{ hoofdstuk: 2, plekken: [goedgekeurd2] }]);
 	});
 
-	it('zet vondsten over een opmaakgrens bij "met de hand", ook in een goedgekeurd hoofdstuk', () => {
-		expect(groepen.metDeHand).toEqual([handGoedgekeurd, hand3]);
+	it('zet plekken over een opmaakgrens bij "met de hand", ook varianten en ook in een goedgekeurd hoofdstuk', () => {
+		expect(groepen.metDeHand).toEqual([variantHand, handGoedgekeurd, hand3]);
+	});
+
+	it('groepeert varianten per vorm op alfabet, in elk hoofdstuk, zonder de varianten met de hand', () => {
+		expect(groepen.varianten).toEqual([
+			{ vorm: 'gezegenden', plekken: [variantAnders] },
+			{ vorm: 'zegende', plekken: [variantEen, variantTwee] },
+		]);
 	});
 });
 
 describe('standaardAangevinkt', () => {
-	it('vinkt alleen vervangbare vondsten in niet-goedgekeurde hoofdstukken aan', () => {
-		const aan = vondst(1, 1);
-		const uit = [vondst(2, 1, { goedgekeurd: true }), vondst(1, 2, { vervangbaar: false })];
+	it('vinkt alleen vervangbare plekken van de zoekterm in niet-goedgekeurde hoofdstukken aan', () => {
+		const aan = plek(1, 1);
+		const uit = [plek(2, 1, { goedgekeurd: true }), plek(1, 2, { vervangbaar: false }), plek(1, 3, { variant: 'zegende' })];
 
 		expect(standaardAangevinkt([aan, ...uit])).toEqual(new Set([vondstSleutel(aan)]));
 	});
 
 	it('geeft elke plek een eigen sleutel', () => {
-		const sleutels = [vondst(1, 1), vondst(1, 1, { van: 5 }), vondst(1, 1, { deel: 1 }), vondst(1, 2), vondst(2, 1)].map(vondstSleutel);
+		const sleutels = [plek(1, 1), plek(1, 1, { van: 5 }), plek(1, 1, { deel: 1 }), plek(1, 2), plek(2, 1)].map(vondstSleutel);
 
 		expect(new Set(sleutels).size).toBe(5);
+	});
+});
+
+describe('verdeelPlekken', () => {
+	const aangevinkt = plek(1, 1, { gevonden: 'Gezegend' });
+	const uitgevinkt = plek(1, 2, { gevonden: 'gezegend' });
+	const goedgekeurd = plek(2, 1, { goedgekeurd: true, gevonden: 'gezegend' });
+	const metDeHand = plek(1, 3, { vervangbaar: false, gevonden: 'ge-zegend' });
+	const variant = plek(1, 4, { variant: 'zegende', gevonden: 'zegende' });
+	const alle = [aangevinkt, uitgevinkt, goedgekeurd, metDeHand, variant];
+	const sleutels = (...gekozen: Plek[]) => new Set(gekozen.map(vondstSleutel));
+
+	it('geeft elke plek die niet wordt toegepast de reden: met de hand, goedgekeurd of uitgevinkt', () => {
+		const { toe, overgeslagen } = verdeelPlekken(alle, sleutels(aangevinkt), 'tekst', new Map());
+
+		expect(toe).toEqual([aangevinkt]);
+		expect(overgeslagen).toEqual([
+			{ hoofdstuk: 1, vers: 2, gevonden: 'gezegend', reden: 'uitgevinkt' },
+			{ hoofdstuk: 2, vers: 1, gevonden: 'gezegend', reden: 'goedgekeurd' },
+			{ hoofdstuk: 1, vers: 3, gevonden: 'ge-zegend', reden: 'met de hand' },
+			{ hoofdstuk: 1, vers: 4, gevonden: 'zegende', reden: 'uitgevinkt' },
+		]);
+	});
+
+	it('past een plek met de hand niet toe, ook als hij aangevinkt is', () => {
+		const { toe, overgeslagen } = verdeelPlekken([metDeHand], sleutels(metDeHand), 'tekst', new Map());
+
+		expect(toe).toEqual([]);
+		expect(overgeslagen.map(({ reden }) => reden)).toEqual(['met de hand']);
+	});
+
+	it('past een aangevinkte goedgekeurde plek wel toe', () => {
+		expect(verdeelPlekken([goedgekeurd], sleutels(goedgekeurd), 'tekst', new Map()).toe).toEqual([goedgekeurd]);
+	});
+
+	it('past een aangevinkte variant bij tekst alleen toe met een vervanging voor die vorm', () => {
+		const zonder = verdeelPlekken([variant], sleutels(variant), 'tekst', new Map([['zegende', '']]));
+		const met = verdeelPlekken([variant], sleutels(variant), 'tekst', new Map([['zegende', 'zegende']]));
+
+		expect(zonder.toe).toEqual([]);
+		expect(zonder.overgeslagen.map(({ reden }) => reden)).toEqual(['uitgevinkt']);
+		expect(met.toe).toEqual([variant]);
+	});
+
+	it('past een aangevinkte variant bij een markeringswissel toe zonder invoer', () => {
+		expect(verdeelPlekken([variant], sleutels(variant), 'markering', new Map()).toe).toEqual([variant]);
+	});
+});
+
+describe('kiesBereik', () => {
+	const verzen = [{ hoofdstuk: 6, vers: 20 }];
+
+	it('neemt zonder vraag het hele boek', () => {
+		expect(kiesBereik(null, false)).toEqual({ bereik: { soort: 'boek' }, melding: null });
+	});
+
+	it('neemt bij een vraag de verzen van de vraag, tenzij de vertaler het hele boek kiest', () => {
+		expect(kiesBereik(verzen, false)).toEqual({ bereik: { soort: 'verzen', verzen }, melding: null });
+		expect(kiesBereik(verzen, true)).toEqual({ bereik: { soort: 'boek' }, melding: null });
+	});
+
+	it('geeft een melding in plaats van het hele boek bij een vraag zonder verzen', () => {
+		const uitkomst = kiesBereik([], false);
+
+		expect(uitkomst.bereik).toBeNull();
+		expect(uitkomst.melding).toContain('geen verzen');
+		expect(kiesBereik([], true).bereik).toEqual({ soort: 'boek' });
+	});
+});
+
+describe('kortUit', () => {
+	it('laat een korte tekst staan', () => {
+		expect(kortUit('Wee jullie', 40)).toBe('Wee jullie');
+	});
+
+	it('kapt een lange tekst af op een woordgrens met weglatingspunten', () => {
+		expect(kortUit('de bron markeert zalig als eeuwigleven', 20)).toBe('de bron markeert…');
+	});
+
+	it('kapt een woord zonder spaties midden in af', () => {
+		expect(kortUit('abcdefghij', 4)).toBe('abcd…');
+	});
+});
+
+describe('keuzeBeschrijving', () => {
+	it('beschrijft een tekstvervanging met de zoekterm en de nieuwe tekst', () => {
+		expect(keuzeBeschrijving({ soort: 'tekst', zoekterm: 'de Mensenzoon', nieuw: 'Mensenzoon', van: null, naar: null })).toBe('"de Mensenzoon" door "Mensenzoon"');
+	});
+
+	it('beschrijft een markeringswissel met van en naar', () => {
+		expect(keuzeBeschrijving({ soort: 'markering', zoekterm: 'gezegend', nieuw: '', van: 'eeuwigleven', naar: 'genade' })).toBe(
+			'markering van "gezegend": eeuwigleven wordt genade',
+		);
 	});
 });
 

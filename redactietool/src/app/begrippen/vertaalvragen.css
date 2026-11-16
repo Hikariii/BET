@@ -142,3 +142,59 @@
 	font-size: .8rem;
 	font-style: italic;
 }
+
+.vertaalvragen .opties {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.vertaalvragen .opties li {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .25rem .75rem;
+	align-items: baseline;
+	padding: .15rem 0;
+}
+
+.vertaalvragen .optietekst {
+	flex: 1 1 18rem;
+	min-width: 0;
+}
+
+.vertaalvragen .antwoord {
+	margin: .6rem 0 0;
+}
+
+.vertaalvragen .zonderwijziging {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem 1rem;
+	align-items: end;
+	margin: .6rem 0 0;
+}
+
+.vertaalvragen .zonderwijziging label {
+	display: flex;
+	flex-direction: column;
+	gap: .2rem;
+	font-size: .75rem;
+	min-width: 0;
+}
+
+.vertaalvragen .zonderwijziging select {
+	max-width: 100%;
+	font: inherit;
+}
+
+.vertaalvragen .vraagmelding {
+	margin: .4rem 0 0;
+}
+
+.vertaalvragen .vraagmelding:empty {
+	display: none;
+}
+
+.vertaalvragen .vraagmelding:focus {
+	outline: none;
+}

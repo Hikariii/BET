@@ -1,15 +1,32 @@
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { bewaarAntwoord, leesAntwoorden, verwijderAntwoord, type Antwoord } from '../../antwoorden/antwoorden';
+import { maakVoorstel, splitsOpties } from '../../begrippen/opties';
 import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels, type VragenFilter } from '../../begrippen/vragenOverzicht';
 import { verzamelVragen } from '../../begrippen/verzamelVragen';
 import type { Vertaalvraag, VraagStatus } from '../../begrippen/types';
+import type { HoofdstukVerzen } from '../../vervangen/types';
+import { leesTussenstand } from '../../bewerken/tussenstand';
 import type { VersRef } from '../../data/types';
+import { bewaarVoorstel, sessieopslag } from '../../vervangen/voorstel';
+import { domeinenOpZoekterm } from '../../vervangen/zoekopdracht';
+import { maakAdres } from '../adres';
+import { browseropslag } from '../bewerken/useTussenstand';
+import { useOpslagTeller } from '../bewaren/useOpslagTeller';
 import type { TabbladProps } from './tabbladProps';
 import { VersLinks } from './VersLinks';
+import { bouwHoofdstukVerzen } from './vervangenVoorbeeld';
 import './vertaalvragen.css';
 
 const STATUSSEN: readonly VraagStatus[] = ['open', 'onbeslist', 'voorlopig besloten', 'besloten'];
 const KORT_AANTAL_VERZEN = 3;
 const GEEN_VERS_IN_KOP = 'Geen vers in de kop';
+
+/** Wat een registervraag kan doen met een optie; elke actie geeft een melding voor de vertaler, of `null` als er niets te melden is. */
+type Antwoordacties = {
+	kies: (vraag: Vertaalvraag, optie: string) => string | null;
+	legVast: (vraag: Vertaalvraag, optie: string) => string;
+	trekIn: (vraag: Vertaalvraag) => string;
+};
 
 /** Tabblad Vertaalvragen: het register en de vragen uit de logs, met status, herkomst en verzen. */
 export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) {
@@ -21,6 +38,12 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	const register = overig.filter((vraag) => vraag.herkomst.soort === 'register');
 	const perHoofdstuk = groepeerLogVragen(overig);
 	const sleutel = (vraag: Vertaalvraag): string => sleutels.get(vraag) ?? '';
+	const opslagTeller = useOpslagTeller();
+	const antwoorden = useMemo(() => new Map(leesAntwoorden(browseropslag(), boek.id).map((antwoord) => [antwoord.kwestie, antwoord])), [boek.id, opslagTeller]);
+	const acties = maakAntwoordacties(boek.id, () => bouwHoofdstukVerzen(hoofdstukken, boek, (hoofdstuk) => leesTussenstand(browseropslag(), boek.id, hoofdstuk)));
+	const registervraag = (vraag: Vertaalvraag) => (
+		<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} antwoord={antwoorden.get(vraag.kwestie) ?? null} acties={acties} />
+	);
 
 	return (
 		<div class="vertaalvragen">
@@ -66,7 +89,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 					<ul class="vragenlijst">
 						{open.map((vraag) =>
 							vraag.herkomst.soort === 'register' ? (
-								<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} />
+								registervraag(vraag)
 							) : (
 								<LogVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} open />
 							),
@@ -79,9 +102,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 				<section aria-labelledby="register-titel">
 					<h2 id="register-titel">Register, niet open ({register.length})</h2>
 					<ul class="vragenlijst">
-						{register.map((vraag) => (
-							<RegisterVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} />
-						))}
+						{register.map(registervraag)}
 					</ul>
 				</section>
 			)}
@@ -109,7 +130,41 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	);
 }
 
-function RegisterVraag({ boek, vraag }: { boek: string; vraag: Vertaalvraag }) {
+function maakAntwoordacties(boek: string, bouwVerzen: () => HoofdstukVerzen[]): Antwoordacties {
+	return {
+		kies(vraag, optie) {
+			const voorstel = maakVoorstel(vraag, optie, (zoekterm) => domeinenOpZoekterm(bouwVerzen(), zoekterm, { soort: 'verzen', verzen: vraag.verzen }));
+			if (!bewaarVoorstel(sessieopslag(), boek, voorstel)) return 'De browser staat niet toe dat de keuze aan Zoeken en vervangen wordt doorgegeven.';
+			window.location.hash = maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' });
+			return null;
+		},
+		legVast(vraag, optie) {
+			const bewaard = bewaarAntwoord(browseropslag(), boek, { kwestie: vraag.kwestie, optie, keuzeId: null, gegeven: new Date().toISOString() });
+			return bewaard ? `Antwoord vastgelegd: optie ${optie}, zonder wijziging in de tekst.` : 'Het antwoord kon niet worden bewaard, waarschijnlijk is de opslag vol.';
+		},
+		trekIn(vraag) {
+			verwijderAntwoord(browseropslag(), boek, vraag.kwestie);
+			return 'Antwoord ingetrokken.';
+		},
+	};
+}
+
+type RegisterVraagProps = { boek: string; vraag: Vertaalvraag; antwoord: Antwoord | null; acties: Antwoordacties };
+
+function RegisterVraag({ boek, vraag, antwoord, acties }: RegisterVraagProps) {
+	const opties = splitsOpties(vraag.alternatief);
+	const [melding, zetMelding] = useState('');
+	const meldingvak = useRef<HTMLParagraphElement>(null);
+	useEffect(() => {
+		if (melding !== '') meldingvak.current?.focus();
+	}, [melding]);
+
+	function vastleggen(gebeurtenis: Event) {
+		gebeurtenis.preventDefault();
+		const gekozen = new FormData(gebeurtenis.currentTarget as HTMLFormElement).get('optie');
+		if (typeof gekozen === 'string' && gekozen !== '') zetMelding(acties.legVast(vraag, gekozen));
+	}
+
 	return (
 		<li class="registervraag">
 			<h3>{vraag.kwestie}</h3>
@@ -118,7 +173,22 @@ function RegisterVraag({ boek, vraag }: { boek: string; vraag: Vertaalvraag }) {
 				<dt>Gekozen in de tekst</dt>
 				<dd>{vraag.gekozen}</dd>
 				<dt>Alternatief</dt>
-				<dd>{vraag.alternatief}</dd>
+				<dd>
+					{opties.length === 0 ? (
+						<span class="geen-verzen">geen opties</span>
+					) : (
+						<ul class="opties">
+							{opties.map((optie) => (
+								<li key={optie}>
+									<span class="optietekst">{optie}</span>
+									<button type="button" aria-label={`Kiezen: ${optie}`} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
+										Kiezen
+									</button>
+								</li>
+							))}
+						</ul>
+					)}
+				</dd>
 				{vraag.tekst !== '' && (
 					<>
 						<dt>Besluit</dt>
@@ -128,6 +198,36 @@ function RegisterVraag({ boek, vraag }: { boek: string; vraag: Vertaalvraag }) {
 				<dt>Verzen</dt>
 				<dd>{vraag.verzen.length === 0 ? <span class="geen-verzen">het hele boek</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}</dd>
 			</dl>
+			{antwoord !== null && (
+				<p class="antwoord">
+					Beantwoord in deze browser: optie {antwoord.optie}.{' '}
+					{antwoord.keuzeId === null ? (
+						<button type="button" onClick={() => zetMelding(acties.trekIn(vraag))}>
+							Antwoord intrekken
+						</button>
+					) : (
+						<>
+							Dit antwoord hoort bij een toegepaste keuze. Draai die terug onder <a href={maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' })}>Zoeken en vervangen</a>; dan vervalt het antwoord.
+						</>
+					)}
+				</p>
+			)}
+			{opties.length > 0 && antwoord?.keuzeId == null && (
+				<form class="zonderwijziging" onSubmit={vastleggen}>
+					<label>
+						Optie zonder wijziging
+						<select name="optie">
+							{opties.map((optie) => (
+								<option value={optie}>{optie}</option>
+							))}
+						</select>
+					</label>
+					<button type="submit">Antwoord vastleggen zonder wijziging</button>
+				</form>
+			)}
+			<p role="status" class="vraagmelding" tabIndex={-1} ref={meldingvak}>
+				{melding}
+			</p>
 		</li>
 	);
 }
