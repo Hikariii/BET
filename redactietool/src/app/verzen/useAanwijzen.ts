@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 /** Zo lang moet de aanwijzer op een cel blijven voor het vak opent, zodat een vak niet oplicht bij elke rij waar de muis langs gaat. */
 const AANWIJSVERTRAGING_MS = 180;
 
+/** Zo lang blijft het vak open nadat de aanwijzer het verlaat, zodat wie net over de rand schuift het niet kwijtraakt. */
+const VERLAATVERTRAGING_MS = 400;
+
 type Aanwijshandelers = {
 	onPointerEnter: () => void;
 	onPointerLeave: () => void;
@@ -12,6 +15,7 @@ type Aanwijshandelers = {
 
 /**
  * Een vak dat opengaat bij aanwijzen (met een korte vertraging) of toetsenbordfocus in de cel, en dichtgaat met Escape.
+ * Na het verlaten blijft het even open; komt de aanwijzer binnen die tijd terug, dan blijft het gewoon open.
  * Escape houdt het vak dicht tot de aanwijzer de cel opnieuw ingaat of de focus er opnieuw in komt.
  */
 export function useAanwijzen(): { open: boolean; handelers: Aanwijshandelers } {
@@ -48,7 +52,7 @@ export function useAanwijzen(): { open: boolean; handelers: Aanwijshandelers } {
 			},
 			onPointerLeave: () => {
 				stopVertraging();
-				zetAangewezen(false);
+				vertraging.current = window.setTimeout(() => zetAangewezen(false), VERLAATVERTRAGING_MS);
 			},
 			onFocusIn: (gebeurtenis) => {
 				// Een klik met de muis op een knop in de cel telt niet: dan opent het vak alleen door aanwijzen.

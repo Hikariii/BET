@@ -74,3 +74,33 @@
 	-webkit-mask-image: none;
 	mask-image: none;
 }
+
+/* De punaise blijft rechtsonder in beeld, ook als het uitgeklapte vak scrolt. */
+.verzen-dicht .punaisestrook {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	justify-content: flex-end;
+	pointer-events: none;
+}
+
+.verzen-dicht .punaise {
+	display: inline-flex;
+	padding: 0.2rem;
+	color: var(--tekst);
+	pointer-events: auto;
+	cursor: pointer;
+	background: #fff;
+	border: 1px solid transparent;
+	border-radius: 3px;
+}
+
+.verzen-dicht .punaise:hover,
+.verzen-dicht .punaise[aria-pressed="true"] {
+	border-color: var(--tekst);
+}
+
+.verzen-dicht .punaise:focus-visible {
+	outline: 2px solid var(--tekst);
+	outline-offset: 1px;
+}

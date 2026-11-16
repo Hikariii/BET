@@ -15,14 +15,15 @@ type Props = {
 /**
  * De cel Vertaalregels van een vers: zo hoog als het vers, wat niet past vervaagt onderaan.
  * Bij aanwijzen of toetsenbordfocus klapt het vak uit over de volgende verzen, zonder dat iets verschuift.
- * Zolang de naslagkaart onder het vers open staat, staat de cel vast in de kolom met alle regels.
+ * De punaise rechtsonder zet een uitgeklapt vak vast in de kolom met alle regels, net als zolang de naslagkaart onder het vers open staat.
  */
 export function VertaalregelsCel({ nummer, naslagOpen, regels }: Props) {
 	const { open, handelers } = useAanwijzen();
 	const celRef = useRef<HTMLTableCellElement>(null);
 	const inhoudRef = useRef<HTMLDivElement>(null);
 	const [overloopt, zetOverloopt] = useState(false);
-	const { vast, klassen, focusbaar } = celToestand(naslagOpen, overloopt, open);
+	const [vastgezet, zetVastgezet] = useState(false);
+	const toestand = celToestand({ naslagOpen, vastgezet, overloopt, open });
 
 	useEffect(() => {
 		const cel = celRef.current;
@@ -39,13 +40,34 @@ export function VertaalregelsCel({ nummer, naslagOpen, regels }: Props) {
 	return (
 		<td ref={celRef} class="regels" {...handelers}>
 			<div
-				class={klassen}
-				tabIndex={focusbaar ? 0 : undefined}
-				role={focusbaar ? 'group' : undefined}
-				aria-label={focusbaar ? `Vertaalregels van vers ${nummer}` : undefined}
+				class={toestand.klassen}
+				tabIndex={toestand.focusbaar ? 0 : undefined}
+				role={toestand.focusbaar ? 'group' : undefined}
+				aria-label={toestand.focusbaar ? `Vertaalregels van vers ${nummer}` : undefined}
 			>
-				<div ref={inhoudRef}>{regels(!vast)}</div>
+				<div ref={inhoudRef}>{regels(!toestand.vast)}</div>
+				{toestand.punaise && <Punaise vastgezet={vastgezet} wissel={() => zetVastgezet(!vastgezet)} />}
 			</div>
 		</td>
+	);
+}
+
+function Punaise({ vastgezet, wissel }: { vastgezet: boolean; wissel: () => void }) {
+	const label = vastgezet ? 'Vertaalregels losmaken' : 'Vertaalregels vastzetten';
+	return (
+		<div class="punaisestrook">
+			<button type="button" class="punaise" aria-pressed={vastgezet} aria-label={label} title={label} onClick={wissel}>
+				<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+					<path
+						d="M7.5 3h5 M8.5 3v5l-2.5 3h8l-2.5-3V3 M10 11v6"
+						fill={vastgezet ? 'currentColor' : 'none'}
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+			</button>
+		</div>
 	);
 }
