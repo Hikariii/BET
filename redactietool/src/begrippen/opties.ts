@@ -35,8 +35,11 @@ export function zoektermUitKwestie(kwestie: string): string | null {
 	return termen.length === 1 && enige !== undefined ? enige : null;
 }
 
-/** Een optie die zegt dat het blijft zoals het is ("… houden", "laten staan", "blijft"): kiezen legt alleen het antwoord vast, zonder wijziging. */
-const HOUDEN = /\b(houden|laten staan|blijft|blijven)\b/i;
+/**
+ * Een optie die zegt dat het blijft zoals het is ("… houden"): kiezen legt alleen het antwoord vast, zonder wijziging.
+ * "X laten staan" hoort er niet bij: in de kolom Alternatief is dat het bronwoord laten staan, een tekstwijziging.
+ */
+const HOUDEN = /\bhouden\b/i;
 
 export function isHoudOptie(optie: string): boolean {
 	return HOUDEN.test(optie);

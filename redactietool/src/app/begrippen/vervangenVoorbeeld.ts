@@ -97,13 +97,16 @@ type Toe = {
 	overgeslagen: OvergeslagenPlek[];
 };
 
+/** Een variant die niet wordt toegepast is niet bewust afgewezen: de vertaler heeft de vorm niet gekozen, dus geen besluit. */
 function redenOvergeslagen(plek: Plek): OvergeslagenPlek['reden'] {
+	if (plek.variant !== null) return 'variant niet toegepast';
 	if (!plek.vervangbaar) return 'met de hand';
 	return plek.goedgekeurd ? 'goedgekeurd' : 'uitgevinkt';
 }
 
 /**
  * Verdeelt de gevonden plekken in wat toegepast wordt en wat overgeslagen wordt, met de reden.
+ * Elke variantplek die niet wordt toegepast heeft de reden `variant niet toegepast`; de plekken van de zoekterm zelf houden hun eigen reden.
  * Een aangevinkte variant telt bij een tekstvervanging alleen mee als haar vorm een vervanging heeft;
  * een markeringswissel geldt ook voor varianten, zonder eigen invoer.
  */

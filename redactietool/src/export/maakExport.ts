@@ -1,12 +1,12 @@
 import type { Antwoord } from '../antwoorden/antwoorden';
-import type { HoofdstukData } from '../data/types';
+import type { HoofdstukData, VersRef } from '../data/types';
 import { serialiseerHoofdstuk } from '../formaat/serialiseer';
 import { isBewerkingVerouderd } from '../bewerken/tussenstand';
 import type { Tussenstand, VersInhoud } from '../bewerken/types';
 import { knipVers } from '../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../bewerken/waarschuwingen';
 import type { StructureleKeuze } from '../vervangen/keuzes';
-import type { ExportKeuze, GewijzigdVers, RedactieExport } from './types';
+import type { ExportAntwoord, ExportKeuze, GewijzigdVers, RedactieExport } from './types';
 
 export type ExportInvoer = {
 	boek: string;
@@ -17,6 +17,8 @@ export type ExportInvoer = {
 	keuzes: readonly StructureleKeuze[];
 	/** Alle antwoorden van het boek. */
 	antwoorden: readonly Antwoord[];
+	/** De verzen per kwestie uit de ingelezen open vragen; een kwestie die er niet in staat, heeft geen verzen. */
+	vraagVerzen: ReadonlyMap<string, readonly VersRef[]>;
 	repoCommit: string | null;
 	toelichting: string;
 	/** Tijd van maken; meegegeven zodat tests vast kunnen staan. */
@@ -52,8 +54,11 @@ function plekNaam(hoofdstuk: number, vers: number): string {
 	return `${hoofdstuk}:${vers}`;
 }
 
-/** De keuze met de plekken van dit hoofdstuk, of `null` als de keuze dit hoofdstuk niet raakt. */
-function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number): ExportKeuze | null {
+/**
+ * De keuze met de plekken van dit hoofdstuk, of `null` als de keuze dit hoofdstuk niet raakt.
+ * De vraag staat er alleen bij als het antwoord op die vraag nog naar deze keuze wijst.
+ */
+function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number, antwoorden: readonly Antwoord[]): ExportKeuze | null {
 	const toegepast = keuze.verzen.filter((vers) => vers.hoofdstuk === hoofdstuk).map((vers) => plekNaam(vers.hoofdstuk, vers.vers));
 	const overgeslagen = keuze.overgeslagen
 		.filter((plek) => plek.hoofdstuk === hoofdstuk)
@@ -68,12 +73,26 @@ function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number): ExportKeuze | 
 		van: keuze.van,
 		naar: keuze.naar,
 		varianten: keuze.varianten,
-		vraag: keuze.vraag,
+		vraag: antwoorden.some((antwoord) => antwoord.kwestie === keuze.vraag && antwoord.keuzeId === keuze.id) ? keuze.vraag : null,
 		aantalToegepasteVerzen: keuze.verzen.length,
 		hoofdstukken: [...hoofdstukken].sort((een, ander) => een - ander),
 		toegepast,
 		overgeslagen,
 	};
+}
+
+/**
+ * Het antwoord met de verzen van zijn vraag, of `null` als het niet in de export van dit hoofdstuk hoort:
+ * een antwoord met keuze hoort bij het hoofdstuk waar de keuze iets raakt, een antwoord zonder keuze
+ * bij een hoofdstuk in de verzen van de vraag (of bij elk hoofdstuk als de vraag geen verzen heeft).
+ */
+function exportAntwoord(antwoord: Antwoord, keuzeIds: ReadonlySet<string>, invoer: ExportInvoer): ExportAntwoord | null {
+	const vraagVerzen = invoer.vraagVerzen.get(antwoord.kwestie) ?? [];
+	const hoortBij =
+		antwoord.keuzeId === null
+			? vraagVerzen.length === 0 || vraagVerzen.some(({ hoofdstuk }) => hoofdstuk === invoer.hoofdstuk.nummer)
+			: keuzeIds.has(antwoord.keuzeId);
+	return hoortBij ? { ...antwoord, verzen: vraagVerzen.map(({ hoofdstuk, vers }) => plekNaam(hoofdstuk, vers)) } : null;
 }
 
 /** Maakt de export voor Claude uit de bewerkte verzen van een hoofdstuk, op oplopend versnummer. */
@@ -82,7 +101,7 @@ export function maakExport(invoer: ExportInvoer): RedactieExport {
 	const nummers = Object.keys(invoer.tussenstand.verzen).map(Number);
 	const verzen = nummers.flatMap((nummer) => gewijzigdVers(nummer, invoer) ?? []);
 	const keuzes = [...invoer.keuzes].sort((een, ander) => Date.parse(een.toegepast) - Date.parse(ander.toegepast));
-	const structureleKeuzes = keuzes.flatMap((keuze) => exportKeuze(keuze, invoer.hoofdstuk.nummer) ?? []);
+	const structureleKeuzes = keuzes.flatMap((keuze) => exportKeuze(keuze, invoer.hoofdstuk.nummer, invoer.antwoorden) ?? []);
 	const keuzeIds = new Set(structureleKeuzes.map((keuze) => keuze.id));
 	return {
 		formaat: 'bet-redactie-export',
@@ -94,7 +113,7 @@ export function maakExport(invoer: ExportInvoer): RedactieExport {
 		toelichting: invoer.toelichting,
 		verzen,
 		structureleKeuzes,
-		beantwoordeVragen: invoer.antwoorden.filter((antwoord) => antwoord.keuzeId === null || keuzeIds.has(antwoord.keuzeId)),
+		beantwoordeVragen: invoer.antwoorden.flatMap((antwoord) => exportAntwoord(antwoord, keuzeIds, invoer) ?? []),
 	};
 }
 

@@ -19,8 +19,17 @@ export type RedactieExport = {
 	verzen: GewijzigdVers[];
 	/** De structurele keuzes die dit hoofdstuk raken (toegepast of overgeslagen), op volgorde van toepassen (oudste eerst). */
 	structureleKeuzes: ExportKeuze[];
-	/** De antwoorden op vertaalvragen waarvan de keuze dit hoofdstuk raakt, plus de antwoorden zonder keuze. */
-	beantwoordeVragen: Antwoord[];
+	/**
+	 * De antwoorden op vertaalvragen waarvan de keuze dit hoofdstuk raakt, plus de antwoorden zonder keuze
+	 * op een vraag die dit hoofdstuk in haar verzen heeft (of helemaal geen verzen heeft).
+	 */
+	beantwoordeVragen: ExportAntwoord[];
+};
+
+/** Een antwoord op een vertaalvraag, met de verzen van de vraag uit open-vragen.md (leeg als de vraag geen verzen heeft). */
+export type ExportAntwoord = Antwoord & {
+	/** Als `hoofdstuk:vers`. */
+	verzen: string[];
 };
 
 /** Een structurele keuze: de hele keuze, met de plekken van dit hoofdstuk apart. */
@@ -33,7 +42,7 @@ export type ExportKeuze = {
 	van: Domein | null;
 	naar: Domein | null;
 	varianten: KeuzeVariant[];
-	/** De kwestie van de vertaalvraag die hiermee beantwoord is, of `null`. */
+	/** De kwestie van de vertaalvraag die hiermee beantwoord is, of `null`; ook `null` als het antwoord op die vraag inmiddels naar een andere keuze wijst. */
 	vraag: string | null;
 	/** Het aantal verzen waarop de keuze nog toegepast staat, in alle hoofdstukken samen. */
 	aantalToegepasteVerzen: number;
@@ -44,11 +53,17 @@ export type ExportKeuze = {
 	overgeslagen: ExportOvergeslagenPlek[];
 };
 
-/** Een plek in dit hoofdstuk die bewust niet is meegenomen; bewust anders, dus niet te "repareren". */
+/** Een plek in dit hoofdstuk die niet is meegenomen; bij een besluit van de vertaler is dat bewust anders, dus niet te "repareren". */
 export type ExportOvergeslagenPlek = {
 	/** `hoofdstuk:vers`. */
 	plek: string;
 	gevonden: string;
+	/**
+	 * Waarom de plek is overgeslagen.
+	 * `uitgevinkt`, `goedgekeurd` en `met de hand` zijn bewuste besluiten van de vertaler.
+	 * `variant niet toegepast` is geen besluit: de vertaler heeft de vorm niet gekozen, ook niet afgewezen.
+	 * `teruggedraaid`: het vers is na het toepassen weer teruggedraaid; `gevonden` is dan de zoekterm.
+	 */
 	reden: StructureleKeuze['overgeslagen'][number]['reden'];
 };
 

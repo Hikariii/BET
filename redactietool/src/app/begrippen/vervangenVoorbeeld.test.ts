@@ -157,7 +157,7 @@ describe('verdeelPlekken', () => {
 	const alle = [aangevinkt, uitgevinkt, goedgekeurd, metDeHand, variant];
 	const sleutels = (...gekozen: Plek[]) => new Set(gekozen.map(vondstSleutel));
 
-	it('geeft elke plek die niet wordt toegepast de reden: met de hand, goedgekeurd of uitgevinkt', () => {
+	it('geeft elke plek die niet wordt toegepast de reden: met de hand, goedgekeurd, uitgevinkt of variant niet toegepast', () => {
 		const { toe, overgeslagen } = verdeelPlekken(alle, sleutels(aangevinkt), 'tekst', new Map());
 
 		expect(toe).toEqual([aangevinkt]);
@@ -165,7 +165,7 @@ describe('verdeelPlekken', () => {
 			{ hoofdstuk: 1, vers: 2, gevonden: 'gezegend', reden: 'uitgevinkt' },
 			{ hoofdstuk: 2, vers: 1, gevonden: 'gezegend', reden: 'goedgekeurd' },
 			{ hoofdstuk: 1, vers: 3, gevonden: 'ge-zegend', reden: 'met de hand' },
-			{ hoofdstuk: 1, vers: 4, gevonden: 'zegende', reden: 'uitgevinkt' },
+			{ hoofdstuk: 1, vers: 4, gevonden: 'zegende', reden: 'variant niet toegepast' },
 		]);
 	});
 
@@ -185,8 +185,14 @@ describe('verdeelPlekken', () => {
 		const met = verdeelPlekken([variant], sleutels(variant), 'tekst', new Map([['zegende', 'zegende']]));
 
 		expect(zonder.toe).toEqual([]);
-		expect(zonder.overgeslagen.map(({ reden }) => reden)).toEqual(['uitgevinkt']);
+		expect(zonder.overgeslagen.map(({ reden }) => reden)).toEqual(['variant niet toegepast']);
 		expect(met.toe).toEqual([variant]);
+	});
+
+	it('geeft een uitgevinkte variant de reden variant niet toegepast en een uitgevinkte plek van de zoekterm zelf uitgevinkt', () => {
+		const { overgeslagen } = verdeelPlekken([uitgevinkt, variant], sleutels(), 'markering', new Map());
+
+		expect(overgeslagen.map(({ reden }) => reden)).toEqual(['uitgevinkt', 'variant niet toegepast']);
 	});
 
 	it('past een aangevinkte variant bij een markeringswissel toe zonder invoer', () => {

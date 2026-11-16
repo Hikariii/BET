@@ -163,7 +163,7 @@ function HoofdstukPagina({ weergavebeheer, boek, referentie, info, gekozenVers, 
 			huidigHoofdstuk={nummer}
 			tabblad={null}
 			titel={<HoofdstukTitel boek={boek} info={info} />}
-			acties={geladen !== null && weergave !== null ? <Hoofdstukacties boek={boek} repo={geladen} weergave={weergave} tussenstand={tussenstand} /> : null}
+			acties={geladen !== null && weergave !== null ? <Hoofdstukacties boek={boek} repo={geladen} weergave={weergave} tussenstand={tussenstand} openVragen={referentie.openVragen} /> : null}
 		>
 			{inhoud}
 		</Indeling>

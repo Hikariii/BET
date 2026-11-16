@@ -156,8 +156,18 @@ describe('Gezegend: kiezen vult zoekterm en van in', () => {
 		expect(voorstel).toMatchObject({ opdracht: 'markering', zoekterm: 'Gezegend', van: 'eeuwigleven', naar: 'genade' });
 	});
 
-	it('herkent een optie die alles laat zoals het is', () => {
-		expect(isHoudOptie('b) eeuwigleven voor "zalig" houden en 1:45/1:48 als plaatselijke keuze zien')).toBe(true);
-		expect(isHoudOptie('a) genade, zoals de vertaler in 1:45/1:48 (referentie, §25A)')).toBe(false);
+	it('herkent optie b) van Gezegend als houden en optie a) niet', () => {
+		const gezegend = leesOpenVragen(leesRepobestand('bijbel/lukas/referentie/open-vragen.md')).find((vraag) => vraag.kwestie.startsWith('markering van "Gezegend"'));
+		const [a, b] = splitsOpties(gezegend?.alternatief ?? null);
+
+		expect(isHoudOptie(a ?? '')).toBe(false);
+		expect(isHoudOptie(b ?? '')).toBe(true);
+	});
+
+	it('telt "laten staan" niet als houden: in de kolom Alternatief is dat het bronwoord laten staan, een tekstwijziging', () => {
+		expect(isHoudOptie('heerlijkheid laten staan')).toBe(false);
+		expect(isHoudOptie('laten staan met uitleg')).toBe(false);
+		expect(isHoudOptie('de tekst blijft zoals hij is')).toBe(false);
+		expect(isHoudOptie('Eeuwigleven houden')).toBe(true);
 	});
 });

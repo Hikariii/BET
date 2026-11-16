@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { BewerktVers, Tussenstand, VersInhoud } from '../bewerken/types';
-import type { HoofdstukData } from '../data/types';
+import type { HoofdstukData, VersRef } from '../data/types';
 import type { Antwoord } from '../antwoorden/antwoorden';
 import { parseerHoofdstuk } from '../formaat/parseer';
 import type { StructureleKeuze } from '../vervangen/keuzes';
@@ -45,8 +45,14 @@ function bewerkt(inhoud: VersInhoud, basis: VersInhoud): BewerktVers {
 	return { inhoud, basis, bewaard: '2026-11-15T15:00:00.000Z' };
 }
 
-function invoer(tussenstand: Tussenstand, toelichting = '', keuzes: StructureleKeuze[] = [], antwoorden: Antwoord[] = []): ExportInvoer {
-	return { boek: 'lukas', hoofdstuk: HOOFDSTUK, tussenstand, keuzes, antwoorden, repoCommit: 'abc123', toelichting, nu: NU };
+function invoer(
+	tussenstand: Tussenstand,
+	toelichting = '',
+	keuzes: StructureleKeuze[] = [],
+	antwoorden: Antwoord[] = [],
+	vraagVerzen: Record<string, VersRef[]> = {},
+): ExportInvoer {
+	return { boek: 'lukas', hoofdstuk: HOOFDSTUK, tussenstand, keuzes, antwoorden, vraagVerzen: new Map(Object.entries(vraagVerzen)), repoCommit: 'abc123', toelichting, nu: NU };
 }
 
 describe('maakExport', () => {
@@ -191,7 +197,8 @@ const OVER_TWEE_HOOFDSTUKKEN = keuze({
 
 describe('maakExport met structurele keuzes', () => {
 	it('geeft de hele keuze met de plekken van dit hoofdstuk apart, ook als de keuze over meer hoofdstukken loopt', () => {
-		const uitkomst = maakExport(invoer({ verzen: {} }, '', [OVER_TWEE_HOOFDSTUKKEN]));
+		const antwoord: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-15T10:00:00.000Z' };
+		const uitkomst = maakExport(invoer({ verzen: {} }, '', [OVER_TWEE_HOOFDSTUKKEN], [antwoord]));
 
 		expect(uitkomst.structureleKeuzes).toEqual([
 			{
@@ -209,6 +216,19 @@ describe('maakExport met structurele keuzes', () => {
 				overgeslagen: [{ plek: '4:2', gevonden: 'genade', reden: 'uitgevinkt' }],
 			},
 		]);
+	});
+
+	it('zet bij een keuze de vraag alleen als het antwoord op die vraag nog naar de keuze wijst', () => {
+		const eerste = keuze({ id: 'k1', verzen: [keuzeVers(4, 1)], vraag: 'Gezegend' });
+		const tweede = keuze({ id: 'k2', toegepast: '2026-11-15T11:00:00.000Z', verzen: [keuzeVers(4, 3)], vraag: 'Gezegend' });
+		const antwoordOpEerste: Antwoord = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-15T10:00:00.000Z' };
+		const antwoordOpTweede: Antwoord = { ...antwoordOpEerste, optie: 'c) iets anders', keuzeId: 'k2', gegeven: '2026-11-15T11:00:00.000Z' };
+
+		const voor = maakExport(invoer({ verzen: {} }, '', [eerste, tweede], [antwoordOpEerste])).structureleKeuzes;
+		const na = maakExport(invoer({ verzen: {} }, '', [eerste, tweede], [antwoordOpTweede])).structureleKeuzes;
+
+		expect(voor.map((uitkomst) => [uitkomst.id, uitkomst.vraag])).toEqual([['k1', 'Gezegend'], ['k2', null]]);
+		expect(na.map((uitkomst) => [uitkomst.id, uitkomst.vraag])).toEqual([['k1', null], ['k2', 'Gezegend']]);
 	});
 
 	it('neemt een keuze op waarvan dit hoofdstuk alleen overgeslagen plekken heeft, en laat een keuze weg die dit hoofdstuk niet raakt', () => {
@@ -252,7 +272,38 @@ describe('maakExport met beantwoorde vragen', () => {
 			invoer({ verzen: {} }, '', [OVER_TWEE_HOOFDSTUKKEN, ELDERS], [ANTWOORD_OP_KEUZE, ANTWOORD_ZONDER_WIJZIGING, ANTWOORD_ANDER_HOOFDSTUK]),
 		);
 
-		expect(beantwoordeVragen).toEqual([ANTWOORD_OP_KEUZE, ANTWOORD_ZONDER_WIJZIGING]);
+		expect(beantwoordeVragen).toEqual([
+			{ ...ANTWOORD_OP_KEUZE, verzen: [] },
+			{ ...ANTWOORD_ZONDER_WIJZIGING, verzen: [] },
+		]);
+	});
+
+	it('geeft bij elk antwoord de verzen van de vraag als hoofdstuk:vers', () => {
+		const verzen: VersRef[] = [
+			{ hoofdstuk: 4, vers: 2 },
+			{ hoofdstuk: 6, vers: 20 },
+		];
+
+		const { beantwoordeVragen } = maakExport(invoer({ verzen: {} }, '', [OVER_TWEE_HOOFDSTUKKEN], [ANTWOORD_OP_KEUZE, ANTWOORD_ZONDER_WIJZIGING], { Gezegend: verzen, Houden: verzen }));
+
+		expect(beantwoordeVragen.map((antwoord) => antwoord.verzen)).toEqual([['4:2', '6:20'], ['4:2', '6:20']]);
+	});
+
+	it('neemt een antwoord zonder keuze alleen op in een hoofdstuk dat in de verzen van de vraag staat, of als de vraag geen verzen heeft', () => {
+		const inVierEnZes: VersRef[] = [
+			{ hoofdstuk: 4, vers: 2 },
+			{ hoofdstuk: 6, vers: 20 },
+		];
+		const alleenZes: VersRef[] = [{ hoofdstuk: 6, vers: 20 }];
+		const metVerzenInDitHoofdstuk: Antwoord = { kwestie: 'Hier', optie: 'b)', keuzeId: null, gegeven: '2026-11-15T10:20:00.000Z' };
+		const metVerzenElders: Antwoord = { kwestie: 'Daar', optie: 'b)', keuzeId: null, gegeven: '2026-11-15T10:21:00.000Z' };
+		const zonderVerzen: Antwoord = { kwestie: 'Nergens', optie: 'b)', keuzeId: null, gegeven: '2026-11-15T10:22:00.000Z' };
+
+		const { beantwoordeVragen } = maakExport(
+			invoer({ verzen: {} }, '', [], [metVerzenInDitHoofdstuk, metVerzenElders, zonderVerzen], { Hier: inVierEnZes, Daar: alleenZes }),
+		);
+
+		expect(beantwoordeVragen.map((antwoord) => antwoord.kwestie)).toEqual(['Hier', 'Nergens']);
 	});
 
 	it('laat een antwoord weg waarvan de keuze niet meer bestaat', () => {

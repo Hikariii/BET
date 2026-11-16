@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 import { bewaarAntwoord, leesAntwoorden, verwijderAntwoord, type Antwoord } from '../../antwoorden/antwoorden';
 import { isHoudOptie, maakVoorstel, splitsOpties } from '../../begrippen/opties';
 import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels, type VragenFilter } from '../../begrippen/vragenOverzicht';
@@ -158,6 +158,10 @@ function RegisterVraag({ boek, vraag, antwoord, acties }: RegisterVraagProps) {
 	const opties = splitsOpties(vraag.alternatief);
 	const [melding, zetMelding] = useState('');
 	const meldingvak = useRef<HTMLParagraphElement>(null);
+	const uitlegId = useId();
+	// Een tweede antwoord zou de toegepaste keuze verweesd laten: eerst de keuze terugdraaien onder Zoeken en vervangen.
+	const vergrendeld = antwoord !== null && antwoord.keuzeId !== null;
+	const uitleg = vergrendeld ? uitlegId : undefined;
 	useEffect(() => {
 		if (melding !== '') meldingvak.current?.focus();
 	}, [melding]);
@@ -184,7 +188,7 @@ function RegisterVraag({ boek, vraag, antwoord, acties }: RegisterVraagProps) {
 							{opties.map((optie) => (
 								<li key={optie}>
 									<span class="optietekst">{optie}</span>
-									<button type="button" aria-label={`Kiezen: ${optie}`} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
+									<button type="button" aria-label={`Kiezen: ${optie}`} disabled={vergrendeld} aria-describedby={uitleg} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
 										Kiezen
 									</button>
 								</li>
@@ -202,7 +206,7 @@ function RegisterVraag({ boek, vraag, antwoord, acties }: RegisterVraagProps) {
 				<dd>{vraag.verzen.length === 0 ? <span class="geen-verzen">het hele boek</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}</dd>
 			</dl>
 			{antwoord !== null && (
-				<p class="antwoord">
+				<p class="antwoord" id={uitlegId}>
 					Beantwoord in deze browser: optie {antwoord.optie}.{' '}
 					{antwoord.keuzeId === null ? (
 						<button type="button" onClick={() => zetMelding(acties.trekIn(vraag))}>
@@ -210,22 +214,24 @@ function RegisterVraag({ boek, vraag, antwoord, acties }: RegisterVraagProps) {
 						</button>
 					) : (
 						<>
-							Dit antwoord hoort bij een toegepaste keuze. Draai die terug onder <a href={maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' })}>Zoeken en vervangen</a>; dan vervalt het antwoord.
+							Dit antwoord hoort bij een toegepaste keuze. Kiezen kan pas weer als je die keuze eerst terugdraait onder <a href={maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' })}>Zoeken en vervangen</a>; dan vervalt het antwoord.
 						</>
 					)}
 				</p>
 			)}
-			{opties.length > 0 && antwoord?.keuzeId == null && (
+			{opties.length > 0 && (
 				<form class="zonderwijziging" onSubmit={vastleggen}>
 					<label>
 						Optie zonder wijziging
-						<select name="optie">
+						<select name="optie" disabled={vergrendeld}>
 							{opties.map((optie) => (
 								<option value={optie}>{optie}</option>
 							))}
 						</select>
 					</label>
-					<button type="submit">Antwoord vastleggen zonder wijziging</button>
+					<button type="submit" disabled={vergrendeld} aria-describedby={uitleg}>
+						Antwoord vastleggen zonder wijziging
+					</button>
 				</form>
 			)}
 			<p role="status" class="vraagmelding" tabIndex={-1} ref={meldingvak}>

@@ -160,7 +160,7 @@ Zo blijft elke keuze terug te vinden en terug te draaien (§2), en kan de redact
 
 ## D. Aangeleverd Word terugvoeren
 
-De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `redactietool/stap1-plan.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst. Een export met `versie: 1` heeft geen keuzes of vragen; `versie: 2` voegt toe: `structureleKeuzes` (de hele keuze met de plekken van dit hoofdstuk, toegepast en overgeslagen met reden), `beantwoordeVragen` (kwestie, optie, keuzeId) en per vers het `keuzeId`.
+De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `redactietool/stap1-plan.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst. Een export met `versie: 1` heeft geen keuzes of vragen; `versie: 2` voegt toe: `structureleKeuzes` (de hele keuze met de plekken van dit hoofdstuk, toegepast en overgeslagen met reden), `beantwoordeVragen` (kwestie, optie, keuzeId en de `verzen` van de vraag; een antwoord zonder keuze staat alleen in de export van een hoofdstuk dat in die verzen voorkomt, of van elk hoofdstuk als de vraag geen verzen heeft) en per vers het `keuzeId`. Bij een keuze staat `vraag` alleen als het antwoord op die vraag nog naar die keuze wijst. Een overgeslagen plek met reden `uitgevinkt`, `goedgekeurd` of `met de hand` is een bewust besluit; `variant niet toegepast` is dat niet (de vorm is niet gekozen) en `teruggedraaid` betekent dat het vers na het toepassen is teruggedraaid.
 
 Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: meestal `bij editor`.
 
@@ -175,7 +175,7 @@ Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: mees
 ### Stap D2: lessen (Claude stelt voor, eigenaar beslist)
 
 1. Elke keuze van de vertaler die afwijkt van de richtlijn of de precedenten wordt een voorstel: precedent naar `vast`, nieuw precedent, of richtlijn aanpassen. In een lijst in `referentie/` (zoals `afwijkingen-h1-3.md`).
-2. Structurele keuzes uit de export worden direct precedentvoorstellen. Overgeslagen plekken zijn bewust anders en worden niet "gerepareerd".
+2. Structurele keuzes uit de export worden direct precedentvoorstellen. Overgeslagen plekken met een besluit (`uitgevinkt`, `goedgekeurd`, `met de hand`) zijn bewust anders en worden niet "gerepareerd"; `variant niet toegepast` is geen besluit en geeft geen voorstel.
 3. Wijkt de tekst in de export af van Word: Word volgen en het verschil melden.
 4. Pas na akkoord: in `precedenten.md` en `controle.json` zetten, en toepassen op hoofdstukken met status `review`. Nooit op hoofdstukken met `bij editor`.
 

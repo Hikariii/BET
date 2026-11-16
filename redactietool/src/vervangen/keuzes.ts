@@ -31,7 +31,12 @@ export type StructureleKeuze = {
 
 export type KeuzeVariant = { vorm: string; nieuw: string };
 
-export type OvergeslagenPlek = { hoofdstuk: number; vers: number; gevonden: string; reden: 'goedgekeurd' | 'met de hand' | 'uitgevinkt' };
+/**
+ * Waarom een plek niet is meegenomen.
+ * `variant niet toegepast` is geen besluit: de vertaler heeft de vorm niet gekozen, ook niet bewust afgewezen.
+ * `teruggedraaid`: het vers is na het toepassen weer teruggedraaid, `gevonden` is dan de zoekterm.
+ */
+export type OvergeslagenPlek = { hoofdstuk: number; vers: number; gevonden: string; reden: 'goedgekeurd' | 'met de hand' | 'uitgevinkt' | 'variant niet toegepast' | 'teruggedraaid' };
 
 type KeuzeVers = { hoofdstuk: number; vers: number; voor: VersInhoud; na: VersInhoud };
 
@@ -70,7 +75,7 @@ function alsVarianten(waarde: unknown): KeuzeVariant[] | null {
 	return varianten;
 }
 
-const REDENEN: readonly OvergeslagenPlek['reden'][] = ['goedgekeurd', 'met de hand', 'uitgevinkt'];
+const REDENEN: readonly OvergeslagenPlek['reden'][] = ['goedgekeurd', 'met de hand', 'uitgevinkt', 'variant niet toegepast', 'teruggedraaid'];
 
 function alsOvergeslagen(waarde: unknown): OvergeslagenPlek[] | null {
 	if (!Array.isArray(waarde)) return null;
@@ -136,7 +141,6 @@ export function schrijfKeuzes(opslag: Opslag, boek: string, keuzes: readonly Str
 function versNaam(hoofdstuk: number, vers: number): string {
 	return `${hoofdstuk}:${vers}`;
 }
-
 
 /** De vervangbare vondsten per hoofdstuk en vers, op oplopend hoofdstuk en vers. */
 function groepeerPerVers<T extends Vondst>(vondsten: readonly T[]): { hoofdstuk: number; vers: number; vondsten: T[] }[] {
@@ -270,13 +274,20 @@ function draaiKeuzeVersTerug(opslag: Opslag, boek: string, keuzes: readonly Stru
 }
 
 /**
- * Schrijft de keuzelijst met alleen `overgebleven` verzen voor `keuze`; zonder verzen is de keuze uit de lijst
+ * Schrijft de keuzelijst met alleen `overgebleven` verzen en de `overgeslagen` plekken voor `keuze`; zonder verzen is de keuze uit de lijst
  * en ook een antwoord dat naar de keuze wijst.
  */
-function bewaarKeuzeNaTerugdraaien(opslag: Opslag, boek: string, keuzes: readonly StructureleKeuze[], keuze: StructureleKeuze, overgebleven: StructureleKeuze['verzen']): void {
+function bewaarKeuzeNaTerugdraaien(
+	opslag: Opslag,
+	boek: string,
+	keuzes: readonly StructureleKeuze[],
+	keuze: StructureleKeuze,
+	overgebleven: StructureleKeuze['verzen'],
+	overgeslagen: StructureleKeuze['overgeslagen'],
+): void {
 	const nieuweLijst = keuzes.flatMap((k) => {
 		if (k.id !== keuze.id) return [k];
-		return overgebleven.length === 0 ? [] : [{ ...k, verzen: overgebleven }];
+		return overgebleven.length === 0 ? [] : [{ ...k, verzen: overgebleven, overgeslagen }];
 	});
 	if (schrijfKeuzes(opslag, boek, nieuweLijst) && overgebleven.length === 0) verwijderAntwoordenVanKeuze(opslag, boek, keuze.id);
 }
@@ -294,14 +305,15 @@ export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): 
 	if (keuze === undefined) return [KEUZE_ONTBREEKT];
 	const uitkomsten = keuze.verzen.map((keuzeVers) => ({ keuzeVers, ...draaiKeuzeVersTerug(opslag, boek, keuzes, keuze, keuzeVers) }));
 	const overgebleven = uitkomsten.filter((uitkomst) => uitkomst.blijftBijKeuze).map((uitkomst) => uitkomst.keuzeVers);
-	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven);
+	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven, keuze.overgeslagen);
 	return uitkomsten.flatMap((uitkomst) => uitkomst.melding ?? []);
 }
 
 /**
  * Draait één vers van een keuze terug, met dezelfde regels als `draaiKeuzeTerug` (niet als een latere keuze of eigen bewerking
  * het vers veranderde). Het vers gaat uit de keuze, behalve als het niet terug kon of een latere keuze het bezit; gaat het laatste vers eruit,
- * dan verdwijnt de keuze en ook een antwoord dat ernaar wijst. Geeft de meldingen.
+ * dan verdwijnt de keuze en ook een antwoord dat ernaar wijst. Een vers dat echt terugging komt bij de overgeslagen plekken van de keuze, met reden `teruggedraaid`.
+ * Geeft de meldingen.
  */
 export function draaiVersTerug(opslag: Opslag, boek: string, keuzeId: string, hoofdstuk: number, vers: number): string[] {
 	const keuzes = leesOpVolgorde(opslag, boek);
@@ -311,7 +323,9 @@ export function draaiVersTerug(opslag: Opslag, boek: string, keuzeId: string, ho
 	if (keuzeVers === undefined) return [`Vers ${versNaam(hoofdstuk, vers)} hoort niet (meer) bij deze keuze.`];
 	const uitkomst = draaiKeuzeVersTerug(opslag, boek, keuzes, keuze, keuzeVers);
 	const overgebleven = keuze.verzen.filter((v) => v !== keuzeVers || uitkomst.blijftBijKeuze);
-	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven);
+	const teruggedraaid: OvergeslagenPlek = { hoofdstuk, vers, gevonden: keuze.zoekterm, reden: 'teruggedraaid' };
+	const overgeslagen = uitkomst.melding === null && !uitkomst.blijftBijKeuze ? [...keuze.overgeslagen, teruggedraaid] : keuze.overgeslagen;
+	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven, overgeslagen);
 	return uitkomst.melding === null ? [] : [uitkomst.melding];
 }
 

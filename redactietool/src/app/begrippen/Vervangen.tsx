@@ -316,16 +316,20 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 		);
 		const aangepast = verdeling.toe.filter((plek) => uitkomst.keuze.verzen.some(({ hoofdstuk, vers }) => hoofdstuk === plek.hoofdstuk && vers === plek.vers)).length;
 		const regels = [...uitkomst.meldingen, `${plekkenTekst(aangepast)} aangepast.`];
-		if (vraag !== null && leesAntwoorden(browseropslag(), boek.id).some(({ keuzeId }) => keuzeId === uitkomst.keuze.id)) {
-				regels.push(`Vraag beantwoord met optie ${vraag.optie}.`);
+		const beantwoord = vraag !== null && leesAntwoorden(browseropslag(), boek.id).some(({ keuzeId }) => keuzeId === uitkomst.keuze.id);
+		// Een tweede Toepassen op dezelfde vraag zou het antwoord stil naar de nieuwe keuze zetten en de eerste keuze verweesd achterlaten.
+		if (beantwoord) {
+			regels.push(`Vraag beantwoord met optie ${vraag.optie}. De zoekopdracht is niet meer aan de vraag gekoppeld en zoekt in het hele boek.`);
+			zetVraag(null);
+			zetHeleBoek(false);
 		}
 		zetMeldingen(regels);
-		zoekMet(vraag, heleBoek, variantVervangingen);
+		zoekMet(beantwoord ? null : vraag, beantwoord ? false : heleBoek, variantVervangingen);
 		herlees();
 		meldingenvak.current?.focus();
 	}
 
-	function naTerugdraaien(keuze: StructureleKeuze, regels: string[]) {
+	function naTerugdraaien(regels: string[]) {
 		zetMeldingen(regels);
 		herlees();
 		if (opdracht !== null) zoekMet(vraag, heleBoek, variantVervangingen);
@@ -333,12 +337,12 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 
 	function terugdraaien(keuze: StructureleKeuze) {
 		const regels = draaiKeuzeTerug(browseropslag(), boek.id, keuze.id);
-		naTerugdraaien(keuze, [...regels, `Keuze "${keuze.zoekterm}" teruggedraaid.`]);
+		naTerugdraaien([...regels, `Keuze "${keuze.zoekterm}" teruggedraaid.`]);
 	}
 
 	function versTerugdraaien(keuze: StructureleKeuze, hoofdstuk: number, vers: number) {
 		const regels = draaiVersTerug(browseropslag(), boek.id, keuze.id, hoofdstuk, vers);
-		naTerugdraaien(keuze, [...regels, `Vers ${hoofdstuk}:${vers} van keuze "${keuze.zoekterm}" teruggedraaid.`]);
+		naTerugdraaien([...regels, `Vers ${hoofdstuk}:${vers} van keuze "${keuze.zoekterm}" teruggedraaid.`]);
 	}
 
 	const groepen = groepeerPlekken(gevonden);

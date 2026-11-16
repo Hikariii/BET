@@ -339,6 +339,7 @@ describe('herkomst', () => {
 			repoCommit: null,
 			keuzes: leesKeuzes(opslag, 'lukas'),
 			antwoorden: [],
+			vraagVerzen: new Map(),
 			toelichting: '',
 			nu: NU,
 		});
@@ -486,6 +487,27 @@ describe('draaiVersTerug', () => {
 		expect(leesAntwoorden(opslag, 'lukas').map((antwoord) => antwoord.kwestie)).toEqual(['Andere vraag', KWESTIE]);
 	});
 
+	it('zet een teruggedraaid vers bij de overgeslagen plekken van de keuze, met de zoekterm als gevonden', () => {
+		const keuze = keuzeOverTweeVerzen();
+		expect(leesKeuzes(opslag, 'lukas')[0]?.overgeslagen).toEqual([{ hoofdstuk: 6, vers: 24, gevonden: 'gezegend', reden: 'uitgevinkt' }]);
+
+		draaiVersTerug(opslag, 'lukas', keuze.id, 6, 22);
+
+		expect(leesKeuzes(opslag, 'lukas')[0]?.overgeslagen).toEqual([
+			{ hoofdstuk: 6, vers: 24, gevonden: 'gezegend', reden: 'uitgevinkt' },
+			{ hoofdstuk: 6, vers: 22, gevonden: 'gezegend', reden: 'teruggedraaid' },
+		]);
+	});
+
+	it('zet een vers dat de vertaler zelf bewerkte en dus blijft staan niet als teruggedraaid bij de overgeslagen plekken', () => {
+		const keuze = keuzeOverTweeVerzen();
+		bewaarOfWis(opslag, 'lukas', 6, 22, metOpmaak([' Hij was heel ', null], ['gezegend', 'genade'], ['.', null]), MARKERING_REPO[22] ?? inhoud(''));
+
+		draaiVersTerug(opslag, 'lukas', keuze.id, 6, 22);
+
+		expect(leesKeuzes(opslag, 'lukas')[0]?.overgeslagen).toEqual([{ hoofdstuk: 6, vers: 24, gevonden: 'gezegend', reden: 'uitgevinkt' }]);
+	});
+
 	it('haalt bij het laatste vers de keuze en het antwoord weg, maar niet andere antwoorden', () => {
 		const keuze = keuzeOverTweeVerzen();
 		draaiVersTerug(opslag, 'lukas', keuze.id, 6, 22);
@@ -598,6 +620,15 @@ describe('alsKeuze', () => {
 		opslag.setItem('bet-keuzes/lukas', JSON.stringify([{ id, zoekterm, nieuw, toegepast, verzen }]));
 
 		expect(leesKeuzes(opslag, 'lukas')).toMatchObject([{ id, soort: 'tekst', varianten: [], overgeslagen: [], vraag: null }]);
+	});
+
+	it('leest alle redenen van een overgeslagen plek, ook de nieuwe twee', () => {
+		const redenen = ['goedgekeurd', 'met de hand', 'uitgevinkt', 'variant niet toegepast', 'teruggedraaid'];
+		const json: Record<string, unknown> = JSON.parse(JSON.stringify(NIEUWE_KEUZE));
+
+		const keuze = alsKeuze({ ...json, overgeslagen: redenen.map((reden, index) => ({ hoofdstuk: 6, vers: 20 + index, gevonden: 'gezegend', reden })) });
+
+		expect(keuze?.overgeslagen.map(({ reden }) => reden)).toEqual(redenen);
 	});
 
 	it('weigert een nieuw veld met een onmogelijke waarde', () => {

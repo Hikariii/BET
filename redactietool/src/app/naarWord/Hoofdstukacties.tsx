@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks';
-import type { BoekData, HoofdstukData } from '../../data/types';
+import type { BoekData, HoofdstukData, OpenVraag } from '../../data/types';
 import type { Tussenstand } from '../../bewerken/types';
 import { leesAntwoorden } from '../../antwoorden/antwoorden';
 import { exportBestandsnaam, maakExport } from '../../export/maakExport';
@@ -18,6 +18,8 @@ type Props = {
 	weergave: Hoofdstuk;
 	/** Dezelfde tussenstand waaruit `weergave` gemaakt is, zodat teller, export en klembord gelijk lopen. */
 	tussenstand: Tussenstand;
+	/** De open vragen uit het register; de export zet de verzen van de vraag bij elk antwoord. */
+	openVragen: readonly OpenVraag[];
 };
 
 /** `van`: de tussenstand op het moment van kopiëren; is die veranderd, dan is het klembord verouderd. */
@@ -58,7 +60,7 @@ function kopieerNaarKlembord(weergave: Hoofdstuk, boek: BoekData, tussenstand: T
 }
 
 /** Knoppen bovenaan het hoofdstuk: Hoofdstuktekst kopiëren voor Word (met de waarschuwing in Safari) en Export voor Claude. */
-export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
+export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen }: Props) {
 	const [kopie, zetKopie] = useState<KopieUitkomst | null>(null);
 	const [exportOpen, zetExportOpen] = useState(false);
 	const [toelichting, zetToelichting] = useState('');
@@ -70,6 +72,7 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
 			tussenstand,
 			keuzes: leesKeuzes(browseropslag(), boek.id),
 			antwoorden: leesAntwoorden(browseropslag(), boek.id),
+			vraagVerzen: new Map(openVragen.map((vraag) => [vraag.kwestie, vraag.verzen])),
 			repoCommit: __REPO_COMMIT__,
 			toelichting: tekst,
 			nu: new Date(),

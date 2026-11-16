@@ -168,7 +168,7 @@ function ZijbalkItems({ boek, referentie }: { boek: BoekData; referentie: Refere
 	);
 }
 
-function KnoppenEnMeldingen({ boek, hoofdstukken, opslag }: Gegevens & { opslag: Opslag }) {
+function KnoppenEnMeldingen({ boek, referentie, hoofdstukken, opslag }: Gegevens & { opslag: Opslag }) {
 	const hoofdstuk = hoofdstukken.find((kandidaat) => kandidaat.nummer === HOOFDSTUK_MET_ACTIES);
 	if (hoofdstuk === undefined) throw new Error(`Hoofdstuk ${HOOFDSTUK_MET_ACTIES} staat niet in de gegevens.`);
 	const tussenstand = leesTussenstand(opslag, boek.id, hoofdstuk.nummer);
@@ -179,7 +179,7 @@ function KnoppenEnMeldingen({ boek, hoofdstukken, opslag }: Gegevens & { opslag:
 				titel="Hoofdactie en gewone knop"
 				notitie="De acties van een hoofdstuk: de hoofdactie is rood, de andere knop gewoon. De melding eronder (role=status) komt van de bewerkingen in dit hoofdstuk."
 			>
-				<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} tussenstand={tussenstand} />
+				<Hoofdstukacties boek={boek} repo={hoofdstuk} weergave={weergave} tussenstand={tussenstand} openVragen={referentie.openVragen} />
 			</Toestand>
 			<Toestand titel="Gewone knop en uitgeschakelde knop" notitie="Een knop zonder bijzondere rol, en dezelfde knop als hij niets kan doen.">
 				<p class="galerij-knoppen">
