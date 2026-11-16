@@ -1,1 +1,277 @@
-/* Variant v5: vul dit bestand met de opmaak van deze variant. Het wordt alleen geladen bij ?ontwerp=v5, na vormgeving.css. */
+/*
+ * Variant v5, Werkbank: twee balken, zijbalk inklapbaar, breedte in tekens.
+ * De bewaarstatus in de balk is een korte link; het overzicht van wat bewaard is staat op een eigen pagina (#/<boek>/bewaard)
+ * met rechts een vaste kolom voor de back-up. Wordt alleen geladen bij ?ontwerp=v5, na vormgeving.css.
+ * Rood alleen voor de hoofdactie (Back-up downloaden) en focus; geen schaduwen of kaartjes.
+ */
+
+/* ---------- Balken ---------- */
+
+html[data-ontwerp='v5'] .bovenbalk .bovenbalk-boekbalk {
+	min-height: 2.5rem;
+	padding-block: 0.3rem;
+	border-bottom: 1px solid var(--rand);
+}
+
+html[data-ontwerp='v5'] .bovenbalk .bovenbalk-hoofdstukbalk {
+	min-height: 2.75rem;
+	padding-block: 0.35rem;
+}
+
+/* Op de overzichtspagina staat de titel al als kop op de pagina zelf; de tweede balk zou hem herhalen. */
+html[data-ontwerp='v5']:has(.bewaard-overzicht) .bovenbalk .bovenbalk-hoofdstukbalk {
+	display: none;
+}
+
+html[data-ontwerp='v5'] .bovenbalk .bovenbalk-boeknaam {
+	font-size: 1rem;
+}
+
+/* ---------- Bewaarstatus in de balk: een korte link ---------- */
+
+html[data-ontwerp='v5'] .bewaarstatus.bewaarstatus-pagina {
+	gap: 0.45rem;
+	padding: 0.25rem 0.1rem 0.2rem;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--tekst);
+	font-size: 0.8125rem;
+	font-weight: 500;
+}
+
+html[data-ontwerp='v5'] .bewaarstatus.bewaarstatus-pagina:hover {
+	background: none;
+	border-bottom-color: var(--rand-donker);
+}
+
+html[data-ontwerp='v5'] .bewaarstatus.bewaarstatus-pagina[aria-current='page'] {
+	border-bottom-color: var(--rood);
+	font-weight: 600;
+}
+
+html[data-ontwerp='v5'] .bewaarstatus.bewaarstatus-pagina::after {
+	content: '\203A';
+	margin-left: -0.1rem;
+	color: var(--gedempt);
+	font-size: 1rem;
+	line-height: 1;
+}
+
+html[data-ontwerp='v5'] .bewaarstatus.bewaarstatus-pagina[aria-current='page']::after {
+	content: none;
+}
+
+/* ---------- Overzichtspagina: kop en samenvatting links, back-up rechts ---------- */
+
+.indeling.ontwerp-v5 main:has(.bewaard-overzicht) {
+	padding: 1.75rem 1.75rem 4rem;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 17rem;
+	column-gap: 3.5rem;
+	max-width: 72rem;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht > :not(.bewaard-acties) {
+	grid-column: 1;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht h1 {
+	margin: 0 0 0.35rem;
+	font-size: 1.375rem;
+	font-weight: 600;
+	letter-spacing: -0.015em;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht .bewaard-regel {
+	margin: 0 0 1.75rem;
+	color: var(--gedempt);
+	font-size: 0.9375rem;
+}
+
+/* De back-up: een vaste kolom naast de lijst, zonder kader, met een dunne lijn aan de linkerkant. */
+.indeling.ontwerp-v5 .bewaard-overzicht .bewaard-acties {
+	position: sticky;
+	top: calc(var(--balk-hoogte, 0px) + 1rem);
+	grid-column: 2;
+	grid-row: 1 / span 99;
+	flex-direction: column;
+	align-items: stretch;
+	align-self: start;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0 0 0 1.5rem;
+	border-left: 1px solid var(--rand);
+}
+
+.indeling.ontwerp-v5 .bewaard-acties::before {
+	content: 'Back-up';
+	margin-bottom: 0.15rem;
+	color: var(--zacht);
+	font-size: 0.6875rem;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.indeling.ontwerp-v5 .bewaard-acties::after {
+	content: 'Eén bestand met je bewerkte verzen en keuzes. Laad het in op een andere computer, of als je browser leeg is gemaakt.';
+	margin-top: 0.35rem;
+	color: var(--gedempt);
+	font-size: 0.8125rem;
+	line-height: 1.5;
+}
+
+.indeling.ontwerp-v5 .bewaard-acties button {
+	padding: 0.4rem 0.75rem;
+	text-align: left;
+}
+
+.indeling.ontwerp-v5 .bewaard-acties button:first-child {
+	background: var(--rood);
+	border-color: var(--rood);
+	color: #fff;
+}
+
+.indeling.ontwerp-v5 .bewaard-acties button:first-child:hover:not(:disabled) {
+	background: #7e1210;
+	border-color: #7e1210;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht .bewaarstatus-melding {
+	margin: -0.75rem 0 1.5rem;
+	padding-left: 0.6rem;
+	border-left: 2px solid var(--tekst);
+	color: var(--tekst);
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht .melding {
+	padding: 0;
+	font-size: 0.9375rem;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht .bewaard-verouderd {
+	margin: 0 0 1.75rem;
+	padding: 0.5rem 0.75rem;
+	background: var(--vlak);
+	border-left: 3px solid var(--tekst);
+}
+
+/* ---------- Hoofdstukken en keuzes: dunne lijnen zoals de tabellen bij Keuzes en vragen ---------- */
+
+.indeling.ontwerp-v5 .bewaard-overzicht h2 {
+	margin: 0;
+	padding: 0 0 0.45rem;
+	border-bottom: 1px solid var(--rand-donker);
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht h2 a {
+	text-decoration: none;
+}
+
+.indeling.ontwerp-v5 .bewaard-overzicht h2 a:hover {
+	text-decoration: underline;
+}
+
+.indeling.ontwerp-v5 .bewaard-hoofdstuk,
+.indeling.ontwerp-v5 .bewaard-keuzes {
+	margin-bottom: 1.75rem;
+}
+
+.indeling.ontwerp-v5 .bewaard-verzen li {
+	display: grid;
+	grid-template-columns: 4.5rem minmax(0, 1fr) auto auto;
+	align-items: baseline;
+	gap: 0 1rem;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid #efefef;
+}
+
+.indeling.ontwerp-v5 .bewaard-verzen li:hover {
+	background: var(--vlak);
+}
+
+.indeling.ontwerp-v5 .bewaard-verzen li > a {
+	font-variant-numeric: tabular-nums;
+	font-weight: 500;
+}
+
+.indeling.ontwerp-v5 .bewaard-tijd {
+	color: var(--gedempt);
+	font-size: 0.75rem;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Een label zonder tijd ervoor schuift niet naar links: de kolommen staan vast. */
+.indeling.ontwerp-v5 .bewaard-label {
+	grid-column: auto;
+	padding: 0.05rem 0.45rem;
+	color: var(--gedempt);
+	font-size: 0.6875rem;
+	letter-spacing: 0.02em;
+}
+
+.indeling.ontwerp-v5 .bewaard-label-verouderd {
+	background: var(--tekst);
+	border-color: var(--tekst);
+	color: #fff;
+}
+
+.indeling.ontwerp-v5 .bewaard-keuzes li {
+	padding: 0.6rem 0;
+	border-bottom: 1px solid #efefef;
+}
+
+.indeling.ontwerp-v5 .bewaard-keuzes p {
+	margin: 0.75rem 0 0;
+	color: var(--gedempt);
+}
+
+/* Bij een smal scherm komt de back-up boven de lijst. */
+@media (max-width: 64rem) {
+	.indeling.ontwerp-v5 .bewaard-overzicht {
+		display: block;
+	}
+
+	.indeling.ontwerp-v5 .bewaard-overzicht .bewaard-acties {
+		position: static;
+		flex-direction: row;
+		flex-wrap: wrap;
+		margin: 0 0 1.75rem;
+		padding: 0;
+		border-left: 0;
+	}
+
+	.indeling.ontwerp-v5 .bewaard-acties::before,
+	.indeling.ontwerp-v5 .bewaard-acties::after {
+		content: none;
+	}
+}
+
+/* ---------- Venster Back-up inladen ---------- */
+
+.indeling.ontwerp-v5 .bewaren-venster {
+	width: min(38rem, 92vw);
+}
+
+.indeling.ontwerp-v5 .bewaren-venster .bewaren-venster-inhoud {
+	padding: 1.5rem 1.75rem 1.75rem;
+}
+
+.indeling.ontwerp-v5 .bewaren-venster h2 {
+	margin: 0 0 1rem;
+	padding: 0 0 0.5rem;
+	border-bottom: 1px solid var(--rand-donker);
+	font-size: 1.125rem;
+	font-weight: 600;
+}
+
+.indeling.ontwerp-v5 .bewaren-venster .bewaren-venster-knoppen {
+	margin-top: 1.25rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--rand);
+}
