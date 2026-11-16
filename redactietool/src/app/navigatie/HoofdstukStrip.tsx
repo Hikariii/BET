@@ -40,21 +40,20 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 	const [stand, zetStand] = useState<Schuifstand>({ terug: false, verder: false });
 	const huidigeIndex = Math.max(0, boek.hoofdstukken.findIndex((hoofdstuk) => hoofdstuk.nummer === huidigHoofdstuk));
 	const [tabstop, zetTabstop] = useState(huidigeIndex);
-	/** De lezer schoof zelf (pijltje of wiel): dan blijft de strip staan waar hij is tot een ander hoofdstuk opengaat. */
-	const zelfGeschoven = useRef(false);
 
 	useEffect(() => {
 		const element = lijst.current;
 		if (element === null) return;
 		const meet = () => zetStand(schuifstand(element.scrollLeft, element.clientWidth, element.scrollWidth));
-		// Bij het openen en bij een andere venster- of lettergrootte komt het open hoofdstuk in het midden; verandert alleen een hoofdstuk van maat, dan blijft de strip staan als het kan.
-		let vorigeBreedte = 0;
+		// Alleen de eerste keer dat de strip een breedte heeft, komt het open hoofdstuk in het midden.
+		// Latere maatwijzigingen (een pijltje dat verschijnt, een letter die laadt, een andere grootte) laten de strip staan:
+		// in Firefox komen die meldingen ook tijdens en na het schuiven, en dan sprong de strip terug.
+		let gecentreerd = false;
 		const waarnemer = new ResizeObserver(() => {
-			if (zelfGeschoven.current) {
-				// Een pijltje dat verschijnt of verdwijnt verandert de breedte; dat mag de strip niet terugzetten.
-			} else if (element.clientWidth > 0 && element.clientWidth !== vorigeBreedte) centreerHuidig(element);
-			else houdHuidigInBeeld(element);
-			vorigeBreedte = element.clientWidth;
+			if (!gecentreerd && element.clientWidth > 0) {
+				centreerHuidig(element);
+				gecentreerd = true;
+			}
 			meet();
 		});
 		waarnemer.observe(element);
@@ -64,7 +63,6 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 		const wiel = (gebeurtenis: WheelEvent) => {
 			if (Math.abs(gebeurtenis.deltaY) <= Math.abs(gebeurtenis.deltaX) || element.scrollWidth <= element.clientWidth) return;
 			gebeurtenis.preventDefault();
-			zelfGeschoven.current = true;
 			element.scrollLeft += gebeurtenis.deltaY;
 		};
 		element.addEventListener('wheel', wiel, { passive: false });
@@ -76,7 +74,6 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 	}, []);
 
 	useEffect(() => {
-		zelfGeschoven.current = false;
 		if (lijst.current !== null) houdHuidigInBeeld(lijst.current);
 		zetTabstop(huidigeIndex);
 	}, [huidigHoofdstuk]);
@@ -100,7 +97,6 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 	const schuif = (richting: 1 | -1) => {
 		const element = lijst.current;
 		if (element === null) return;
-		zelfGeschoven.current = true;
 		element.scrollBy({ left: richting * schuifAfstand(element.clientWidth), behavior: 'smooth' });
 	};
 
