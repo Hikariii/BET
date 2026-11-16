@@ -19,18 +19,51 @@ export function antwoordenSleutel(boek: string): string {
 	return `bet-antwoorden/${boek}`;
 }
 
-/** Alle antwoorden van een boek; onleesbare opslag geeft een lege lijst. Wordt ingevuld. */
-export function leesAntwoorden(_opslag: Opslag, _boek: string): Antwoord[] {
-	return [];
+/** Leest één antwoord uit opgeslagen JSON; `null` bij een onbruikbare vorm. */
+export function alsAntwoord(waarde: unknown): Antwoord | null {
+	if (typeof waarde !== 'object' || waarde === null || Array.isArray(waarde)) return null;
+	const { kwestie, optie, keuzeId, gegeven } = waarde as Record<string, unknown>;
+	if (typeof kwestie !== 'string' || typeof optie !== 'string' || typeof gegeven !== 'string') return null;
+	if (keuzeId !== null && typeof keuzeId !== 'string') return null;
+	return { kwestie, optie, keuzeId, gegeven };
 }
 
-/** Bewaart een antwoord; een eerder antwoord op dezelfde kwestie wordt vervangen. Geeft onwaar als de opslag weigert. Wordt ingevuld. */
-export function bewaarAntwoord(_opslag: Opslag, _boek: string, _antwoord: Antwoord): boolean {
-	return false;
+/** Alle antwoorden van een boek, op volgorde van bewaren; onleesbare opslag geeft een lege lijst, een onleesbaar antwoord wordt overgeslagen. */
+export function leesAntwoorden(opslag: Opslag, boek: string): Antwoord[] {
+	try {
+		const tekst = opslag.getItem(antwoordenSleutel(boek));
+		if (tekst === null) return [];
+		const json: unknown = JSON.parse(tekst);
+		if (!Array.isArray(json)) return [];
+		return json.flatMap((waarde) => alsAntwoord(waarde) ?? []);
+	} catch {
+		return [];
+	}
 }
 
-/** Haalt het antwoord op een kwestie weg. Wordt ingevuld. */
-export function verwijderAntwoord(_opslag: Opslag, _boek: string, _kwestie: string): void {}
+/** Schrijft de lijst terug; zonder antwoorden verdwijnt de sleutel. Geeft `false` als de opslag het weigert. */
+export function schrijfAntwoorden(opslag: Opslag, boek: string, antwoorden: readonly Antwoord[]): boolean {
+	try {
+		if (antwoorden.length === 0) opslag.removeItem(antwoordenSleutel(boek));
+		else opslag.setItem(antwoordenSleutel(boek), JSON.stringify(antwoorden));
+		return true;
+	} catch {
+		return false;
+	}
+}
 
-/** Haalt de antwoorden weg die naar een (teruggedraaide) keuze wijzen. Wordt ingevuld. */
-export function verwijderAntwoordenVanKeuze(_opslag: Opslag, _boek: string, _keuzeId: string): void {}
+/** Bewaart een antwoord; een eerder antwoord op dezelfde kwestie wordt vervangen. Geeft onwaar als de opslag weigert. */
+export function bewaarAntwoord(opslag: Opslag, boek: string, antwoord: Antwoord): boolean {
+	const overige = leesAntwoorden(opslag, boek).filter((bestaand) => bestaand.kwestie !== antwoord.kwestie);
+	return schrijfAntwoorden(opslag, boek, [...overige, antwoord]);
+}
+
+/** Haalt het antwoord op een kwestie weg. */
+export function verwijderAntwoord(opslag: Opslag, boek: string, kwestie: string): void {
+	schrijfAntwoorden(opslag, boek, leesAntwoorden(opslag, boek).filter((antwoord) => antwoord.kwestie !== kwestie));
+}
+
+/** Haalt de antwoorden weg die naar een (teruggedraaide) keuze wijzen. */
+export function verwijderAntwoordenVanKeuze(opslag: Opslag, boek: string, keuzeId: string): void {
+	schrijfAntwoorden(opslag, boek, leesAntwoorden(opslag, boek).filter((antwoord) => antwoord.keuzeId !== keuzeId));
+}

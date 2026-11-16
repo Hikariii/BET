@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData } from '../../data/types';
 import type { Tussenstand } from '../../bewerken/types';
+import { leesAntwoorden } from '../../antwoorden/antwoorden';
 import { exportBestandsnaam, maakExport } from '../../export/maakExport';
 import type { Hoofdstuk } from '../../formaat/types';
 import { maakKlembordInhoud, vulKopieerGebeurtenis } from '../../klembord/kopieer';
+import { leesKeuzes } from '../../vervangen/keuzes';
+import { browseropslag } from '../bewerken/useTussenstand';
 import { downloadAlsJson } from '../downloadBestand';
 import './hoofdstukacties.css';
 
@@ -61,7 +64,16 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand }: Props) {
 	const [toelichting, zetToelichting] = useState('');
 
 	const bouwExport = (tekst: string) =>
-		maakExport({ boek: boek.id, hoofdstuk: repo, tussenstand, repoCommit: __REPO_COMMIT__, toelichting: tekst, nu: new Date() });
+		maakExport({
+			boek: boek.id,
+			hoofdstuk: repo,
+			tussenstand,
+			keuzes: leesKeuzes(browseropslag(), boek.id),
+			antwoorden: leesAntwoorden(browseropslag(), boek.id),
+			repoCommit: __REPO_COMMIT__,
+			toelichting: tekst,
+			nu: new Date(),
+		});
 	const { aantalBewerkt, aantalVerouderd } = useMemo(() => {
 		const verzen = bouwExport('').verzen;
 		return { aantalBewerkt: verzen.length, aantalVerouderd: verzen.filter((vers) => vers.verouderd).length };

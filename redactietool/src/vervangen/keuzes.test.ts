@@ -1,13 +1,49 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { bewaarOfWis, leesTussenstand } from '../bewerken/tussenstand';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
 import type { HoofdstukData } from '../data/types';
 import { parseerHoofdstuk } from '../formaat/parseer';
 import { maakExport } from '../export/maakExport';
-import { draaiKeuzeTerug, leesKeuzes, pasKeuzeToe } from './keuzes';
+import { bewaarAntwoord, leesAntwoorden } from '../antwoorden/antwoorden';
+import type { Opmaak } from '../formaat/types';
+import { alsKeuze, draaiKeuzeTerug, draaiVersTerug, leesKeuzes, pasKeuzeToe, pasOpdrachtToe, type StructureleKeuze, type Toepassing } from './keuzes';
 import type { HoofdstukVerzen, Vondst } from './types';
 import { zoekVondsten } from './zoekEnVervang';
+import type { Plek, Zoekopdracht } from './zoekopdracht';
+
+/**
+ * Een eenvoudige eigen versie van `wijzigVers` voor deze tests: vervangt of wisselt per plek binnen één tekststuk.
+ * De echte versie komt uit `zoekopdracht.ts`; deze mock kan weg zodra die gebouwd is.
+ */
+function eenvoudigeWijzigVers(inhoud: VersInhoud, plekken: readonly Plek[], opdracht: Zoekopdracht, variantVervangingen: ReadonlyMap<string, string>): VersInhoud {
+	const delen = inhoud.delen.map((deel, deelIndex) => {
+		let begin = 0;
+		const bereiken = deel.stukken.map((stuk) => ({ stuk, van: begin, tot: (begin += stuk.tekst.length) }));
+		const nieuweStukken = deel.stukken.map((stuk) => ({ ...stuk }));
+		const dezePlekken = plekken.filter((plek) => plek.deel === deelIndex).sort((a, b) => b.van - a.van);
+		for (const plek of dezePlekken) {
+			const index = bereiken.findIndex((bereik) => bereik.van <= plek.van && plek.tot <= bereik.tot);
+			const bereik = bereiken[index];
+			const stuk = nieuweStukken[index];
+			if (bereik === undefined || stuk === undefined) continue;
+			if (opdracht.soort === 'markering') {
+				nieuweStukken[index] = { ...stuk, opmaak: stuk.opmaak.map((opmaak) => (opmaak === opdracht.van ? opdracht.naar : opmaak)) };
+				continue;
+			}
+			const vervanging = plek.variant === null ? opdracht.nieuw : (variantVervangingen.get(plek.variant) ?? '');
+			if (vervanging === '') continue;
+			nieuweStukken[index] = { ...stuk, tekst: stuk.tekst.slice(0, plek.van - bereik.van) + vervanging + stuk.tekst.slice(plek.tot - bereik.van) };
+		}
+		return { ...deel, stukken: nieuweStukken };
+	});
+	return { delen };
+}
+
+vi.mock('./zoekopdracht', async (origineel) => ({
+	...(await origineel<typeof import('./zoekopdracht')>()),
+	wijzigVers: eenvoudigeWijzigVers,
+}));
 
 class GeheugenOpslag implements Opslag {
 	readonly items = new Map<string, string>();
@@ -42,20 +78,24 @@ const VERS_23 = ' Daarna zweeg hij, harde man.';
 const VERS_24 = ' Niets bijzonders.';
 const REPO: Record<number, string> = { 22: VERS_22, 23: VERS_23, 24: VERS_24 };
 
-/** Het hoofdstuk zoals de vertaler het ziet: de repo met de tussenstand erover. */
-function hoofdstukken(opslag: Opslag): HoofdstukVerzen[] {
+/** Hoofdstuk 6 zoals de vertaler het ziet: de repo-verzen met de tussenstand erover. */
+function hoofdstukUit(opslag: Opslag, repo: Record<number, VersInhoud>): HoofdstukVerzen[] {
 	const tussenstand = leesTussenstand(opslag, 'lukas', 6);
 	return [
 		{
 			hoofdstuk: 6,
 			goedgekeurd: false,
-			verzen: Object.entries(REPO).map(([nummer, tekst]) => ({
+			verzen: Object.entries(repo).map(([nummer, repoInhoud]) => ({
 				vers: Number(nummer),
-				inhoud: tussenstand.verzen[Number(nummer)]?.inhoud ?? inhoud(tekst),
-				repo: inhoud(tekst),
+				inhoud: tussenstand.verzen[Number(nummer)]?.inhoud ?? repoInhoud,
+				repo: repoInhoud,
 			})),
 		},
 	];
+}
+
+function hoofdstukken(opslag: Opslag): HoofdstukVerzen[] {
+	return hoofdstukUit(opslag, Object.fromEntries(Object.entries(REPO).map(([nummer, tekst]) => [nummer, inhoud(tekst)])));
 }
 
 const VONDSTEN = zoekVondsten(hoofdstukken(new GeheugenOpslag()), 'harde');
@@ -330,6 +370,8 @@ describe('herkomst', () => {
 			hoofdstuk,
 			tussenstand: leesTussenstand(opslag, 'lukas', 6),
 			repoCommit: null,
+			keuzes: leesKeuzes(opslag, 'lukas'),
+			antwoorden: [],
 			toelichting: '',
 			nu: NU,
 		});
@@ -339,5 +381,265 @@ describe('herkomst', () => {
 			[23, 'structurele keuze'],
 			[24, 'zelf getypt'],
 		]);
+	});
+});
+
+function metOpmaak(...stukken: [tekst: string, opmaak: Opmaak | null][]): VersInhoud {
+	return { delen: [{ stijl: null, stukken: stukken.map(([tekst, opmaak]) => ({ soort: 'tekst', tekst, opmaak: opmaak === null ? [] : [opmaak] })) }] };
+}
+
+const MARKERING_REPO: Record<number, VersInhoud> = {
+	22: metOpmaak([' Hij was ', null], ['gezegend', 'eeuwigleven'], ['.', null]),
+	23: metOpmaak([' Ook ', null], ['Gezegend', 'eeuwigleven'], [' was hij; de gezegenden ook.', null]),
+	24: metOpmaak([' Wie gezegend is, weet het.', null]),
+};
+
+function plekIn(vers: number, gevonden: string, variant: string | null = null): Plek {
+	const inhoudVan = MARKERING_REPO[vers];
+	const tekst = inhoudVan?.delen[0]?.stukken.map((stuk) => stuk.tekst).join('') ?? '';
+	const van = tekst.indexOf(gevonden);
+	return { hoofdstuk: 6, vers, deel: 0, van, tot: van + gevonden.length, gevonden, ervoor: '', erna: '', vervangbaar: true, goedgekeurd: false, variant };
+}
+
+const KWESTIE = 'Gezegend';
+const OPTIE = 'a) genade, zoals de vertaler in 1:45/1:48';
+
+function markeringToepassing(opslag: Opslag, uitzonderingen: Partial<Toepassing> = {}): Toepassing {
+	return {
+		hoofdstukken: hoofdstukUit(opslag, MARKERING_REPO),
+		opdracht: { soort: 'markering', zoekterm: 'gezegend', van: 'eeuwigleven', naar: 'genade', bereik: { soort: 'boek' } },
+		aangevinkt: [plekIn(22, 'gezegend'), plekIn(23, 'Gezegend')],
+		overgeslagen: [{ hoofdstuk: 6, vers: 24, gevonden: 'gezegend', reden: 'uitgevinkt' }],
+		variantVervangingen: new Map(),
+		vraag: { kwestie: KWESTIE, optie: OPTIE },
+		...uitzonderingen,
+	};
+}
+
+describe('pasOpdrachtToe met een markeringswissel', () => {
+	it('wisselt de markering, bewaart de keuze met soort, overgeslagen plek en vraag, en bewaart het antwoord met het keuze-id', () => {
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([]);
+
+		const { keuze, meldingen } = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU);
+
+		expect(meldingen).toEqual([]);
+		expect(huidig(opslag, 22)).toEqual(metOpmaak([' Hij was ', null], ['gezegend', 'genade'], ['.', null]));
+		expect(huidig(opslag, 24)).toBeUndefined();
+		expect(leesTussenstand(opslag, 'lukas', 6).verzen[22]).toMatchObject({ herkomst: 'structurele keuze', keuzeId: keuze.id });
+		expect(leesKeuzes(opslag, 'lukas')).toEqual([keuze]);
+		expect(keuze).toMatchObject({
+			soort: 'markering',
+			zoekterm: 'gezegend',
+			nieuw: '',
+			van: 'eeuwigleven',
+			naar: 'genade',
+			varianten: [],
+			vraag: KWESTIE,
+			overgeslagen: [{ hoofdstuk: 6, vers: 24, gevonden: 'gezegend', reden: 'uitgevinkt' }],
+		});
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: KWESTIE, optie: OPTIE, keuzeId: keuze.id, gegeven: NU.toISOString() }]);
+	});
+
+	it('bewaart bij een tekstvervanging alleen de gebruikte varianten met een vervanging', () => {
+		const toepassing = markeringToepassing(opslag, {
+			opdracht: { soort: 'tekst', zoekterm: 'gezegend', nieuw: 'gezegende', bereik: { soort: 'boek' } },
+			aangevinkt: [plekIn(22, 'gezegend'), plekIn(23, 'gezegenden', 'gezegenden')],
+			variantVervangingen: new Map([
+				['gezegenden', 'zegenden'],
+				['gezegende', 'x'],
+				['zegen', ''],
+			]),
+			vraag: null,
+		});
+
+		const { keuze } = pasOpdrachtToe(opslag, 'lukas', toepassing, NU);
+
+		expect(keuze).toMatchObject({ soort: 'tekst', nieuw: 'gezegende', van: null, naar: null, varianten: [{ vorm: 'gezegenden', nieuw: 'zegenden' }], vraag: null });
+		expect(huidig(opslag, 23)).toEqual(metOpmaak([' Ook ', null], ['Gezegend', 'eeuwigleven'], [' was hij; de zegenden ook.', null]));
+	});
+
+	it('bewaart zonder vraag geen antwoord', () => {
+		pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag, { vraag: null }), NU);
+
+		expect(leesKeuzes(opslag, 'lukas')).toHaveLength(1);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([]);
+	});
+
+	it('bewaart geen keuze en geen antwoord als er niets veranderde', () => {
+		const { keuze } = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag, { aangevinkt: [] }), NU);
+
+		expect(keuze.verzen).toEqual([]);
+		expect(leesKeuzes(opslag, 'lukas')).toEqual([]);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([]);
+	});
+
+	it('vervangt het eerdere antwoord op dezelfde vraag', () => {
+		bewaarAntwoord(opslag, 'lukas', { kwestie: KWESTIE, optie: 'b) houden', keuzeId: null, gegeven: '2026-11-14T10:00:00.000Z' });
+
+		const { keuze } = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU);
+
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: KWESTIE, optie: OPTIE, keuzeId: keuze.id, gegeven: NU.toISOString() }]);
+	});
+
+	it('meldt een antwoord dat niet bewaard kon worden, terwijl de keuze wel bewaard is', () => {
+		class AntwoordenVol extends GeheugenOpslag {
+			override setItem(sleutel: string, waarde: string): void {
+				if (sleutel.startsWith('bet-antwoorden/')) throw new DOMException('De opslag is vol', 'QuotaExceededError');
+				super.setItem(sleutel, waarde);
+			}
+		}
+		const vol = new AntwoordenVol();
+
+		const { meldingen } = pasOpdrachtToe(vol, 'lukas', markeringToepassing(vol), NU);
+
+		expect(meldingen).toEqual([expect.stringContaining('antwoord')]);
+		expect(leesKeuzes(vol, 'lukas')).toHaveLength(1);
+	});
+});
+
+describe('draaiVersTerug', () => {
+	const TIJD_ANDER = '2026-11-15T09:00:00.000Z';
+
+	function keuzeOverTweeVerzen() {
+		bewaarAntwoord(opslag, 'lukas', { kwestie: 'Andere vraag', optie: 'houden', keuzeId: null, gegeven: TIJD_ANDER });
+		const { keuze } = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU);
+		return keuze;
+	}
+
+	it('draait alleen dat vers terug en laat de keuze en het antwoord staan zolang er een vers over is', () => {
+		const keuze = keuzeOverTweeVerzen();
+		expect(leesKeuzes(opslag, 'lukas')[0]?.verzen.map((v) => v.vers)).toEqual([22, 23]);
+
+		const meldingen = draaiVersTerug(opslag, 'lukas', keuze.id, 6, 22);
+
+		expect(meldingen).toEqual([]);
+		expect(huidig(opslag, 22)).toBeUndefined();
+		expect(huidig(opslag, 23)).toEqual(metOpmaak([' Ook ', null], ['Gezegend', 'genade'], [' was hij; de gezegenden ook.', null]));
+		expect(leesKeuzes(opslag, 'lukas')[0]?.verzen.map((v) => v.vers)).toEqual([23]);
+		expect(leesAntwoorden(opslag, 'lukas').map((antwoord) => antwoord.kwestie)).toEqual(['Andere vraag', KWESTIE]);
+	});
+
+	it('haalt bij het laatste vers de keuze en het antwoord weg, maar niet andere antwoorden', () => {
+		const keuze = keuzeOverTweeVerzen();
+		draaiVersTerug(opslag, 'lukas', keuze.id, 6, 22);
+
+		const meldingen = draaiVersTerug(opslag, 'lukas', keuze.id, 6, 23);
+
+		expect(meldingen).toEqual([]);
+		expect(leesTussenstand(opslag, 'lukas', 6).verzen).toEqual({});
+		expect(leesKeuzes(opslag, 'lukas')).toEqual([]);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ kwestie: 'Andere vraag', optie: 'houden', keuzeId: null, gegeven: TIJD_ANDER }]);
+	});
+
+	it('laat een vers staan dat de vertaler zelf bewerkte, haalt het uit de keuze en meldt dat', () => {
+		const keuze = keuzeOverTweeVerzen();
+		bewaarOfWis(opslag, 'lukas', 6, 22, metOpmaak([' Hij was heel ', null], ['gezegend', 'genade'], ['.', null]), MARKERING_REPO[22] ?? inhoud(''));
+
+		const meldingen = draaiVersTerug(opslag, 'lukas', keuze.id, 6, 22);
+
+		expect(meldingen).toEqual(['Vers 6:22 is na de keuze zelf bewerkt en blijft staan.']);
+		expect(leesKeuzes(opslag, 'lukas')[0]?.verzen.map((v) => v.vers)).toEqual([23]);
+	});
+
+	it('houdt een vers bij de keuze zolang een latere keuze het vers bezit, en laat het antwoord staan', () => {
+		const eerste = keuzeOverTweeVerzen();
+		const latereOpdracht: Toepassing = markeringToepassing(opslag, {
+			opdracht: { soort: 'markering', zoekterm: 'gezegend', van: 'genade', naar: 'geloof', bereik: { soort: 'boek' } },
+			aangevinkt: [plekIn(22, 'gezegend')],
+			overgeslagen: [],
+			vraag: null,
+		});
+		pasOpdrachtToe(opslag, 'lukas', latereOpdracht, new Date('2026-11-15T16:05:00.000Z'));
+
+		const meldingen = draaiVersTerug(opslag, 'lukas', eerste.id, 6, 22);
+
+		expect(meldingen).toEqual(['Vers 6:22 is daarna veranderd door de keuze "gezegend"; draai die eerst terug.']);
+		expect(leesKeuzes(opslag, 'lukas').find((k) => k.id === eerste.id)?.verzen.map((v) => v.vers)).toEqual([22, 23]);
+		expect(leesAntwoorden(opslag, 'lukas').some((antwoord) => antwoord.keuzeId === eerste.id)).toBe(true);
+	});
+
+	it('meldt een vers dat niet bij de keuze hoort en een keuze die er niet is', () => {
+		const keuze = keuzeOverTweeVerzen();
+
+		expect(draaiVersTerug(opslag, 'lukas', keuze.id, 6, 24)).toEqual(['Vers 6:24 hoort niet (meer) bij deze keuze.']);
+		expect(draaiVersTerug(opslag, 'lukas', 'bestaat-niet', 6, 22)).toEqual(['Deze keuze staat niet meer in de lijst.']);
+		expect(leesKeuzes(opslag, 'lukas')[0]?.verzen).toHaveLength(2);
+	});
+});
+
+describe('draaiKeuzeTerug en antwoorden', () => {
+	it('haalt het antwoord van de keuze weg en laat het antwoord van een andere keuze staan', () => {
+		const eerste = pasOpdrachtToe(opslag, 'lukas', markeringToepassing(opslag), NU).keuze;
+		const tweede = pasOpdrachtToe(
+			opslag,
+			'lukas',
+			markeringToepassing(opslag, {
+				opdracht: { soort: 'markering', zoekterm: 'gezegend', van: 'genade', naar: 'geloof', bereik: { soort: 'boek' } },
+				aangevinkt: [plekIn(22, 'gezegend')],
+				overgeslagen: [],
+				vraag: { kwestie: 'Tweede vraag', optie: 'a)' },
+			}),
+			new Date('2026-11-15T16:05:00.000Z'),
+		).keuze;
+		expect(leesAntwoorden(opslag, 'lukas').map((antwoord) => antwoord.keuzeId)).toEqual([eerste.id, tweede.id]);
+
+		draaiKeuzeTerug(opslag, 'lukas', tweede.id);
+
+		expect(leesAntwoorden(opslag, 'lukas').map((antwoord) => antwoord.keuzeId)).toEqual([eerste.id]);
+	});
+});
+
+describe('alsKeuze', () => {
+	const NIEUWE_KEUZE: StructureleKeuze = {
+		id: '1',
+		soort: 'markering',
+		zoekterm: 'gezegend',
+		nieuw: '',
+		van: 'eeuwigleven',
+		naar: 'genade',
+		varianten: [{ vorm: 'gezegenden', nieuw: 'zegenden' }],
+		toegepast: NU.toISOString(),
+		verzen: [{ hoofdstuk: 6, vers: 22, voor: inhoud(' a'), na: inhoud(' b') }],
+		overgeslagen: [{ hoofdstuk: 6, vers: 24, gevonden: 'gezegend', reden: 'met de hand' }],
+		vraag: KWESTIE,
+	};
+
+	it('geeft een keuze met alle nieuwe velden ongewijzigd terug na een omweg door tekst', () => {
+		expect(alsKeuze(JSON.parse(JSON.stringify(NIEUWE_KEUZE)))).toEqual(NIEUWE_KEUZE);
+	});
+
+	it('geeft een oude keuze zonder de nieuwe velden de standaardwaarden van een tekstvervanging', () => {
+		const { id, zoekterm, nieuw, toegepast, verzen } = NIEUWE_KEUZE;
+
+		expect(alsKeuze({ id, zoekterm, nieuw, toegepast, verzen })).toEqual({
+			id,
+			zoekterm,
+			nieuw,
+			toegepast,
+			verzen,
+			soort: 'tekst',
+			van: null,
+			naar: null,
+			varianten: [],
+			overgeslagen: [],
+			vraag: null,
+		});
+	});
+
+	it('leest een oude keuze uit de opslag', () => {
+		const { id, zoekterm, nieuw, toegepast, verzen } = NIEUWE_KEUZE;
+		opslag.setItem('bet-keuzes/lukas', JSON.stringify([{ id, zoekterm, nieuw, toegepast, verzen }]));
+
+		expect(leesKeuzes(opslag, 'lukas')).toMatchObject([{ id, soort: 'tekst', varianten: [], overgeslagen: [], vraag: null }]);
+	});
+
+	it('weigert een nieuw veld met een onmogelijke waarde', () => {
+		const json: Record<string, unknown> = JSON.parse(JSON.stringify(NIEUWE_KEUZE));
+
+		expect(alsKeuze({ ...json, soort: 'iets' })).toBeNull();
+		expect(alsKeuze({ ...json, naar: 'onbekend-domein' })).toBeNull();
+		expect(alsKeuze({ ...json, varianten: [{ vorm: 'x' }] })).toBeNull();
+		expect(alsKeuze({ ...json, overgeslagen: [{ hoofdstuk: 6, vers: 24, gevonden: 'x', reden: 'geen reden' }] })).toBeNull();
+		expect(alsKeuze({ ...json, vraag: 5 })).toBeNull();
 	});
 });

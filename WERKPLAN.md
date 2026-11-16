@@ -160,7 +160,7 @@ Zo blijft elke keuze terug te vinden en terug te draaien (§2), en kan de redact
 
 ## D. Aangeleverd Word terugvoeren
 
-De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `redactietool/stap1-plan.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst.
+De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `redactietool/stap1-plan.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst. Een export met `versie: 1` heeft geen keuzes of vragen; `versie: 2` voegt toe: `structureleKeuzes` (de hele keuze met de plekken van dit hoofdstuk, toegepast en overgeslagen met reden), `beantwoordeVragen` (kwestie, optie, keuzeId) en per vers het `keuzeId`.
 
 Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: meestal `bij editor`.
 

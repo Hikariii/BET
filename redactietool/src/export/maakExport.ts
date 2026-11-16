@@ -1,16 +1,22 @@
+import type { Antwoord } from '../antwoorden/antwoorden';
 import type { HoofdstukData } from '../data/types';
 import { serialiseerHoofdstuk } from '../formaat/serialiseer';
 import { isBewerkingVerouderd } from '../bewerken/tussenstand';
 import type { Tussenstand, VersInhoud } from '../bewerken/types';
 import { knipVers } from '../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../bewerken/waarschuwingen';
-import type { GewijzigdVers, RedactieExport } from './types';
+import type { StructureleKeuze } from '../vervangen/keuzes';
+import type { ExportKeuze, GewijzigdVers, RedactieExport } from './types';
 
 export type ExportInvoer = {
 	boek: string;
 	/** Het hoofdstuk zoals in de repo (zonder tussenstand). */
 	hoofdstuk: HoofdstukData;
 	tussenstand: Tussenstand;
+	/** Alle keuzes van het boek, in willekeurige volgorde; de export neemt de keuzes die dit hoofdstuk raken. */
+	keuzes: readonly StructureleKeuze[];
+	/** Alle antwoorden van het boek. */
+	antwoorden: readonly Antwoord[];
 	repoCommit: string | null;
 	toelichting: string;
 	/** Tijd van maken; meegegeven zodat tests vast kunnen staan. */
@@ -36,8 +42,37 @@ function gewijzigdVers(nummer: number, invoer: ExportInvoer): GewijzigdVers | nu
 		repo: repo === null ? [] : opFormaatRegels(repo),
 		bewerkt: opFormaatRegels(bewerkt.inhoud),
 		herkomst: bewerkt.herkomst ?? 'zelf getypt',
+		keuzeId: bewerkt.keuzeId ?? null,
 		waarschuwingen: bron === null ? [] : waarschuwingenVoorVers(bron, bewerkt.inhoud).map((waarschuwing) => waarschuwing.tekst),
 		verouderd,
+	};
+}
+
+function plekNaam(hoofdstuk: number, vers: number): string {
+	return `${hoofdstuk}:${vers}`;
+}
+
+/** De keuze met de plekken van dit hoofdstuk, of `null` als de keuze dit hoofdstuk niet raakt. */
+function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number): ExportKeuze | null {
+	const toegepast = keuze.verzen.filter((vers) => vers.hoofdstuk === hoofdstuk).map((vers) => plekNaam(vers.hoofdstuk, vers.vers));
+	const overgeslagen = keuze.overgeslagen
+		.filter((plek) => plek.hoofdstuk === hoofdstuk)
+		.map(({ hoofdstuk: plekHoofdstuk, vers, gevonden, reden }) => ({ plek: plekNaam(plekHoofdstuk, vers), gevonden, reden }));
+	if (toegepast.length === 0 && overgeslagen.length === 0) return null;
+	const hoofdstukken = new Set([...keuze.verzen.map((vers) => vers.hoofdstuk), ...keuze.overgeslagen.map((plek) => plek.hoofdstuk)]);
+	return {
+		id: keuze.id,
+		soort: keuze.soort,
+		zoekterm: keuze.zoekterm,
+		nieuw: keuze.nieuw,
+		van: keuze.van,
+		naar: keuze.naar,
+		varianten: keuze.varianten,
+		vraag: keuze.vraag,
+		aantalToegepasteVerzen: keuze.verzen.length,
+		hoofdstukken: [...hoofdstukken].sort((een, ander) => een - ander),
+		toegepast,
+		overgeslagen,
 	};
 }
 
@@ -46,17 +81,20 @@ export function maakExport(invoer: ExportInvoer): RedactieExport {
 	// Sleutels die gehele getallen zijn, komen in JavaScript altijd oplopend terug.
 	const nummers = Object.keys(invoer.tussenstand.verzen).map(Number);
 	const verzen = nummers.flatMap((nummer) => gewijzigdVers(nummer, invoer) ?? []);
+	const keuzes = [...invoer.keuzes].sort((een, ander) => Date.parse(een.toegepast) - Date.parse(ander.toegepast));
+	const structureleKeuzes = keuzes.flatMap((keuze) => exportKeuze(keuze, invoer.hoofdstuk.nummer) ?? []);
+	const keuzeIds = new Set(structureleKeuzes.map((keuze) => keuze.id));
 	return {
 		formaat: 'bet-redactie-export',
-		versie: 1,
+		versie: 2,
 		boek: invoer.boek,
 		hoofdstuk: invoer.hoofdstuk.nummer,
 		repoCommit: invoer.repoCommit,
 		gemaakt: invoer.nu.toISOString(),
 		toelichting: invoer.toelichting,
 		verzen,
-		structureleKeuzes: [],
-		beantwoordeVragen: [],
+		structureleKeuzes,
+		beantwoordeVragen: invoer.antwoorden.filter((antwoord) => antwoord.keuzeId === null || keuzeIds.has(antwoord.keuzeId)),
 	};
 }
 

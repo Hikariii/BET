@@ -1,10 +1,11 @@
 import { alsInhoud, bewaarKeuzeVers, bewaarVers, leesTussenstand, wisVers, zelfdeInhoud } from '../bewerken/tussenstand';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
+import { bewaarAntwoord, verwijderAntwoordenVanKeuze } from '../antwoorden/antwoorden';
 import { vervangInVers } from './zoekEnVervang';
-import type { Domein } from '../formaat/types';
+import { DOMEINEN, type Domein } from '../formaat/types';
 import type { HoofdstukVerzen, Vondst } from './types';
-import type { Plek, Zoekopdracht } from './zoekopdracht';
+import { wijzigVers, type Plek, type Zoekopdracht } from './zoekopdracht';
 
 /** Een toegepaste structurele keuze, bewaard om hem in één keer terug te draaien. */
 export type StructureleKeuze = {
@@ -55,7 +56,36 @@ function alsKeuzeVers(waarde: unknown): KeuzeVers | null {
 	return { hoofdstuk, vers, voor, na };
 }
 
-/** Leest één keuze uit opgeslagen JSON; `null` bij een onbruikbare vorm. */
+function alsDomein(waarde: unknown): Domein | null {
+	return DOMEINEN.find((domein) => domein === waarde) ?? null;
+}
+
+function alsVarianten(waarde: unknown): KeuzeVariant[] | null {
+	if (!Array.isArray(waarde)) return null;
+	const varianten: KeuzeVariant[] = [];
+	for (const variant of waarde) {
+		if (!isObject(variant) || typeof variant['vorm'] !== 'string' || typeof variant['nieuw'] !== 'string') return null;
+		varianten.push({ vorm: variant['vorm'], nieuw: variant['nieuw'] });
+	}
+	return varianten;
+}
+
+const REDENEN: readonly OvergeslagenPlek['reden'][] = ['goedgekeurd', 'met de hand', 'uitgevinkt'];
+
+function alsOvergeslagen(waarde: unknown): OvergeslagenPlek[] | null {
+	if (!Array.isArray(waarde)) return null;
+	const plekken: OvergeslagenPlek[] = [];
+	for (const plek of waarde) {
+		if (!isObject(plek)) return null;
+		const { hoofdstuk, vers, gevonden } = plek;
+		const reden = REDENEN.find((kandidaat) => kandidaat === plek['reden']);
+		if (typeof hoofdstuk !== 'number' || typeof vers !== 'number' || typeof gevonden !== 'string' || reden === undefined) return null;
+		plekken.push({ hoofdstuk, vers, gevonden, reden });
+	}
+	return plekken;
+}
+
+/** Leest één keuze uit opgeslagen JSON; `null` bij een onbruikbare vorm. Velden die oude keuzes (van vóór fase 8) niet hebben, krijgen hun standaard. */
 export function alsKeuze(waarde: unknown): StructureleKeuze | null {
 	if (!isObject(waarde) || !Array.isArray(waarde['verzen'])) return null;
 	const { id, zoekterm, nieuw, toegepast } = waarde;
@@ -66,8 +96,17 @@ export function alsKeuze(waarde: unknown): StructureleKeuze | null {
 		if (keuzeVers === null) return null;
 		verzen.push(keuzeVers);
 	}
-	// Keuzes van vóór fase 8 hebben de nieuwe velden niet: dat waren tekstvervangingen zonder varianten, overgeslagen plekken of vraag.
-	return { id, soort: 'tekst', zoekterm, nieuw, van: null, naar: null, varianten: [], toegepast, verzen, overgeslagen: [], vraag: null };
+	const soort = waarde['soort'] ?? 'tekst';
+	if (soort !== 'tekst' && soort !== 'markering') return null;
+	const van = waarde['van'] ?? null;
+	const naar = waarde['naar'] ?? null;
+	const vraag = waarde['vraag'] ?? null;
+	if ((van !== null && alsDomein(van) === null) || (naar !== null && alsDomein(naar) === null)) return null;
+	if (vraag !== null && typeof vraag !== 'string') return null;
+	const varianten = alsVarianten(waarde['varianten'] ?? []);
+	const overgeslagen = alsOvergeslagen(waarde['overgeslagen'] ?? []);
+	if (varianten === null || overgeslagen === null) return null;
+	return { id, soort, zoekterm, nieuw, van: alsDomein(van), naar: alsDomein(naar), varianten, toegepast, verzen, overgeslagen, vraag };
 }
 
 /** Alle bewaarde keuzes op volgorde van toepassen (oudste eerst); onleesbare opslag geeft een lege lijst. */
@@ -98,9 +137,10 @@ function versNaam(hoofdstuk: number, vers: number): string {
 	return `${hoofdstuk}:${vers}`;
 }
 
+
 /** De vervangbare vondsten per hoofdstuk en vers, op oplopend hoofdstuk en vers. */
-function groepeerPerVers(vondsten: readonly Vondst[]): { hoofdstuk: number; vers: number; vondsten: Vondst[] }[] {
-	const groepen = new Map<string, { hoofdstuk: number; vers: number; vondsten: Vondst[] }>();
+function groepeerPerVers<T extends Vondst>(vondsten: readonly T[]): { hoofdstuk: number; vers: number; vondsten: T[] }[] {
+	const groepen = new Map<string, { hoofdstuk: number; vers: number; vondsten: T[] }>();
 	for (const vondst of vondsten) {
 		if (!vondst.vervangbaar) continue;
 		const naam = versNaam(vondst.hoofdstuk, vondst.vers);
@@ -118,11 +158,64 @@ function nieuwId(nu: Date, bestaand: readonly StructureleKeuze[]): string {
 	return id;
 }
 
+function legeKeuze(id: string, nu: Date): StructureleKeuze {
+	return {
+		id,
+		soort: 'tekst',
+		zoekterm: '',
+		nieuw: '',
+		van: null,
+		naar: null,
+		varianten: [],
+		toegepast: nu.toISOString(),
+		verzen: [],
+		overgeslagen: [],
+		vraag: null,
+	};
+}
+
+/**
+ * Zet per vers de gewijzigde inhoud in de tussenstand (herkomst "structurele keuze", met het keuze-id) en de verzen in `keuze`.
+ * Bewaart daarna `keuze` achter de `bewaard`e keuzes als er verzen veranderd zijn.
+ * Een vers waarvan de bewaarde bewerking niet meer past of bij een oudere repo-tekst hoort, wordt overgeslagen met een melding. Een mislukte opslag
+ * geeft een melding per vers; alleen de verzen die lukten staan in de keuze.
+ */
+function pasVerzenToe<T extends Vondst>(
+	opslag: Opslag,
+	boek: string,
+	hoofdstukken: readonly HoofdstukVerzen[],
+	keuze: StructureleKeuze,
+	bewaard: readonly StructureleKeuze[],
+	aangevinkt: readonly T[],
+	wijzig: (inhoud: VersInhoud, plekken: T[]) => VersInhoud,
+): { meldingen: string[]; keuzeBewaard: boolean } {
+	const meldingen: string[] = [];
+	for (const groep of groepeerPerVers(aangevinkt)) {
+		const gevonden = hoofdstukken.find((h) => h.hoofdstuk === groep.hoofdstuk)?.verzen.find((v) => v.vers === groep.vers);
+		if (gevonden === undefined) {
+			meldingen.push(`Vers ${versNaam(groep.hoofdstuk, groep.vers)} staat niet in het hoofdstuk en is overgeslagen.`);
+			continue;
+		}
+		const huidig = gevonden.inhoud;
+		const na = wijzig(huidig, groep.vondsten);
+		if (zelfdeInhoud(na, huidig)) continue;
+		const uitkomst = bewaarKeuzeVers(opslag, boek, groep.hoofdstuk, groep.vers, na, gevonden.repo, keuze.id);
+		if (!uitkomst.gelukt) {
+			meldingen.push(uitkomst.melding);
+			continue;
+		}
+		keuze.verzen.push({ hoofdstuk: groep.hoofdstuk, vers: groep.vers, voor: huidig, na });
+	}
+	const keuzeBewaard = keuze.verzen.length > 0 && schrijfKeuzes(opslag, boek, [...bewaard, keuze]);
+	if (keuze.verzen.length > 0 && !keuzeBewaard) {
+		meldingen.push('De keuze kon niet worden bewaard, waarschijnlijk is de opslag vol. Terugdraaien in één keer kan niet.');
+	}
+	return { meldingen, keuzeBewaard };
+}
+
 /**
  * Past de aangevinkte vondsten toe: per vers `vervangInVers` op de huidige inhoud (met tussenstand), bewaard in de
  * tussenstand met herkomst "structurele keuze" en het keuze-id, en de keuze zelf bewaard voor terugdraaien.
- * Een vers waarvan de bewaarde bewerking niet meer past of bij een oudere repo-tekst hoort, wordt overgeslagen met een melding. Een mislukte opslag
- * geeft een melding per vers; alleen de verzen die lukten staan in de keuze.
  */
 export function pasKeuzeToe(
 	opslag: Opslag,
@@ -134,39 +227,8 @@ export function pasKeuzeToe(
 	nu: Date,
 ): ToepasUitkomst {
 	const bewaard = leesOpVolgorde(opslag, boek);
-	const keuze: StructureleKeuze = {
-		id: nieuwId(nu, bewaard),
-		soort: 'tekst',
-		zoekterm,
-		nieuw,
-		van: null,
-		naar: null,
-		varianten: [],
-		toegepast: nu.toISOString(),
-		verzen: [],
-		overgeslagen: [],
-		vraag: null,
-	};
-	const meldingen: string[] = [];
-	for (const groep of groepeerPerVers(aangevinkt)) {
-		const gevonden = hoofdstukken.find((h) => h.hoofdstuk === groep.hoofdstuk)?.verzen.find((v) => v.vers === groep.vers);
-		if (gevonden === undefined) {
-			meldingen.push(`Vers ${versNaam(groep.hoofdstuk, groep.vers)} staat niet in het hoofdstuk en is overgeslagen.`);
-			continue;
-		}
-		const huidig = gevonden.inhoud;
-		const na = vervangInVers(huidig, groep.vondsten, nieuw);
-		if (zelfdeInhoud(na, huidig)) continue;
-		const uitkomst = bewaarKeuzeVers(opslag, boek, groep.hoofdstuk, groep.vers, na, gevonden.repo, keuze.id);
-		if (!uitkomst.gelukt) {
-			meldingen.push(uitkomst.melding);
-			continue;
-		}
-		keuze.verzen.push({ hoofdstuk: groep.hoofdstuk, vers: groep.vers, voor: huidig, na });
-	}
-	if (keuze.verzen.length > 0 && !schrijfKeuzes(opslag, boek, [...bewaard, keuze])) {
-		meldingen.push('De keuze kon niet worden bewaard, waarschijnlijk is de opslag vol. Terugdraaien in één keer kan niet.');
-	}
+	const keuze = { ...legeKeuze(nieuwId(nu, bewaard), nu), zoekterm, nieuw };
+	const { meldingen } = pasVerzenToe(opslag, boek, hoofdstukken, keuze, bewaard, aangevinkt, (inhoud, vondsten) => vervangInVers(inhoud, vondsten, nieuw));
 	return { keuze, meldingen };
 }
 
@@ -175,58 +237,86 @@ export function leesKeuzes(opslag: Opslag, boek: string): StructureleKeuze[] {
 	return leesOpVolgorde(opslag, boek).reverse();
 }
 
+/** Wat er met één vers van een keuze gebeurt bij terugdraaien: een melding als er iets te melden is, en of het vers bij de keuze blijft. */
+type VersTerugUitkomst = { melding: string | null; blijftBijKeuze: boolean };
+
 /**
- * Draait een keuze terug: alleen verzen waarvan de huidige inhoud nog gelijk is aan "na" (anders overgeslagen met melding,
+ * Draait één vers van een keuze terug: alleen als de huidige inhoud nog gelijk is aan "na" (anders blijft het staan met melding,
  * want dan heeft de vertaler het vers daarna zelf bewerkt). Een vers waarvan "voor" gelijk is aan de basis van de
  * bewerking (de repo-inhoud) verdwijnt uit de tussenstand; anders komt "voor" terug als eigen bewerking.
- * Een vers dat een latere keuze nog bezit, blijft bij de keuze, zodat die later alsnog terug kan; zijn er zulke verzen niet, dan is de keuze uit de lijst.
+ * Een vers dat een latere keuze nog bezit, blijft bij de keuze, zodat die later alsnog terug kan.
+ */
+function draaiKeuzeVersTerug(opslag: Opslag, boek: string, keuzes: readonly StructureleKeuze[], keuze: StructureleKeuze, keuzeVers: KeuzeVers): VersTerugUitkomst {
+	const { hoofdstuk, vers, voor, na } = keuzeVers;
+	const naam = versNaam(hoofdstuk, vers);
+	const bewerkt = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
+	if (bewerkt === undefined) return { melding: `Vers ${naam} staat al weer op de repo-tekst.`, blijftBijKeuze: false };
+	const latereKeuze = keuzes.find((k) => k.id === bewerkt.keuzeId && k.id !== keuze.id);
+	if (latereKeuze !== undefined) {
+		return { melding: `Vers ${naam} is daarna veranderd door de keuze "${latereKeuze.zoekterm}"; draai die eerst terug.`, blijftBijKeuze: true };
+	}
+	if (!zelfdeInhoud(bewerkt.inhoud, na)) return { melding: `Vers ${naam} is na de keuze zelf bewerkt en blijft staan.`, blijftBijKeuze: false };
+	const kanNietTerug = { melding: `Vers ${naam} kon niet worden teruggezet en blijft staan.`, blijftBijKeuze: true };
+	if (zelfdeInhoud(voor, bewerkt.basis)) {
+		try {
+			wisVers(opslag, boek, hoofdstuk, vers);
+		} catch {
+			return kanNietTerug;
+		}
+		return { melding: null, blijftBijKeuze: false };
+	}
+	if (!bewaarVers(opslag, boek, hoofdstuk, vers, voor, bewerkt.basis).gelukt) return kanNietTerug;
+	return { melding: null, blijftBijKeuze: false };
+}
+
+/**
+ * Schrijft de keuzelijst met alleen `overgebleven` verzen voor `keuze`; zonder verzen is de keuze uit de lijst
+ * en ook een antwoord dat naar de keuze wijst.
+ */
+function bewaarKeuzeNaTerugdraaien(opslag: Opslag, boek: string, keuzes: readonly StructureleKeuze[], keuze: StructureleKeuze, overgebleven: StructureleKeuze['verzen']): void {
+	const nieuweLijst = keuzes.flatMap((k) => {
+		if (k.id !== keuze.id) return [k];
+		return overgebleven.length === 0 ? [] : [{ ...k, verzen: overgebleven }];
+	});
+	if (schrijfKeuzes(opslag, boek, nieuweLijst) && overgebleven.length === 0) verwijderAntwoordenVanKeuze(opslag, boek, keuze.id);
+}
+
+const KEUZE_ONTBREEKT = 'Deze keuze staat niet meer in de lijst.';
+
+/**
+ * Draait een keuze terug, vers voor vers met de regels van `draaiKeuzeVersTerug`. Verzen die blijven staan zonder bij de keuze te blijven
+ * (door een eigen bewerking) verdwijnen uit de keuze. Zijn er geen verzen meer over, dan is de keuze uit de lijst en ook het antwoord dat ernaar wees.
  * Geeft de meldingen terug.
  */
 export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): string[] {
 	const keuzes = leesOpVolgorde(opslag, boek);
 	const keuze = keuzes.find((k) => k.id === keuzeId);
-	if (keuze === undefined) return ['Deze keuze staat niet meer in de lijst.'];
-	const meldingen: string[] = [];
-	const overgebleven: StructureleKeuze['verzen'] = [];
-	for (const keuzeVers of keuze.verzen) {
-		const { hoofdstuk, vers, voor, na } = keuzeVers;
-		const naam = versNaam(hoofdstuk, vers);
-		const bewerkt = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
-		if (bewerkt === undefined) {
-			meldingen.push(`Vers ${naam} staat al weer op de repo-tekst.`);
-			continue;
-		}
-		const latereKeuze = keuzes.find((k) => k.id === bewerkt.keuzeId && k.id !== keuzeId);
-		if (latereKeuze !== undefined) {
-			meldingen.push(`Vers ${naam} is daarna veranderd door de keuze "${latereKeuze.zoekterm}"; draai die eerst terug.`);
-			overgebleven.push(keuzeVers);
-			continue;
-		}
-		if (!zelfdeInhoud(bewerkt.inhoud, na)) {
-			meldingen.push(`Vers ${naam} is na de keuze zelf bewerkt en blijft staan.`);
-			continue;
-		}
-		if (zelfdeInhoud(voor, bewerkt.basis)) {
-			try {
-				wisVers(opslag, boek, hoofdstuk, vers);
-			} catch {
-				meldingen.push(`Vers ${naam} kon niet worden teruggezet en blijft staan.`);
-				overgebleven.push(keuzeVers);
-			}
-			continue;
-		}
-		if (!bewaarVers(opslag, boek, hoofdstuk, vers, voor, bewerkt.basis).gelukt) {
-			meldingen.push(`Vers ${naam} kon niet worden teruggezet en blijft staan.`);
-			overgebleven.push(keuzeVers);
-		}
-	}
-	const nieuweLijst = keuzes.flatMap((k) => {
-		if (k.id !== keuzeId) return [k];
-		return overgebleven.length === 0 ? [] : [{ ...k, verzen: overgebleven }];
-	});
-	schrijfKeuzes(opslag, boek, nieuweLijst);
-	return meldingen;
+	if (keuze === undefined) return [KEUZE_ONTBREEKT];
+	const uitkomsten = keuze.verzen.map((keuzeVers) => ({ keuzeVers, ...draaiKeuzeVersTerug(opslag, boek, keuzes, keuze, keuzeVers) }));
+	const overgebleven = uitkomsten.filter((uitkomst) => uitkomst.blijftBijKeuze).map((uitkomst) => uitkomst.keuzeVers);
+	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven);
+	return uitkomsten.flatMap((uitkomst) => uitkomst.melding ?? []);
 }
+
+/**
+ * Draait één vers van een keuze terug, met dezelfde regels als `draaiKeuzeTerug` (niet als een latere keuze of eigen bewerking
+ * het vers veranderde). Het vers gaat uit de keuze, behalve als het niet terug kon of een latere keuze het bezit; gaat het laatste vers eruit,
+ * dan verdwijnt de keuze en ook een antwoord dat ernaar wijst. Geeft de meldingen.
+ */
+export function draaiVersTerug(opslag: Opslag, boek: string, keuzeId: string, hoofdstuk: number, vers: number): string[] {
+	const keuzes = leesOpVolgorde(opslag, boek);
+	const keuze = keuzes.find((k) => k.id === keuzeId);
+	if (keuze === undefined) return [KEUZE_ONTBREEKT];
+	const keuzeVers = keuze.verzen.find((v) => v.hoofdstuk === hoofdstuk && v.vers === vers);
+	if (keuzeVers === undefined) return [`Vers ${versNaam(hoofdstuk, vers)} hoort niet (meer) bij deze keuze.`];
+	const uitkomst = draaiKeuzeVersTerug(opslag, boek, keuzes, keuze, keuzeVers);
+	const overgebleven = keuze.verzen.filter((v) => v !== keuzeVers || uitkomst.blijftBijKeuze);
+	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven);
+	return uitkomst.melding === null ? [] : [uitkomst.melding];
+}
+
+/** De vraag die met een keuze beantwoord wordt, met de gekozen optie zoals hij in de vraag staat. */
+type BeantwoordeVraag = { kwestie: string; optie: string };
 
 /** Alles wat bij het toepassen van een zoekopdracht hoort, buiten de opslag en de tijd. */
 export type Toepassing = {
@@ -234,24 +324,44 @@ export type Toepassing = {
 	opdracht: Zoekopdracht;
 	aangevinkt: readonly Plek[];
 	overgeslagen: readonly OvergeslagenPlek[];
+	/** Per variant (kleine letters) de vervanging uit het voorbeeldvenster; leeg of ontbrekend betekent niet toepassen. */
 	variantVervangingen: ReadonlyMap<string, string>;
-	/** De kwestie van de vraag die hiermee beantwoord wordt, of `null`. */
-	vraag: string | null;
+	/** De vraag die hiermee beantwoord wordt, of `null`. */
+	vraag: BeantwoordeVraag | null;
 };
 
-/**
- * Past een zoekopdracht (tekst of markering, met varianten) toe zoals `pasKeuzeToe`, en bewaart de keuze met soort, varianten,
- * overgeslagen plekken en vraag. Komt in de plaats van `pasKeuzeToe`. Wordt ingevuld.
- */
-export function pasOpdrachtToe(_opslag: Opslag, _boek: string, _toepassing: Toepassing, _nu: Date): ToepasUitkomst {
-	throw new Error('pasOpdrachtToe: nog niet gebouwd');
+/** De varianten waarvan een plek is aangevinkt en die een niet-lege vervanging hebben, in de volgorde van de vervangingen. */
+function gebruikteVarianten(toepassing: Toepassing): KeuzeVariant[] {
+	if (toepassing.opdracht.soort === 'markering') return [];
+	const gevonden = new Set(toepassing.aangevinkt.flatMap((plek) => plek.variant ?? []));
+	return [...toepassing.variantVervangingen].flatMap(([vorm, nieuw]) => (nieuw !== '' && gevonden.has(vorm) ? [{ vorm, nieuw }] : []));
 }
 
 /**
- * Draait één vers van een keuze terug, met dezelfde regels als `draaiKeuzeTerug` (niet als een latere keuze of eigen bewerking
- * het vers veranderde). Het vers gaat uit de keuze; gaat het laatste vers eruit, dan verdwijnt de keuze en ook een antwoord dat
- * ernaar wijst. Geeft de meldingen. Wordt ingevuld.
+ * Past een zoekopdracht (tekst of markering, met varianten) toe zoals `pasKeuzeToe`, en bewaart de keuze met soort, varianten,
+ * overgeslagen plekken en vraag. Hoort er een vraag bij, dan wordt ook het antwoord bewaard, met het keuze-id.
+ * Is er niets veranderd of kon de keuze niet bewaard worden, dan is er ook geen antwoord.
  */
-export function draaiVersTerug(_opslag: Opslag, _boek: string, _keuzeId: string, _hoofdstuk: number, _vers: number): string[] {
-	return [];
+export function pasOpdrachtToe(opslag: Opslag, boek: string, toepassing: Toepassing, nu: Date): ToepasUitkomst {
+	const { opdracht, vraag } = toepassing;
+	const bewaard = leesOpVolgorde(opslag, boek);
+	const keuze: StructureleKeuze = {
+		...legeKeuze(nieuwId(nu, bewaard), nu),
+		soort: opdracht.soort,
+		zoekterm: opdracht.zoekterm,
+		nieuw: opdracht.soort === 'tekst' ? opdracht.nieuw : '',
+		van: opdracht.soort === 'markering' ? opdracht.van : null,
+		naar: opdracht.soort === 'markering' ? opdracht.naar : null,
+		varianten: gebruikteVarianten(toepassing),
+		overgeslagen: [...toepassing.overgeslagen],
+		vraag: vraag === null ? null : vraag.kwestie,
+	};
+	const { meldingen, keuzeBewaard } = pasVerzenToe(opslag, boek, toepassing.hoofdstukken, keuze, bewaard, toepassing.aangevinkt, (inhoud, plekken) =>
+		wijzigVers(inhoud, plekken, opdracht, toepassing.variantVervangingen),
+	);
+	if (vraag !== null && keuzeBewaard) {
+		const antwoord = { kwestie: vraag.kwestie, optie: vraag.optie, keuzeId: keuze.id, gegeven: nu.toISOString() };
+		if (!bewaarAntwoord(opslag, boek, antwoord)) meldingen.push('Het antwoord op de vraag kon niet worden bewaard, waarschijnlijk is de opslag vol.');
+	}
+	return { keuze, meldingen };
 }
