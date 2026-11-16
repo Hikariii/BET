@@ -67,8 +67,9 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	);
 	const { open, metBesluit, opmerkingen } = deelVragenIn(getoond);
 	const openBeantwoord = open.filter((vraag) => antwoorden.has(vraag.kwestie)).length;
-	const perHoofdstuk = groepeerLogVragen(opmerkingen);
-	const aantalTwijfels = opmerkingen.filter((vraag) => vraag.status === 'open').length;
+	const twijfels = opmerkingen.filter((vraag) => vraag.status === 'open');
+	const perHoofdstuk = groepeerLogVragen(opmerkingen.filter((vraag) => vraag.status !== 'open'));
+	const overigeOpmerkingen = opmerkingen.length - twijfels.length;
 	const isDoel = (vraag: Vertaalvraag): boolean => vraag.nr === doelNr;
 	// Met een filter aan staan de lijsten onder de open vragen open: de lezer zoekt dan iets in die lijsten.
 	const groepOpen = filter !== GEEN_FILTER || alleenOnbeantwoord;
@@ -156,25 +157,40 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 				</Lijstgroep>
 			)}
 
-			{perHoofdstuk.length > 0 && (
-				<Lijstgroep
-					titelId="opmerkingen-titel"
-					titel={`Opmerkingen van Claude (${opmerkingen.length})${aantalTwijfels > 0 ? `, waarvan ${aantalTwijfels} waar Claude nog twijfelde` : ''}`}
-					open={groepOpen || opmerkingen.some(isDoel)}
-				>
-					{perHoofdstuk.map(({ hoofdstuk, vragen: hoofdstukVragen }) => (
-						<section key={hoofdstuk} aria-labelledby={`logs-hoofdstuk-${hoofdstuk}`}>
-							<h3 id={`logs-hoofdstuk-${hoofdstuk}`}>
-								Hoofdstuk {hoofdstuk} ({hoofdstukVragen.length})
-							</h3>
+			{opmerkingen.length > 0 && (
+				<section aria-labelledby="opmerkingen-titel">
+					<h2 id="opmerkingen-titel">Opmerkingen van Claude ({opmerkingen.length})</h2>
+					{twijfels.length > 0 && (
+						<section aria-labelledby="twijfels-titel">
+							<h3 id="twijfels-titel">Waar Claude nog twijfelde ({twijfels.length})</h3>
 							<ul class="vragenlijst">
-								{hoofdstukVragen.map((vraag) => (
+								{twijfels.map((vraag) => (
 									<LogVraag key={vraag.nr} boek={boek.id} vraag={vraag} doel={isDoel(vraag)} />
 								))}
 							</ul>
 						</section>
-					))}
-				</Lijstgroep>
+					)}
+					{perHoofdstuk.length > 0 && (
+						<Lijstgroep
+							titelId="overige-opmerkingen-titel"
+							titel={`${twijfels.length > 0 ? 'Alle andere opmerkingen' : 'Alle opmerkingen'} per hoofdstuk (${overigeOpmerkingen})`}
+							open={groepOpen || opmerkingen.some((vraag) => vraag.status !== 'open' && isDoel(vraag))}
+						>
+							{perHoofdstuk.map(({ hoofdstuk, vragen: hoofdstukVragen }) => (
+								<section key={hoofdstuk} aria-labelledby={`logs-hoofdstuk-${hoofdstuk}`}>
+									<h3 id={`logs-hoofdstuk-${hoofdstuk}`}>
+										Hoofdstuk {hoofdstuk} ({hoofdstukVragen.length})
+									</h3>
+									<ul class="vragenlijst">
+										{hoofdstukVragen.map((vraag) => (
+											<LogVraag key={vraag.nr} boek={boek.id} vraag={vraag} doel={isDoel(vraag)} />
+										))}
+									</ul>
+								</section>
+							))}
+						</Lijstgroep>
+					)}
+				</section>
 			)}
 
 			{getoond.length === 0 && <p class="melding">Geen vragen die bij deze filters passen.</p>}
