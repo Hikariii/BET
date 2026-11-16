@@ -94,14 +94,14 @@ function BoekScherm({ adres, boeken, ontwerp, weergavebeheer }: BoekSchermProps)
 	const gedeeld = { ontwerp, weergavebeheer, boek, referentie };
 	if (adres.soort === 'begrippen') {
 		return (
-			<Indeling {...gedeeld} pagina="begrippen" huidigHoofdstuk={null} titel={<PaginaTitel pagina="begrippen" />} acties={null}>
-				<BegrippenScherm boek={boek} referentie={referentie} tabblad={adres.tabblad} />
+			<Indeling {...gedeeld} pagina="begrippen" huidigHoofdstuk={null} tabblad={adres.tabblad} titel={<PaginaTitel pagina="begrippen" />} acties={null}>
+				<BegrippenScherm boek={boek} referentie={referentie} tabblad={adres.tabblad} tabbladenInBalk={tabbladenInBalk(ontwerp)} />
 			</Indeling>
 		);
 	}
 	if (adres.soort === 'bewaard') {
 		return (
-			<Indeling {...gedeeld} pagina="bewaard" huidigHoofdstuk={null} titel={<PaginaTitel pagina="bewaard" />} acties={null}>
+			<Indeling {...gedeeld} pagina="bewaard" huidigHoofdstuk={null} tabblad={null} titel={<PaginaTitel pagina="bewaard" />} acties={null}>
 				<BewaardOverzicht boek={boek} />
 			</Indeling>
 		);
@@ -109,7 +109,7 @@ function BoekScherm({ adres, boeken, ontwerp, weergavebeheer }: BoekSchermProps)
 	const info = boek.hoofdstukken.find((hoofdstuk) => hoofdstuk.nummer === adres.hoofdstuk);
 	if (info === undefined) {
 		return (
-			<Indeling {...gedeeld} pagina="hoofdstuk" huidigHoofdstuk={null} titel={null} acties={null}>
+			<Indeling {...gedeeld} pagina="hoofdstuk" huidigHoofdstuk={null} tabblad={null} titel={null} acties={null}>
 				<OnbekendAdres boeken={boeken} reden={`${boek.naam} heeft geen hoofdstuk ${adres.hoofdstuk}.`} />
 			</Indeling>
 		);
@@ -123,6 +123,11 @@ function BoekScherm({ adres, boeken, ontwerp, weergavebeheer }: BoekSchermProps)
 			onWisselRegels={() => zetRegelsAltijdZichtbaar(!regelsAltijdZichtbaar)}
 		/>
 	);
+}
+
+/** Staan de plekken van het boek al in de bovenbalk, dan toont het scherm Keuzes en vragen geen eigen tabbladen. */
+function tabbladenInBalk(ontwerp: Ontwerp): boolean {
+	return ontwerp.variant !== null && ontwerp.config.boeknavigatie !== 'knop';
 }
 
 const PAGINATITEL: Record<Exclude<Pagina, 'hoofdstuk'>, string> = {
@@ -194,6 +199,7 @@ function HoofdstukPagina({ ontwerp, weergavebeheer, boek, referentie, info, geko
 			referentie={referentie}
 			pagina="hoofdstuk"
 			huidigHoofdstuk={nummer}
+			tabblad={null}
 			titel={<HoofdstukTitel boek={boek} info={info} />}
 			acties={metBalk && geladen !== null && weergave !== null ? <Hoofdstukacties boek={boek} repo={geladen} weergave={weergave} tussenstand={tussenstand} /> : null}
 		>

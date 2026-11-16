@@ -1,5 +1,6 @@
 import type { BoekData, Referentie } from '../../data/types';
 import { maakAdres, TABBLADEN, type Tabblad } from '../adres';
+import { TABBLADTITEL } from '../navigatie/boekplekken';
 import { laadAlleHoofdstukken } from '../gegevens';
 import { useLaden } from '../hooks';
 import { useMemo } from 'preact/hooks';
@@ -14,20 +15,15 @@ import { zoekVersVoorproef } from './versVoorproef';
 import { VoorproefContext, type Voorproefbron } from './VersVoorproefVak';
 import './begrippen.css';
 
-const TITEL: Record<Tabblad, string> = {
-	besloten: 'Vertaalkeuzes',
-	gevonden: 'Zo vertaald',
-	vragen: 'Vertaalvragen',
-	vervangen: 'Zoeken en vervangen',
-};
-
 type Props = {
 	boek: BoekData;
 	referentie: Referentie;
 	tabblad: Tabblad;
+	/** De tabbladen staan al in de bovenbalk; het scherm toont dan alleen het gekozen onderdeel, met de naam ervan als kop. */
+	tabbladenInBalk: boolean;
 };
 
-export function BegrippenScherm({ boek, referentie, tabblad }: Props) {
+export function BegrippenScherm({ boek, referentie, tabblad, tabbladenInBalk }: Props) {
 	const hoofdstukken = useLaden(() => laadAlleHoofdstukken(boek), [boek.id]);
 	const geladen: readonly HoofdstukData[] = hoofdstukken.soort === 'klaar' ? hoofdstukken.waarde : [];
 	const voorproef = useMemo<Voorproefbron>(
@@ -40,14 +36,16 @@ export function BegrippenScherm({ boek, referentie, tabblad }: Props) {
 	);
 	return (
 		<section class="begrippen" aria-labelledby="begrippen-titel">
-			<h1 id="begrippen-titel">Keuzes en vragen</h1>
-			<nav class="tabbladen" aria-label="Tabbladen">
-				{TABBLADEN.map((naam) => (
-					<a href={maakAdres({ soort: 'begrippen', boek: boek.id, tabblad: naam })} aria-current={naam === tabblad ? 'page' : undefined}>
-						{TITEL[naam]}
-					</a>
-				))}
-			</nav>
+			<h1 id="begrippen-titel">{tabbladenInBalk ? TABBLADTITEL[tabblad] : 'Keuzes en vragen'}</h1>
+			{!tabbladenInBalk && (
+				<nav class="tabbladen" aria-label="Tabbladen">
+					{TABBLADEN.map((naam) => (
+						<a href={maakAdres({ soort: 'begrippen', boek: boek.id, tabblad: naam })} aria-current={naam === tabblad ? 'page' : undefined}>
+							{TABBLADTITEL[naam]}
+						</a>
+					))}
+				</nav>
+			)}
 			{hoofdstukken.soort === 'laden' && <p class="melding">De hoofdstukken worden geladen.</p>}
 			{hoofdstukken.soort === 'fout' && (
 				<p class="melding" role="alert">

@@ -10,7 +10,7 @@ import './bewaren.css';
 
 type Props = {
 	boek: BoekData;
-	/** `tekst`: de regel in de balk; `icoon`: een icoon met het venster; `pagina`: een link naar het overzicht. */
+	/** `tekst`: de regel in de balk; `icoon`: een icoon met het venster; `pagina`: een link naar het overzicht; `kort`: dezelfde link als pictogram, "Bewaard" en het aantal verzen. */
 	vorm: OntwerpConfig['status'];
 	/** Of het overzicht open staat; dan is de link van vorm `pagina` de huidige pagina. */
 	overzichtOpen: boolean;
@@ -27,13 +27,25 @@ function OpslagIcoon() {
 
 /**
  * Laat zien dat en wat de browser bewaart, met Back-up downloaden, Back-up inladen en het Overzicht.
- * De vorm `pagina` is alleen een link; de acties staan dan op de overzichtspagina.
+ * De vormen `pagina` en `kort` zijn alleen een link; de acties staan dan op de overzichtspagina.
  */
 export function BewaarStatus({ boek, vorm, overzichtOpen }: Props) {
 	const overzicht = useBewaardOverzicht(boek);
 	const regel = bewaarRegel(overzicht);
 	const overzichtAdres = maakAdres({ soort: 'bewaard', boek: boek.id });
 
+	if (vorm === 'kort') {
+		return (
+			<a class="bewaarstatus bewaarstatus-kort" href={overzichtAdres} aria-current={overzichtOpen ? 'page' : undefined} title={regel}>
+				<OpslagIcoon />
+				<span aria-hidden="true">Bewaard</span>
+				<span class="bewaarstatus-aantal" aria-hidden="true">
+					{overzicht.totaal.verzen}
+				</span>
+				<span class="alleen-lezers">Bewaard in deze browser. {regel}</span>
+			</a>
+		);
+	}
 	if (vorm === 'pagina') {
 		return (
 			<a class="bewaarstatus bewaarstatus-pagina" href={overzichtAdres} aria-current={overzichtOpen ? 'page' : undefined} title={regel}>

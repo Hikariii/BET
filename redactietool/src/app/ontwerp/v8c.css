@@ -1,0 +1,53 @@
+/*
+ * Variant v8c: een compacte werkbalk in de boekbalk, op de basis van v7.css.
+ * Per plek een klein pictogram (één lijndikte, in de toolkleur) en een kort woord: Lezen, Keuzes, Zo vertaald, Vragen 17, Zoeken, Bewaard.
+ * De volledige naam staat in de tooltip en voor schermlezers. Wordt alleen geladen bij ?ontwerp=v8c, na v7.css.
+ */
+
+html[data-ontwerp='v8c'] .bovenbalk .boekplekken ul {
+	gap: 0.15rem;
+	margin-left: 0.25rem;
+}
+
+html[data-ontwerp='v8c'] .bovenbalk .boekplek,
+html[data-ontwerp='v8c'] .bovenbalk .bewaarstatus.bewaarstatus-kort {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.2rem 0.5rem 0.15rem;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--tekst);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	text-decoration: none;
+}
+
+html[data-ontwerp='v8c'] .bovenbalk .boekplek:hover,
+html[data-ontwerp='v8c'] .bovenbalk .bewaarstatus.bewaarstatus-kort:hover {
+	background: var(--vlak);
+	border-bottom-color: var(--rand-donker);
+}
+
+html[data-ontwerp='v8c'] .bovenbalk .boekplek[aria-current='page'],
+html[data-ontwerp='v8c'] .bovenbalk .bewaarstatus.bewaarstatus-kort[aria-current='page'] {
+	border-bottom-color: var(--rood);
+	font-weight: 700;
+}
+
+html[data-ontwerp='v8c'] .bovenbalk .boekplek-icoon,
+html[data-ontwerp='v8c'] .bovenbalk .bewaarstatus-kort .bewaarstatus-icoon {
+	width: 1rem;
+	height: 1rem;
+}
+
+html[data-ontwerp='v8c'] .bovenbalk .boekplek-aantal,
+html[data-ontwerp='v8c'] .bovenbalk .bewaarstatus-kort .bewaarstatus-aantal {
+	color: var(--gedempt);
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+
+html[data-ontwerp='v8c'] .begrippen h1 {
+	margin-top: 0.75rem;
+}

@@ -9,7 +9,7 @@ import { useOpslagTeller } from './useOpslagTeller';
 const hoofdstukkenPerBoek = new Map<string, Promise<HoofdstukData[]>>();
 
 /** Laadt de hoofdstukken van het boek één keer voor de hele sessie; een mislukte poging wordt de volgende keer opnieuw gedaan. */
-function laadHoofdstukkenEenmalig(boek: BoekData): Promise<HoofdstukData[]> {
+export function laadHoofdstukkenEenmalig(boek: BoekData): Promise<HoofdstukData[]> {
 	const eerder = hoofdstukkenPerBoek.get(boek.id);
 	if (eerder !== undefined) return eerder;
 	const belofte = laadAlleHoofdstukken(boek);

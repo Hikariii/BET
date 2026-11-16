@@ -8,7 +8,7 @@ type Props = {
 	uitvoering: OntwerpConfig['bovenbalk'];
 	/** Het boek: de naam en, als de zijbalk het niet toont, de knop Keuzes en vragen. */
 	boek: ComponentChildren;
-	/** De hoofdstuktitel met status. */
+	/** De hoofdstuktitel met status; zonder titel en acties (`null`) heeft de variant met twee balken geen hoofdstukbalk. */
 	titel: ComponentChildren;
 	/** Hoofdstuk kopiëren voor Word en Export voor Claude; `null` buiten een hoofdstuk. */
 	acties: ComponentChildren;
@@ -56,10 +56,12 @@ export function Bovenbalk({ uitvoering, boek, titel, acties, bewaarstatus, groot
 						<div class="bovenbalk-bewaarstatus">{bewaarstatus}</div>
 						<div class="bovenbalk-grootte">{grootte}</div>
 					</div>
-					<div class="bovenbalk-rij bovenbalk-hoofdstukbalk">
-						<div class="bovenbalk-titel">{titel}</div>
-						<div class="bovenbalk-acties">{acties}</div>
-					</div>
+					{(titel !== null || acties !== null) && (
+						<div class="bovenbalk-rij bovenbalk-hoofdstukbalk">
+							<div class="bovenbalk-titel">{titel}</div>
+							<div class="bovenbalk-acties">{acties}</div>
+						</div>
+					)}
 				</>
 			)}
 			{navigatie !== null && <div class="bovenbalk-navigatie">{navigatie}</div>}

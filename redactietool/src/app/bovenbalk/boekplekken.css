@@ -1,0 +1,93 @@
+/*
+ * Structuur van de plekken in de boekbalk (BoekTabbladen) en het menu Hele boek (HeleBoekMenu).
+ * Het uiterlijk (onderstreping, kleuren, pictogrammen) staat per variant in src/app/ontwerp/v8a.css tot v8c.css.
+ */
+
+.boekplekken ul {
+	display: flex;
+	align-items: baseline;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.boekplekken .boekplek {
+	display: inline-flex;
+	align-items: baseline;
+	color: var(--tekst);
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.boekplekken .boekplek-aantal {
+	font-variant-numeric: tabular-nums;
+}
+
+.boekplekken .boekplek-icoon {
+	flex-shrink: 0;
+	align-self: center;
+}
+
+.helebook-menu {
+	position: relative;
+}
+
+.helebook-menu .helebook-knop {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	color: var(--tekst);
+	white-space: nowrap;
+}
+
+.helebook-menu .helebook-pijl {
+	flex-shrink: 0;
+	border: 0.28rem solid transparent;
+	border-top-color: currentColor;
+	border-bottom-width: 0;
+}
+
+.helebook-menu .helebook-knop[aria-expanded='true'] .helebook-pijl {
+	transform: rotate(180deg);
+}
+
+.helebook-menu .helebook-lijst {
+	position: absolute;
+	top: calc(100% + 0.25rem);
+	right: 0;
+	z-index: 30;
+	min-width: 17rem;
+	margin: 0;
+	padding: 0.25rem 0;
+	background: #fff;
+	border: 1px solid var(--rand-donker);
+	list-style: none;
+}
+
+.helebook-menu .helebook-lijst[hidden] {
+	display: none;
+}
+
+.helebook-menu .helebook-plek {
+	display: flex;
+	justify-content: space-between;
+	gap: 1.5rem;
+	padding: 0.4rem 0.9rem;
+	color: var(--tekst);
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.helebook-menu .helebook-plek:hover {
+	background: var(--vlak);
+}
+
+.helebook-menu .helebook-plek[aria-current='page'] {
+	font-weight: 700;
+}
+
+.helebook-menu .helebook-aantal {
+	color: var(--gedempt);
+	font-variant-numeric: tabular-nums;
+	font-weight: 400;
+}

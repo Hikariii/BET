@@ -1,7 +1,7 @@
 import type { Grootte } from './weergave/weergave';
 
-/** De zes ontwerpvarianten van de proefronde; `?ontwerp=v3` kiest er één. */
-export const ONTWERPEN = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'] as const;
+/** De ontwerpvarianten van de proef; `?ontwerp=v3` kiest er één. */
+export const ONTWERPEN = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8a', 'v8b', 'v8c'] as const;
 export type OntwerpNaam = (typeof ONTWERPEN)[number];
 
 export type OntwerpConfig = {
@@ -11,8 +11,14 @@ export type OntwerpConfig = {
 	navigatie: 'zijbalk' | 'strip';
 	/** `tekens`: leesbreedte in tekens, de kolom groeit met de grootte. `vol`: de hele breedte, de letter groeit mee met het scherm. */
 	breedte: 'tekens' | 'vol';
-	/** De bewaarstatus als tekst, als icoon met venster, of als link naar de overzichtspagina. */
-	status: 'tekst' | 'icoon' | 'pagina';
+	/** De bewaarstatus als tekst, als icoon met venster, als link naar de overzichtspagina, of als korte link (pictogram, "Bewaard" en het aantal verzen). */
+	status: 'tekst' | 'icoon' | 'pagina' | 'kort';
+	/**
+	 * Hoe je binnen het boek naar Hoofdstukken, Vertaalkeuzes, Zo vertaald, Vertaalvragen en Zoeken en vervangen komt.
+	 * `knop`: de knop Keuzes en vragen (zoals altijd). `tabbladen`: elke plek een tabblad in de boekbalk.
+	 * `menu`: Hoofdstukken links, de vier andere onderdelen in het menu Hele boek. `werkbalk`: elke plek een pictogram met een kort woord.
+	 */
+	boeknavigatie: 'knop' | 'tabbladen' | 'menu' | 'werkbalk';
 	grootteStandaard: Extract<Grootte, 0 | 1>;
 	zijbalkStandaardIngeklapt: boolean;
 };
@@ -23,27 +29,43 @@ export type Ontwerp = { variant: null } | { variant: OntwerpNaam; titel: string;
 const VARIANTEN: Record<OntwerpNaam, { titel: string; config: OntwerpConfig }> = {
 	v1: {
 		titel: 'Compact',
-		config: { bovenbalk: 'een', navigatie: 'zijbalk', breedte: 'tekens', status: 'tekst', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+		config: { bovenbalk: 'een', navigatie: 'zijbalk', breedte: 'tekens', status: 'tekst', boeknavigatie: 'knop', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
 	},
 	v2: {
 		titel: 'Twee balken',
-		config: { bovenbalk: 'twee', navigatie: 'zijbalk', breedte: 'tekens', status: 'tekst', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+		config: { bovenbalk: 'twee', navigatie: 'zijbalk', breedte: 'tekens', status: 'tekst', boeknavigatie: 'knop', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
 	},
 	v3: {
 		titel: 'Hoofdstukstrip',
-		config: { bovenbalk: 'een', navigatie: 'strip', breedte: 'vol', status: 'icoon', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+		config: { bovenbalk: 'een', navigatie: 'strip', breedte: 'vol', status: 'icoon', boeknavigatie: 'knop', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
 	},
 	v4: {
 		titel: 'Volle breedte',
-		config: { bovenbalk: 'een', navigatie: 'zijbalk', breedte: 'vol', status: 'icoon', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+		config: { bovenbalk: 'een', navigatie: 'zijbalk', breedte: 'vol', status: 'icoon', boeknavigatie: 'knop', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
 	},
 	v5: {
 		titel: 'Werkbank',
-		config: { bovenbalk: 'twee', navigatie: 'zijbalk', breedte: 'tekens', status: 'pagina', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+		config: { bovenbalk: 'twee', navigatie: 'zijbalk', breedte: 'tekens', status: 'pagina', boeknavigatie: 'knop', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
 	},
 	v6: {
 		titel: 'Groot lezen',
-		config: { bovenbalk: 'een', navigatie: 'zijbalk', breedte: 'tekens', status: 'tekst', grootteStandaard: 1, zijbalkStandaardIngeklapt: true },
+		config: { bovenbalk: 'een', navigatie: 'zijbalk', breedte: 'tekens', status: 'tekst', boeknavigatie: 'knop', grootteStandaard: 1, zijbalkStandaardIngeklapt: true },
+	},
+	v7: {
+		titel: 'Strip, twee balken',
+		config: { bovenbalk: 'twee', navigatie: 'strip', breedte: 'vol', status: 'pagina', boeknavigatie: 'knop', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+	},
+	v8a: {
+		titel: 'Plekken als tabbladen',
+		config: { bovenbalk: 'twee', navigatie: 'strip', breedte: 'vol', status: 'pagina', boeknavigatie: 'tabbladen', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+	},
+	v8b: {
+		titel: 'Menu Hele boek',
+		config: { bovenbalk: 'twee', navigatie: 'strip', breedte: 'vol', status: 'pagina', boeknavigatie: 'menu', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
+	},
+	v8c: {
+		titel: 'Compacte werkbalk',
+		config: { bovenbalk: 'twee', navigatie: 'strip', breedte: 'vol', status: 'kort', boeknavigatie: 'werkbalk', grootteStandaard: 0, zijbalkStandaardIngeklapt: false },
 	},
 };
 
@@ -51,7 +73,7 @@ function isOntwerpNaam(waarde: string | null): waarde is OntwerpNaam {
 	return ONTWERPEN.some((naam) => naam === waarde);
 }
 
-/** Leest `?ontwerp=v1` tot `v6` uit de zoekdeel van het adres (`window.location.search`); een onbekende waarde telt als geen. */
+/** Leest `?ontwerp=v1` tot `v8c` uit de zoekdeel van het adres (`window.location.search`); een onbekende waarde telt als geen. */
 export function leesOntwerp(zoekdeel: string): Ontwerp {
 	const waarde = new URLSearchParams(zoekdeel).get('ontwerp');
 	return isOntwerpNaam(waarde) ? { variant: waarde, ...VARIANTEN[waarde] } : { variant: null };
@@ -63,4 +85,9 @@ export function adresMetOntwerp(huidig: string, variant: OntwerpNaam | null): st
 	if (variant === null) adres.searchParams.delete('ontwerp');
 	else adres.searchParams.set('ontwerp', variant);
 	return adres.href;
+}
+
+/** De css-bestanden van een variant in `ontwerp/`, in laadvolgorde: v7 is de basis (opzet van v3 met de bovenbalk van v5) waarop v8a tot en met v8c voortbouwen. */
+export function cssVanOntwerp(variant: OntwerpNaam): string[] {
+	return variant.startsWith('v8') ? ['v7', variant] : [variant];
 }

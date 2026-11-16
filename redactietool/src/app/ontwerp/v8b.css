@@ -1,0 +1,58 @@
+/*
+ * Variant v8b: twee groepen in de boekbalk, op de basis van v7.css.
+ * Links Hoofdstukken (met de strip eronder op de leespagina), rechts het menu Hele boek met de vier onderdelen en hun aantallen, naast Bewaard.
+ * Het menu is een knop met aria-expanded; Escape sluit en de pijltjestoetsen lopen door de onderdelen.
+ * Wordt alleen geladen bij ?ontwerp=v8b, na v7.css.
+ */
+
+/* De boekgroep vult de balk, zodat het menu rechts naast Bewaard staat. */
+html[data-ontwerp='v8b'] .bovenbalk .bovenbalk-boekbalk .bovenbalk-boek {
+	flex: 1;
+	flex-wrap: nowrap;
+	align-items: center;
+}
+
+html[data-ontwerp='v8b'] .bovenbalk .boekplekken ul {
+	margin-left: 0.25rem;
+}
+
+html[data-ontwerp='v8b'] .bovenbalk .boekplek,
+html[data-ontwerp='v8b'] .bovenbalk .helebook-knop {
+	padding: 0.25rem 0.1rem 0.2rem;
+	background: none;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	font-size: 0.8125rem;
+	font-weight: 500;
+}
+
+html[data-ontwerp='v8b'] .bovenbalk .boekplek:hover,
+html[data-ontwerp='v8b'] .bovenbalk .helebook-knop:hover:not(:disabled),
+html[data-ontwerp='v8b'] .bovenbalk .helebook-knop[aria-expanded='true'] {
+	background: none;
+	border-bottom-color: var(--rand-donker);
+	color: var(--tekst);
+}
+
+html[data-ontwerp='v8b'] .bovenbalk .boekplek[aria-current='page'],
+html[data-ontwerp='v8b'] .bovenbalk .helebook-knop[aria-current='page'] {
+	border-bottom-color: var(--rood);
+	font-weight: 700;
+}
+
+html[data-ontwerp='v8b'] .bovenbalk .helebook-menu {
+	margin-left: auto;
+}
+
+html[data-ontwerp='v8b'] .bovenbalk .helebook-lijst {
+	font-size: 0.8125rem;
+}
+
+html[data-ontwerp='v8b'] .bovenbalk .helebook-plek[aria-current='page'] {
+	border-left: 2px solid var(--rood);
+	padding-left: calc(0.9rem - 2px);
+}
+
+html[data-ontwerp='v8b'] .begrippen h1 {
+	margin-top: 0.75rem;
+}
