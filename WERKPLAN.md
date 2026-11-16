@@ -5,7 +5,16 @@ Inhoudelijke regels: de redactierichtlijn. Mappen: `README.md`. Tags: `FORMAAT.m
 
 **Paden.** Het plan geldt voor elk boek. Paden als `bron/`, `vereenvoudigd/`, `wijzigingslog/`, `referentie/`, `export/` en `STATUS.md` zijn relatief aan de boekmap `bijbel/<boek>/`. `richtlijn/`, `sjablonen/` en `scripts/` staan in de hoofdmap. De voorbeelden gebruiken Lukas (`bijbel/lukas/`, prefix `lukas`).
 
-Rollen:
+**Voorstel (2026-11-16), wacht op akkoord eigenaar.** Rollen, met één woord per rol (overal in dit plan, in `open-vragen.md` en in de tool):
+
+| Rol | Wie | Doet en beslist |
+|---|---|---|
+| **Eigenaar** | de eigenaar van de repo (in `CLAUDE.md`: de gebruiker) | Kiest wat er gebouwd en gedaan wordt; beslist over de voorstellen uit deel D (precedent, regel, opmaak); zegt wanneer een hoofdstuk naar de redacteur gaat; pusht; geeft Word-bestanden door en zet aangeleverd Word in `origineel/` |
+| **Redactie** | de mensen die de richtlijn bewaken | Beslist over de inhoud: beantwoordt vragen, keurt een hoofdstuk goed, beslist over richtlijnwijzigingen (B6) |
+| **Redacteur** | de vertaler die de definitieve tekst maakt, in de tool of in Word | Bewerkt een hoofdstuk en levert het Word-bestand aan bij de eigenaar |
+| **Claude** | de hoofdsessie en de agents die zij start | Maakt concept en log, voert de controles uit, committet (nooit pushen), houdt `STATUS.md`, `referentie/` en de statuswissels bij, neemt voorlopige besluiten (status `voorlopig`) en doet voorstellen |
+
+Tot de eigenaar akkoord geeft, geldt de korte indeling:
 - **Claude** maakt het concept, het wijzigingslog en voert de controles uit.
 - **Redactie** beslist: beoordeelt in Word, beantwoordt vragen, keurt goed.
 
@@ -53,6 +62,8 @@ Voorbeeld: Lukas 4 (`bijbel/lukas/`).
 6. Elk gewijzigd vers komt in `wijzigingslog/lukas-04.md` (sjabloon: `sjablonen/wijzigingslog.md`): bron, nieuw, elke wijziging met regelnummer.
 7. Twijfel wordt niet weggestopt: zet een **Vraag aan redactie** bij het vers en kies in de tekst de veilige optie (dichter bij de bron).
 
+Een vers heet **gewijzigd** als de tekst van de vereenvoudiging (zonder opmaak-tags) verschilt van de bron. Alleen die verzen staan in het wijzigingslog en tellen mee in "41/44 gewijzigd" in `STATUS.md`.
+
 Resultaat: `vereenvoudigd/lukas-04.md` + `wijzigingslog/lukas-04.md`. Status in `STATUS.md`: `concept`.
 
 ### Stap 3 – Controleren (script + Claude)
@@ -66,7 +77,7 @@ Resultaat: `vereenvoudigd/lukas-04.md` + `wijzigingslog/lukas-04.md`. Status in 
 
 **Inhoudelijk (eindcontrole §24):**
 - Een **tweede, onafhankelijke controle** door een aparte Claude-sessie. Die krijgt alleen de bron, het concept en de richtlijn, niet het log. Per vers controleert die: iets toegevoegd? iets weggelaten? kernbegrip beschadigd? betekenis verschoven? wijziging overbodig?
-- Bevindingen worden verwerkt of als vraag in het log gezet.
+- De bevindingen staan in `wijzigingslog/lukas-04-controle.md` (`<prefix>-NN-controle.md`). Dat bestand is geen wijzigingslog en wordt door de scripts en de tool niet als log gelezen. Ze worden verwerkt of als vraag in het log gezet.
 
 ### Stap 4 – Ter review aanbieden (Claude)
 
@@ -77,7 +88,18 @@ De vergelijking met het origineel is het belangrijkste werk van de redactie. Het
    - Een derde, smalle kolom met de wijzigingen uit het log ("Heere → Heer, §11").
    - Verzen zonder wijziging staan grijs, zodat de aandacht naar de gewijzigde verzen gaat.
 2. Vragen aan de redactie staan bovenaan het document.
-3. Commit in git. Status: `review`.
+3. Commit de md-bestanden in git (de export staat niet in git, zie stap 4b). Status: `review`.
+
+**Voorstel (2026-11-16), wacht op akkoord eigenaar.** Het reviewdocument is een **leesdocument**: de redactie leest en markeert op papier of in Word, maar reageert niet in het bestand, want niets leest die reacties terug. Reacties lopen via deel D (de tool, of een Word-bestand in hoofdstukvorm).
+
+### Stap 4b – Overdragen aan de redacteur (voorstel)
+
+**Voorstel (2026-11-16), wacht op akkoord eigenaar.**
+1. De eigenaar zegt dat de redacteur aan hoofdstuk N begint.
+2. Claude zet de status op `bij editor` (met datum in de kolom Herkomst van `STATUS.md`) en committet. Vanaf nu raakt Claude dit hoofdstuk niet meer aan: ook geen regel uit D2 erop toepassen.
+3. De eigenaar pusht (de tool op Pages toont dan de nieuwste tekst van Claude) en geeft de redacteur het kanaal door: de tool, het reviewdocument of beide. Het kanaal staat in de kolom Herkomst. Liever één kanaal per hoofdstuk, anders ontstaan er twee versies.
+4. De redacteur levert het Word-bestand aan bij de eigenaar. De eigenaar zet het in `origineel/` (naast de andere aanleveringen, nooit een bestand overschrijven).
+5. Op verzoek van de eigenaar voert Claude het terug volgens deel D. Claude zet de status op `verwerkt` (D1). Stopt de redacteur zonder aan te leveren, dan zegt de eigenaar dat en zet Claude de status terug op `review`.
 
 ### Stap 5 – Review (redactie)
 
@@ -86,9 +108,11 @@ De vergelijking met het origineel is het belangrijkste werk van de redactie. Het
 - Vragen bovenaan beantwoorden.
 - Aangeven welke keuzes **precedent** moeten worden.
 
+**Voorstel (2026-11-16), wacht op akkoord eigenaar.** Opmerkingen in de tabel van het reviewdocument kan niemand terugvoeren (`docx_naar_md.py` leest dat bestand niet: "Geen hoofdstuktitels gevonden"). Daarom: de redactie leest in het reviewdocument, en een afgewezen wijziging gaat via de redacteur in de tool of in een Word-bestand in hoofdstukvorm (deel D). Antwoorden op vragen gaan via de tool (Vertaalvragen), of via de eigenaar naar Claude.
+
 ### Stap 6 – Verwerken (Claude)
 
-1. Opmerkingen en teruggezette verzen uit het reviewdocument terugzetten naar `vereenvoudigd/lukas-04.md` en het log bijwerken.
+1. Opmerkingen en teruggezette verzen uit het reviewdocument terugzetten naar `vereenvoudigd/lukas-04.md` en het log bijwerken. (**Voorstel (2026-11-16), wacht op akkoord eigenaar.** Voor aangeleverd werk geldt deel D in plaats van deze stap.)
 2. Nieuwe keuzes → `referentie/precedenten.md`.
 3. Keuzes die een **regel** raken (bijv. een nieuw begrip als "Zoon des mensen") → voorstel voor de richtlijn met een nieuw versienummer. De redactie beslist.
 4. Controles (stap 3, het automatische deel) opnieuw draaien.
@@ -99,6 +123,7 @@ De vergelijking met het origineel is het belangrijkste werk van de redactie. Het
 1. Redactie keurt goed.
 2. Status `goedgekeurd`, versie `v1.0` in `STATUS.md`; git-tag `lukas-04-v1.0` (`<prefix>-NN-v1.0`).
 3. Exporteer de definitieve versie: `export/lukas-04-v1.0.docx` (zonder wijzigingen bijhouden).
+   **Voorstel (2026-11-16), wacht op akkoord eigenaar.** Dit geldt voor hoofdstukken die niet via deel D zijn teruggevoerd. Wanneer de redacteur het hoofdstuk heeft aangeleverd, is **het aangeleverde Word-bestand het eindproduct** (stap1-plan U2: Word is leidend) en vervalt deze export als eindproduct. Dan is de export uit de md alleen de controle: leg hem naast het aangeleverde bestand (heen-en-terug) en meld elk verschil.
 4. Vanaf nu telt dit hoofdstuk als referentie (§25), net als hoofdstuk 1–3.
 
 ---
@@ -116,11 +141,11 @@ De vergelijking met het origineel is het belangrijkste werk van de redactie. Het
 
 ## Tempo
 
-Eerst Lukas 4 als proefhoofdstuk (ongeveer 1.200 woorden). Daarna evalueren:
+Lukas 4 tot 24 zijn in de autonome modus (deel C) gemaakt en staan op `review`. Wat ontbreekt is de proef met een echt hoofdstuk door de hele cyclus: bewerken, naar Word, aanleveren, terugvoeren (zie `redactietool/stap2-plan.md`, fase 6). Daarna evalueren:
 - Hoeveel vragen kwamen er en hoeveel wijzigingen draaide de redactie terug?
-- Was de review in Word met wijzigingen bijhouden prettig?
+- Was de review in Word met wijzigingen bijhouden prettig? (Zie D1 over bijgehouden wijzigingen.)
 
-Pas daarna het plan aan. Overweeg vervolgens om meerdere hoofdstukken tegelijk in concept te zetten.
+Pas daarna het plan aan. Overweeg vervolgens om meerdere hoofdstukken tegelijk door de redacteur te laten bewerken.
 
 ---
 
@@ -160,13 +185,26 @@ Zo blijft elke keuze terug te vinden en terug te draaien (§2), en kan de redact
 
 ## D. Aangeleverd Word terugvoeren
 
-De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `redactietool/stap1-plan.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst. Een export met `versie: 1` heeft geen keuzes of vragen; `versie: 2` voegt toe: `structureleKeuzes` (de hele keuze met de plekken van dit hoofdstuk, toegepast en overgeslagen met reden), `beantwoordeVragen` en per vers het `keuzeId`. Een export met `versie: 3` geeft elk antwoord op een vertaalvraag deze velden: `kwestie`, `optie` (de gekozen optietekst, of `eigen antwoord` bij een genuanceerd antwoord), `toelichting` (de regel of uitleg van de vertaler, mag leeg bij een gewone optie), `keuzeIds` (de toegepaste keuzes onder het antwoord die dit hoofdstuk raken; er kunnen er meer dan één zijn, of geen) en de `verzen` van de vraag. Een antwoord met keuzes staat in de export van elk hoofdstuk dat een van die keuzes raakt; een antwoord zonder (bestaande) keuze staat alleen in de export van een hoofdstuk dat in de verzen van de vraag voorkomt, of van elk hoofdstuk als de vraag geen verzen heeft. Bij een keuze staat `vraag` alleen als het antwoord op die vraag die keuze nog noemt. De toelichting is input voor regels of precedentvoorstellen (stap D2), nooit een besluit: Claude neemt ze mee bij volgende hoofdstukken zodra de eigenaar ze heeft goedgekeurd, via `precedenten.md` of de richtlijn. Een toelichting die nog niet goedgekeurd is, geldt niet als regel. Een overgeslagen plek met reden `uitgevinkt`, `goedgekeurd` of `met de hand` is een bewust besluit; `variant niet toegepast` is dat niet (de vorm is niet gekozen) en `teruggedraaid` betekent dat het vers na het toepassen is teruggedraaid: ook dat is bewust anders en wordt niet gerepareerd.
+De vertaler levert de definitieve tekst van een hoofdstuk aan als Word-bestand (zie `redactietool/stap1-plan.md`: Word is leidend). Het maakt niet uit of het bestand uit de redactietool komt of rechtstreeks in Word gemaakt is. Soms komt er een export voor Claude bij (`<prefix>-NN.redactie.json`); die is een toelichting, nooit een bron van tekst.
 
-Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: meestal `bij editor`.
+De export heeft `versie: 3` (exports met een andere versie worden niet meer gelezen). De velden:
+
+| Veld | Betekenis |
+|---|---|
+| `structureleKeuzes` | de hele keuze met de plekken van dit hoofdstuk, toegepast en overgeslagen (met reden) |
+| `beantwoordeVragen` | per antwoord: `kwestie`, `optie` (de gekozen optietekst, of `eigen antwoord`), `toelichting` (de regel of uitleg van de vertaler; mag leeg), `keuzeIds` (de toegepaste keuzes onder het antwoord die dit hoofdstuk raken; geen, één of meer) en de `verzen` van de vraag |
+| per vers | het `keuzeId` en de herkomst |
+
+Een antwoord met keuzes staat in de export van elk hoofdstuk dat een van die keuzes raakt. Een antwoord zonder (bestaande) keuze staat alleen in de export van een hoofdstuk dat in de verzen van de vraag voorkomt, of van elk hoofdstuk als de vraag geen verzen heeft. Bij een keuze staat `vraag` alleen als het antwoord op die vraag die keuze nog noemt.
+
+De toelichting is input voor regels of precedentvoorstellen (stap D2), nooit een besluit: Claude neemt ze mee bij volgende hoofdstukken zodra de eigenaar ze heeft goedgekeurd, via `precedenten.md` of de richtlijn. Een toelichting die nog niet goedgekeurd is, geldt niet als regel. Een overgeslagen plek met reden `uitgevinkt`, `goedgekeurd` of `met de hand` is een bewust besluit; `variant niet toegepast` is dat niet (de vorm is niet gekozen) en `teruggedraaid` betekent dat het vers na het toepassen is teruggedraaid: ook dat is bewust anders en wordt niet gerepareerd.
+
+Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: meestal `bij editor` (zie stap 4b, voorstel).
 
 ### Stap D1: tekst (Claude)
 
-1. Het Word-bestand komt naast de andere aanleveringen in `origineel/`. Nooit een bestaand bestand overschrijven.
+0. **Voorstel (2026-11-16), wacht op akkoord eigenaar.** Controleer eerst of het bestand bijgehouden wijzigingen of opmerkingen bevat. `docx_naar_md.py` meldt alleen dat er `ins`/`del` staat en leest geen opmerkingen; tekst gaat dan stil verloren. Vraag de redacteur om een schone versie (alle wijzigingen aanvaard of afgewezen, opmerkingen apart), of lees de opmerkingen met de hand en meld in het log wat het script negeert.
+1. Het Word-bestand komt naast de andere aanleveringen in `origineel/` (de eigenaar zet het daar, zie stap 4b). Nooit een bestaand bestand overschrijven.
 2. Omzetten met `scripts/docx_naar_md.py` naar een tijdelijke map; het hoofdstuk daarna naar `vereenvoudigd/<prefix>-NN.md`.
 3. Wijzigingslog bijwerken: per vers het verschil tussen Claudes concept en de aangeleverde tekst, met de herkomst uit de export als die er is.
 4. Controlescript draaien.
@@ -187,4 +225,10 @@ Altijd op verzoek van de eigenaar, één hoofdstuk per keer. Status vooraf: mees
 
 ### Stap D4: afronden
 
-Na akkoord op D2 en D3: status `goedgekeurd`, git-tag `<prefix>-NN-v1.0` (of een hogere versie bij een eerder goedgekeurd hoofdstuk), en het hoofdstuk telt als referentie (§25).
+Na akkoord op D2 en D3: status `goedgekeurd`, git-tag `<prefix>-NN-v1.0` (of een hogere versie bij een eerder goedgekeurd hoofdstuk), en het hoofdstuk telt als referentie (§25). **Voorstel (2026-11-16), wacht op akkoord eigenaar.** Het aangeleverde Word-bestand is het eindproduct; zie stap 7.
+
+---
+
+## E. Voorlopige precedenten vast maken (open vraag)
+
+**Voorstel (2026-11-16), wacht op akkoord eigenaar.** Er is geen stap waarin een `voorlopig` precedent `vast` wordt: 477 van de 478 regels in `bijbel/lukas/referentie/precedenten.md` zijn voorlopig, en de richtlijn is v1.4 (concept). Open vragen aan de eigenaar: wie loopt ze door (de tool toont ze in Vertaalkeuzes), en mag een hoofdstuk `goedgekeurd` worden zolang ze voorlopig zijn? Tot dit beslist is, is er geen deel E en staat de vraag in `TAKEN.md`, "Wacht op de eigenaar".
