@@ -17,6 +17,13 @@ export class GeheugenOpslag implements Opslag {
 	}
 }
 
+/** Een opslag waarin elke schrijfactie de fout van een volle opslag geeft. */
+export class VolleOpslag extends GeheugenOpslag {
+	override setItem(): void {
+		throw new DOMException('De opslag is vol', 'QuotaExceededError');
+	}
+}
+
 /** Een opslag waarin bewaren onder één van de sleutels de fout van een volle opslag geeft. */
 export class OpslagMetVolleSleutel extends GeheugenOpslag {
 	constructor(private readonly volBij: string) {

@@ -25,6 +25,15 @@ export function leesBijbelbestanden(): Bijbelbestand[] {
 	});
 }
 
+/** Beschrijft de eerste regel waarop twee teksten verschillen, voor een leesbare foutmelding. */
+export function eerstAfwijkendeRegel(origineel: string, terug: string): string {
+	const oorspronkelijk = origineel.split('\n');
+	const nieuw = terug.split('\n');
+	const index = oorspronkelijk.findIndex((regel, plek) => regel !== nieuw[plek]);
+	if (index === -1) return `de tekst is ${oorspronkelijk.length === nieuw.length ? 'gelijk' : 'korter of langer'}`;
+	return `regel ${index + 1}:\n  oorspronkelijk: ${JSON.stringify(oorspronkelijk[index])}\n  teruggeschreven: ${JSON.stringify(nieuw[index])}`;
+}
+
 export type PythonSegment = ['tekst', string, string[]] | ['vers', number, string[]];
 
 export type PythonAlinea = {

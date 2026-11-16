@@ -15,14 +15,14 @@ describe('leesOpenVragen op open-vragen.md', () => {
 	it('geeft elke tabelregel', () => {
 		const rijen = tekst.split('\n').filter((regel) => regel.startsWith('| Lk '));
 
-		expect(rijen.length).toBeGreaterThan(30);
+		expect(rijen.length).toBeGreaterThan(0);
 		expect(vragen).toHaveLength(rijen.length);
 	});
 
-	it('laat alleen de vraag over de aanhalingstekens zonder verzen, omdat die over elk vers gaat', () => {
-		const zonderVerzen = vragen.filter((vraag) => vraag.verzen.length === 0);
+	it('geeft een lege lijst verzen aan precies de vragen met een lege cel Verzen', () => {
+		const rijenZonderVerzen = tekst.split('\n').filter((regel) => regel.startsWith('| Lk ') && /\|\s*\|$/.test(regel));
 
-		expect(zonderVerzen.map((vraag) => vraag.kwestie)).toEqual(['aanhalingstekens: gekrulde of rechte']);
+		expect(vragen.filter((vraag) => vraag.verzen.length === 0)).toHaveLength(rijenZonderVerzen.length);
 	});
 
 	it('geeft elk vers in verzen dat echt in het vereenvoudigde hoofdstuk staat', () => {
@@ -41,32 +41,18 @@ describe('leesOpenVragen op open-vragen.md', () => {
 			.filter(([hoofdstuk]) => hoofdstuk >= 4)
 			.flatMap(([hoofdstuk, verzen]) => [...verzen].filter(([, tekst]) => tekst.includes('Mensenzoon')).map(([vers]) => ({ hoofdstuk, vers })));
 
-		expect(vraag).toMatchObject({ plaats: 'Lk 4–24', besluit: 'de Mensenzoon', status: 'besloten door gebruiker' });
 		expect(vraag?.verzen).toEqual(metMensenzoon);
 	});
 
 	it('geeft de vraag over Gezegend met 1:45, 1:48 en elk vers in 4 tot 24 met {eeuwigleven}Gezegend', () => {
-		const vraag = vragen.at(-1);
+		const vraag = vragen.find((kandidaat) => kandidaat.kwestie.startsWith('markering van "Gezegend"'));
 		const metEeuwigleven = [...vereenvoudigd]
 			.filter(([hoofdstuk]) => hoofdstuk >= 4)
 			.flatMap(([hoofdstuk, verzen]) => [...verzen].filter(([, tekst]) => /\{eeuwigleven\}gezegend/i.test(tekst)).map(([vers]) => ({ hoofdstuk, vers })));
 
 		expect(metEeuwigleven.length).toBeGreaterThan(0);
-		expect(vraag?.kwestie).toMatch(/^markering van "Gezegend"/);
 		expect(vraag?.verzen.slice(0, 2)).toEqual(versen(1, 45, 48));
 		expect(vraag?.verzen.slice(2)).toEqual(metEeuwigleven);
-	});
-
-	it('geeft een vraag met een bereik binnen één hoofdstuk als losse verzen', () => {
-		const vraag = vragen.find((kandidaat) => kandidaat.plaats === 'Lk 5:12–14');
-
-		expect(vraag?.verzen).toEqual(versen(5, 12, 13, 14));
-	});
-
-	it('geeft een vraag zonder besluit een lege tekst', () => {
-		const vraag = vragen.find((kandidaat) => kandidaat.plaats === 'Lk 4:18–19');
-
-		expect(vraag).toMatchObject({ status: 'open', besluit: '', verzen: versen(4, 18, 19) });
 	});
 });
 

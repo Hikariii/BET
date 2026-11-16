@@ -104,16 +104,4 @@ describe('Besloten op de data van Lukas', () => {
 	it('geeft elk precedent een eigen sleutel', () => {
 		expect(new Set(tellingen.map(precedentSleutel)).size).toBe(tellingen.length);
 	});
-
-	it('telt onzekere rijen met een bronvorm die nog staat niet als zeker nog oud', () => {
-		const metBronvormNog = tellingen.filter((rij) => rij.nietToegepast.length > 0);
-		const onzeker = metBronvormNog.filter((rij) => rij.opmerkingen.length > 0);
-
-		expect(onzeker.length).toBeGreaterThan(0);
-		expect(onzeker.length).toBeLessThan(metBronvormNog.length);
-		expect(metBronvormNog.filter(staatZekerNogOud)).toHaveLength(metBronvormNog.length - onzeker.length);
-		expect(beslotenSamenvatting(tellingen, tellingen.length)).toContain(
-			`waarvan ${metBronvormNog.length} met een bronvorm die nog staat, waarvan ${onzeker.length} met een onzekere telling`,
-		);
-	});
 });

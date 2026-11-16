@@ -115,32 +115,34 @@ describe('maakVoorstel', () => {
 	});
 });
 
+describe('domeinInOptie', () => {
+	it('leest het domein uit de opties a) en b) van een markeringswissel en geeft null voor een optie zonder domein', () => {
+		const opties = splitsOpties('a) genade, zoals in 1:45/1:48 (referentie, §25A); b) eeuwigleven houden; c) een ander woord kiezen');
+
+		expect(opties.map(domeinInOptie)).toEqual(['genade', 'eeuwigleven', null]);
+	});
+});
+
 describe('opties van de vragen in open-vragen.md', () => {
 	const vragen = leesOpenVragen(leesRepobestand('bijbel/lukas/referentie/open-vragen.md'));
-	const opties = vragen.map((vraag) => splitsOpties(vraag.alternatief));
+	const gesplitst = vragen.map((vraag) => ({ alternatief: vraag.alternatief, opties: splitsOpties(vraag.alternatief) }));
 
-	it('geeft Gezegend drie opties en elke "/"-vraag twee', () => {
-		const gezegend = vragen.findIndex((vraag) => vraag.kwestie.startsWith('markering van "Gezegend"'));
-		const metStreep = vragen.map((vraag, index) => (/ \/ /.test(vraag.alternatief) ? index : -1)).filter((index) => index !== -1);
-
-		expect(opties[gezegend]?.map((optie) => optie.slice(0, 2))).toEqual(['a)', 'b)', 'c)']);
-		expect(metStreep).toHaveLength(10);
-		expect(metStreep.map((index) => opties[index]?.length)).toEqual(Array(10).fill(2));
+	it('splitst elk alternatief zonder fout in opties die letterlijk in het alternatief staan', () => {
+		expect(gesplitst.length).toBeGreaterThan(0);
+		for (const { alternatief, opties } of gesplitst) {
+			expect(opties.length === 0).toBe((alternatief ?? '').trim() === '');
+			for (const optie of opties) expect(alternatief).toContain(optie);
+		}
 	});
 
-	it('telt over alle 36 vragen 1 vraag zonder opties, 24 met één, 10 met twee en 1 met drie', () => {
-		const aantallen = new Map<number, number>();
-		for (const lijst of opties) aantallen.set(lijst.length, (aantallen.get(lijst.length) ?? 0) + 1);
+	it('geeft een alternatief met letteropties evenveel opties als er letters zijn, en een met " / " één meer dan er streepjes zijn', () => {
+		const letters = (alternatief: string) => [...alternatief.matchAll(/(?:^|; )[a-z]\) /g)].length;
+		const strepen = (alternatief: string) => alternatief.split(' / ').length - 1;
+		const metLetters = gesplitst.filter(({ alternatief }) => alternatief !== null && letters(alternatief) > 0);
+		const metStrepen = gesplitst.filter(({ alternatief }) => alternatief !== null && letters(alternatief) === 0 && strepen(alternatief) > 0);
 
-		expect(vragen).toHaveLength(36);
-		expect(Object.fromEntries(aantallen)).toEqual({ 0: 1, 1: 24, 2: 10, 3: 1 });
-	});
-
-	it('zet in Gezegend alleen de opties a) en b) op een markeringswissel', () => {
-		const gezegend = vragen.find((vraag) => vraag.kwestie.startsWith('markering van "Gezegend"'));
-		const optiesGezegend = splitsOpties(gezegend?.alternatief ?? null);
-
-		expect(optiesGezegend.map(domeinInOptie)).toEqual(['genade', 'eeuwigleven', null]);
+		for (const { alternatief, opties } of metLetters) expect(opties).toHaveLength(letters(alternatief ?? ''));
+		for (const { alternatief, opties } of metStrepen) expect(opties).toHaveLength(strepen(alternatief ?? '') + 1);
 	});
 });
 

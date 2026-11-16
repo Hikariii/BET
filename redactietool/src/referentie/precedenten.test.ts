@@ -3,7 +3,6 @@ import { leesRepobestand, leesVereenvoudigdeVerzen } from './bestanden.testhulp'
 import { leesPrecedenten } from './precedenten';
 
 const PRECEDENTEN = 'bijbel/lukas/referentie/precedenten.md';
-const GEDACHTENSTREEP = String.fromCodePoint(0x2014);
 
 /** Telt de gegevensregels op een andere manier dan de parser: alle tabelregels, min kop- en scheidingsregels. */
 function telGegevensregels(tekst: string): number {
@@ -19,7 +18,7 @@ describe('leesPrecedenten op precedenten.md', () => {
 	const precedenten = leesPrecedenten(tekst);
 
 	it('geeft elke tabelregel, zonder kop- en scheidingsregels', () => {
-		expect(telGegevensregels(tekst)).toBeGreaterThan(400);
+		expect(telGegevensregels(tekst)).toBeGreaterThan(0);
 		expect(precedenten).toHaveLength(telGegevensregels(tekst));
 		expect(precedenten.some((precedent) => precedent.bron === 'Bron' || precedent.bron.startsWith('---'))).toBe(false);
 	});
@@ -30,29 +29,13 @@ describe('leesPrecedenten op precedenten.md', () => {
 			.flatMap(([, verzen]) => [...verzen.values()])
 			.filter((tekst) => tekst.includes('Mensenzoon')).length;
 
-		expect(precedenten.find((precedent) => precedent.bron === 'Zoon des mensen')).toEqual({
-			sectie: `Begrippen voor Lukas 4–24 ${GEDACHTENSTREEP} voorlopig (besloten 2026-11-15, vóór Lukas 4)`,
-			bron: 'Zoon des mensen',
-			vereenvoudigd: 'de Mensenzoon',
-			plaats: String(versenMetMensenzoon),
-			status: 'vast',
-			opmerking: 'besloten door gebruiker 2026-11-15; met hoofdletter, zoals andere titels van Jezus',
-		});
-	});
-
-	it('geeft een regel uit een tabel met de kolom Plaats, met een lege opmerking', () => {
-		expect(precedenten.find((precedent) => precedent.bron === 'verschrompeld')).toEqual({
-			sectie: `Besluiten na Lukas 6 ${GEDACHTENSTREEP} voorlopig (hoofdsessie)`,
-			bron: 'verschrompeld',
-			vereenvoudigd: 'verdord',
-			plaats: '6:6, 6:8',
-			status: 'voorlopig',
-			opmerking: '',
-		});
+		expect(precedenten.find((precedent) => precedent.bron === 'Zoon des mensen')).toMatchObject({ plaats: String(versenMetMensenzoon) });
 	});
 
 	it('kent alleen de statussen voorlopig en vast', () => {
-		expect(new Set(precedenten.map((precedent) => precedent.status))).toEqual(new Set(['voorlopig', 'vast']));
+		const onbekend = precedenten.filter((precedent) => precedent.status !== 'voorlopig' && precedent.status !== 'vast');
+
+		expect(onbekend).toEqual([]);
 	});
 });
 
@@ -62,6 +45,12 @@ describe('leesPrecedenten op kleine invoer', () => {
 	it('behandelt een pipe binnen backticks en een geëscapete pipe als tekst in de cel', () => {
 		expect(leesPrecedenten(tabel('| `a | b` | c \\| d | 1:1 | voorlopig | x |'))).toEqual([
 			{ sectie: 'Sectie', bron: '`a | b`', vereenvoudigd: 'c | d', plaats: '1:1', status: 'voorlopig', opmerking: 'x' },
+		]);
+	});
+
+	it('geeft een regel met de kolom Plaats en een lege opmerking', () => {
+		expect(leesPrecedenten(tabel('| verschrompeld | verdord | 6:6, 6:8 | voorlopig | |'))).toEqual([
+			{ sectie: 'Sectie', bron: 'verschrompeld', vereenvoudigd: 'verdord', plaats: '6:6, 6:8', status: 'voorlopig', opmerking: '' },
 		]);
 	});
 

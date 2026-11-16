@@ -3,6 +3,7 @@ import { leesTussenstand } from '../bewerken/tussenstand';
 import { bewaarOfWis } from '../bewerken/terugNaarRepo';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
+import { GeheugenOpslag, inhoud, VolleOpslag } from '../bewaren/testhulp';
 import type { HoofdstukData } from '../data/types';
 import { parseerHoofdstuk } from '../formaat/parseer';
 import { maakExport } from '../export/maakExport';
@@ -12,29 +13,6 @@ import { alsKeuze, draaiKeuzeTerug, draaiVersTerug, leesKeuzes, pasKeuzeToe, pas
 import type { HoofdstukVerzen, Vondst } from './types';
 import { zoekVondsten } from './zoekEnVervang';
 import type { Plek } from './zoekopdracht';
-
-class GeheugenOpslag implements Opslag {
-	readonly items = new Map<string, string>();
-	getItem(sleutel: string): string | null {
-		return this.items.get(sleutel) ?? null;
-	}
-	setItem(sleutel: string, waarde: string): void {
-		this.items.set(sleutel, waarde);
-	}
-	removeItem(sleutel: string): void {
-		this.items.delete(sleutel);
-	}
-}
-
-class VolleOpslag extends GeheugenOpslag {
-	override setItem(): void {
-		throw new DOMException('De opslag is vol', 'QuotaExceededError');
-	}
-}
-
-function inhoud(tekst: string): VersInhoud {
-	return { delen: [{ stijl: null, stukken: [{ soort: 'tekst', tekst, opmaak: [] }] }] };
-}
 
 function vondst(vers: number, gevonden: string, tekst: string): Vondst {
 	const van = tekst.indexOf(gevonden);

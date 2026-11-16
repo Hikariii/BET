@@ -3,23 +3,11 @@ import type { Hoofdstuk, Tekstalinea } from '../formaat/types';
 import { bewaarOfWis } from './terugNaarRepo';
 import { bewaarKeuzeVers, bewaarVers, isVerouderd, leesTussenstand, pasTussenstandToe, wisVers } from './tussenstand';
 import type { Opslag } from './tussenstand';
+import { GeheugenOpslag, VolleOpslag } from '../bewaren/testhulp';
 import type { Tussenstand, VersInhoud } from './types';
 import { knipVers } from './versknip';
 
 const SLEUTEL = 'bet-tussenstand/lukas/3';
-
-class GeheugenOpslag implements Opslag {
-	readonly items = new Map<string, string>();
-	getItem(sleutel: string): string | null {
-		return this.items.get(sleutel) ?? null;
-	}
-	setItem(sleutel: string, waarde: string): void {
-		this.items.set(sleutel, waarde);
-	}
-	removeItem(sleutel: string): void {
-		this.items.delete(sleutel);
-	}
-}
 
 class TellendeOpslag extends GeheugenOpslag {
 	schrijfacties = 0;
@@ -30,12 +18,6 @@ class TellendeOpslag extends GeheugenOpslag {
 	override removeItem(sleutel: string): void {
 		this.schrijfacties++;
 		super.removeItem(sleutel);
-	}
-}
-
-class VolleOpslag extends GeheugenOpslag {
-	override setItem(): void {
-		throw new DOMException('De opslag is vol', 'QuotaExceededError');
 	}
 }
 

@@ -1,21 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Opslag } from '../bewerken/tussenstand';
+import { GeheugenOpslag, VolleOpslag } from '../bewaren/testhulp';
 import { alsVoorstel, bewaarVoorstel, neemVoorstel, type Voorstel } from './voorstel';
-
-function geheugenOpslag(weiger = false): Opslag & { sleutels: () => string[] } {
-	const data = new Map<string, string>();
-	return {
-		getItem: (sleutel) => data.get(sleutel) ?? null,
-		setItem: (sleutel, waarde) => {
-			if (weiger) throw new Error('vol');
-			data.set(sleutel, waarde);
-		},
-		removeItem: (sleutel) => {
-			data.delete(sleutel);
-		},
-		sleutels: () => [...data.keys()],
-	};
-}
 
 const voorstel: Voorstel = {
 	kwestie: 'markering van "Gezegend"',
@@ -33,16 +18,16 @@ const voorstel: Voorstel = {
 
 describe('voorstel doorgeven', () => {
 	it('geeft het bewaarde voorstel één keer terug en laat daarna niets over', () => {
-		const opslag = geheugenOpslag();
+		const opslag = new GeheugenOpslag();
 		bewaarVoorstel(opslag, 'lukas', voorstel);
 
 		expect(neemVoorstel(opslag, 'lukas')).toEqual(voorstel);
 		expect(neemVoorstel(opslag, 'lukas')).toBeNull();
-		expect(opslag.sleutels()).toEqual([]);
+		expect([...opslag.items.keys()]).toEqual([]);
 	});
 
 	it('houdt de voorstellen van twee boeken apart', () => {
-		const opslag = geheugenOpslag();
+		const opslag = new GeheugenOpslag();
 		bewaarVoorstel(opslag, 'lukas', voorstel);
 
 		expect(neemVoorstel(opslag, 'marcus')).toBeNull();
@@ -50,11 +35,11 @@ describe('voorstel doorgeven', () => {
 	});
 
 	it('meldt onwaar als de opslag het bewaren weigert', () => {
-		expect(bewaarVoorstel(geheugenOpslag(true), 'lukas', voorstel)).toBe(false);
+		expect(bewaarVoorstel(new VolleOpslag(), 'lukas', voorstel)).toBe(false);
 	});
 
 	it('geeft niets bij onleesbare tekst in de opslag', () => {
-		const opslag = geheugenOpslag();
+		const opslag = new GeheugenOpslag();
 		opslag.setItem('bet-voorstel/lukas', '{kapot');
 
 		expect(neemVoorstel(opslag, 'lukas')).toBeNull();
