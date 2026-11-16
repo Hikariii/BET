@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { bewaarAntwoord, leesAntwoorden, verwijderAntwoord, type Antwoord } from '../../antwoorden/antwoorden';
-import { maakVoorstel, splitsOpties } from '../../begrippen/opties';
+import { isHoudOptie, maakVoorstel, splitsOpties } from '../../begrippen/opties';
 import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels, type VragenFilter } from '../../begrippen/vragenOverzicht';
 import { verzamelVragen } from '../../begrippen/verzamelVragen';
 import type { Vertaalvraag, VraagStatus } from '../../begrippen/types';
@@ -131,17 +131,20 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 }
 
 function maakAntwoordacties(boek: string, bouwVerzen: () => HoofdstukVerzen[]): Antwoordacties {
+	const legVast = (vraag: Vertaalvraag, optie: string): string => {
+		const bewaard = bewaarAntwoord(browseropslag(), boek, { kwestie: vraag.kwestie, optie, keuzeId: null, gegeven: new Date().toISOString() });
+		return bewaard ? `Antwoord vastgelegd: optie ${optie}, zonder wijziging in de tekst.` : 'Het antwoord kon niet worden bewaard, waarschijnlijk is de opslag vol.';
+	};
 	return {
 		kies(vraag, optie) {
+			// "… houden": er verandert niets aan de tekst, dus alleen het antwoord vastleggen (anders zou de wissel de plaatselijke keuzes terugdraaien).
+			if (isHoudOptie(optie)) return legVast(vraag, optie);
 			const voorstel = maakVoorstel(vraag, optie, (zoekterm) => domeinenOpZoekterm(bouwVerzen(), zoekterm, { soort: 'verzen', verzen: vraag.verzen }));
 			if (!bewaarVoorstel(sessieopslag(), boek, voorstel)) return 'De browser staat niet toe dat de keuze aan Zoeken en vervangen wordt doorgegeven.';
 			window.location.hash = maakAdres({ soort: 'begrippen', boek, tabblad: 'vervangen' });
 			return null;
 		},
-		legVast(vraag, optie) {
-			const bewaard = bewaarAntwoord(browseropslag(), boek, { kwestie: vraag.kwestie, optie, keuzeId: null, gegeven: new Date().toISOString() });
-			return bewaard ? `Antwoord vastgelegd: optie ${optie}, zonder wijziging in de tekst.` : 'Het antwoord kon niet worden bewaard, waarschijnlijk is de opslag vol.';
-		},
+		legVast,
 		trekIn(vraag) {
 			verwijderAntwoord(browseropslag(), boek, vraag.kwestie);
 			return 'Antwoord ingetrokken.';

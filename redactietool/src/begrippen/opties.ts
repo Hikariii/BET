@@ -22,12 +22,24 @@ export function splitsOpties(alternatief: string | null): string[] {
 	return delen.map((deel) => deel.trim()).filter((deel) => deel !== '');
 }
 
+/** Alle woorden tussen aanhalingstekens in de kwestie die letterlijk te zoeken zijn (geen weglatingspunten), zonder dubbele, in volgorde. */
+function zoektermenUitKwestie(kwestie: string): string[] {
+	const termen = [...kwestie.matchAll(AANHALING)].map((treffer) => (treffer[1] ?? treffer[2] ?? treffer[3] ?? '').trim());
+	return [...new Set(termen)].filter((term) => term !== '' && !ELLIPS.test(term));
+}
+
 /** Het woord of de woorden tussen aanhalingstekens in de kwestie, als dat er precies één is en het letterlijk te zoeken is (geen weglatingspunten). */
 export function zoektermUitKwestie(kwestie: string): string | null {
-	const termen = new Set([...kwestie.matchAll(AANHALING)].map((treffer) => (treffer[1] ?? treffer[2] ?? treffer[3] ?? '').trim()));
+	const termen = zoektermenUitKwestie(kwestie);
 	const [enige] = termen;
-	if (termen.size !== 1 || enige === undefined || enige === '' || ELLIPS.test(enige)) return null;
-	return enige;
+	return termen.length === 1 && enige !== undefined ? enige : null;
+}
+
+/** Een optie die zegt dat het blijft zoals het is ("… houden", "laten staan", "blijft"): kiezen legt alleen het antwoord vast, zonder wijziging. */
+const HOUDEN = /\b(houden|laten staan|blijft|blijven)\b/i;
+
+export function isHoudOptie(optie: string): boolean {
+	return HOUDEN.test(optie);
 }
 
 /** De markering die de optie noemt, als dat er precies één is. */
@@ -46,11 +58,17 @@ type VraagVoorVoorstel = { kwestie: string; verzen: readonly VersRef[] };
  * anders een tekstopdracht zonder vervanging, want de optietekst is meestal geen letterlijke tekst.
  */
 export function maakVoorstel(vraag: VraagVoorVoorstel, optie: string, domeinenOpZoekterm: (zoekterm: string) => readonly Domein[]): Voorstel {
-	const zoekterm = zoektermUitKwestie(vraag.kwestie) ?? '';
 	const naar = domeinInOptie(optie);
-	const basis = { kwestie: vraag.kwestie, optie, zoekterm, verzen: [...vraag.verzen] };
-	if (naar === null) return { ...basis, opdracht: 'tekst', nieuw: '', van: null, naar: null };
-	const aanwezig = zoekterm === '' ? [] : domeinenOpZoekterm(zoekterm);
-	const [enige] = aanwezig;
-	return { ...basis, opdracht: 'markering', nieuw: '', van: aanwezig.length === 1 && enige !== undefined && enige !== naar ? enige : null, naar };
+	const termen = zoektermenUitKwestie(vraag.kwestie);
+	if (naar === null) {
+		const zoekterm = termen.length === 1 ? (termen[0] ?? '') : '';
+		return { kwestie: vraag.kwestie, optie, zoekterm, verzen: [...vraag.verzen], opdracht: 'tekst', nieuw: '', van: null, naar: null };
+	}
+	// Noemt de kwestie meer termen (bv. "Gezegend" uit "zalig"), dan de enige die op de verzen een markering heeft.
+	const gemarkeerd = termen.filter((term) => domeinenOpZoekterm(term).length > 0);
+	const zoekterm = gemarkeerd.length === 1 ? (gemarkeerd[0] ?? '') : termen.length === 1 ? (termen[0] ?? '') : '';
+	// Van: het enige domein op de zoekterm dat niet al het doeldomein is.
+	const anders = zoekterm === '' ? [] : domeinenOpZoekterm(zoekterm).filter((domein) => domein !== naar);
+	const van = anders.length === 1 ? (anders[0] ?? null) : null;
+	return { kwestie: vraag.kwestie, optie, zoekterm, verzen: [...vraag.verzen], opdracht: 'markering', nieuw: '', van, naar };
 }

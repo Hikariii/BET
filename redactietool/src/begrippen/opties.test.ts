@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Domein } from '../formaat/types';
 import { leesRepobestand } from '../referentie/bestanden.testhulp';
 import { leesOpenVragen } from '../referentie/openVragen';
-import { domeinInOptie, maakVoorstel, splitsOpties, zoektermUitKwestie } from './opties';
+import { domeinInOptie, isHoudOptie, maakVoorstel, splitsOpties, zoektermUitKwestie } from './opties';
 
 describe('splitsOpties', () => {
 	it('splitst a), b) en c) op de puntkomma en houdt de letters', () => {
@@ -141,5 +141,23 @@ describe('opties van de vragen in open-vragen.md', () => {
 		const optiesGezegend = splitsOpties(gezegend?.alternatief ?? null);
 
 		expect(optiesGezegend.map(domeinInOptie)).toEqual(['genade', 'eeuwigleven', null]);
+	});
+});
+
+describe('Gezegend: kiezen vult zoekterm en van in', () => {
+	const kwestie = 'markering van "Gezegend" (uit "zalig"): de bron markeert zalig als eeuwigleven';
+	const verzen = [{ hoofdstuk: 6, vers: 20 }];
+	// Op de verzen van de vraag staat "Gezegend" als eeuwigleven en (1:45/1:48) al als genade; "zalig" komt niet meer voor.
+	const domeinen = (zoekterm: string): Domein[] => (zoekterm === 'Gezegend' ? ['eeuwigleven', 'genade'] : []);
+
+	it('kiest de term met een markering en als van het enige andere domein dan het doel', () => {
+		const voorstel = maakVoorstel({ kwestie, verzen }, 'a) genade, zoals de vertaler in 1:45/1:48', domeinen);
+
+		expect(voorstel).toMatchObject({ opdracht: 'markering', zoekterm: 'Gezegend', van: 'eeuwigleven', naar: 'genade' });
+	});
+
+	it('herkent een optie die alles laat zoals het is', () => {
+		expect(isHoudOptie('b) eeuwigleven voor "zalig" houden en 1:45/1:48 als plaatselijke keuze zien')).toBe(true);
+		expect(isHoudOptie('a) genade, zoals de vertaler in 1:45/1:48 (referentie, §25A)')).toBe(false);
 	});
 });
