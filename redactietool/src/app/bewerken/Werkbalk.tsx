@@ -4,7 +4,7 @@ import type { WordStijl } from '../../data/types';
 import { isDomein } from '../../formaat/types';
 import { KLEUREN, type Kleur, type KnopToestand, type WerkbalkActie, type WerkbalkToestand } from '../../editor/werkbalk';
 import { rasterStop } from '../navigatie/toetsenbord';
-import { DIRECTE_OPMAAK, domeinNaam } from '../opmaakNamen';
+import { alineastijlNaam, DIRECTE_OPMAAK, domeinNaam } from '../opmaakNamen';
 import { tekststukOpmaakstijl } from '../stijl';
 import { sneltoetsTekst } from './sneltoetsen';
 import './werkbalk.css';
@@ -36,6 +36,16 @@ function kleurvlak(kleur: Kleur, stijlen: readonly WordStijl[]): string | undefi
 
 function kleurNaam(kleur: Kleur, stijlen: readonly WordStijl[]): string {
 	return isDomein(kleur) ? domeinNaam(kleur, stijlen) : DIRECTE_OPMAAK[kleur];
+}
+
+/** Een klein slot: de alineastijl staat vast in deze balk. */
+function Slot() {
+	return (
+		<svg class="werkbalk-slot" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+			<rect x="3.5" y="7" width="9" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.4" />
+			<path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.4" />
+		</svg>
+	);
 }
 
 function menuregels(menu: HTMLElement | null): HTMLElement[] {
@@ -135,6 +145,9 @@ export function Werkbalk({ toestand, stijlen, mac, kleurmenuOpen, onKleurmenu, o
 		);
 	};
 
+	const alineanamen = toestand.alineastijlen.map((stijl) => (stijl === null ? 'gewone tekst' : alineastijlNaam(stijl, stijlen))).join(', ');
+	const stijlnamen = toestand.alineastijlen.flatMap((stijl) => (stijl === null ? [] : [alineastijlNaam(stijl, stijlen)])).join(', ');
+	const alineauitleg = `De alineastijl ${stijlnamen} geldt voor de hele alinea en geeft hem zijn kleur. Wijzigen kan alleen in Word.`;
 	const kleurKnop = toestand.kleur;
 	const actieveKleur = toestand.actieveKleur;
 	const actieveNaam = actieveKleur === null ? null : actieveKleur === 'gemengd' ? 'meer dan één kleur' : kleurNaam(actieveKleur, stijlen);
@@ -205,10 +218,22 @@ export function Werkbalk({ toestand, stijlen, mac, kleurmenuOpen, onKleurmenu, o
 							<span class="werkbalk-kleurvlak werkbalk-kleurvlak-geen" aria-hidden="true" />
 							Geen kleur
 						</button>
+						{alineanamen !== '' && (
+							<p class="werkbalk-menunoot">
+								<Slot />
+								{alineauitleg}
+							</p>
+						)}
 					</div>
 				)}
 			</span>
 			{gewoneKnop('wissen', 'Opmaak wissen', null, 'Opmaak wissen')}
+			{alineanamen !== '' && (
+				<span class="werkbalk-alinea" data-help="werkbalk-alineastijl" title={alineauitleg}>
+					<Slot />
+					Alineastijl: {alineanamen}
+				</span>
+			)}
 		</div>
 	);
 }

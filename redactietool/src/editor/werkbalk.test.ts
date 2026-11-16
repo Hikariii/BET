@@ -222,6 +222,27 @@ describe('wissen', () => {
 	});
 });
 
+describe('alineastijl', () => {
+	it('noemt de alineastijl van de selectie en van de cursor, en niets in een gewone alinea', () => {
+		expect(werkbalkToestand(selecteer(stand([['Ik moet gaan']], 'jezus'), 'moet'), GEEN_VETTE_OPMAAK).alineastijlen).toEqual(['jezus']);
+		expect(werkbalkToestand(cursorNa(stand([['Ik moet gaan']], 'jezus'), 'Ik'), GEEN_VETTE_OPMAAK).alineastijlen).toEqual(['jezus']);
+		expect(werkbalkToestand(selecteer(stand([['Hij ging']]), 'ging'), GEEN_VETTE_OPMAAK).alineastijlen).toEqual([]);
+	});
+
+	it('noemt ook de gewone alinea als de selectie over een gewone alinea en een alinea met stijl loopt (Lukas 4:43)', () => {
+		const inhoud: VersInhoud = {
+			delen: [
+				{ stijl: null, stukken: [{ soort: 'tekst', tekst: 'Maar Hij zei tegen hen:', opmaak: [] }] },
+				{ stijl: 'jezus', stukken: [{ soort: 'tekst', tekst: 'Ik moet ook gaan.', opmaak: [] }] },
+			],
+		};
+		const state = EditorState.create({ doc: versInhoudNaarDocument(inhoud) });
+		const alles = state.apply(state.tr.setSelection(TextSelection.create(state.doc, 1, state.doc.content.size - 1)));
+
+		expect(werkbalkToestand(alles, GEEN_VETTE_OPMAAK).alineastijlen).toEqual([null, 'jezus']);
+	});
+});
+
 describe('een cursor zonder selectie', () => {
 	it('zet opmaak als stored mark, zodat de volgende tekst hem krijgt', () => {
 		const begin = cursorNa(stand([['Zij zagen ']]), 'zagen');

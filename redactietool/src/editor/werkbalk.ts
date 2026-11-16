@@ -26,6 +26,11 @@ export type WerkbalkToestand = {
 	kleur: KnopToestand;
 	wissen: KnopToestand;
 	actieveKleur: ActieveKleur;
+	/**
+	 * De alineastijlen van de alinea's in de selectie (of van de cursor), op volgorde; `null` is een gewone alinea.
+	 * Leeg als alles gewone tekst is. De werkbalk verandert ze niet.
+	 */
+	alineastijlen: readonly (Alineastijl | null)[];
 };
 
 const ALLEEN_SPATIES = 'De selectie bevat alleen spaties.';
@@ -121,9 +126,10 @@ function vetToestand(stukken: readonly Stuk[], vette: VetteOpmaak): KnopToestand
 /** De stand van de knoppen bij deze selectie of cursor. */
 export function werkbalkToestand(state: EditorState, vette: VetteOpmaak): WerkbalkToestand {
 	const stukken = stukkenVan(state);
+	const alineastijlen = alineastijlenVan(state);
 	if (stukken.length === 0) {
 		const uitgeschakeld: KnopToestand = { soort: 'uitgeschakeld', reden: ALLEEN_SPATIES };
-		return { vet: uitgeschakeld, onderstreept: uitgeschakeld, markeren: uitgeschakeld, kleur: uitgeschakeld, wissen: uitgeschakeld, actieveKleur: null };
+		return { vet: uitgeschakeld, onderstreept: uitgeschakeld, markeren: uitgeschakeld, kleur: uitgeschakeld, wissen: uitgeschakeld, actieveKleur: null, alineastijlen };
 	}
 	const actieveKleur = actieveKleurVan(stukken);
 	return {
@@ -133,7 +139,19 @@ export function werkbalkToestand(state: EditorState, vette: VetteOpmaak): Werkba
 		kleur: { soort: actieveKleur === null ? 'uit' : 'aan' },
 		wissen: heeftOpmaak(stukken) ? { soort: 'uit' } : NIETS_OM_TE_WISSEN,
 		actieveKleur,
+		alineastijlen,
 	};
+}
+
+function alineastijlenVan(state: EditorState): (Alineastijl | null)[] {
+	const { from, to } = state.selection;
+	const stijlen = new Set<Alineastijl | null>();
+	state.doc.nodesBetween(from, to, (node) => {
+		if (node.type.name !== 'alinea') return true;
+		stijlen.add(alineastijlVan(node.attrs['stijl']));
+		return false;
+	});
+	return [...stijlen].some((stijl) => stijl !== null) ? [...stijlen] : [];
 }
 
 /** Wat er met de opmaak van één stuk gebeurt. */

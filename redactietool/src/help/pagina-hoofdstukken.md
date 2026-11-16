@@ -24,6 +24,10 @@ Terwijl je een vers bewerkt, staat boven de tekst een balk met vijf knoppen. Sel
 - **Kleur ▾** opent een lijst met de begripsdomeinen en Onderwijs, elk met zijn kleur uit het Word-sjabloon. Een woord heeft één kleur: een nieuwe keuze vervangt de oude. Kies dezelfde kleur nog eens, of **Geen kleur**, om hem weg te halen. Alt+K opent de lijst met het toetsenbord.
 - **Opmaak wissen** haalt alle opmaak van de selectie weg (Ctrl+Spatie). De alineastijl, zoals de woorden van Jezus, blijft.
 
+Rechts in de balk staat met een slotje de alineastijl van de geselecteerde tekst, bijvoorbeeld *Alineastijl: Jezus_woorden*. Die stijl geldt voor de hele alinea en geeft de woorden van Jezus hun rode kleur. De balk verandert hem niet: dat kan alleen in Word. Daarom staat bij de woorden van Jezus in het kleurmenu *Geen kleur* aangevinkt, tenzij een woord zelf een kleur heeft.
+
+{{wijs werkbalk-alineastijl | Alineastijl met slotje | Rechts in de opmaakbalk, als je tekst selecteert in een alinea met een stijl, zoals de woorden van Jezus.}}
+
 Op een Mac staat ⌘ voor Ctrl en ⌥ voor Alt. Daar wist ⌘+\ de opmaak, want ⌘+Spatie is van Spotlight. Een knop die aan staat, is gevuld. De tooltip noemt de sneltoets, of waarom een knop nu niet werkt.
 
 Selecteer je niets, dan geldt je keuze voor wat je daarna typt. Spaties aan het begin en eind van je selectie krijgen geen opmaak, want in de tekst van de repo staan ze buiten de markering. Cursief is er niet: dat doe je in Word.

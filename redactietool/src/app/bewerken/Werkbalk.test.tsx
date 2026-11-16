@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, fireEvent, render, screen } from '@testing-library/preact';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/preact';
 import { useState } from 'preact/hooks';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WordStijl } from '../../data/types';
@@ -16,6 +16,7 @@ const UIT: WerkbalkToestand = {
 	kleur: { soort: 'uit' },
 	wissen: { soort: 'uit' },
 	actieveKleur: null,
+	alineastijlen: [],
 };
 
 type Opties = { toestand?: WerkbalkToestand; mac?: boolean; kleurmenuStart?: boolean };
@@ -120,6 +121,22 @@ describe('Werkbalk', () => {
 		knop('Vet').focus();
 		fireEvent.keyDown(knop('Vet'), { key: 'Escape' });
 		expect(terugNaarEditor).toHaveLength(1);
+	});
+});
+
+describe('de alineastijl', () => {
+	it('staat als label in de balk en als uitleg in het kleurmenu, en ontbreekt in een gewone alinea', () => {
+		toonWerkbalk({ toestand: { ...UIT, alineastijlen: ['jezus'] }, kleurmenuStart: true });
+
+		expect(screen.getByText('Alineastijl: Jezuswoorden')).toBeTruthy();
+		expect(within(screen.getByRole('menu')).getByText(/alineastijl Jezuswoorden geldt voor de hele alinea/)).toBeTruthy();
+	});
+
+	it('toont geen label en geen uitleg zonder alineastijl', () => {
+		toonWerkbalk({ kleurmenuStart: true });
+
+		expect(screen.queryByText(/^Alineastijl:/)).toBeNull();
+		expect(within(screen.getByRole('menu')).queryByText(/alineastijl/)).toBeNull();
 	});
 });
 

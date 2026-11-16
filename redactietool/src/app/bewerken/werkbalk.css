@@ -101,3 +101,41 @@
 .werkbalk-menuregel[aria-checked='true']:hover:not(:disabled) {
 	background: var(--tekst);
 }
+
+/* Welke alineastijl de selectie heeft: alleen ter informatie, rechts in de balk. */
+.werkbalk-alinea {
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	cursor: default;
+	margin-left: auto;
+	padding: 0 0.65rem;
+	color: var(--gedempt);
+	font-size: var(--t-klein);
+	white-space: nowrap;
+}
+
+.werkbalk > .werkbalk-alinea {
+	border-left: 0;
+}
+
+.werkbalk-menunoot {
+	max-width: 16rem;
+	margin: 0.25rem 0 0;
+	padding: 0.4rem 0.5rem 0.25rem;
+	border-top: 1px solid var(--rand);
+	color: var(--gedempt);
+	font-size: var(--t-klein);
+	line-height: 1.4;
+}
+
+.werkbalk-slot {
+	flex: none;
+	width: 0.85rem;
+	height: 0.85rem;
+	vertical-align: -0.1rem;
+}
+
+.werkbalk-menunoot .werkbalk-slot {
+	margin-right: 0.3rem;
+}
