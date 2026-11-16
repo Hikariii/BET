@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import type { WordStijl } from '../../data/types';
 import { isDomein } from '../../formaat/types';
 import { KLEUREN, type Kleur, type KnopToestand, type WerkbalkActie, type WerkbalkToestand } from '../../editor/werkbalk';
@@ -55,7 +55,7 @@ export function Werkbalk({ toestand, stijlen, mac, kleurmenuOpen, onKleurmenu, o
 	const bruikbaar = KNOPPEN.filter((naam) => !isUitgeschakeld(toestand[naam]));
 	const huidigeTabstop = bruikbaar.includes(tabstop) ? tabstop : bruikbaar[0];
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (!kleurmenuOpen) return;
 		const regels = menuregels(menu.current);
 		const actief = toestand.actieveKleur === null || toestand.actieveKleur === 'gemengd' ? 0 : KLEUREN.indexOf(toestand.actieveKleur);

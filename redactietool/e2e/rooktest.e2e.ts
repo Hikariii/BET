@@ -28,6 +28,26 @@ async function bewerkVers(pagina: Page, nummer: number): Promise<void> {
 	await expect(editor).toHaveCount(0);
 }
 
+/**
+ * Selecteert de eerste plek van `tekst` in de open editor, zoals een muis dat doet.
+ * ProseMirror leest de selectie pas na de selectionchange van de browser; de korte wacht laat hem de selectie kennen voordat de volgende toets komt.
+ */
+async function selecteerTekst(pagina: Page, tekst: string): Promise<void> {
+	await pagina.evaluate((gezocht) => {
+		const knopen = document.createTreeWalker(document.querySelector('[role="textbox"]')!, NodeFilter.SHOW_TEXT);
+		for (let knoop = knopen.nextNode(); knoop !== null; knoop = knopen.nextNode()) {
+			const begin = (knoop.textContent ?? '').indexOf(gezocht);
+			if (begin !== -1) {
+				window.getSelection()?.setBaseAndExtent(knoop, begin, knoop, begin + gezocht.length);
+				return;
+			}
+		}
+		throw new Error(`'${gezocht}' staat niet in de editor`);
+	}, tekst);
+	await expect.poll(() => pagina.evaluate(() => window.getSelection()?.toString())).toBe(tekst);
+	await pagina.evaluate(() => new Promise((klaar) => setTimeout(klaar, 100)));
+}
+
 test.describe('de gebouwde app', () => {
 	test('Lukas 1 toont alle versrijen zonder fouten', async ({ page }) => {
 		const fouten = volgFouten(page);
@@ -56,6 +76,45 @@ test.describe('de gebouwde app', () => {
 		await page.reload();
 		await page.locator('table.verzen tr.vers').first().waitFor();
 		await expect(vers).not.toContainText(TYPSEL.trim());
+		expect(fouten).toEqual([]);
+	});
+
+	test('opmaak zetten met de werkbalk komt als geldige FORMAAT-tekst in de export', async ({ page }) => {
+		const fouten = volgFouten(page);
+		await wachtOpHoofdstuk(page, 1);
+		await page.locator('#vers-1 [data-help="vers-bewerken"]').click();
+		const editor = page.locator('#vers-1 [role="textbox"]');
+		await editor.waitFor();
+		const werkbalk = page.getByRole('toolbar', { name: 'Opmaak' });
+		await expect(werkbalk).toBeVisible();
+		await expect(editor).toBeFocused();
+
+		// De vers-tekst begint met een spatie: de selectie " Veel" mag die spatie niet in de opmaak meenemen.
+		await selecteerTekst(page, ' Veel');
+		await werkbalk.getByRole('button', { name: 'Vet' }).click();
+		await expect(werkbalk.getByRole('button', { name: 'Vet' })).toHaveAttribute('aria-pressed', 'true');
+		await expect(editor).toBeFocused();
+
+		await selecteerTekst(page, ' mensen');
+		await page.keyboard.press('Alt+k');
+		const kleurmenu = page.getByRole('menu', { name: 'Kleur' });
+		await expect(kleurmenu).toBeVisible();
+		await expect(kleurmenu.getByRole('menuitemradio').first()).toBeFocused();
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('Enter');
+		await expect(kleurmenu).toHaveCount(0);
+		await expect(editor).toBeFocused();
+
+		await page.getByRole('button', { name: 'Klaar' }).click();
+		await expect(editor).toHaveCount(0);
+
+		await page.locator('[data-help="export-voor-claude"]').click();
+		const downloadWacht = page.waitForEvent('download');
+		await page.locator('.hoofdstukacties-export button[type="submit"]').click();
+		const download = await downloadWacht;
+		const uitvoer = JSON.parse(readFileSync(await download.path(), 'utf-8')) as { verzen: { vers: number; bewerkt: string[] }[] };
+		const eerstebewerkteRegel = uitvoer.verzen[0]?.bewerkt[0] ?? '';
+		expect(eerstebewerkteRegel).toMatch(/^ \{vet\}Veel\{\/vet\} \{genade\}mensen\{\/genade\} zijn begonnen /);
 		expect(fouten).toEqual([]);
 	});
 
