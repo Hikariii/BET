@@ -62,7 +62,7 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
 - [ ] Redactietool, uit de review van fase 7b (v8e):
   - [x] Back-up samenvoegen: per vers wint de nieuwste (keuze eigenaar, 2026-11-16).
   - [ ] Feature: bij back-up inladen conflicten tonen (beide versies naast elkaar) en per vers laten kiezen (zie `redactietool/stap2-plan.md`, "conflicten tonen").
-  - [ ] Overzicht Bewaard: "verouderd nog niet gecontroleerd" tonen zolang de hoofdstukken laden (`verouderdBekend`); in het voorbeeld van inladen ook verouderde verzen tonen; terug naar de repo per vers vanuit het overzicht.
+  - [ ] Overzicht Opgeslagen: "verouderd nog niet gecontroleerd" tonen zolang de hoofdstukken laden (`verouderdBekend`); in het voorbeeld van inladen ook verouderde verzen tonen; terug naar de repo per vers vanuit het overzicht.
   - [ ] Bewaarstatus: een mislukte schrijfactie (opslag vol) ook bovenin melden, niet alleen bij het vers.
   - [ ] Vervangen bij inladen: eerst automatisch een back-up van de huidige stand downloaden.
   - [ ] Tests: foutpaden van back-up (terugzetten mislukt, keuzes niet bewaard); `toegepast` als datum controleren in `alsKeuze`; component- of Playwright-test voor de vaste vertaalregels bij een open naslagkaart en voor Escape/focus in het back-upvenster.

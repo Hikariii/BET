@@ -6,7 +6,7 @@ Hier lees en bewerk je één hoofdstuk. Elk vers heeft een rij met vier kolommen
 
 Klik in de vereenvoudigde tekst van het vers en typ. Met het toetsenbord ga je met Tab naar het vers en druk je op Enter of de spatiebalk. Klik op **Klaar** of druk op Escape om te stoppen.
 
-De tool bewaart je wijziging meteen. Bij een gewijzigd vers staat het woord *gewijzigd*. Met **Terug naar de repo** zet je het vers terug op de tekst van Claude. De repo is de map met de teksten die Claude beheert.
+De tool slaat je wijziging meteen op. Bij een gewijzigd vers staat het woord *gewijzigd*. Met **Terug naar de repo** zet je het vers terug op de tekst van Claude. De repo is de map met de teksten die Claude beheert.
 
 De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een markering uit de bron uit het vers, dan waarschuwt de tool. Zie *Kleuren en markeringen*.
 

@@ -267,11 +267,11 @@ function schrijfHoofdstuk(opslag: Opslag, boek: string, hoofdstuk: number, verze
 }
 
 function nietBewaard(hoofdstuk: number): string {
-	return `Hoofdstuk ${hoofdstuk} kon niet in de browser worden bewaard, waarschijnlijk is de opslag vol.`;
+	return `Hoofdstuk ${hoofdstuk} kon niet in de browser worden opgeslagen, waarschijnlijk is de opslag vol.`;
 }
 
-const KEUZES_NIET_BEWAARD = 'De keuzes konden niet in de browser worden bewaard, waarschijnlijk is de opslag vol.';
-const ANTWOORDEN_NIET_BEWAARD = 'De antwoorden konden niet in de browser worden bewaard, waarschijnlijk is de opslag vol.';
+const KEUZES_NIET_BEWAARD = 'De keuzes konden niet in de browser worden opgeslagen, waarschijnlijk is de opslag vol.';
+const ANTWOORDEN_NIET_BEWAARD = 'De antwoorden konden niet in de browser worden opgeslagen, waarschijnlijk is de opslag vol.';
 
 function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst {
 	const meldingen: string[] = [];

@@ -28,7 +28,7 @@ export function BewaarStatus({ boek, overzichtOpen }: Props) {
 	return (
 		<a class="bewaarstatus bewaarstatus-pagina" href={maakAdres({ soort: 'bewaard', boek: boek.id })} aria-current={overzichtOpen ? 'page' : undefined} title={regel}>
 			<OpslagIcoon />
-			<span class="bewaarstatus-tekst">Bewaard: {bewaarTelling(overzicht)}</span>
+			<span class="bewaarstatus-tekst">Opgeslagen: {bewaarTelling(overzicht)}</span>
 			{backup.herinnering !== null && <span class="bewaarstatus-herinnering">Maak een back-up</span>}
 			<span class="alleen-lezers">. {regel}</span>
 		</a>

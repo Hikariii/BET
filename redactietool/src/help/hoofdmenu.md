@@ -1,6 +1,6 @@
 # Het hoofdmenu
 
-Bovenaan blijft een balk staan, ook als je scrolt. De naam van het boek ({{boek}}) brengt je naar hoofdstuk 1. Daarnaast staan de plekken van het boek. De plek waar je bent, heeft een streep eronder. Rechts staan Bewaard, de lettergrootte en Help.
+Bovenaan blijft een balk staan, ook als je scrolt. De naam van het boek ({{boek}}) brengt je naar hoofdstuk 1. Daarnaast staan de plekken van het boek. De plek waar je bent, heeft een streep eronder. Rechts staan {{plek:bewaard}}, de lettergrootte en Help.
 
 ## {{plek:hoofdstukken}}
 
@@ -34,7 +34,7 @@ Een woord of zin in het hele boek vervangen, of alleen de markering van dezelfde
 
 ## {{plek:bewaard}}
 
-Rechts in de balk staat wat de browser van je werk bewaart. Klik erop voor het overzicht en voor de back-up.
+Rechts in de balk staat wat de browser van je werk opslaat. Klik erop voor het overzicht en voor de back-up.
 
 {{wijs bewaarstatus | {{plek:bewaard}} | Rechtsboven in de balk.}}
 

@@ -18,7 +18,7 @@ export type Plek = 'hoofdstukken' | Tabblad;
 export const PLEKNAAM: Record<Plek, string> = { hoofdstukken: 'Hoofdstukken', ...TABBLADTITEL };
 
 /** De naam van de pagina Bewaard; die staat niet als tabblad in de balk maar als link naar de bewaarstatus. */
-export const BEWAARD_NAAM = 'Bewaard';
+export const BEWAARD_NAAM = 'Opgeslagen';
 
 type Aantal = { getal: number; tekst: string };
 

@@ -39,8 +39,8 @@ export function Welkom() {
 		>
 			<h2 id="welkom-titel">Welkom bij de redactietool</h2>
 			<p>
-				Met deze tool lees en bewerk je de vereenvoudiging naast de bron en breng je hem naar Word. Je werk wordt automatisch bewaard in deze browser op deze
-				computer; maak bij Bewaard een back-up. De knop Help rechtsboven legt uit hoe alles werkt.
+				Met deze tool lees en bewerk je de vereenvoudiging naast de bron en breng je hem naar Word. Je werk wordt automatisch opgeslagen in deze browser op deze
+				computer; maak bij Opgeslagen een back-up. De knop Help rechtsboven legt uit hoe alles werkt.
 			</p>
 			<p class="welkom-knoppen">
 				<button

@@ -391,7 +391,7 @@ function GegevenAntwoord({ boek, vraag, antwoord, bestaandeKeuzes, acties, zetMe
 			return;
 		}
 		zetAanpassen(false);
-		zetMelding('Toelichting bewaard.');
+		zetMelding('Toelichting opgeslagen.');
 	}
 
 	return (
@@ -430,7 +430,7 @@ function GegevenAntwoord({ boek, vraag, antwoord, bestaandeKeuzes, acties, zetMe
 								</p>
 							)}
 							<div class="knoppen">
-								<button type="submit">Toelichting bewaren</button>
+								<button type="submit">Toelichting opslaan</button>
 								<button type="button" onClick={annuleer}>
 									Annuleren
 								</button>

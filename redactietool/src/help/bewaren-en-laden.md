@@ -1,8 +1,8 @@
-# Bewaren en laden
+# Opslaan en laden
 
-## Wat de tool bewaart
+## Wat de tool opslaat
 
-De tool heeft geen server en geen account. Alles wat je doet, bewaart de browser **alleen op deze computer, in deze browser**: je bewerkte verzen, de keuzes die je toepast en je antwoorden op vertaalvragen. Dat gaat vanzelf; je hoeft nergens op Opslaan te klikken.
+De tool heeft geen server en geen account. Alles wat je doet, slaat de browser op, **alleen op deze computer, in deze browser**: je bewerkte verzen, de keuzes die je toepast en je antwoorden op vertaalvragen. Dat gaat vanzelf; je hoeft nergens op te klikken.
 
 ## Wat blijft er staan?
 
@@ -22,7 +22,7 @@ De tool heeft geen server en geen account. Alles wat je doet, bewaart de browser
 |---|---|---|
 | **Word** | De definitieve tekst van een hoofdstuk. Je maakt het met **Hoofdstuktekst kopiëren voor Word** en plakken in Word. | De redactie, en Claude bij het terugvoeren. Dit is het bestand dat telt. |
 | **Export voor Claude** | Uitleg bij een hoofdstuk: wat je hebt bewerkt, welke keuzes en antwoorden erbij horen, met je toelichting. Bijvoorbeeld {{exportbestand}}. | Alleen Claude. Het bevat nooit de tekst zelf. |
-| **Back-up** | Alles wat de browser van het boek bewaart, om later terug te zetten. Bijvoorbeeld {{back-upbestand}}. | Alleen deze tool, als je hem inlaadt. Claude gebruikt hem niet. |
+| **Back-up** | Alles wat de browser van het boek opslaat, om later terug te zetten. Bijvoorbeeld {{back-upbestand}}. | Alleen deze tool, als je hem inlaadt. Claude gebruikt hem niet. |
 
 ## Maak een back-up aan het eind van elke werksessie
 
@@ -32,4 +32,4 @@ Werk je op een andere computer verder, of heb je de browsergegevens gewist? Klik
 
 {{wijs back-up-downloaden | Back-up downloaden | Op de pagina {{plek:bewaard}}, bovenaan.}}
 {{wijs back-up-inladen | Back-up inladen | Op de pagina {{plek:bewaard}}, bovenaan.}}
-{{wijs bewaarstatus | Bewaard | Rechtsboven in de balk, op elke pagina.}}
+{{wijs bewaarstatus | {{plek:bewaard}} | Rechtsboven in de balk, op elke pagina.}}

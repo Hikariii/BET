@@ -18,7 +18,7 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 
 	return (
 		<section class="bewaard-overzicht" aria-labelledby="bewaard-titel">
-			<h1 id="bewaard-titel">Bewaard in deze browser</h1>
+			<h1 id="bewaard-titel">Opgeslagen in deze browser</h1>
 			<p class="bewaard-regel">{bewaarRegel(overzicht)}</p>
 			<p class="bewaard-backupregel">{backup.regel}</p>
 			{backup.herinnering !== null && <p class="bewaard-herinnering">{backup.herinnering}</p>}
@@ -36,7 +36,7 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 			<BackupInladen boek={boek} focusNaSluiten={inladenKnop} invoer={invoer} />
 			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && (
 				<div class="bewaard-leeg">
-					<p class="melding">Er is niets bewaard. Bewerk een vers of pas een keuze toe en het staat hier.</p>
+					<p class="melding">Er is niets opgeslagen. Bewerk een vers of pas een keuze toe en het staat hier.</p>
 					<p class="bewaard-leeg-tip">Werkte je eerder in een andere browser of op een andere computer? Laad dan je back-up in.</p>
 					<p>
 						<button type="button" onClick={() => invoer.current?.click()}>
@@ -62,7 +62,7 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 						{verzen.map((vers) => (
 							<li>
 								<a href={versAdres(boek.id, hoofdstuk, vers.vers)}>vers {vers.vers}</a>
-								<span class="bewaard-tijd">bewaard {tijdVan(vers.bewaard)}</span>
+								<span class="bewaard-tijd">opgeslagen {tijdVan(vers.bewaard)}</span>
 								{vers.herkomst === 'structurele keuze' && <span class="bewaard-label">via keuze</span>}
 								{vers.verouderd && <span class="bewaard-label bewaard-label-verouderd">verouderd</span>}
 							</li>

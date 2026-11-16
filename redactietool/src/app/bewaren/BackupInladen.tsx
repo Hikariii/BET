@@ -178,7 +178,7 @@ function Klaar({ toestand, onSluit }: { toestand: Extract<Toestand, { soort: 'kl
 		<>
 			<p role={gelukt ? 'status' : 'alert'}>
 				{gelukt
-					? `Klaar: ${meervoud(geschreven.verzen, 'vers', 'verzen')}, ${meervoud(geschreven.keuzes, 'keuze', 'keuzes')} en ${meervoud(geschreven.antwoorden, 'antwoord', 'antwoorden')} bewaard (${toestand.modus}).`
+					? `Klaar: ${meervoud(geschreven.verzen, 'vers', 'verzen')}, ${meervoud(geschreven.keuzes, 'keuze', 'keuzes')} en ${meervoud(geschreven.antwoorden, 'antwoord', 'antwoorden')} opgeslagen (${toestand.modus}).`
 					: 'Het inladen is niet helemaal gelukt.'}
 			</p>
 			{!gelukt && (

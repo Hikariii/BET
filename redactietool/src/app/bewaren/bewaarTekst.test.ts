@@ -44,7 +44,7 @@ describe('bewaarRegel', () => {
 			nu,
 		);
 
-		expect(regel).toBe('Bewaard in deze browser · 12 verzen in 3 hoofdstukken · 14:32');
+		expect(regel).toBe('Opgeslagen in deze browser · 12 verzen in 3 hoofdstukken · 14:32');
 	});
 
 	it('noemt verouderde bewerkingen als die er zijn', () => {
@@ -55,7 +55,7 @@ describe('bewaarRegel', () => {
 		expect(regel.endsWith(' · 2 verouderd')).toBe(true);
 	});
 
-	it('zegt dat er niets bewaard is', () => {
-		expect(bewaarRegel(overzicht({ totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0 } }))).toBe('Nog niets bewaard in deze browser');
+	it('zegt dat er niets opgeslagen is', () => {
+		expect(bewaarRegel(overzicht({ totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0 } }))).toBe('Nog niets opgeslagen in deze browser');
 	});
 });

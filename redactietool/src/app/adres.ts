@@ -22,7 +22,8 @@ export type BoekAdres =
 
 const HOOFDSTUK = /^#\/([^/]+)\/(\d+)(?:\/(\d+))?\/?$/;
 const BEGRIPPEN = /^#\/([^/]+)\/begrippen(?:\/([a-z]+))?\/?$/;
-const BEWAARD = /^#\/([^/]+)\/bewaard\/?$/;
+/** De pagina heette eerst Bewaard; oude links en bladwijzers naar `bewaard` werken nog. */
+const BEWAARD = /^#\/([^/]+)\/(?:opgeslagen|bewaard)\/?$/;
 const GALERIJ = /^#\/galerij\/?$/;
 
 /** Geeft `null` voor een leeg of onbegrijpelijk adres. */
@@ -57,7 +58,7 @@ export function maakAdres(adres: Adres): string {
 	if (adres.soort === 'begrippen') {
 		return `${boek}/begrippen/${adres.tabblad}`;
 	}
-	if (adres.soort === 'bewaard') return `${boek}/bewaard`;
+	if (adres.soort === 'bewaard') return `${boek}/opgeslagen`;
 	const hoofdstukAdres = `${boek}/${adres.hoofdstuk}`;
 	return adres.vers === null ? hoofdstukAdres : `${hoofdstukAdres}/${adres.vers}`;
 }
