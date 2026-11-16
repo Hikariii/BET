@@ -1,6 +1,8 @@
 # {{plek:vragen}}
 
-De vertaalvragen van het boek: eerst de open vragen, daarna de vragen met een besluit, daarna de opmerkingen van Claude per hoofdstuk. Hier beantwoord je een vraag. Je komt ook bij een vraag via het vraagteken naast een versnummer, of via de link bij *vraag* in de kolom Vertaalregels: de vraag staat dan open en in beeld.
+De pagina heeft drie groepen: **Open vragen** (vragen aan de redactie; alleen die kun je beantwoorden en alleen die tellen mee in het getal bij de naam en bij een hoofdstuk), **Vragen met een besluit**, en **Opmerkingen van Claude** (door Claude geschreven bij een hoofdstuk, ter informatie en ingeklapt). Een vraag heeft een vast nummer (`V12`), een opmerking een nummer met het hoofdstuk erin (`O5.2`), en je kunt op beide zoeken.
+
+Hier beantwoord je een vraag. Je komt ook bij een vraag via het vraagteken naast een versnummer, of via de link bij *vraag* in de kolom Vertaalregels: de vraag staat dan open en in beeld.
 
 ## Vragen vinden
 
@@ -8,7 +10,7 @@ Filter op status, soort en hoofdstuk, of zoek in de tekst. Met **Nog niet door m
 
 Een vraag met opties heeft opties om uit te kiezen. Een opmerking van Claude bij het hoofdstuk is alleen een melding met links naar de verzen.
 
-De status zegt waar de vraag staat. **open**: er is nog geen besluit. **voorlopig besloten**: de redactie heeft een besluit genomen dat nog bevestigd moet worden. **besloten**: het besluit staat vast. **onbeslist**: Claude noteerde de vraag zonder dat er een besluit of een open markering bij staat; behandel hem als een vraag die nog open is.
+De status zegt waar de vraag staat. **open**: er is nog geen besluit; dat staat alleen bij een vraag aan de redactie. **Claude twijfelde nog**: bij een opmerking van Claude stond "open" in de tekst. **voorlopig besloten**: de redactie heeft een besluit genomen dat nog bevestigd moet worden. **besloten**: het besluit staat vast. **onbeslist**: er staat geen statuswoord bij.
 
 {{wijs vragen-filters | Filters | Bovenaan de pagina.}}
 

@@ -88,7 +88,7 @@ function BoekScherm({ adres, boeken, weergavebeheer }: BoekSchermProps) {
 	if (adres.soort === 'bewaard') {
 		return (
 			<Indeling {...gedeeld} pagina="bewaard" huidigHoofdstuk={null} tabblad={null} titel={null} acties={null}>
-				<BewaardOverzicht boek={boek} />
+				<BewaardOverzicht boek={boek} openVragen={referentie.openVragen} />
 			</Indeling>
 		);
 	}

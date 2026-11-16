@@ -71,7 +71,7 @@ function maakMiniRepo({ statusTekst, openVragenRegels, stijlenZonder }: MiniRepo
 		statusTekst ?? '| Hoofdstuk | Status | Versie | Herkomst | Opmerking |\n|---|---|---|---|---|\n| Test 1 | - | | | |\n',
 	);
 	writeFileSync(path.join(boekmap, 'bron/test-01.md'), '# Test 1\n\n[1] Een. [2] Twee. [3] Drie.\n');
-	const openVragenKop = '| Plaats | Begrip / kwestie | Gekozen in tekst | Alternatief | Status | Besluit | Verzen |\n|---|---|---|---|---|---|---|\n';
+	const openVragenKop = '| Nr | Plaats | Begrip / kwestie | Gekozen in tekst | Alternatief | Status | Besluit | Verzen |\n|---|---|---|---|---|---|---|---|\n';
 	writeFileSync(path.join(boekmap, 'referentie/open-vragen.md'), openVragenKop + (openVragenRegels ?? []).join('\n') + '\n');
 	writeFileSync(path.join(hoofdmap, 'richtlijn/redactierichtlijn.md'), '# Richtlijn\n\n## 1. Eerste\n\nTekst.\n');
 	return hoofdmap;
@@ -110,13 +110,13 @@ describe('leesStylesXml', () => {
 
 describe('bouwData op een kleine repo', () => {
 	it('bouwt een geldige mini-repo zonder fout', () => {
-		const regel = '| Lk 1:3 | kwestie | gekozen | alternatief | open | | 1:3 |';
+		const regel = '| V1 | Lk 1:3 | kwestie | gekozen | alternatief | open | | 1:3 |';
 
 		expect(foutVanBouw({ openVragenRegels: [regel] })).toBe('');
 	});
 
 	it('weigert een open vraag met een vers dat het hoofdstuk niet heeft en noemt bestand, vraag en vers', () => {
-		const regel = '| Lk 1:4 | slecht vers | gekozen | alternatief | open | | 1:4 |';
+		const regel = '| V1 | Lk 1:4 | slecht vers | gekozen | alternatief | open | | 1:4 |';
 
 		const melding = foutVanBouw({ openVragenRegels: [regel] });
 
@@ -126,7 +126,7 @@ describe('bouwData op een kleine repo', () => {
 	});
 
 	it('weigert een open vraag met een onbekend hoofdstuk', () => {
-		const regel = '| Lk 2:1 | ander hoofdstuk | gekozen | alternatief | open | | 1:1, 2:1 |';
+		const regel = '| V1 | Lk 2:1 | ander hoofdstuk | gekozen | alternatief | open | | 1:1, 2:1 |';
 
 		const melding = foutVanBouw({ openVragenRegels: [regel] });
 
@@ -148,7 +148,7 @@ describe('bouwData op een kleine repo', () => {
 	});
 
 	it('zet het pad van het referentiebestand voor een fout van de parser', () => {
-		const regel = '| Lk 1:1 | kwestie | gekozen | alternatief | open | | eerste vers |';
+		const regel = '| V1 | Lk 1:1 | kwestie | gekozen | alternatief | open | | eerste vers |';
 
 		const melding = foutVanBouw({ openVragenRegels: [regel] });
 

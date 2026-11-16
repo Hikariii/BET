@@ -3,8 +3,8 @@ import type { VersRef } from '../data/types';
 import { leesRepobestand, leesVereenvoudigdeVerzen } from './bestanden.testhulp';
 import { leesOpenVragen } from './openVragen';
 
-const KOP = '| Plaats | Begrip / kwestie | Gekozen in tekst | Alternatief | Status | Besluit | Verzen |\n|---|---|---|---|---|---|---|';
-const rij = (verzen: string, plaats = 'Lk 1:1') => `| ${plaats} | kwestie | gekozen | alternatief | open | besluit | ${verzen} |`;
+const KOP = '| Nr | Plaats | Begrip / kwestie | Gekozen in tekst | Alternatief | Status | Besluit | Verzen |\n|---|---|---|---|---|---|---|---|';
+const rij = (verzen: string, plaats = 'Lk 1:1', nr = 'V1') => `| ${nr} | ${plaats} | kwestie | gekozen | alternatief | open | besluit | ${verzen} |`;
 const versen = (hoofdstuk: number, ...nummers: number[]): VersRef[] => nummers.map((vers) => ({ hoofdstuk, vers }));
 
 describe('leesOpenVragen op open-vragen.md', () => {
@@ -13,14 +13,22 @@ describe('leesOpenVragen op open-vragen.md', () => {
 	const vereenvoudigd = leesVereenvoudigdeVerzen();
 
 	it('geeft elke tabelregel', () => {
-		const rijen = tekst.split('\n').filter((regel) => regel.startsWith('| Lk '));
+		const rijen = tekst.split('\n').filter((regel) => regel.startsWith('| V'));
 
 		expect(rijen.length).toBeGreaterThan(0);
 		expect(vragen).toHaveLength(rijen.length);
 	});
 
+	it('geeft elke vraag een nummer V<getal> uit de kolom Nr, elk nummer één keer', () => {
+		const nummers = vragen.map((vraag) => vraag.nr);
+
+		expect(nummers.filter((nr) => !/^V[1-9]\d*$/.test(nr))).toEqual([]);
+		expect(new Set(nummers).size).toBe(nummers.length);
+		expect(nummers.slice(0, 2)).toEqual(['V1', 'V2']);
+	});
+
 	it('geeft een lege lijst verzen aan precies de vragen met een lege cel Verzen', () => {
-		const rijenZonderVerzen = tekst.split('\n').filter((regel) => regel.startsWith('| Lk ') && /\|\s*\|$/.test(regel));
+		const rijenZonderVerzen = tekst.split('\n').filter((regel) => regel.startsWith('| V') && /\|\s*\|$/.test(regel));
 
 		expect(vragen.filter((vraag) => vraag.verzen.length === 0)).toHaveLength(rijenZonderVerzen.length);
 	});
@@ -58,7 +66,7 @@ describe('leesOpenVragen op open-vragen.md', () => {
 
 describe('leesOpenVragen op kleine invoer', () => {
 	it('geeft een enkel vers, een lijst en een bereik met spaties', () => {
-		expect(leesOpenVragen(`${KOP}\n${rij('1:45')}\n${rij('1:45 ,  6:20-22,7:23')}`).map((vraag) => vraag.verzen)).toEqual([
+		expect(leesOpenVragen(`${KOP}\n${rij('1:45')}\n${rij('1:45 ,  6:20-22,7:23', 'Lk 1:1', 'V2')}`).map((vraag) => vraag.verzen)).toEqual([
 			versen(1, 45),
 			[...versen(1, 45), ...versen(6, 20, 21, 22), ...versen(7, 23)],
 		]);
@@ -74,12 +82,12 @@ describe('leesOpenVragen op kleine invoer', () => {
 
 	it('geeft de overige kolommen ongewijzigd', () => {
 		expect(leesOpenVragen(`${KOP}\n${rij('2:1', 'Lk 2:1')}`)).toEqual([
-			{ plaats: 'Lk 2:1', kwestie: 'kwestie', gekozen: 'gekozen', alternatief: 'alternatief', status: 'open', besluit: 'besluit', verzen: versen(2, 1) },
+			{ nr: 'V1', plaats: 'Lk 2:1', kwestie: 'kwestie', gekozen: 'gekozen', alternatief: 'alternatief', status: 'open', besluit: 'besluit', verzen: versen(2, 1) },
 		]);
 	});
 
 	it('geeft een lege lijst verzen als de kolom Verzen ontbreekt', () => {
-		const tekst = '| Plaats | Begrip / kwestie | Gekozen in tekst | Alternatief | Status | Besluit |\n|---|---|---|---|---|---|\n| Lk 1:1 | k | g | a | open | b |';
+		const tekst = '| Nr | Plaats | Begrip / kwestie | Gekozen in tekst | Alternatief | Status | Besluit |\n|---|---|---|---|---|---|---|\n| V1 | Lk 1:1 | k | g | a | open | b |';
 
 		expect(leesOpenVragen(tekst)[0]?.verzen).toEqual([]);
 	});
@@ -94,11 +102,29 @@ describe('leesOpenVragen op kleine invoer', () => {
 		['een lege plek in de lijst', '1:45, , 1:48'],
 		['tekst in plaats van verzen', 'zie log'],
 	])('meldt %s met het regelnummer', (_naam, verzen) => {
-		expect(() => leesOpenVragen(`Voorwoord\n\n${KOP}\n${rij('1:1')}\n${rij(verzen)}`)).toThrowError(/^regel 6: ongeldig(e versaanduiding| bereik) /);
+		expect(() => leesOpenVragen(`Voorwoord\n\n${KOP}\n${rij('1:1')}\n${rij(verzen, 'Lk 1:1', 'V2')}`)).toThrowError(/^regel 6: ongeldig(e versaanduiding| bereik) /);
 	});
 
 	it('meldt een ontbrekende kolom bij de kopregel', () => {
-		expect(() => leesOpenVragen('| Plaats | Status |\n|---|---|')).toThrowError("regel 1: kolom 'Begrip / kwestie' ontbreekt");
+		expect(() => leesOpenVragen('| Nr | Plaats | Status |\n|---|---|---|')).toThrowError("regel 1: kolom 'Begrip / kwestie' ontbreekt");
+	});
+
+	it('meldt een ontbrekende kolom Nr bij de kopregel', () => {
+		const zonderNr = '| Plaats | Begrip / kwestie | Gekozen in tekst | Alternatief | Status | Besluit | Verzen |\n|---|---|---|---|---|---|---|\n| Lk 1:1 | k | g | a | open | b | 1:1 |';
+
+		expect(() => leesOpenVragen(zonderNr)).toThrowError("regel 1: kolom 'Nr' ontbreekt");
+	});
+
+	it('meldt een leeg nummer met het regelnummer', () => {
+		expect(() => leesOpenVragen(`${KOP}\n${rij('1:1', 'Lk 1:1', '')}`)).toThrowError('regel 3: de kolom Nr is leeg');
+	});
+
+	it('meldt een nummer dat al eerder voorkomt met het regelnummer', () => {
+		expect(() => leesOpenVragen(`${KOP}\n${rij('1:1', 'Lk 1:1', 'V7')}\n${rij('1:2', 'Lk 1:2', 'V7')}`)).toThrowError("regel 4: nummer 'V7' komt al eerder voor in de kolom Nr");
+	});
+
+	it.each(['12', 'v12', 'O12', 'V0', 'V012', 'V1.2', 'V12a'])('meldt het nummer %s dat niet de vorm V<getal> heeft', (nr) => {
+		expect(() => leesOpenVragen(`${KOP}\n${rij('1:1', 'Lk 1:1', nr)}`)).toThrowError(`regel 3: ongeldig nummer '${nr}' in de kolom Nr (verwacht: 'V12')`);
 	});
 
 	it('meldt een bestand zonder tabel', () => {

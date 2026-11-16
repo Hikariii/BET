@@ -53,6 +53,7 @@ describe('optieActie op de vragen van Lukas', () => {
 	}));
 	const verzen = bouwHoofdstukVerzen(hoofdstukken, boek, () => ({ verzen: {} }));
 	const vragen: Vertaalvraag[] = leesOpenVragen(leesRepobestand('bijbel/lukas/referentie/open-vragen.md')).map((vraag) => ({
+		nr: vraag.nr,
 		herkomst: { soort: 'register' },
 		kwestie: vraag.kwestie,
 		tekst: vraag.besluit,

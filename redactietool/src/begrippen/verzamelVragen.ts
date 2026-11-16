@@ -26,6 +26,7 @@ const STATUSVOLGORDE: Record<VraagStatus, number> = { open: 0, onbeslist: 1, 'vo
 /**
  * Alle vertaalvragen: het register (open-vragen.md) en de vragen uit de wijzigingslogs.
  * Een vers-vraag "Zie vraag N" is geen eigen vraag: haar verzen gaan naar hoofdstukvraag N van hetzelfde hoofdstuk.
+ * Elke vraag heeft een nummer: dat van het register, of `O<hoofdstuk>.<n>` voor een opmerking uit een log; een "Zie vraag N" of een lege vers-vraag krijgt er geen en telt niet mee.
  * Gesorteerd op status (open, onbeslist, voorlopig besloten, besloten), dan register eerst, dan hoofdstuk en eerste vers.
  */
 export function verzamelVragen(openVragen: readonly OpenVraag[], hoofdstukken: readonly LogHoofdstuk[]): Vertaalvraag[] {
@@ -35,6 +36,7 @@ export function verzamelVragen(openVragen: readonly OpenVraag[], hoofdstukken: r
 
 function registerVraag(vraag: OpenVraag): Vertaalvraag {
 	return {
+		nr: vraag.nr,
 		herkomst: { soort: 'register' },
 		kwestie: vraag.kwestie,
 		tekst: vraag.besluit,
@@ -54,6 +56,11 @@ function registerStatus(kolom: string): VraagStatus {
 	return 'onbeslist';
 }
 
+/** `O5.2`: de tweede opmerking in het log van hoofdstuk 5, geteld in leesvolgorde (eerst `## Vragen aan redactie`, dan per vers). */
+function logNr(hoofdstuk: number, volgnummer: number): string {
+	return `O${hoofdstuk}.${volgnummer}`;
+}
+
 function vragenUitLog({ nummer: hoofdstuk, log }: LogHoofdstuk): Vertaalvraag[] {
 	const hoofdstukVragen = log.algemeneVragen.map((tekst, index) => hoofdstukVraag(hoofdstuk, index + 1, tekst));
 	const eigenVersVragen: Vertaalvraag[] = [];
@@ -64,7 +71,7 @@ function vragenUitLog({ nummer: hoofdstuk, log }: LogHoofdstuk): Vertaalvraag[] 
 			if (verwezen.length > 0) {
 				for (const nummer of verwezen) hoofdstukVragen[nummer - 1]?.verzen.push(...verzen);
 			} else if (!LEGE_VERS_VRAAG.test(tekst)) {
-				eigenVersVragen.push(versVraag(hoofdstuk, logVers.verzen[0] ?? 0, verzen, tekst));
+				eigenVersVragen.push(versVraag(logNr(hoofdstuk, hoofdstukVragen.length + eigenVersVragen.length + 1), hoofdstuk, logVers.verzen[0] ?? 0, verzen, tekst));
 			}
 		}
 	}
@@ -75,6 +82,7 @@ function vragenUitLog({ nummer: hoofdstuk, log }: LogHoofdstuk): Vertaalvraag[] 
 function hoofdstukVraag(hoofdstuk: number, nummer: number, tekst: string): Vertaalvraag {
 	const kop = KOP.exec(tekst)?.[1] ?? null;
 	return {
+		nr: logNr(hoofdstuk, nummer),
 		herkomst: { soort: 'hoofdstuk', hoofdstuk, nummer },
 		kwestie: kop === null ? eersteZin(tekst) : kwestieUitKop(kop),
 		tekst,
@@ -86,8 +94,9 @@ function hoofdstukVraag(hoofdstuk: number, nummer: number, tekst: string): Verta
 	};
 }
 
-function versVraag(hoofdstuk: number, vers: number, verzen: VersRef[], tekst: string): Vertaalvraag {
+function versVraag(nr: string, hoofdstuk: number, vers: number, verzen: VersRef[], tekst: string): Vertaalvraag {
 	return {
+		nr,
 		herkomst: { soort: 'vers', hoofdstuk, vers },
 		kwestie: eersteZin(tekst),
 		tekst,

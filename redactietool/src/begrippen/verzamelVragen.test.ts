@@ -12,7 +12,7 @@ const GEDACHTENSTREEP = String.fromCharCode(0x2013);
 const versen = (hoofdstuk: number, ...nummers: number[]): VersRef[] => nummers.map((vers) => ({ hoofdstuk, vers }));
 
 function registerRegel(velden: Partial<OpenVraag>): OpenVraag {
-	return { plaats: 'Lk 1:1', kwestie: 'kwestie', gekozen: 'gekozen', alternatief: 'alternatief', status: 'open', besluit: '', verzen: [], ...velden };
+	return { nr: 'V1', plaats: 'Lk 1:1', kwestie: 'kwestie', gekozen: 'gekozen', alternatief: 'alternatief', status: 'open', besluit: '', verzen: [], ...velden };
 }
 
 function logVers(verzen: number[], vragen: string[]): LogVers {
@@ -32,7 +32,7 @@ function vind(vragen: readonly Vertaalvraag[], kwestie: string): Vertaalvraag {
 describe('verzamelVragen op een klein register', () => {
 	const vragen = verzamelVragen(
 		[
-			registerRegel({ kwestie: 'open kwestie', gekozen: 'keuze A', alternatief: 'keuze B', status: 'open', besluit: 'ter beslissing redactie', verzen: versen(4, 18, 19) }),
+			registerRegel({ nr: 'V7', kwestie: 'open kwestie', gekozen: 'keuze A', alternatief: 'keuze B', status: 'open', besluit: 'ter beslissing redactie', verzen: versen(4, 18, 19) }),
 			registerRegel({ kwestie: 'voorlopige kwestie', status: 'voorlopig besloten', verzen: versen(5, 9) }),
 			registerRegel({ kwestie: 'besloten kwestie', status: 'besloten door gebruiker', verzen: versen(5, 24) }),
 		],
@@ -41,6 +41,7 @@ describe('verzamelVragen op een klein register', () => {
 
 	it('neemt kwestie, gekozen, alternatief, besluit en verzen over met herkomst register', () => {
 		expect(vind(vragen, 'open kwestie')).toEqual({
+			nr: 'V7',
 			herkomst: { soort: 'register' },
 			kwestie: 'open kwestie',
 			tekst: 'ter beslissing redactie',
@@ -108,6 +109,49 @@ describe('verzamelVragen op de koppen van een klein log', () => {
 
 	it('neemt bij een vraag zonder kop de eerste zin als kwestie en geeft geen verzen', () => {
 		expect(vind(vragen, 'Een vraag zonder kop.').verzen).toEqual([]);
+	});
+});
+
+describe('verzamelVragen geeft opmerkingen uit een log een nummer', () => {
+	const vragen = verzamelVragen(
+		[],
+		[
+			logHoofdstuk(
+				5,
+				['**5:1, alfa:** tekst.', '**5:2, beta:** tekst.'],
+				[
+					logVers([10], ['Zie vraag 1.', 'Geen.']),
+					logVers([11], ['Eerste eigen vraag bij vers 11.']),
+					logVers([12], ['Tweede eigen vraag.']),
+				],
+			),
+			logHoofdstuk(12, ['**12:3, gamma:** tekst.'], [logVers([4], ['Een eigen vraag.'])]),
+		],
+	);
+
+	it('telt O<hoofdstuk>.<n> in leesvolgorde: eerst Vragen aan redactie, dan per vers', () => {
+		expect(vragen.map((vraag) => [vraag.nr, vraag.kwestie]).sort()).toEqual([
+			['O12.1', 'gamma'],
+			['O12.2', 'Een eigen vraag.'],
+			['O5.1', 'alfa'],
+			['O5.2', 'beta'],
+			['O5.3', 'Eerste eigen vraag bij vers 11.'],
+			['O5.4', 'Tweede eigen vraag.'],
+		]);
+	});
+
+	it('telt "Zie vraag N" en "Geen." niet mee, en begint elk hoofdstuk opnieuw', () => {
+		expect(vragen.filter((vraag) => vraag.nr.startsWith('O5.'))).toHaveLength(4);
+		expect(vragen.find((vraag) => vraag.nr === 'O12.1')?.kwestie).toBe('gamma');
+	});
+
+	it('houdt het nummer bij het sorteren op status bij de vraag', () => {
+		const metOpen = verzamelVragen([], [logHoofdstuk(5, ['**5:1, rustig:** tekst.', '**5:2, twijfel:** OPEN'])]);
+
+		expect(metOpen.map((vraag) => [vraag.kwestie, vraag.nr])).toEqual([
+			['twijfel', 'O5.2'],
+			['rustig', 'O5.1'],
+		]);
 	});
 });
 
@@ -223,6 +267,16 @@ describe('verzamelVragen op de logs en het register van Lukas', () => {
 
 		expect(eigen.length).toBeGreaterThan(50);
 		expect(eigen.filter((vraag) => /zie vraag \d/i.test(vraag.tekst))).toEqual([]);
+	});
+
+	it('geeft elke vraag en opmerking een eigen nummer, en elke registervraag het nummer uit open-vragen.md', () => {
+		const nummersInBestand = leesRepobestand('bijbel/lukas/referentie/open-vragen.md')
+			.split('\n')
+			.flatMap((regel) => /^\| (V\d+) \|/.exec(regel)?.[1] ?? []);
+
+		expect(new Set(vragen.map((vraag) => vraag.nr)).size).toBe(vragen.length);
+		expect(vragen.filter((vraag) => vraag.herkomst.soort === 'register').map((vraag) => vraag.nr).sort()).toEqual([...nummersInBestand].sort());
+		expect(vragen.filter((vraag) => vraag.herkomst.soort !== 'register').every((vraag) => /^O\d+\.\d+$/.test(vraag.nr))).toBe(true);
 	});
 
 	it('geeft alleen verzen die in de vereenvoudiging bestaan', () => {

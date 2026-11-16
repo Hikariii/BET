@@ -23,6 +23,8 @@ export type VraagHerkomst =
 	| { soort: 'vers'; hoofdstuk: number; vers: number };
 
 export type Vertaalvraag = {
+	/** Het nummer dat de lezer ziet: `V12` voor een vraag uit het register (vast, uit de kolom Nr), `O5.2` voor een opmerking uit het log van hoofdstuk 5 (de tweede in leesvolgorde). */
+	nr: string;
 	herkomst: VraagHerkomst;
 	/** Korte titel: de kwestie uit het register, of de kop van de vraag zonder versverwijzing. */
 	kwestie: string;

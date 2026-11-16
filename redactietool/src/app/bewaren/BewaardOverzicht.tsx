@@ -1,8 +1,8 @@
 import { useRef, useState } from 'preact/hooks';
 import type { BewaardOverzicht } from '../../bewaren/overzicht';
-import type { BoekData } from '../../data/types';
+import type { BoekData, OpenVraag } from '../../data/types';
 import { versAdres } from '../adres';
-import { registerVraagSleutel, vraagAdres } from '../begrippen/vraagAdres';
+import { vraagAdres } from '../begrippen/vraagAdres';
 import { BackupInladen } from './BackupInladen';
 import { kortUit, optieOmschrijving } from '../begrippen/vervangenVoorbeeld';
 import { bewaarRegel, tijdVan, verouderdMelding, vervangingRegel } from './bewaarTekst';
@@ -17,10 +17,11 @@ function verouderdeVerzen(overzicht: BewaardOverzicht, boekNaam: string): string
 }
 
 /** De pagina `#/<boek>/opgeslagen`: wat de browser bewaart per hoofdstuk, de toegepaste vervangingen, de antwoorden en de back-upknoppen. */
-export function BewaardOverzicht({ boek }: { boek: BoekData }) {
+export function BewaardOverzicht({ boek, openVragen }: { boek: BoekData; openVragen: readonly OpenVraag[] }) {
 	const overzicht = useBewaardOverzicht(boek);
 	const backup = useBackupStand(boek.id, overzicht);
 	const [melding, zetMelding] = useState('');
+	const nummers = new Map(openVragen.map((vraag) => [vraag.kwestie, vraag.nr]));
 	const invoer = useRef<HTMLInputElement>(null);
 	const inladenKnop = useRef<HTMLButtonElement>(null);
 
@@ -94,7 +95,7 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 					<ul>
 						{overzicht.antwoorden.map((antwoord) => (
 							<li>
-								<a href={vraagAdres(boek.id, registerVraagSleutel(antwoord.kwestie))}>{kortUit(antwoord.kwestie, 80)}</a>: <strong>{kortUit(optieOmschrijving(antwoord.optie), 80)}</strong>, gegeven{' '}
+								<AntwoordKop boekId={boek.id} kwestie={antwoord.kwestie} nummers={nummers} />: <strong>{kortUit(optieOmschrijving(antwoord.optie), 80)}</strong>, gegeven{' '}
 								{tijdVan(antwoord.gegeven)}.
 							</li>
 						))}
@@ -102,5 +103,16 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 				</section>
 			)}
 		</section>
+	);
+}
+
+/** De kwestie van een beantwoorde vraag, als link naar de vraag; een kwestie die niet meer in het register staat is gewone tekst. */
+function AntwoordKop({ boekId, kwestie, nummers }: { boekId: string; kwestie: string; nummers: ReadonlyMap<string, string> }) {
+	const nr = nummers.get(kwestie);
+	if (nr === undefined) return <>{kortUit(kwestie, 80)}</>;
+	return (
+		<>
+			<span class="vraagnr">{nr}</span> <a href={vraagAdres(boekId, nr)}>{kortUit(kwestie, 80)}</a>
+		</>
 	);
 }

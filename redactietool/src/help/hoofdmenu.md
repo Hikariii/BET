@@ -22,7 +22,7 @@ Per bronwoord zie je hoe het in het boek is vertaald. Standaard zie je alleen de
 
 ## {{plek:vragen}}
 
-De vertaalvragen die nog open staan, en de vragen die al een besluit hebben. Hier beantwoord je ze; je komt er ook via het vraagteken bij een vers. Het getal naast de naam is het aantal open vragen.
+De vertaalvragen die nog open staan, de vragen die al een besluit hebben en de opmerkingen van Claude. Hier beantwoord je de vragen; je komt er ook via het vraagteken bij een vers. Het getal naast de naam is het aantal open vragen aan de redactie.
 
 {{wijs plek-vragen | {{plek:vragen}} | Bovenaan in de balk, met het aantal open vragen erachter.}}
 

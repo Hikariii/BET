@@ -87,6 +87,8 @@ export type Precedent = {
 
 /** Een tabelregel uit referentie/open-vragen.md. */
 export type OpenVraag = {
+	/** Het vaste nummer uit de kolom Nr, bv. `V12`; een vraag houdt haar nummer, ook als er vragen bij komen. */
+	nr: string;
 	plaats: string;
 	kwestie: string;
 	gekozen: string;

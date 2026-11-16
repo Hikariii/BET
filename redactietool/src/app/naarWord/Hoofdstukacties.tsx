@@ -70,7 +70,7 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 			tussenstand,
 			keuzes: leesKeuzes(browseropslag(), boek.id),
 			antwoorden: leesAntwoorden(browseropslag(), boek.id),
-			vraagVerzen: new Map(openVragen.map((vraag) => [vraag.kwestie, vraag.verzen])),
+			vragen: new Map(openVragen.map((vraag) => [vraag.kwestie, { nr: vraag.nr, verzen: vraag.verzen }])),
 			repoCommit: __REPO_COMMIT__,
 			toelichting: tekst,
 			nu: new Date(),

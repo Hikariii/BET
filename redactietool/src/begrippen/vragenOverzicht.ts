@@ -1,7 +1,11 @@
-import type { Vertaalvraag, VraagStatus } from './types';
+import type { Vertaalvraag } from './types';
+
+/** Waar de lezer op filtert: de status, waarbij "open" alleen een open vraag uit het register is en een opmerking met een statuswoord "open" onder "Claude twijfelde nog" valt. */
+export const FILTERSTATUSSEN = ['open', 'Claude twijfelde nog', 'voorlopig besloten', 'besloten', 'onbeslist'] as const;
+export type FilterStatus = (typeof FILTERSTATUSSEN)[number];
 
 export type VragenFilter = {
-	status: VraagStatus | 'alle';
+	status: FilterStatus | 'alle';
 	herkomst: 'alle' | 'register' | 'logs';
 	hoofdstuk: number | 'alle';
 	zoekterm: string;
@@ -15,16 +19,24 @@ function hoortBijHoofdstuk(vraag: Vertaalvraag, hoofdstuk: number): boolean {
 	return uitLog || vraag.verzen.some((ref) => ref.hoofdstuk === hoofdstuk);
 }
 
+function filterStatus(vraag: Vertaalvraag): FilterStatus {
+	if (vraag.status !== 'open') return vraag.status;
+	return vraag.herkomst.soort === 'register' ? 'open' : 'Claude twijfelde nog';
+}
+
+/** Een zoekterm als `V12` of `O11.3` vindt dat nummer, en `O11` alle opmerkingen van hoofdstuk 11; verder telt de tekst. */
 function bevatTekst(vraag: Vertaalvraag, zoekterm: string): boolean {
+	const term = zoekterm.trim().toLowerCase();
+	const nr = vraag.nr.toLowerCase();
 	const doorzoekbaar = [vraag.kwestie, vraag.tekst, vraag.gekozen ?? '', vraag.alternatief ?? ''].join('\n').toLowerCase();
-	return doorzoekbaar.includes(zoekterm.trim().toLowerCase());
+	return nr === term || nr.startsWith(`${term}.`) || doorzoekbaar.includes(term);
 }
 
 /** Houdt de volgorde van `vragen`. */
 export function filterVragen(vragen: readonly Vertaalvraag[], filter: VragenFilter): Vertaalvraag[] {
 	return vragen.filter(
 		(vraag) =>
-			(filter.status === 'alle' || vraag.status === filter.status) &&
+			(filter.status === 'alle' || filterStatus(vraag) === filter.status) &&
 			(filter.herkomst === 'alle' || (filter.herkomst === 'register') === (vraag.herkomst.soort === 'register')) &&
 			(filter.hoofdstuk === 'alle' || hoortBijHoofdstuk(vraag, filter.hoofdstuk)) &&
 			bevatTekst(vraag, filter.zoekterm),
@@ -45,34 +57,21 @@ export function groepeerLogVragen(vragen: readonly Vertaalvraag[]): HoofdstukVra
 	return [...groepen].map(([hoofdstuk, groepVragen]) => ({ hoofdstuk, vragen: groepVragen })).sort((a, b) => a.hoofdstuk - b.hoofdstuk);
 }
 
-export type OpenEnOverig = { open: Vertaalvraag[]; overig: Vertaalvraag[] };
+export type Indeling = {
+	/** De vragen uit het register met status open: de vragen die de redactie kan beantwoorden. */
+	open: Vertaalvraag[];
+	/** De overige vragen uit het register. */
+	metBesluit: Vertaalvraag[];
+	/** Alle opmerkingen uit de logs, ook die met een statuswoord "open". */
+	opmerkingen: Vertaalvraag[];
+};
 
-/** Splitst in de open vragen (register en logs samen) en de rest; beide houden de volgorde van `vragen`, geen vraag staat in beide. */
-export function splitsOpenVragen(vragen: readonly Vertaalvraag[]): OpenEnOverig {
+/** Deelt in drie groepen in; elke groep houdt de volgorde van `vragen`, en elke vraag staat in precies één groep. */
+export function deelVragenIn(vragen: readonly Vertaalvraag[]): Indeling {
+	const register = vragen.filter((vraag) => vraag.herkomst.soort === 'register');
 	return {
-		open: vragen.filter((vraag) => vraag.status === 'open'),
-		overig: vragen.filter((vraag) => vraag.status !== 'open'),
+		open: register.filter((vraag) => vraag.status === 'open'),
+		metBesluit: register.filter((vraag) => vraag.status !== 'open'),
+		opmerkingen: vragen.filter((vraag) => vraag.herkomst.soort !== 'register'),
 	};
-}
-
-function sleutelBasis({ herkomst, kwestie }: Vertaalvraag): string {
-	if (herkomst.soort === 'register') return `register-${kwestie}`;
-	if (herkomst.soort === 'hoofdstuk') return `hoofdstuk-${herkomst.hoofdstuk}-${herkomst.nummer}`;
-	return `vers-${herkomst.hoofdstuk}-${herkomst.vers}`;
-}
-
-/**
- * Een vaste sleutel per vraag, afgeleid uit de herkomst, zodat de weergave van een vraag bij filteren dezelfde blijft.
- * Hoort meer dan één vraag bij dezelfde basis (twee vragen bij één vers), dan telt een volgnummer in de volgorde van `vragen` mee.
- */
-export function vraagSleutels(vragen: readonly Vertaalvraag[]): Map<Vertaalvraag, string> {
-	const gezien = new Map<string, number>();
-	const sleutels = new Map<Vertaalvraag, string>();
-	for (const vraag of vragen) {
-		const basis = sleutelBasis(vraag);
-		const volgnummer = (gezien.get(basis) ?? 0) + 1;
-		gezien.set(basis, volgnummer);
-		sleutels.set(vraag, `${basis}-${volgnummer}`);
-	}
-	return sleutels;
 }

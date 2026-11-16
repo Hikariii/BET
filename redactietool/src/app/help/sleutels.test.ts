@@ -50,7 +50,7 @@ function sleutelsInCode(): Map<string, string> {
 	}
 	const balk = join(APP, 'bovenbalk', 'BoekTabbladen.tsx');
 	expect(readFileSync(balk, 'utf8')).toContain('data-help={plekSleutel(plek.plek)}');
-	for (const plek of boekPlekken('lukas', { precedenten: [], openVragen: [] }, null, 1)) sleutels.set(plekSleutel(plek.plek), balk);
+	for (const plek of boekPlekken('lukas', { precedenten: [], openVragen: [] }, 1)) sleutels.set(plekSleutel(plek.plek), balk);
 	return sleutels;
 }
 
@@ -77,7 +77,7 @@ describe('data-help in de schermen en de help', () => {
 
 	it('wijst elke plek in de balk aan', () => {
 		const inHelp = sleutelsInHelp();
-		for (const plek of boekPlekken('lukas', { precedenten: [], openVragen: [] }, null, 1)) expect(inHelp.has(plekSleutel(plek.plek)), plek.plek).toBe(true);
+		for (const plek of boekPlekken('lukas', { precedenten: [], openVragen: [] }, 1)) expect(inHelp.has(plekSleutel(plek.plek)), plek.plek).toBe(true);
 	});
 
 	it('toont bij een knop dezelfde tekst als op de echte knop', () => {

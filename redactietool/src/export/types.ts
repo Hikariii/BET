@@ -33,6 +33,8 @@ export type RedactieExport = {
 export type ExportAntwoord = Omit<Antwoord, 'keuzeIds'> & {
 	/** De bestaande keuzes onder het antwoord die dit hoofdstuk raken (te vinden in `structureleKeuzes`); leeg bij een antwoord zonder keuzes. */
 	keuzeIds: string[];
+	/** Het nummer van de vraag in open-vragen.md (`V12`); `null` als de kwestie daar niet (meer) staat. */
+	nr: string | null;
 	/** Als `hoofdstuk:vers`. */
 	verzen: string[];
 };

@@ -3,7 +3,7 @@ import { pasTussenstandToe } from '../../bewerken/tussenstand';
 import type { BoekData, HoofdstukData, Referentie } from '../../data/types';
 import { useTussenstand } from '../bewerken/useTussenstand';
 import { groepeerPerVers } from '../groepeerPerVers';
-import { maakVersVraagAdres } from '../begrippen/vraagAdres';
+import { maakVersVraag } from '../begrippen/vraagAdres';
 import { VersRij } from '../HoofdstukScherm';
 import { wisselNaslag, type OpenNaslag, type Naslag } from '../naslag';
 
@@ -59,7 +59,7 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 					boek={boek}
 					hoofdstuk={hoofdstuk}
 					referentie={referentie}
-					vraagAdres={maakVersVraagAdres(boek.id, referentie.openVragen, hoofdstuk)(vers)}
+					versVraag={maakVersVraag(boek.id, referentie.openVragen, hoofdstuk)(vers)}
 					geselecteerd={gekozen}
 					openNaslag={openNaslag?.naslag ?? null}
 					onOpenNaslag={(naslag: Naslag) => zetOpenNaslag(wisselNaslag(openNaslag, 0, naslag))}

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { Vertaalvraag, VraagStatus } from './types';
-import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels } from './vragenOverzicht';
+import type { Vertaalvraag } from './types';
+import { deelVragenIn, filterVragen, FILTERSTATUSSEN, GEEN_FILTER, groepeerLogVragen, type FilterStatus } from './vragenOverzicht';
 
-function vraag(velden: Partial<Vertaalvraag> & Pick<Vertaalvraag, 'kwestie'>): Vertaalvraag {
+function vraag(velden: Partial<Vertaalvraag> & Pick<Vertaalvraag, 'kwestie' | 'nr'>): Vertaalvraag {
 	return {
 		herkomst: { soort: 'hoofdstuk', hoofdstuk: 1, nummer: 1 },
 		tekst: '',
@@ -15,14 +15,16 @@ function vraag(velden: Partial<Vertaalvraag> & Pick<Vertaalvraag, 'kwestie'>): V
 	};
 }
 
-const register = vraag({ kwestie: 'Zoon des mensen', herkomst: { soort: 'register' }, status: 'besloten', gekozen: 'Mensenzoon', verzen: [{ hoofdstuk: 5, vers: 24 }] });
-const hoofdstukDrie = vraag({ kwestie: 'woestenij', herkomst: { soort: 'hoofdstuk', hoofdstuk: 3, nummer: 2 }, status: 'open', tekst: 'Een lege plek of een woestenij?' });
-const versVraagVijf = vraag({ kwestie: 'En', herkomst: { soort: 'vers', hoofdstuk: 5, vers: 2 }, status: 'voorlopig besloten', tekst: 'Waarom blijft En staan?', verzen: [{ hoofdstuk: 5, vers: 2 }] });
+const register = vraag({ nr: 'V12', kwestie: 'Zoon des mensen', herkomst: { soort: 'register' }, status: 'besloten', gekozen: 'Mensenzoon', verzen: [{ hoofdstuk: 5, vers: 24 }] });
+const hoofdstukDrie = vraag({ nr: 'O3.2', kwestie: 'woestenij', herkomst: { soort: 'hoofdstuk', hoofdstuk: 3, nummer: 2 }, status: 'open', tekst: 'Een lege plek of een woestenij?' });
+const versVraagVijf = vraag({ nr: 'O5.1', kwestie: 'En', herkomst: { soort: 'vers', hoofdstuk: 5, vers: 2 }, status: 'voorlopig besloten', tekst: 'Waarom blijft En staan?', verzen: [{ hoofdstuk: 5, vers: 2 }] });
 const hoofdstukDrieMetVersInVijf = vraag({
+	nr: 'O3.1',
 	kwestie: 'bang',
 	herkomst: { soort: 'hoofdstuk', hoofdstuk: 3, nummer: 1 },
 	verzen: [{ hoofdstuk: 5, vers: 26 }],
 });
+const openRegister = vraag({ nr: 'V3', kwestie: 'onreine geest', herkomst: { soort: 'register' }, status: 'open' });
 const alle = [register, hoofdstukDrie, versVraagVijf, hoofdstukDrieMetVersInVijf];
 
 function kwesties(vragen: readonly Vertaalvraag[]): string[] {
@@ -34,13 +36,22 @@ describe('filterVragen', () => {
 		expect(kwesties(filterVragen(alle, GEEN_FILTER))).toEqual(['Zoon des mensen', 'woestenij', 'En', 'bang']);
 	});
 
-	it.each<[VraagStatus, string[]]>([
-		['open', ['woestenij']],
+	it.each<[FilterStatus, string[]]>([
+		['open', ['onreine geest']],
+		['Claude twijfelde nog', ['woestenij']],
 		['besloten', ['Zoon des mensen']],
 		['voorlopig besloten', ['En']],
 		['onbeslist', ['bang']],
 	])('filtert op status %s', (status, verwacht) => {
-		expect(kwesties(filterVragen(alle, { ...GEEN_FILTER, status }))).toEqual(verwacht);
+		expect(kwesties(filterVragen([...alle, openRegister], { ...GEEN_FILTER, status }))).toEqual(verwacht);
+	});
+
+	it('kent voor elke status een filterwaarde en laat "open" alleen de open registervragen zien, niet een opmerking met een statuswoord "open"', () => {
+		const alles = [...alle, openRegister];
+
+		expect(FILTERSTATUSSEN.flatMap((status) => filterVragen(alles, { ...GEEN_FILTER, status }))).toHaveLength(alles.length);
+		expect(hoofdstukDrie.status).toBe('open');
+		expect(kwesties(filterVragen(alles, { ...GEEN_FILTER, status: 'open' }))).not.toContain('woestenij');
 	});
 
 	it('filtert op herkomst: register tegen logs', () => {
@@ -59,8 +70,15 @@ describe('filterVragen', () => {
 		expect(kwesties(filterVragen(alle, { ...GEEN_FILTER, zoekterm: 'blijft en' }))).toEqual(['En']);
 	});
 
+	it('zoekt op nummer: het hele nummer, of een hoofdstuk van de opmerkingen, zonder letterverschil', () => {
+		expect(kwesties(filterVragen(alle, { ...GEEN_FILTER, zoekterm: 'V12' }))).toEqual(['Zoon des mensen']);
+		expect(kwesties(filterVragen(alle, { ...GEEN_FILTER, zoekterm: ' o3.2 ' }))).toEqual(['woestenij']);
+		expect(kwesties(filterVragen(alle, { ...GEEN_FILTER, zoekterm: 'O3' }))).toEqual(['woestenij', 'bang']);
+		expect(kwesties(filterVragen(alle, { ...GEEN_FILTER, zoekterm: 'V1' }))).toEqual([]);
+	});
+
 	it('combineert de filters', () => {
-		expect(kwesties(filterVragen(alle, { status: 'open', herkomst: 'logs', hoofdstuk: 3, zoekterm: 'woesten' }))).toEqual(['woestenij']);
+		expect(kwesties(filterVragen(alle, { status: 'Claude twijfelde nog', herkomst: 'logs', hoofdstuk: 3, zoekterm: 'woesten' }))).toEqual(['woestenij']);
 		expect(filterVragen(alle, { status: 'open', herkomst: 'register', hoofdstuk: 'alle', zoekterm: '' })).toEqual([]);
 	});
 });
@@ -76,48 +94,21 @@ describe('groepeerLogVragen', () => {
 	});
 });
 
-describe('splitsOpenVragen', () => {
-	const openRegister = vraag({ kwestie: 'onreine geest', herkomst: { soort: 'register' }, status: 'open' });
+describe('deelVragenIn', () => {
 	const alleMetOpen = [register, hoofdstukDrie, openRegister, versVraagVijf, hoofdstukDrieMetVersInVijf];
 
-	it('zet de open vragen uit register en logs samen in open, de rest in overig, in de oorspronkelijke volgorde', () => {
-		const { open, overig } = splitsOpenVragen(alleMetOpen);
+	it('zet alleen de open vragen uit het register in open, de andere registervragen bij een besluit en alle opmerkingen, ook die met een statuswoord "open", bij de opmerkingen', () => {
+		const { open, metBesluit, opmerkingen } = deelVragenIn(alleMetOpen);
 
-		expect(kwesties(open)).toEqual(['woestenij', 'onreine geest']);
-		expect(kwesties(overig)).toEqual(['Zoon des mensen', 'En', 'bang']);
+		expect(kwesties(open)).toEqual(['onreine geest']);
+		expect(kwesties(metBesluit)).toEqual(['Zoon des mensen']);
+		expect(kwesties(opmerkingen)).toEqual(['woestenij', 'En', 'bang']);
 	});
 
-	it('houdt geen open vraag in overig en verliest geen vraag', () => {
-		const { open, overig } = splitsOpenVragen(alleMetOpen);
+	it('zet elke vraag in precies één groep', () => {
+		const { open, metBesluit, opmerkingen } = deelVragenIn(alleMetOpen);
 
-		expect(open.length + overig.length).toBe(alleMetOpen.length);
-		expect(overig.some((gevonden) => gevonden.status === 'open')).toBe(false);
-	});
-});
-
-describe('vraagSleutels', () => {
-	const tweedeVersVraag = vraag({ kwestie: 'Ook', herkomst: { soort: 'vers', hoofdstuk: 5, vers: 2 }, tekst: 'Een tweede vraag bij hetzelfde vers.' });
-	const sleutels = vraagSleutels([register, hoofdstukDrie, versVraagVijf, tweedeVersVraag, hoofdstukDrieMetVersInVijf]);
-
-	function sleutel(gevonden: Vertaalvraag): string {
-		const waarde = sleutels.get(gevonden);
-		if (waarde === undefined) throw new Error(`geen sleutel voor '${gevonden.kwestie}'`);
-		return waarde;
-	}
-
-	it('leidt de sleutel af uit de herkomst', () => {
-		expect(sleutel(register)).toBe('register-Zoon des mensen-1');
-		expect(sleutel(hoofdstukDrie)).toBe('hoofdstuk-3-2-1');
-		expect(sleutel(hoofdstukDrieMetVersInVijf)).toBe('hoofdstuk-3-1-1');
-	});
-
-	it('geeft twee vragen bij hetzelfde vers een verschillend volgnummer', () => {
-		expect(sleutel(versVraagVijf)).toBe('vers-5-2-1');
-		expect(sleutel(tweedeVersVraag)).toBe('vers-5-2-2');
-	});
-
-	it('geeft elke vraag een andere sleutel', () => {
-		expect(new Set(sleutels.values()).size).toBe(sleutels.size);
-		expect(sleutels.size).toBe(5);
+		expect(open.length + metBesluit.length + opmerkingen.length).toBe(alleMetOpen.length);
+		expect(new Set([...open, ...metBesluit, ...opmerkingen]).size).toBe(alleMetOpen.length);
 	});
 });

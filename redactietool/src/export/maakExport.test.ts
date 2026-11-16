@@ -50,9 +50,9 @@ function invoer(
 	toelichting = '',
 	keuzes: StructureleKeuze[] = [],
 	antwoorden: Antwoord[] = [],
-	vraagVerzen: Record<string, VersRef[]> = {},
+	vragen: Record<string, { nr: string; verzen: VersRef[] }> = {},
 ): ExportInvoer {
-	return { boek: 'lukas', hoofdstuk: HOOFDSTUK, tussenstand, keuzes, antwoorden, vraagVerzen: new Map(Object.entries(vraagVerzen)), repoCommit: 'abc123', toelichting, nu: NU };
+	return { boek: 'lukas', hoofdstuk: HOOFDSTUK, tussenstand, keuzes, antwoorden, vragen: new Map(Object.entries(vragen)), repoCommit: 'abc123', toelichting, nu: NU };
 }
 
 describe('maakExport', () => {
@@ -273,8 +273,8 @@ describe('maakExport met beantwoorde vragen', () => {
 		);
 
 		expect(beantwoordeVragen).toEqual([
-			{ ...ANTWOORD_OP_KEUZE, verzen: [] },
-			{ ...ANTWOORD_ZONDER_WIJZIGING, verzen: [] },
+			{ ...ANTWOORD_OP_KEUZE, nr: null, verzen: [] },
+			{ ...ANTWOORD_ZONDER_WIJZIGING, nr: null, verzen: [] },
 		]);
 	});
 
@@ -284,9 +284,10 @@ describe('maakExport met beantwoorde vragen', () => {
 			{ hoofdstuk: 6, vers: 20 },
 		];
 
-		const { beantwoordeVragen } = maakExport(invoer({ verzen: {} }, '', [OVER_TWEE_HOOFDSTUKKEN], [ANTWOORD_OP_KEUZE, ANTWOORD_ZONDER_WIJZIGING], { Gezegend: verzen, Houden: verzen }));
+		const { beantwoordeVragen } = maakExport(invoer({ verzen: {} }, '', [OVER_TWEE_HOOFDSTUKKEN], [ANTWOORD_OP_KEUZE, ANTWOORD_ZONDER_WIJZIGING], { Gezegend: { nr: 'V12', verzen }, Houden: { nr: 'V13', verzen } }));
 
 		expect(beantwoordeVragen.map((antwoord) => antwoord.verzen)).toEqual([['4:2', '6:20'], ['4:2', '6:20']]);
+		expect(beantwoordeVragen.map((antwoord) => antwoord.nr)).toEqual(['V12', 'V13']);
 	});
 
 	it('neemt een antwoord zonder keuze alleen op in een hoofdstuk dat in de verzen van de vraag staat, of als de vraag geen verzen heeft', () => {
@@ -300,7 +301,7 @@ describe('maakExport met beantwoorde vragen', () => {
 		const zonderVerzen: Antwoord = { kwestie: 'Nergens', optie: 'b)', toelichting: '', keuzeIds: [], gegeven: '2026-11-15T10:22:00.000Z' };
 
 		const { beantwoordeVragen } = maakExport(
-			invoer({ verzen: {} }, '', [], [metVerzenInDitHoofdstuk, metVerzenElders, zonderVerzen], { Hier: inVierEnZes, Daar: alleenZes }),
+			invoer({ verzen: {} }, '', [], [metVerzenInDitHoofdstuk, metVerzenElders, zonderVerzen], { Hier: { nr: 'V1', verzen: inVierEnZes }, Daar: { nr: 'V2', verzen: alleenZes } }),
 		);
 
 		expect(beantwoordeVragen.map((antwoord) => antwoord.kwestie)).toEqual(['Hier', 'Nergens']);
@@ -318,29 +319,29 @@ describe('maakExport met beantwoorde vragen', () => {
 			gegeven: '2026-11-15T10:00:00.000Z',
 		};
 
-		const { beantwoordeVragen, structureleKeuzes } = maakExport(invoer({ verzen: {} }, '', [eerste, tweede, anderHoofdstuk], [eigen], { Gezegend: [{ hoofdstuk: 4, vers: 1 }] }));
+		const { beantwoordeVragen, structureleKeuzes } = maakExport(invoer({ verzen: {} }, '', [eerste, tweede, anderHoofdstuk], [eigen], { Gezegend: { nr: 'V12', verzen: [{ hoofdstuk: 4, vers: 1 }] } }));
 
-		expect(beantwoordeVragen).toEqual([{ ...eigen, keuzeIds: ['k1', 'k2'], verzen: ['4:1'] }]);
+		expect(beantwoordeVragen).toEqual([{ ...eigen, keuzeIds: ['k1', 'k2'], nr: 'V12', verzen: ['4:1'] }]);
 		expect(structureleKeuzes.map((uitkomst) => [uitkomst.id, uitkomst.vraag])).toEqual([['k1', 'Gezegend'], ['k2', 'Gezegend']]);
 	});
 
 	it('geeft een eigen antwoord met toelichting zonder keuzes in een hoofdstuk van de vraag', () => {
 		const eigen: Antwoord = { kwestie: 'Gezegend', optie: EIGEN_ANTWOORD, toelichting: 'Regel.', keuzeIds: [], gegeven: '2026-11-15T10:00:00.000Z' };
 
-		const hier = maakExport(invoer({ verzen: {} }, '', [], [eigen], { Gezegend: [{ hoofdstuk: 4, vers: 1 }] })).beantwoordeVragen;
-		const elders = maakExport(invoer({ verzen: {} }, '', [], [eigen], { Gezegend: [{ hoofdstuk: 6, vers: 20 }] })).beantwoordeVragen;
+		const hier = maakExport(invoer({ verzen: {} }, '', [], [eigen], { Gezegend: { nr: 'V12', verzen: [{ hoofdstuk: 4, vers: 1 }] } })).beantwoordeVragen;
+		const elders = maakExport(invoer({ verzen: {} }, '', [], [eigen], { Gezegend: { nr: 'V12', verzen: [{ hoofdstuk: 6, vers: 20 }] } })).beantwoordeVragen;
 
-		expect(hier).toEqual([{ ...eigen, verzen: ['4:1'] }]);
+		expect(hier).toEqual([{ ...eigen, nr: 'V12', verzen: ['4:1'] }]);
 		expect(elders).toEqual([]);
 	});
 
 	it('telt een antwoord waarvan alle keuzes verdwenen zijn als antwoord zonder keuzes', () => {
 		const verdwenen: Antwoord = { kwestie: 'Gezegend', optie: EIGEN_ANTWOORD, toelichting: 'Regel.', keuzeIds: ['weg'], gegeven: '2026-11-15T10:00:00.000Z' };
 
-		const hier = maakExport(invoer({ verzen: {} }, '', [], [verdwenen], { Gezegend: [{ hoofdstuk: 4, vers: 1 }] })).beantwoordeVragen;
-		const elders = maakExport(invoer({ verzen: {} }, '', [], [verdwenen], { Gezegend: [{ hoofdstuk: 6, vers: 20 }] })).beantwoordeVragen;
+		const hier = maakExport(invoer({ verzen: {} }, '', [], [verdwenen], { Gezegend: { nr: 'V12', verzen: [{ hoofdstuk: 4, vers: 1 }] } })).beantwoordeVragen;
+		const elders = maakExport(invoer({ verzen: {} }, '', [], [verdwenen], { Gezegend: { nr: 'V12', verzen: [{ hoofdstuk: 6, vers: 20 }] } })).beantwoordeVragen;
 
-		expect(hier).toEqual([{ ...verdwenen, keuzeIds: [], verzen: ['4:1'] }]);
+		expect(hier).toEqual([{ ...verdwenen, keuzeIds: [], nr: 'V12', verzen: ['4:1'] }]);
 		expect(elders).toEqual([]);
 	});
 });

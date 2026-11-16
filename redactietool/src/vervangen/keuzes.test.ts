@@ -318,7 +318,7 @@ describe('herkomst', () => {
 			repoCommit: null,
 			keuzes: leesKeuzes(opslag, 'lukas'),
 			antwoorden: [],
-			vraagVerzen: new Map(),
+			vragen: new Map(),
 			toelichting: '',
 			nu: NU,
 		});

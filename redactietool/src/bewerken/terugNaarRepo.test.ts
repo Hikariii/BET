@@ -36,7 +36,7 @@ function exportVan(opslag: GeheugenOpslag) {
 		tussenstand: leesTussenstand(opslag, 'lukas', 1),
 		keuzes: leesKeuzes(opslag, 'lukas'),
 		antwoorden: leesAntwoorden(opslag, 'lukas'),
-		vraagVerzen: new Map(),
+		vragen: new Map(),
 		repoCommit: null,
 		toelichting: '',
 		nu: NU,

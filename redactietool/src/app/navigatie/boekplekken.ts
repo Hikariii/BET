@@ -1,8 +1,7 @@
-import { splitsOpenVragen } from '../../begrippen/vragenOverzicht';
-import { verzamelVragen } from '../../begrippen/verzamelVragen';
-import type { HoofdstukData, Referentie } from '../../data/types';
+import type { Referentie } from '../../data/types';
 import { maakAdres, TABBLADEN, versAdres, type Tabblad } from '../adres';
 import { meervoud } from '../bewaren/bewaarTekst';
+import { aantalOpenVragenInBoek } from '../vertaalvragen';
 
 export const TABBLADTITEL: Record<Tabblad, string> = {
 	besloten: 'Vertaalkeuzes',
@@ -27,7 +26,7 @@ export type BoekPlek = {
 	/** De volledige naam, voor de tabbladen. */
 	naam: string;
 	adres: string;
-	/** Het aantal en wat het telt, bv. `17 open vragen`; `null` als een telling hier niets zegt of nog niet bekend is. */
+	/** Het aantal en wat het telt, bv. `9 open vragen`; `null` als een telling hier niets zegt. */
 	aantal: Aantal | null;
 };
 
@@ -35,26 +34,16 @@ function aantalVan(getal: number, enkelvoud: string, meervoudsvorm: string): Aan
 	return { getal, tekst: meervoud(getal, enkelvoud, meervoudsvorm) };
 }
 
-/** De open vragen van het register en uit de logs samen, zoals het tabblad Vertaalvragen ze telt. */
-function aantalOpenVragenInBoek(referentie: Referentie, hoofdstukken: readonly Pick<HoofdstukData, 'nummer' | 'log'>[]): number {
-	return splitsOpenVragen(verzamelVragen(referentie.openVragen, hoofdstukken)).open.length;
-}
-
 /**
  * De plekken in een boek, in de volgorde van de balk.
  * Hoofdstukken wijst naar `laatsteHoofdstuk`, het hoofdstuk dat de lezer het laatst open had.
- * Zolang de hoofdstukken nog laden (`null`) is het aantal open vragen niet bekend, want de logs staan in de hoofdstukken.
+ * Het aantal bij Vertaalvragen telt de open vragen uit het register: de vragen die de redactie kan beantwoorden.
  */
-export function boekPlekken(
-	boek: string,
-	referentie: Referentie,
-	hoofdstukken: readonly Pick<HoofdstukData, 'nummer' | 'log'>[] | null,
-	laatsteHoofdstuk: number,
-): BoekPlek[] {
+export function boekPlekken(boek: string, referentie: Referentie, laatsteHoofdstuk: number): BoekPlek[] {
 	const aantallen: Record<Tabblad, Aantal | null> = {
 		besloten: aantalVan(referentie.precedenten.length, 'vertaalkeuze', 'vertaalkeuzes'),
 		gevonden: null,
-		vragen: hoofdstukken === null ? null : aantalVan(aantalOpenVragenInBoek(referentie, hoofdstukken), 'open vraag', 'open vragen'),
+		vragen: aantalVan(aantalOpenVragenInBoek(referentie.openVragen), 'open vraag', 'open vragen'),
 		vervangen: null,
 	};
 	return [

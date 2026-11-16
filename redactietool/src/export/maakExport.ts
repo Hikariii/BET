@@ -17,8 +17,8 @@ export type ExportInvoer = {
 	keuzes: readonly StructureleKeuze[];
 	/** Alle antwoorden van het boek. */
 	antwoorden: readonly Antwoord[];
-	/** De verzen per kwestie uit de ingelezen open vragen; een kwestie die er niet in staat, heeft geen verzen. */
-	vraagVerzen: ReadonlyMap<string, readonly VersRef[]>;
+	/** Nummer en verzen per kwestie uit de ingelezen open vragen; een kwestie die er niet in staat, heeft geen nummer en geen verzen. */
+	vragen: ReadonlyMap<string, { nr: string; verzen: readonly VersRef[] }>;
 	repoCommit: string | null;
 	toelichting: string;
 	/** Tijd van maken; meegegeven zodat tests vast kunnen staan. */
@@ -87,14 +87,16 @@ function exportKeuze(keuze: StructureleKeuze, hoofdstuk: number, antwoorden: rea
  * zonder bestaande keuze bij een hoofdstuk in de verzen van de vraag, of bij elk hoofdstuk als de vraag geen verzen heeft.
  */
 function exportAntwoord(antwoord: Antwoord, keuzeIds: ReadonlySet<string>, bestaandeKeuzes: ReadonlySet<string>, invoer: ExportInvoer): ExportAntwoord | null {
-	const vraagVerzen = invoer.vraagVerzen.get(antwoord.kwestie) ?? [];
+	const vraag = invoer.vragen.get(antwoord.kwestie);
+	const nr = vraag?.nr ?? null;
+	const vraagVerzen = vraag?.verzen ?? [];
 	const verzen = vraagVerzen.map(({ hoofdstuk, vers }) => plekNaam(hoofdstuk, vers));
 	if (levendeKeuzeIds(antwoord, bestaandeKeuzes).length === 0) {
 		const hoortBij = vraagVerzen.length === 0 || vraagVerzen.some(({ hoofdstuk }) => hoofdstuk === invoer.hoofdstuk.nummer);
-		return hoortBij ? { ...antwoord, keuzeIds: [], verzen } : null;
+		return hoortBij ? { ...antwoord, keuzeIds: [], nr, verzen } : null;
 	}
 	const hier = levendeKeuzeIds(antwoord, keuzeIds);
-	return hier.length > 0 ? { ...antwoord, keuzeIds: hier, verzen } : null;
+	return hier.length > 0 ? { ...antwoord, keuzeIds: hier, nr, verzen } : null;
 }
 
 /** Maakt de export voor Claude uit de bewerkte verzen van een hoofdstuk, op oplopend versnummer. */

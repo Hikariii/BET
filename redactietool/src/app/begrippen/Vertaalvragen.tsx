@@ -15,9 +15,9 @@ import {
 } from '../../antwoorden/antwoorden';
 import { leesKeuzes, type StructureleKeuze } from '../../vervangen/keuzes';
 import { isHoudOptie, maakVoorstel, splitsOpties } from '../../begrippen/opties';
-import { filterVragen, GEEN_FILTER, groepeerLogVragen, splitsOpenVragen, vraagSleutels, type VragenFilter } from '../../begrippen/vragenOverzicht';
+import { deelVragenIn, filterVragen, FILTERSTATUSSEN, GEEN_FILTER, groepeerLogVragen, type VragenFilter } from '../../begrippen/vragenOverzicht';
 import { verzamelVragen } from '../../begrippen/verzamelVragen';
-import type { Vertaalvraag, VraagStatus } from '../../begrippen/types';
+import type { Vertaalvraag } from '../../begrippen/types';
 import type { HoofdstukVerzen } from '../../vervangen/types';
 import { leesTussenstand } from '../../bewerken/tussenstand';
 import type { VersRef } from '../../data/types';
@@ -34,7 +34,6 @@ import { VersLinks } from './VersLinks';
 import { bouwHoofdstukVerzen, keuzeBeschrijving, kortUit, optieOmschrijving } from './vervangenVoorbeeld';
 import './vertaalvragen.css';
 
-const STATUSSEN: readonly VraagStatus[] = ['open', 'onbeslist', 'voorlopig besloten', 'besloten'];
 const KORT_AANTAL_VERZEN = 3;
 const GEEN_VERS_IN_KOP = 'Geen vers in de kop';
 
@@ -53,13 +52,12 @@ function meldingVan(uitkomst: Uitkomst, bevestiging: string): string {
 	return uitkomst.gelukt ? bevestiging : uitkomst.melding;
 }
 
-/** Tabblad Vertaalvragen: het register en de vragen uit de logs, met status, herkomst en verzen. */
+/** Tabblad Vertaalvragen: de vragen uit het register (open, met een besluit) en de opmerkingen van Claude uit de logs, elk met nummer en verzen. */
 export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) {
 	const vragen = useMemo(() => verzamelVragen(referentie.openVragen, hoofdstukken), [referentie, hoofdstukken]);
 	const [filter, zetFilter] = useState<VragenFilter>(GEEN_FILTER);
-	const sleutels = useMemo(() => vraagSleutels(vragen), [vragen]);
 	const adres = useAdres();
-	const doelSleutel = adres?.soort === 'begrippen' && adres.tabblad === 'vragen' ? (adres.vraag ?? null) : null;
+	const doelNr = adres?.soort === 'begrippen' && adres.tabblad === 'vragen' ? (adres.vraag ?? null) : null;
 	const [alleenOnbeantwoord, zetAlleenOnbeantwoord] = useState(false);
 	const opslagTeller = useOpslagTeller();
 	const antwoorden = useMemo(() => new Map(leesAntwoorden(browseropslag(), boek.id).map((antwoord) => [antwoord.kwestie, antwoord])), [boek.id, opslagTeller]);
@@ -67,16 +65,15 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 		() => filterVragen(vragen, filter).filter((vraag) => !alleenOnbeantwoord || !antwoorden.has(vraag.kwestie) || vraag.herkomst.soort !== 'register'),
 		[vragen, filter, alleenOnbeantwoord, antwoorden],
 	);
-	const { open, overig } = splitsOpenVragen(getoond);
-	const openBeantwoord = open.filter((vraag) => vraag.herkomst.soort === 'register' && antwoorden.has(vraag.kwestie)).length;
-	const register = overig.filter((vraag) => vraag.herkomst.soort === 'register');
-	const perHoofdstuk = groepeerLogVragen(overig);
-	const sleutel = (vraag: Vertaalvraag): string => sleutels.get(vraag) ?? '';
-	const isDoel = (vraag: Vertaalvraag): boolean => sleutel(vraag) === doelSleutel;
+	const { open, metBesluit, opmerkingen } = deelVragenIn(getoond);
+	const openBeantwoord = open.filter((vraag) => antwoorden.has(vraag.kwestie)).length;
+	const perHoofdstuk = groepeerLogVragen(opmerkingen);
+	const aantalTwijfels = opmerkingen.filter((vraag) => vraag.status === 'open').length;
+	const isDoel = (vraag: Vertaalvraag): boolean => vraag.nr === doelNr;
 	// Met een filter aan staan de lijsten onder de open vragen open: de lezer zoekt dan iets in die lijsten.
 	const groepOpen = filter !== GEEN_FILTER || alleenOnbeantwoord;
-	const uitlegBijOpen = open.some((vraag) => vraag.herkomst.soort === 'register');
-	const uitlegBijRegister = !uitlegBijOpen && register.length > 0;
+	const uitlegBijOpen = open.length > 0;
+	const uitlegBijMetBesluit = !uitlegBijOpen && metBesluit.length > 0;
 	const bestaandeKeuzes = useMemo(() => new Map(leesKeuzes(browseropslag(), boek.id).map((keuze) => [keuze.id, keuze])), [boek.id, opslagTeller]);
 	const hoofdstukVerzen = useMemo(
 		() => bouwHoofdstukVerzen(hoofdstukken, boek, (hoofdstuk) => leesTussenstand(browseropslag(), boek.id, hoofdstuk)),
@@ -85,7 +82,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 	const acties = useMemo(() => maakAntwoordacties(boek.id, hoofdstukVerzen), [boek.id, hoofdstukVerzen]);
 	const registervraag = (vraag: Vertaalvraag) => (
 		<RegisterVraag
-			key={sleutel(vraag)}
+			key={vraag.nr}
 			boek={boek.id}
 			vraag={vraag}
 			doel={isDoel(vraag)}
@@ -97,12 +94,16 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 
 	return (
 		<div class="vertaalvragen">
+			<p class="intro">
+				Vertaalvragen (<span class="vraagnr">V1</span>, <span class="vraagnr">V2</span>, …) zijn vragen aan de redactie; die kun je beantwoorden. Opmerkingen van Claude (<span class="vraagnr">O5.2</span>, …) schreef Claude bij
+				het vereenvoudigen van een hoofdstuk; die staan er ter informatie.
+			</p>
 			<form class="filters" data-help="vragen-filters" role="search" aria-label="Vertaalvragen filteren" onSubmit={(gebeurtenis) => gebeurtenis.preventDefault()}>
 				<label>
 					Status
 					<select value={filter.status} onChange={(gebeurtenis) => zetFilter({ ...filter, status: leesStatus(gebeurtenis.currentTarget.value) })}>
 						<option value="alle">alle</option>
-						{STATUSSEN.map((status) => (
+						{FILTERSTATUSSEN.map((status) => (
 							<option value={status}>{status}</option>
 						))}
 					</select>
@@ -133,7 +134,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 				</label>
 			</form>
 			<p class="aantal" role="status">
-				{getoond.length} van {vragen.length} vragen
+				{getoond.length} van {vragen.length} vragen en opmerkingen
 				{open.length > 0 && `, waarvan ${open.length} open${openBeantwoord > 0 ? ` (${openBeantwoord} door jou beantwoord)` : ''}`}
 			</p>
 
@@ -144,27 +145,23 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 						{openBeantwoord > 0 && `, ${openBeantwoord} door jou beantwoord`})
 					</h2>
 					{uitlegBijOpen && <AntwoordUitleg />}
-					<ul class="vragenlijst">
-						{open.map((vraag) =>
-							vraag.herkomst.soort === 'register' ? (
-								registervraag(vraag)
-							) : (
-								<LogVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} open doel={sleutel(vraag) === doelSleutel} />
-							),
-						)}
-					</ul>
+					<ul class="vragenlijst">{open.map(registervraag)}</ul>
 				</section>
 			)}
 
-			{register.length > 0 && (
-				<Lijstgroep titelId="register-titel" titel={`Vragen met een besluit (${register.length})`} open={groepOpen || register.some(isDoel)}>
-					{uitlegBijRegister && <AntwoordUitleg />}
-					<ul class="vragenlijst">{register.map(registervraag)}</ul>
+			{metBesluit.length > 0 && (
+				<Lijstgroep titelId="besluit-titel" titel={`Vragen met een besluit (${metBesluit.length})`} open={groepOpen || metBesluit.some(isDoel)}>
+					{uitlegBijMetBesluit && <AntwoordUitleg />}
+					<ul class="vragenlijst">{metBesluit.map(registervraag)}</ul>
 				</Lijstgroep>
 			)}
 
 			{perHoofdstuk.length > 0 && (
-				<Lijstgroep titelId="logs-titel" titel={`Opmerkingen van Claude per hoofdstuk (${overig.length - register.length})`} open={groepOpen || overig.some(isDoel)}>
+				<Lijstgroep
+					titelId="opmerkingen-titel"
+					titel={`Opmerkingen van Claude (${opmerkingen.length})${aantalTwijfels > 0 ? `, waarvan ${aantalTwijfels} waar Claude nog twijfelde` : ''}`}
+					open={groepOpen || opmerkingen.some(isDoel)}
+				>
 					{perHoofdstuk.map(({ hoofdstuk, vragen: hoofdstukVragen }) => (
 						<section key={hoofdstuk} aria-labelledby={`logs-hoofdstuk-${hoofdstuk}`}>
 							<h3 id={`logs-hoofdstuk-${hoofdstuk}`}>
@@ -172,7 +169,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 							</h3>
 							<ul class="vragenlijst">
 								{hoofdstukVragen.map((vraag) => (
-									<LogVraag key={sleutel(vraag)} boek={boek.id} vraag={vraag} open={false} doel={isDoel(vraag)} />
+									<LogVraag key={vraag.nr} boek={boek.id} vraag={vraag} doel={isDoel(vraag)} />
 								))}
 							</ul>
 						</section>
@@ -229,7 +226,9 @@ function RegisterVraag({ boek, vraag, doel, antwoord, bestaandeKeuzes, acties }:
 	return (
 		<li class={doel ? 'registervraag vraag-doel' : 'registervraag'} ref={rij} tabIndex={doel ? -1 : undefined}>
 			<div class="vraaginhoud">
-				<h3>{vraag.kwestie}</h3>
+				<h3>
+					<span class="vraagnr">{vraag.nr}</span> {vraag.kwestie}
+				</h3>
 				<Status vraag={vraag} />
 				<dl>
 					<dt>Nu in de tekst</dt>
@@ -608,14 +607,14 @@ function Lijstgroep({ titelId, titel, open, children }: LijstgroepProps) {
 	);
 }
 
-/** `open` bepaalt alleen de beginstand; daarna beslist de lezer. */
-function LogVraag({ boek, vraag, open, doel }: { boek: string; vraag: Vertaalvraag; open: boolean; doel: boolean }) {
+/** Een opmerking van Claude uit een log: ingeklapt, tenzij een link naar dit nummer hier uitkomt. */
+function LogVraag({ boek, vraag, doel }: { boek: string; vraag: Vertaalvraag; doel: boolean }) {
 	const rij = useDoel<HTMLLIElement>(doel);
 	return (
 		<li class={doel ? 'vraag-doel' : undefined} ref={rij} tabIndex={doel ? -1 : undefined}>
-			<details open={open || doel}>
+			<details open={doel}>
 				<summary>
-					{open && vraag.herkomst.soort !== 'register' && <span class="hoofdstuklabel">Hoofdstuk {vraag.herkomst.hoofdstuk}: </span>}
+					<span class="vraagnr">{vraag.nr}</span>
 					<span class="kwestie">{vraag.kwestie}</span>
 					<Status vraag={vraag} />
 					<span class="versjes">{kortVersoverzicht(vraag.verzen)}</span>
@@ -644,11 +643,26 @@ function useDoel<Houder extends HTMLElement>(doel: boolean): RefObject<Houder | 
 	return element;
 }
 
+/** Een vraag uit het register toont haar status. Een opmerking toont het label "opmerking" en alleen een statuswoord uit haar tekst; "open" heet daar "Claude twijfelde nog". */
 function Status({ vraag }: { vraag: Vertaalvraag }) {
+	const opmerking = vraag.herkomst.soort !== 'register';
+	if (!opmerking) {
+		return (
+			<span class="statuslabel">
+				<span class={`status status-${vraag.status.replace(' ', '-')}`}>{vraag.status}</span>
+			</span>
+		);
+	}
 	return (
 		<span class="statuslabel">
-			<span class={`status status-${vraag.status.replace(' ', '-')}`}>{vraag.status}</span>
-			{vraag.statusAfgeleid && <span class="volgens-tekst">volgens tekst</span>}
+			<span class="status status-opmerking">opmerking</span>
+			{vraag.status === 'open' && <span class="status status-twijfel">Claude twijfelde nog</span>}
+			{(vraag.status === 'voorlopig besloten' || vraag.status === 'besloten') && (
+				<>
+					<span class={`status status-${vraag.status.replace(' ', '-')}`}>{vraag.status}</span>
+					<span class="volgens-tekst">volgens tekst</span>
+				</>
+			)}
 		</span>
 	);
 }
@@ -673,7 +687,7 @@ function filterAan(filter: VragenFilter): boolean {
 }
 
 function leesStatus(waarde: string): VragenFilter['status'] {
-	return STATUSSEN.find((status) => status === waarde) ?? 'alle';
+	return FILTERSTATUSSEN.find((status) => status === waarde) ?? 'alle';
 }
 
 function leesHerkomst(waarde: string): VragenFilter['herkomst'] {

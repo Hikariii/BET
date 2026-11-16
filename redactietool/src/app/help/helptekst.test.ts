@@ -56,7 +56,7 @@ describe('de helpteksten', () => {
 		const hoofdmenu = splitsBlokken(helptekst('hoofdmenu'), NAMEN)
 			.map((blok) => (blok.soort === 'markdown' ? blok.markdown : ''))
 			.join('\n');
-		const plekken = boekPlekken('lukas', { precedenten: [], openVragen: [] }, null, 1);
+		const plekken = boekPlekken('lukas', { precedenten: [], openVragen: [] }, 1);
 		for (const plek of plekken) expect(hoofdmenu, plek.plek).toContain(`## ${plek.naam}`);
 		expect(hoofdmenu).toContain(`## ${BEWAARD_NAAM}`);
 	});

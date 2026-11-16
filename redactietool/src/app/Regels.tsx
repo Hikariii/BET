@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
 import type { LogVers, OpenVraag, Verwijzing } from '../data/types';
-import { registerVraagSleutel, vraagAdres as maakVraagAdres } from './begrippen/vraagAdres';
+import { vraagAdres as maakVraagAdres, type VersVraag } from './begrippen/vraagAdres';
 import { kapRegels } from './kapRegels';
 import { splitsOpVerwijzingen } from '../log/leesLog';
 import { InlineMarkdown } from './Markdownweergave';
@@ -12,8 +12,8 @@ import './regels.css';
 
 export type RegelsProps = {
 	boekId: string;
-	/** Het adres van de eerste vertaalvraag bij dit vers op Vertaalvragen, of `null` als er geen is. */
-	vraagAdres: string | null;
+	/** De eerste vertaalvraag bij dit vers op Vertaalvragen, of `null` als er geen is. */
+	versVraag: VersVraag | null;
 	/** De logblokken waar dit vers in valt. */
 	logVerzen: readonly LogVers[];
 	/** De vertaalvragen uit de referentie die aan dit vers hangen. */
@@ -27,7 +27,7 @@ export type RegelsProps = {
 	onOpenNaslag: (naslag: Naslag, verwijzing: HTMLElement) => void;
 };
 
-export function Regels({ boekId, vraagAdres, logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenNaslag }: RegelsProps) {
+export function Regels({ boekId, versVraag, logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenNaslag }: RegelsProps) {
 	const [uitgeklapt, zetUitgeklapt] = useState(false);
 	const aantalPerBlok = logVerzen.map((logVers) => logVers.wijzigingen.length);
 	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || !gekapt);
@@ -61,7 +61,7 @@ export function Regels({ boekId, vraagAdres, logVerzen, vragen, gekapt, openNasl
 				</button>
 			)}
 			{!heeftRegels && <p class="geen-regels">Claude heeft bij dit vers niets aangepast.</p>}
-			{(vragen.length > 0 || logVragen.length > 0) && <Vraag boekId={boekId} vraagAdres={vraagAdres} vragen={vragen} logVragen={logVragen} />}
+			{(vragen.length > 0 || logVragen.length > 0) && <Vraag boekId={boekId} versVraag={versVraag} vragen={vragen} logVragen={logVragen} />}
 		</>
 	);
 }
@@ -115,9 +115,9 @@ function naarNaslag(verwijzing: Verwijzing, regel: string): Naslag {
 		: { soort: 'precedenten', regel };
 }
 
-type VraagProps = { boekId: string; vraagAdres: string | null; vragen: readonly OpenVraag[]; logVragen: readonly string[] };
+type VraagProps = { boekId: string; versVraag: VersVraag | null; vragen: readonly OpenVraag[]; logVragen: readonly string[] };
 
-function Vraag({ boekId, vraagAdres, vragen, logVragen }: VraagProps) {
+function Vraag({ boekId, versVraag, vragen, logVragen }: VraagProps) {
 	return (
 		<details class={vragen.some(isOpen) ? 'vraag vraag-open' : 'vraag'}>
 			<summary>vraag</summary>
@@ -126,7 +126,7 @@ function Vraag({ boekId, vraagAdres, vragen, logVragen }: VraagProps) {
 				<dl>
 					<dt>Vraag</dt>
 					<dd>
-						<InlineMarkdown tekst={vraag.kwestie} /> <span class="vraagstatus">({vraag.status})</span>
+						<span class="vraagnr">{vraag.nr}</span> <InlineMarkdown tekst={vraag.kwestie} /> <span class="vraagstatus">({vraag.status})</span>
 					</dd>
 					<dt>Nu in de tekst</dt>
 					<dd>
@@ -146,7 +146,7 @@ function Vraag({ boekId, vraagAdres, vragen, logVragen }: VraagProps) {
 					)}
 				</dl>
 				<p class="vraagkoppeling-link">
-					<a href={maakVraagAdres(boekId, registerVraagSleutel(vraag.kwestie))}>Beantwoorden bij Vertaalvragen</a>
+					<a href={maakVraagAdres(boekId, vraag.nr)}>Beantwoorden bij Vertaalvragen</a>
 				</p>
 				</>
 			))}
@@ -155,9 +155,9 @@ function Vraag({ boekId, vraagAdres, vragen, logVragen }: VraagProps) {
 					<InlineMarkdown tekst={tekst} />
 				</p>
 			))}
-			{vragen.length === 0 && vraagAdres !== null && (
+			{vragen.length === 0 && versVraag !== null && (
 				<p class="vraagkoppeling-link">
-					<a href={vraagAdres}>Naar de vraag bij Vertaalvragen</a>
+					<a href={versVraag.adres}>Naar de vraag {versVraag.nr} bij Vertaalvragen</a>
 				</p>
 			)}
 		</details>

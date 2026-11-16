@@ -21,7 +21,7 @@ describe('onderdelen van de help', () => {
 	});
 
 	it('heeft een onderdeel voor elke plek in de balk en voor Opgeslagen', () => {
-		const plekken = boekPlekken('lukas', { precedenten: [], openVragen: [] }, null, 1).map((plek) => plek.plek);
+		const plekken = boekPlekken('lukas', { precedenten: [], openVragen: [] }, 1).map((plek) => plek.plek);
 		expect(plekken).toHaveLength(5);
 		for (const plek of plekken) expect(HELP_PLEKKEN).toContain(plek);
 		expect(HELP_PLEKKEN).toContain('bewaard');

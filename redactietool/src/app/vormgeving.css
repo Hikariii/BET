@@ -952,6 +952,20 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 	font-size: 0.75rem;
 }
 
+/* Het nummer van een vraag (V12) of opmerking (O5.2): toolkleur, klein. Op de pagina Vertaalvragen een vaste kolom, zodat de koppen onder elkaar staan. */
+.vraagnr {
+	color: var(--toolkleur);
+	font-size: 0.75rem;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.vertaalvragen .vragenlijst .vraagnr {
+	display: inline-block;
+	flex: none;
+	width: 3.5rem;
+}
+
 /* Status in vragen: zelfde stilte als in de zijbalk; open valt op door gewicht */
 .vertaalvragen .status {
 	padding: 0;
@@ -980,6 +994,20 @@ table.verzen .naslagkaart .markdown table td:nth-child(3) {
 .vertaalvragen .status-besloten {
 	background: none;
 	color: var(--zacht);
+}
+
+/* Een opmerking van Claude: een rustig label, ook als Claude nog twijfelde (geen vraag aan de redactie). */
+.vertaalvragen .status-opmerking,
+.vertaalvragen .status-twijfel {
+	background: none;
+	color: var(--zacht);
+	font-weight: 400;
+}
+
+.vertaalvragen .status-twijfel {
+	font-style: italic;
+	letter-spacing: 0;
+	text-transform: none;
 }
 
 .vertaalvragen .status::before {
