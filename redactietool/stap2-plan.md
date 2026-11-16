@@ -1,6 +1,6 @@
 # Plan: redactietool, stap 2
 
-Status (2026-11-16): gebouwd zijn de fasen 7, 7b en 8 en de Help. Open zijn fase 6 (de proef met een echt hoofdstuk), 9a, 9b en 10, en de conflicten bij back-up inladen. Nog geen hoofdstuk is door de hele cyclus gegaan (bewerken in de tool, naar Word, export, terugvoeren). Het knelpunt is niet meer de tool maar de proef en de inhoud: zie het spoor Inhoud.
+Status (2026-11-16): gebouwd zijn de fasen 7, 7b en 8 en de Help. Open zijn fase 6 (de proef met een echt hoofdstuk), 9a, 9b en 10, en de conflicten bij back-up inladen. De review van de hele app is verwerkt (tests, rooktest, toetsenbord, teksten). Nog geen hoofdstuk is door de hele cyclus gegaan (bewerken in de tool, naar Word, export, terugvoeren). Het knelpunt is niet meer de tool maar de proef en de inhoud: zie het spoor Inhoud.
 
 Dit plan bouwt voort op [`stap1-plan.md`](stap1-plan.md). Daar staan het doel, de uitgangspunten (U1 tot U8), wat de vertaler ziet en kan, het terugvoeren, de architectuur, wat buiten het plan valt en de risico's. Die gelden nog steeds, behalve waar het kader "Wijkt nu af" bovenaan stap 1 of dit plan iets anders zegt. Stap 2 bevat wat in stap 1 beschreven is maar nog niet gebouwd, plus wat erbij gekomen is.
 
@@ -11,9 +11,9 @@ De tool staat op https://hikariii.github.io/BET/ en wordt bij elke push naar `ma
 | Fase | Gebouwd | Open |
 |---|---|---|
 | **6. Proef van de cyclus** | Niets: dit is geen bouwwerk | 6a en 6b, zie [Fase 6](#fase-6-proef-van-de-cyclus-open) |
-| **7. Ontwerp** | Gekozen richting v8e (zie [Ontwerp](#ontwerp-fase-7)), visuele basis als css-variabelen (`vormgeving.css`, `indeling.css`), galerij op `#/galerij`, Grootte instelbaar (A− A A+), de hele breedte met een letter die meegroeit | De kleinste tekst omhoog (besloten 2026-11-16: minimaal `.8125rem`, vertaalregels en verslinks `.875rem`, in één schaal van tokens); kolom Vertaalregels inklappen (twijfel); schermafbeeldingen met Playwright als test (zie `TAKEN.md`, Tests) |
+| **7. Ontwerp** | Gekozen richting v8e (zie [Ontwerp](#ontwerp-fase-7)), visuele basis als css-variabelen (`vormgeving.css`, `indeling.css`), galerij op `#/galerij`, Grootte instelbaar (A− A A+), de hele breedte met een letter die meegroeit | Kolom Vertaalregels inklappen (twijfel); schermafbeeldingen met Playwright als test (zie `TAKEN.md`, Tests). De lettergrootte is op verzoek van de eigenaar teruggezet naar de oude maten, dus "de kleinste tekst omhoog" vervalt |
 | **7b. Opslag zichtbaar** | Bewaarstatus in de bovenbalk, pagina Opgeslagen (overzicht per hoofdstuk), back-up downloaden en inladen met voorbeeld, samenvoegen (per vers wint de nieuwste) of vervangen | Conflicten tonen en per vers kiezen, zie [Conflicten bij back-up inladen](#conflicten-bij-back-up-inladen-open) |
-| **8. Vragen beantwoorden** | Markering wisselen, varianten, bereik van een vraag, terugdraaien per vers, Kiezen per optie en antwoord zonder wijziging; genuanceerd antwoord (toelichting of regel, eigen antwoord, meer keuzes onder één antwoord); in de export de structurele keuzes met overgeslagen plekken en de beantwoorde vragen (back-up en export versie 3). Opties komen uit de vrije kolom Alternatief; alleen Gezegend heeft nu echte opties | Niets in dit plan. De route "vraag beantwoorden" afmaken staat in verbeterplan UI (`TAKEN.md`) |
+| **8. Vragen beantwoorden** | Markering wisselen, varianten, bereik van een vraag, terugdraaien per vers, Kiezen per optie en antwoord zonder wijziging; genuanceerd antwoord (toelichting of regel, eigen antwoord, meer keuzes onder één antwoord); in de export de structurele keuzes met overgeslagen plekken en de beantwoorde vragen (back-up en export versie 3). Opties komen uit de vrije kolom Alternatief; alleen Gezegend heeft nu echte opties | Niets in dit plan. De route is af: bij elke optie Kiezen (waar de tool kan invullen) of Zoek de plekken, het `?` in een vertaalregel linkt naar de vraag, en antwoorden staan in Opgeslagen en in de back-up. Wat nog mist staat in `TAKEN.md` |
 | **Help** | Knop Help en toets `?` met uitleg per pagina en "Wijs aan", welkom bij het eerste bezoek, "Laatste back-up" met herinnering, tip bij een lege browser | Niets in dit plan |
 | **9a. Opmaak en waarschuwingen** | Opmaakwaarschuwing bij een weggevallen markering; waarschuwingen staan als tekst in de export | De opmaakwerkbalk, waarschuwingen voor oude vormen en vaste begrippen uit één gedeelde lijst; zie [Fase 9a](#fase-9a-opmaak-en-waarschuwingen-open) |
 | **9b. Verschil en terug** | Terug naar de tekst van Claude per vers | Verschil zichtbaar, terug per hoofdstuk, stip in de hoofdstukstrip; zie [Fase 9b](#fase-9b-verschil-en-terug-open) |
@@ -75,7 +75,7 @@ Alleen bouwen als 6a of 6b laat zien dat de redacteur het mist.
 - **Terug per hoofdstuk**, in één keer, met ongedaan maken.
 - **Stip bij een hoofdstuk met wijzigingen**, in de hoofdstukstrip (`KortHoofdstuk`, gevoed met het aantal bewerkte verzen per hoofdstuk; `useOpslagTeller` bestaat). De zijbalk bestaat niet meer.
 - **Aanpak:**
-  - Eerst één `terugNaarRepo(opslag, boek, hoofdstuk, vers)` die tussenstand én keuze bijwerkt, via `draaiVersTerug` als het vers van een keuze komt. Anders blijft een vers dat via een keuze veranderd is, na terugzetten in `keuze.verzen` staan en noemt de export het nog toegepast. Terug per hoofdstuk is dan een lus eroverheen.
+  - `terugNaarRepo(opslag, boek, hoofdstuk, vers)` bestaat (`src/bewerken/terugNaarRepo.ts`) en werkt tussenstand én keuze bij, via `draaiVersTerug` als het vers van een keuze komt; de knop Vers terugzetten gebruikt hem. Terug per hoofdstuk is dan een lus eroverheen.
   - Eén diffmodule (bijvoorbeeld `uitlijning/verschil.ts`). `lijnVersUit` is gemaakt om bronwoorden aan vertalingen te koppelen en negeert leestekens en hoofdletters: een wijziging van alleen een komma geeft er geen verschil. De module tokeniseert mét leestekens, vergelijkt exact en hergebruikt het algoritme uit `overeenkomendeWoorden` (nu niet geëxporteerd). Vergelijk met `bewerkt.basis`, niet met de huidige repo, anders toont een verouderde bewerking andermans wijzigingen. Dezelfde module dient de conflictweergave.
 - **Klaar als:** de vertaler ziet per vers wat hij veranderde, en kan een hele bewerkte stand in één keer terugzetten zonder dat de export of Zoeken en vervangen iets als toegepast tonen dat teruggezet is.
 
@@ -87,7 +87,7 @@ Eigenaar, 2026-11-16 (feature). Nu wint bij Samenvoegen per vers de nieuwste bew
 - Eén functie `besluitPerVers(eigen, uitBackup, gekozen)` voor voorbeeld én schrijven. `pasBackupToe` krijgt een `Map<versSleutel, 'mijn' | 'back-up'>`, standaard de nieuwste.
 - Het voorbeeld heeft nu geen inhoud (`VersVergelijking` bevat alleen hoofdstuk, vers en soort); die komt erbij. Voor de weergave in Word-opmaak is `VersTekst` bruikbaar; het gemarkeerde verschil gebruikt de diffmodule uit 9b.
 - Geen apart conflictscherm voor keuzes: leid `keuze.verzen` af uit de gekozen verzen (`keuzeId` staat al in `BewerktVers`). `voegSamen` voegt keuzes met hetzelfde `id` nu niet samen, dus `keuze.verzen` kan na een per-vers-keuze naar het verkeerde vers wijzen.
-- Eerst `terugNaarRepo` (zie 9b). Klein en eerst: "bij Vervangen eerst automatisch een back-up van de huidige stand downloaden" dekt het echte risico (tussenstand gewist) al grotendeels.
+- `terugNaarRepo` bestaat al (zie 9b). Klein en eerst: "bij Vervangen eerst automatisch een back-up van de huidige stand downloaden" dekt het echte risico (tussenstand gewist) al grotendeels.
 
 ## Fase 10: keuzes in de tekst (open)
 
@@ -101,7 +101,7 @@ Stippellijn bij aanwijzen (woorden met een vertaalkeuze of met meerdere vertalin
 
 Eerst fase 6; die laat zien wat de redacteur echt mist. Daarna de gedeelde bouwstenen, zodat geen fase werk van een andere terugdraait:
 
-1. `terugNaarRepo` en de gedeelde diff.
+1. De gedeelde diff (`terugNaarRepo` bestaat al).
 2. De waarschuwingen-JSON, de bouw en Python `--json`, dan de waarschuwingen en hun export.
 3. 9a: de werkbalk (B, U, Kleur, Wissen), met de plaatsing van zwevende balken (`plekBij` in `VersVoorproefVak.tsx`, naast `useAanwijzen.ts` en `wijsAan.ts`) naar één gedeelde functie.
 4. 9b: verschil, terug per hoofdstuk en de stip, op 1 en 2.
@@ -126,7 +126,7 @@ Gebouwd en gekozen; hieronder staat wat het ontwerp bepaalt, voor wie eraan werk
 - Donkerrood spaarzaam en alleen buiten de tekstkolommen: de actieve plek (gekozen hoofdstuk, tabblad, vers), de ene hoofdactie op een scherm, focus.
 - Waarschuwingen en meldingen door tekst en plaats, niet door een eigen kleurenpalet.
 
-**Vast gegeven:** de opmaak van de Bijbeltekst komt uit het Word-sjabloon van het boek, met eigen kleuren (Jezuswoorden `FF0000`, domeinen in blauw, groen, paars, oranje). Het ontwerp kiest daar niets voor en houdt het donkerrood uit de tekst, zodat het niet met de Jezuswoorden verward wordt. De opmaak (kleuren, arcering, vet, cursief, onderstreept) blijft in elk ontwerp gelijk aan Word; `ontwerp/opmaakcontrole.mjs` controleert dat.
+**Vast gegeven:** de opmaak van de Bijbeltekst komt uit het Word-sjabloon van het boek, met eigen kleuren (Jezuswoorden `FF0000`, domeinen in blauw, groen, paars, oranje). Het ontwerp kiest daar niets voor en houdt het donkerrood uit de tekst, zodat het niet met de Jezuswoorden verward wordt. De opmaak (kleuren, arcering, vet, cursief, onderstreept) blijft in elk ontwerp gelijk aan Word. De rooktest controleert dat voor alle hoofdstukken (`e2e/opmaakcontrole.ts`, kleuren en achtergronden; vet, cursief en onderstreept komen nog). `ontwerp/opmaakcontrole.mjs` is een los gereedschap voor een lopende tool.
 
 **Letters en kleur (2026-11-15):** Bijbeltekst in **Atkinson Hyperlegible Next** (schreefloos, in maat het dichtst bij Aptos), in Word-zwart. Tool in **Inter** met toolkleur **`#6b4f4b`** (warm bruingrijs, verwant aan het donkerrood). Afgevallen: schreefletters, smalle letters en monospaced voor de tool. Vastgelegd in `src/app/vormgeving.css`; de combinaties staan in `ontwerp/letters.md`.
 
@@ -134,7 +134,16 @@ Gebouwd en gekozen; hieronder staat wat het ontwerp bepaalt, voor wie eraan werk
 
 **Gekozen (2026-11-16): v8e.** De eigenaar kiest de boekbalk met de plekken als tabbladen met pictogrammen en Opgeslagen rechts, één hoofdstukbalk met titelblok (status als pictogram), hoofdstukstrip met pijltjes en de acties, geen zijbalk, de hele breedte met een letter die meegroeit, en de dichte verzen (d4). Dit is de tool zonder parameter. De css staat in `src/app/indeling.css`. Verslag van de ronde: `ontwerp/ronde4/v7-v8.md`. Eerdere rondes (layouts a tot f, ronde 3) staan als notities in `ontwerp/`; de schermafbeeldingen zijn uit de werkboom en alleen nog in de git-geschiedenis te vinden.
 
-**Grootte instelbaar (gebouwd).** Alles staat in `rem`, dus één schaal op de basisgrootte vergroot de hele tool; de maximale leesbreedte staat in `ch` en groeit mee. Besloten (2026-11-16): de kleinste tekst minimaal `.8125rem`, vertaalregels en verslinks `.875rem`, in één schaal van lettergrootte-tokens.
+**Keuzes van de eigenaar (2026-11-16), gebouwd na v8e:**
+- Het statuswoord is uit de hoofdstukstrip; de status blijft een pictogram.
+- Het open hoofdstuk is in de strip een heel rood blok.
+- De strip schuift alleen als het open hoofdstuk niet in beeld staat.
+- In de vertaalregels is de § in de tekst zelf klikbaar.
+- De vertaalregels staan weer in hun oude, kleinere maat.
+- De naslagkaart staat weer over de hele breedte.
+- De knop heet "Vers terugzetten" en de pagina "Opgeslagen".
+
+**Grootte instelbaar (gebouwd).** Alles staat in `rem`, dus één schaal op de basisgrootte vergroot de hele tool; de maximale leesbreedte staat in `ch` en groeit mee. De lettergroottes zijn op verzoek van de eigenaar teruggezet naar de oude maten (de vertaalregels weer in hun kleinere maat), met de schaal van lettergrootte-tokens als basis.
 
 **Open: kolom Vertaalregels inklappen.** Twijfel. De schakelaar "Vertaalregels altijd tonen" is weg (eigenaar, 2026-11-16); de kolom staat er altijd, met de punaise per vers. Bekijken of een ingeklapte smalle kolom met alleen labels (§7A, vertaalkeuze, vraag) beter is.
 
@@ -144,7 +153,7 @@ Gebouwd en gekozen; hieronder staat wat het ontwerp bepaalt, voor wie eraan werk
 - *Een woord in de tekst omzetten* (zoals DeepL): A via selectie zonder vaste markering (een balkje met Zo vertaald, Vertaalkeuze, Bron, Overal aanpassen), B stippellijnen bij woorden met een keuze (als schakelaar), C rechtermuisknop of Alt+klik. Voorlopige voorkeur: A als basis, B als schakelaar.
 - Open: zegt "vertaalkeuze" de redacteur iets; waar komen de alternatieven vandaan (Zo vertaald, vertaalkeuzes, bronvorm).
 
-**Werkwijze (zoals gevolgd):** analyse van de huidige tool en de taken van de redacteur; richtingen met Claude Design op echte Lukas-tekst; een galerij in de tool (`#/galerij`) met de componenten in hun lastige toestanden, met echte data en op Pages. De galerij is de bron van waarheid voor de componenten. Schermafbeeldingen met Playwright die ongewenste veranderingen vangen zijn nog niet gebouwd; ze horen bij de rooktest (`TAKEN.md`, Tests).
+**Werkwijze (zoals gevolgd):** analyse van de huidige tool en de taken van de redacteur; richtingen met Claude Design op echte Lukas-tekst; een galerij in de tool (`#/galerij`) met de componenten in hun lastige toestanden, met echte data en op Pages. De galerij is de bron van waarheid voor de componenten. De rooktest met Playwright draait op de gebouwde app (`redactietool/e2e/`). Schermafbeeldingen die ongewenste veranderingen vangen zijn nog niet gebouwd; ze horen bij de uitbreiding van de rooktest (`TAKEN.md`, Tests).
 
 ## Open vragen voor de eigenaar
 

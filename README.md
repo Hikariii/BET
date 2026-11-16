@@ -10,7 +10,7 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 |---|---|---|
 | `richtlijn/` | Redactierichtlijn in Markdown (geldt voor alle boeken); `richtlijn/origineel/` bevat de aangeleverde Word-versie. **Origineel nooit wijzigen.** | redactie |
 | `sjablonen/` | Sjablonen, zoals het wijzigingslog. | - |
-| `scripts/` | Omzetten uit Word, controles, terugzetten naar Word. Werken voor elk boek (`--boek`). | - |
+| `scripts/` | Omzetten uit Word, controles, terugzetten naar Word, en hun tests (`test_scripts.py`). Werken voor elk boek (`--boek`). `formaat.py` bevat het formaat. | - |
 | `.claude/` | Configuratie voor Claude Code: skills, `/intent`, `/pr` en `/autopilot`, rules en een hook tegen em-dashes. Zie [`.claude/README.md`](.claude/README.md). | - |
 | `redactietool/` | Web-tool om vertalingen te lezen, te redigeren en naast het origineel te vergelijken (broncode; de build gaat via GitHub Actions naar Pages). Plan: `redactietool/stap1-plan.md` (afgesloten) en `redactietool/stap2-plan.md` (stand per fase en wat nog moet). | - |
 | `bijbel/<boek>/` | Alles van één Bijbelboek, zie hieronder. | |
@@ -65,9 +65,27 @@ python3 -I scripts/log_naar_json.py --boek lukas
 # Heen-en-terugtest: bron zonder vereenvoudiging naar een tijdelijk Word-bestand en terug naar md,
 # daarna byte voor byte vergeleken met bron/ (exit 1 bij een verschil)
 python3 -I scripts/controleer_heen_en_terug.py --boek lukas
+
+# Tests van de scripts zelf, op een nep-boek "1 Johannes" in een tijdelijke map (niet in bijbel/)
+python3 -I scripts/test_scripts.py
 ```
 
-De heen-en-terugtest hoort bij elke wijziging aan de omzet- of exportscripts. Wie hem met de hand wil doen: `md_naar_docx.py doc` over `bron/`, dan `docx_naar_md.py <docx> <map>` en `diff -rq <map> bijbel/lukas/bron`.
+`scripts/formaat.py` is de ene plek in Python voor de tags, de Word-stijlen en `parse_md`/`parse_log`; de andere scripts importeren eruit. De tool heeft een eigen parser (`redactietool/src/formaat/parseer.ts`) die tegen `formaat.py` getest wordt.
+
+De heen-en-terugtest en `test_scripts.py` horen bij elke wijziging aan de omzet- of exportscripts. Wie hem met de hand wil doen: `md_naar_docx.py doc` over `bron/`, dan `docx_naar_md.py <docx> <map>` en `diff -rq <map> bijbel/lukas/bron`.
+
+## Tests van de tool
+
+Vanuit de hoofdmap, met `mise x --` ervoor (zie `redactietool/README.md`):
+
+```sh
+npm --prefix redactietool test             # vitest, ook de componenttests (*.test.tsx, happy-dom per bestand)
+npm --prefix redactietool run typecheck
+npm --prefix redactietool run build        # nodig voor de rooktest
+npm --prefix redactietool run test:e2e     # rooktest op de gebouwde app (Chromium); poort via E2E_POORT, standaard 4173
+```
+
+De workflow (`.github/workflows/pages.yml`) draait dit alles, plus de Python-controles en `test_scripts.py`, vóór het publiceren.
 
 ## Een nieuw boek toevoegen
 

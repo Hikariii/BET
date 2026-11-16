@@ -8,7 +8,8 @@ De broncode van de tool. Het plan staat in [`stap1-plan.md`](stap1-plan.md) (afg
 | `src/bouw/` | bouwscript: zet `bijbel/` en de richtlijn om naar JSON in `public/data/` |
 | `src/app/` | de Preact-app die die JSON toont. De submappen: `begrippen/` (het scherm Keuzes en vragen met de tabbladen Vertaalkeuzes, Zo vertaald, Vertaalvragen en Zoeken en vervangen), `bewaren/` (de pagina Opgeslagen, de bewaarstatus, back-up downloaden en inladen), `bewerken/` (de vers-editor in de tabel), `naarWord/` (de hoofdstukacties), `navigatie/`, `bovenbalk/`, `verzen/`, `welkom/` en `galerij/`. De boekpagina heeft een bovenbalk (boekbalk met de plekken van het boek als tabbladen, Opgeslagen, de grootte en Help; hoofdstukbalk met titel, hoofdstukstrip en acties). De css daarvan staat in `src/app/indeling.css`, die `main.tsx` na `vormgeving.css` laadt |
 | `src/help/`, `src/app/help/` | de help: de tekst als Markdown per onderdeel (`src/help/*.md`) en het venster dat hem toont (knop Help in de boekbalk, toets `?`). In de tekst vullen `{{plek:…}}`, `{{boek}}`, `{{back-upbestand}}` en `{{exportbestand}}` namen in uit de code, `{{legenda}}` toont de legenda uit het Word-sjabloon en `{{wijs sleutel \| naam \| waar}}` maakt een regel met een knop "Wijs aan" die het element met `data-help="sleutel"` laat oplichten. `sleutels.test.ts` bewaakt dat de sleutels in de tekst en in de schermen gelijk zijn |
-| `ontwerp/` | archief van fase 7: de besluitnotities (`*.md`) en `opmaakcontrole.mjs`, dat de opmaak van de tool met Word vergelijkt. De schermafbeeldingen, html-pagina's en proefscripts zijn verwijderd; ze staan in de git-geschiedenis tot en met commit `15ef416`. Geen onderdeel van de build |
+| `ontwerp/` | archief van fase 7: de besluitnotities (`*.md`) en `opmaakcontrole.mjs`, een los gereedschap dat de opmaak van een lopende tool met Word vergelijkt (de rooktest doet dat ook, in `e2e/opmaakcontrole.ts`). De schermafbeeldingen, html-pagina's en proefscripts zijn verwijderd; ze staan in de git-geschiedenis tot en met commit `15ef416`. Geen onderdeel van de build |
+| `e2e/` | de rooktest op de gebouwde app (Playwright, Chromium); zie "Tests draaien" |
 | `src/data/` | het gegevenscontract (types) tussen bouwscript en app |
 | `src/log/`, `src/referentie/`, `src/sjabloon/` | de lezers voor wijzigingslogs, referentiebestanden, `STATUS.md`, richtlijn en Word-stijlen |
 | `src/begrippen/` | rekenfuncties voor het scherm Keuzes en vragen: vertaalkeuzes tellen (`telPrecedenten`), vertaalvragen verzamelen (`verzamelVragen`) en de opties van een vraag (`opties`) |
@@ -47,11 +48,16 @@ Node staat vast in `../mise.toml`. Vanuit de hoofdmap van de repo:
 
 ```sh
 mise x -- npm --prefix redactietool ci        # eenmalig
-mise x -- npm --prefix redactietool test      # alle tests
+mise x -- npm --prefix redactietool test      # alle tests (vitest)
 mise x -- npm --prefix redactietool run typecheck
+mise x -- npm --prefix redactietool run build # nodig voor de rooktest
+mise x -- npm --prefix redactietool run test:e2e  # de rooktest op de gebouwde app
+python3 -I scripts/test_scripts.py            # de Python-scripts op een nep-boek
 ```
 
-De tests hebben `python3` nodig (alleen de standaardbibliotheek).
+De tests hebben `python3` nodig (alleen de standaardbibliotheek). De componenttests (`*.test.tsx`) draaien in happy-dom: elk bestand zet bovenaan `// @vitest-environment happy-dom`, de andere tests draaien zonder browseromgeving.
+
+De rooktest (`npm run test:e2e`) opent de gebouwde app met `vite preview` in Chromium en faalt als `dist/` ontbreekt: draai eerst `npm run build`. De poort staat in `E2E_POORT` (standaard 4173). De workflow draait hem vóór het publiceren, samen met de Python-controles en `test_scripts.py`.
 
 ## Wat de tests bewijzen
 
@@ -73,9 +79,27 @@ De tests hebben `python3` nodig (alleen de standaardbibliotheek).
 | `src/bewerken/*.test.ts` | Tussenstand bewaren, terugzetten en verouderen; een bewerkt vers knippen; de opmaakwaarschuwing |
 | `src/vervangen/*.test.ts` | Zoeken, het voorstel per plek en toepassen en terugdraaien van keuzes, ook op de echte hoofdstukken van Lukas |
 | `src/antwoorden/*.test.ts`, `src/bewaren/*.test.ts`, `src/export/*.test.ts` | Antwoorden, het overzicht van wat bewaard is, back-up (voorbeeld, samenvoegen, vervangen) en de export |
+| `src/**/*.test.tsx` | Componenten in happy-dom: Back-up inladen (voorbeeld, Escape, focus) en het bewerken van een vers (typen, Enter, Escape, bewaren, Vers terugzetten) |
+| `e2e/rooktest.e2e.ts` | De gebouwde app in Chromium, zonder console- en paginafouten: Lukas 1 toont alle versrijen, een bewerkt vers staat er na herladen nog en Vers terugzetten haalt het weg, Vertaalvragen en de galerij openen, Export voor Claude downloadt, Hoofdstuktekst kopiëren zet HTML met alle Word-stijlnamen op het klembord, de Bijbeltekst heeft in elk hoofdstuk alleen opmaak uit het sjabloon (`e2e/opmaakcontrole.ts`), en de versrijen komen overeen met `boek.json` |
+| `../scripts/test_scripts.py` | De Python-scripts op een nep-boek "1 Johannes" in een tijdelijke map: omzetten, controles en export werken voor elk boek via `--boek` |
 | `src/uitlijning/*.test.ts` | Uitlijning op kleine handgemaakte verzen en bekende vervangingen op Lukas (Heere → Heer, Zoon des mensen → Mensenzoon); rekentijd |
 
 De pariteitstest draait `scripts/formaat_naar_json.py --boek lukas`, dat de uitvoer van `parse_md` als JSON geeft. Dat script geeft ook de lijsten met alineastijlen, domeinen en directe opmaak, zodat de test controleert dat TypeScript dezelfde kent.
+
+## Woordenlijst
+
+Eén naam per begrip, in de schermen, de Help en de documenten. Namen in de code en de `data-help`-sleutels mogen afwijken; de bestandsnamen houden bewust de oude namen.
+
+| Naam | Bedoeld is | Opmerking |
+|---|---|---|
+| vervanging | een uitgevoerde zoek-en-vervang | |
+| vertaalkeuze | een afspraak in `precedenten.md` | In de tool nooit "precedent". |
+| opmerking van Claude | wat in het wijzigingslog staat | In de tool geen "log". |
+| de tekst van Claude, de vereenvoudiging van Claude | de vereenvoudigde tekst zoals Claude hem in de repo zette | In de tool geen "repo". |
+| Vers terugzetten | de bewerking van een vers weghalen, zodat de tekst van Claude weer staat | De knop onder een bewerkt vers. |
+| Opgeslagen | de pagina met wat de browser bewaart | De adressen en bestandsnamen houden de oude naam Bewaard. |
+| antwoord | wat je op een vertaalvraag kiest of schrijft | |
+| toelichting | de uitleg die je zelf bij een antwoord of in Export voor Claude schrijft | |
 
 ## Gegevensmodel
 

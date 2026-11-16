@@ -24,7 +24,7 @@ Lees eerst:
 ## Gereedschap
 - Scripts werken voor elk boek via `--boek`; niets boekspecifieks (namen, paden, versaantallen) in de code. Dat hoort in `bijbel/<boek>/boek.json` of `controle.json`.
 - `FORMAAT.md` is de gedeelde specificatie voor de Python-scripts en de web-tool. Verander je het formaat, dan pas je beide kanten aan.
-- Bij een wijziging aan de omzet- of exportscripts: eerst de heen-en-terugtest (origineel → md → docx → md, zonder vereenvoudiging): `python3 -I scripts/controleer_heen_en_terug.py --boek <boek>`. Opmaak en tekst moeten gelijk blijven (exit 0).
+- Bij een wijziging aan de omzet- of exportscripts: eerst de heen-en-terugtest (origineel → md → docx → md, zonder vereenvoudiging): `python3 -I scripts/controleer_heen_en_terug.py --boek <boek>`. Opmaak en tekst moeten gelijk blijven (exit 0). Draai daarna ook `python3 -I scripts/test_scripts.py` (scripts op een nep-boek).
 
 ## Schrijfstijl
 Tekst voor mensen (chat, commits, PR's, comments, documentatie): Nederlands, gewone woorden, actieve vorm, geen em-dashes. Volledige regels: [writing-skill](.claude/skills/writing/SKILL.md). De hook `.claude/hooks/check_em_dash.py` blokkeert em-dashes, behalve in de vaste logformaten (`bijbel/*/wijzigingslog/`, `bijbel/*/referentie/`, `sjablonen/`) en in `richtlijn/`. Een geblokkeerde Write: herschrijf de zin, omzeil de hook niet.
