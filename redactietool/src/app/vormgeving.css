@@ -31,6 +31,9 @@
 	--t-kop2: 1.125rem;
 	--t-lees: 1.1875rem;
 	--t-kop1: 1.375rem;
+	/* De kolom Vertaalregels houdt zijn eigen, kleinere maat (keuze eigenaar, 2026-11-16): de regels zijn notities naast het werk. */
+	--t-regels: 0.71875rem;
+	--t-regels-klein: 0.6875rem;
 	/* Eén linkermarge voor de balk en alle pagina's, en één ruimte boven de paginakop. */
 	--marge-inhoud: 1.5rem;
 	--kop-ruimte: 1.5rem;
@@ -522,8 +525,17 @@ table.verzen td.regels {
 	border-left: 0;
 	color: var(--gedempt);
 	font-family: var(--tool);
-	font-size: var(--t-basis);
+	font-size: var(--t-regels);
 	line-height: 1.55;
+}
+
+/* Binnen de kolom Vertaalregels: labels iets kleiner, links en knoppen in de maat van de regels. */
+table.verzen td.regels :is(.geen-regels, .vraag summary, .vraag dt, .logbereik) {
+	font-size: var(--t-regels-klein);
+}
+
+table.verzen td.regels :is(.meerregels, .vraagkoppeling-link, .verwijzing) {
+	font-size: var(--t-regels);
 }
 
 .logblok ul {
