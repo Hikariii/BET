@@ -16,7 +16,7 @@ De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een ma
 
 ## Met het toetsenbord
 
-De eerste Tab brengt je bij **Naar de verzen**. De hoofdstukstrip is één tabstop: met pijl links en rechts, Home en End loop je langs de hoofdstukken, Enter opent. Met **j** en **k** spring je naar het volgende of vorige vers (niet terwijl je typt). In de editor gaat **Alt+pijl omlaag** of **omhoog** naar het volgende of vorige vers.
+De eerste Tab brengt je bij **Naar de verzen**. De titel van het hoofdstuk is een knop: Enter, de spatiebalk of pijl omlaag opent het raster met hoofdstukken. Daarin loop je met de pijltjes, Home en End langs de hoofdstukken en opent Enter het gekozen hoofdstuk. Escape sluit het raster en brengt je terug bij de titel. Met **j** en **k** spring je naar het volgende of vorige vers (niet terwijl je typt). In de editor gaat **Alt+pijl omlaag** of **omhoog** naar het volgende of vorige vers.
 
 ## De vertaalregels
 
@@ -54,7 +54,8 @@ Onder de boekbalk staat de balk van dit hoofdstuk: de titel met de status als pi
 
 {{wijs hoofdstuk-kopieren | Hoofdstuktekst kopiëren voor Word | Rechtsboven in de balk van het hoofdstuk.}}
 {{wijs export-voor-claude | Export voor Claude | Rechtsboven in de balk van het hoofdstuk.}}
-{{wijs hoofdstukstrip | Hoofdstukken | In de balk van het hoofdstuk, links van de knoppen.}}
+{{wijs hoofdstukkeuze | Hoofdstukkeuze | De titel van het hoofdstuk, links in de balk.}}
+{{wijs hoofdstuk-bladeren | Vorige en volgende hoofdstuk | Naast de titel, met het nummer van het hoofdstuk waar de knop heen gaat.}}
 
 ## De status van een hoofdstuk
 

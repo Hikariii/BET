@@ -1,5 +1,5 @@
 /*
- * De indeling van de boekpagina: de bovenbalk (boekbalk met de plekken als tabbladen, hoofdstukbalk met titel, hoofdstukstrip en acties),
+ * De indeling van de boekpagina: de bovenbalk (boekbalk met de plekken als tabbladen, hoofdstukbalk met de hoofdstukkeuze en acties),
  * de hele breedte met een letter die meegroeit met het scherm, en de pagina Bewaard.
  * Wordt na vormgeving.css geladen (zie main.tsx) en wint daarom bij gelijke specificiteit.
  * Geen rood in of rond de tekstkolommen; rood alleen op de actieve plek, de hoofdactie en focus (vormgeving.css).
@@ -171,11 +171,11 @@
 	content: none;
 }
 
-/* ---------- Hoofdstukbalk: titelblok, hoofdstukstrip en acties op één regel ---------- */
+/* ---------- Hoofdstukbalk: titelblok en acties op één regel ---------- */
 
 /*
- * De hoofdstukken zijn klikbaar over de hele hoogte van de balk, zodat je niet misklikt:
- * de balk zelf heeft geen ruimte boven en onder; titel en acties krijgen die zelf, de strip rekt mee.
+ * De titel is klikbaar over de hele hoogte van de balk, zodat je niet misklikt:
+ * de balk zelf heeft geen ruimte boven en onder; de acties krijgen die zelf, het titelblok rekt mee.
  */
 .bovenbalk .bovenbalk-hoofdstukbalk {
 	flex-wrap: wrap;
@@ -185,36 +185,26 @@
 	padding: 0 var(--marge-inhoud);
 }
 
-.bovenbalk .bovenbalk-hoofdstukbalk > :is(.bovenbalk-titel, .bovenbalk-acties) {
-	align-self: center;
-}
-
-/* In een smal venster passen de acties niet naast titel en strip: ze komen op een eigen regel, in plaats van de pagina zijwaarts te laten schuiven. */
+/* In een smal venster passen de acties niet naast het titelblok: ze komen op een eigen regel, in plaats van de pagina zijwaarts te laten schuiven. */
 .bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-acties {
+	flex: 0 0 auto;
+	align-self: center;
 	padding: 0.3rem 0;
 }
 
 /*
- * Titelblok met vaste breedte: hoofdstuk met de status als pictogram ernaast (zie onder).
- * Zo begint de strip altijd op dezelfde plek, ook als de status wisselt (review, goedgekeurd v1.0).
- * Een dunne lijn scheidt het blok van de strip.
+ * Titelblok: de hoofdstukkeuze met de status als pictogram ernaast (zie onder), dan Vorige en Volgende.
+ * Alles heeft een vaste breedte, zodat niets verspringt als het hoofdstuk of de status wisselt (review, goedgekeurd v1.0).
  */
 .bovenbalk .bovenbalk-titel {
 	display: flex;
 	flex: none;
+	flex-wrap: nowrap;
 	align-items: center;
-	gap: 0.4rem;
-	width: 9.5rem;
-	padding-right: 1rem;
-	border-right: 1px solid var(--rand);
+	align-self: stretch;
+	gap: 0.75rem;
 	line-height: 1.2;
 	white-space: nowrap;
-}
-
-.bovenbalk .bovenbalk-titel .bovenbalk-hoofdstuktitel {
-	min-width: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
 
 /*
@@ -274,150 +264,119 @@
 	--statusicoon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10' cy='10' r='7.5' opacity='0.6'/%3E%3C/svg%3E");
 }
 
-/* ---------- De hoofdstukstrip ---------- */
+/* ---------- De hoofdstukkeuze: titel als knop met een raster van hoofdstukken, en Vorige en Volgende ---------- */
 
-/* Eén rij die zijwaarts schuift; ook bij 150 hoofdstukken blijft de balk even hoog. */
-.hoofdstukstrip ul {
-	gap: 0;
-	padding: 0 0 0.15rem;
-	scrollbar-color: var(--rand-donker) transparent;
-	scrollbar-width: thin;
-}
-
-.hoofdstukstrip li {
-	flex: none;
-}
-
-/* Een dun streepje scheidt de hoofdstukken, zodat `12 2? 13` niet als `2? 13` leest. */
-.hoofdstukstrip li + li {
-	border-left: 1px solid var(--rand);
-}
-
-.hoofdstukstrip .hoofdstuk-kort {
+/* De titel is klikbaar over de hele hoogte van de balk. De negatieve marge zet de tekst op dezelfde lijn als de boeknaam erboven. */
+.bovenbalk .hoofdstukkeuze {
+	position: relative;
 	display: flex;
-	align-items: baseline;
-	gap: 0.3rem;
-	padding: 0.05rem 0.55rem;
-	border: 0;
+	align-items: center;
+	align-self: stretch;
+	gap: 0.4rem;
+	margin-left: -0.5rem;
 }
 
-.hoofdstukstrip .hoofdstuk-kort:hover {
-	background: var(--vlak);
+.bovenbalk .hoofdstukkeuze .bovenbalk-hoofdstuktitel {
+	display: flex;
+	align-self: stretch;
 }
 
-.hoofdstukstrip .hoofdstuk-kort-nummer {
-	display: block;
-	min-width: 1.4rem;
-	height: auto;
-	padding: 0.05rem 0.3rem;
+/* Vaste breedte: de knop en alles ernaast blijven op dezelfde plek, ook bij hoofdstuk 1 of 24. */
+.bovenbalk .hoofdstukkeuze-knop {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	width: 8.5rem;
+	padding: 0 0.5rem;
 	background: none;
 	border: 0;
-	font-size: 0.8125rem;
-	font-weight: 600;
-	text-align: center;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
 }
 
-.hoofdstukstrip .hoofdstuk-kort:hover .hoofdstuk-kort-nummer {
-	border: 0;
+.bovenbalk .hoofdstukkeuze-knop:hover,
+.bovenbalk .hoofdstukkeuze-knop[aria-expanded='true'] {
+	background: var(--vlak);
+	color: inherit;
 }
 
-/* Het open hoofdstuk krijgt hetzelfde vak als de hover, in rood met witte tekst. */
-.hoofdstukstrip .hoofdstuk-kort[aria-current='page'],
-.hoofdstukstrip .hoofdstuk-kort[aria-current='page']:hover {
-	background: var(--rood);
+.bovenbalk .hoofdstukkeuze-naam {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
-.hoofdstukstrip .hoofdstuk-kort[aria-current='page'] > * {
-	color: #fff;
+.bovenbalk .hoofdstukkeuze-pijl {
+	flex: none;
+	color: var(--gedempt);
+	font-size: 0.75rem;
 }
 
-/* Het vinkje is een feit, het aantal vragen een bijzaak. */
-.hoofdstukstrip .hoofdstuk-kort-vinkje {
+/* Het raster hangt direct onder de balk; bij veel hoofdstukken scrolt het zelf. */
+.bovenbalk .hoofdstukkeuze-venster {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 30;
+	max-height: calc(100vh - var(--balk-hoogte, 6rem) - 1rem);
+	padding: 0.5rem;
+	overflow-y: auto;
+	background: #fff;
+	border: 1px solid var(--rand-donker);
+	box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 0.12);
+}
+
+.bovenbalk .hoofdstukkeuze-venster ul {
+	display: grid;
+	grid-template-columns: repeat(var(--kolommen), 4.5rem);
+	gap: 0.15rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bovenbalk .hoofdstuk-bladeren {
+	display: flex;
+	gap: 0.35rem;
+}
+
+.bovenbalk .hoofdstuk-blader {
+	display: grid;
+	justify-items: center;
+	padding: 0.15rem 0.6rem;
+	border-color: var(--rand-donker);
+	font-size: var(--t-klein);
+	font-variant-numeric: tabular-nums;
+}
+
+/* De onzichtbare maat (`data-maat`) en de tekst liggen op elkaar; de maat bepaalt de breedte. */
+.bovenbalk .hoofdstuk-blader::before,
+.bovenbalk .hoofdstuk-blader > span {
+	grid-area: 1 / 1;
+}
+
+.bovenbalk .hoofdstuk-blader::before {
+	content: attr(data-maat);
+	visibility: hidden;
+}
+
+.bovenbalk .hoofdstuk-blader-leeg {
+	visibility: hidden;
+}
+
+.bovenbalk .hoofdstuk-blader:hover:not(:disabled) {
+	background: var(--vlak);
+	border-color: var(--tekst);
 	color: var(--tekst);
-}
-
-/* In de rij zonder eigen scrollbalk: de pijltjes en het wiel doen het schuiven. */
-.bovenbalk .bovenbalk-strip .hoofdstukstrip ul {
-	padding-bottom: 0;
-	scrollbar-width: none;
-}
-
-.bovenbalk .bovenbalk-strip .hoofdstukstrip ul::-webkit-scrollbar {
-	display: none;
-}
-
-.bovenbalk .bovenbalk-strip,
-.bovenbalk .bovenbalk-strip .hoofdstukstrip,
-.bovenbalk .bovenbalk-strip .hoofdstukstrip ul {
-	display: flex;
-	align-items: stretch;
-}
-
-.bovenbalk .bovenbalk-strip .hoofdstukstrip li {
-	display: flex;
-}
-
-.bovenbalk .bovenbalk-strip .hoofdstuk-kort {
-	align-content: center;
-	align-items: center;
-}
-
-.bovenbalk .bovenbalk-strip .strip-pijl {
-	align-self: center;
-}
-
-/* De strip neemt alleen de ruimte die over is; de acties blijven op één regel. */
-.bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-strip {
-	flex: 1 1 0;
-	min-width: 14rem;
-}
-
-.bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-acties {
-	flex: 0 0 auto;
+	cursor: pointer;
 }
 
 .bovenbalk .bovenbalk-acties .hoofdstukacties-knoppen {
 	flex-wrap: nowrap;
 	white-space: nowrap;
-}
-
-@property --strip-vervaag-links {
-	syntax: '<length>';
-	inherits: false;
-	initial-value: 0px;
-}
-
-@property --strip-vervaag-rechts {
-	syntax: '<length>';
-	inherits: false;
-	initial-value: 0px;
-}
-
-@keyframes strip-vervaag {
-	0% {
-		--strip-vervaag-links: 0px;
-		--strip-vervaag-rechts: 2rem;
-	}
-	4% {
-		--strip-vervaag-links: 2rem;
-		--strip-vervaag-rechts: 2rem;
-	}
-	96% {
-		--strip-vervaag-links: 2rem;
-		--strip-vervaag-rechts: 2rem;
-	}
-	100% {
-		--strip-vervaag-links: 2rem;
-		--strip-vervaag-rechts: 0px;
-	}
-}
-
-@supports (animation-timeline: scroll()) {
-	.hoofdstukstrip ul {
-		animation: strip-vervaag linear both;
-		animation-timeline: scroll(self inline);
-		mask-image: linear-gradient(to right, transparent, #000 var(--strip-vervaag-links), #000 calc(100% - var(--strip-vervaag-rechts)), transparent);
-	}
 }
 
 /* ---------- Inhoud: de hele breedte, smalle marges ---------- */

@@ -154,26 +154,94 @@ test.describe('de gebouwde app', () => {
 		}
 	});
 
-	test('de pijltjes van de hoofdstukstrip schuiven heen en terug, en een buurhoofdstuk laat de rest staan', async ({ page }) => {
+	test('de hoofdstukkeuze opent, kiest een hoofdstuk en sluit met Escape en een klik buiten', async ({ page }) => {
 		const fouten = volgFouten(page);
-		await page.setViewportSize({ width: 1440, height: 900 });
+		await page.setViewportSize({ width: 1280, height: 900 });
 		await wachtOpHoofdstuk(page, 4);
-		const lijst = page.locator('.hoofdstukstrip ul');
-		const scroll = () => lijst.evaluate((element) => element.scrollLeft);
-		const begin = await scroll();
+		const knop = page.locator('[data-help="hoofdstukkeuze"]');
+		const raster = page.locator('#hoofdstukkeuze-raster');
+		const titel = page.locator('.hoofdstukkeuze-naam');
+		const gefocust = () => page.evaluate(() => document.activeElement?.getAttribute('href') ?? document.activeElement?.className ?? null);
+		await expect(titel).toHaveText('Lukas 4');
+		await expect(knop).toHaveAttribute('aria-expanded', 'false');
+		await expect(raster).toHaveCount(0);
 
-		await page.locator('.strip-pijl-verder').click();
-		await expect.poll(scroll).toBeGreaterThan(begin);
-		const verder = await scroll();
-		await page.locator('.strip-pijl-terug').click();
-		await expect.poll(scroll).toBeLessThan(verder);
+		await knop.click();
+		await expect(knop).toHaveAttribute('aria-expanded', 'true');
+		await expect(raster.locator('.hoofdstuk-cel')).toHaveCount(boek.verzen_per_hoofdstuk.length);
+		const open = raster.locator('[aria-current="page"]');
+		await expect(open).toHaveText(/^4/);
+		await expect(open).not.toHaveAttribute('href', /.*/);
+		await expect(open).toBeFocused();
+		await page.keyboard.press('Enter');
+		await expect(raster).toBeVisible();
+		await expect(page).toHaveURL(new RegExp(`${hoofdstukAdres(4)}$`));
 
-		await wachtOpHoofdstuk(page, 15);
-		const posities = () => page.locator('.hoofdstuk-kort').evaluateAll((links) => links.map((link) => Math.round(link.getBoundingClientRect().x)));
-		const bij15 = await posities();
-		await page.locator('.hoofdstuk-kort[href$="/16"]').click();
-		await expect(page.locator('.hoofdstuk-kort[aria-current="page"]')).toHaveAttribute('href', /\/16$/);
-		expect(await posities()).toEqual(bij15);
+		await page.keyboard.press('ArrowDown');
+		expect(await gefocust()).toBe(hoofdstukAdres(12));
+		await page.keyboard.press('End');
+		expect(await gefocust()).toBe(hoofdstukAdres(boek.verzen_per_hoofdstuk.length));
+		await page.keyboard.press('Home');
+		expect(await gefocust()).toBe(hoofdstukAdres(1));
+
+		await page.keyboard.press('Escape');
+		await expect(raster).toHaveCount(0);
+		await expect(knop).toBeFocused();
+		await expect(knop).toHaveAttribute('aria-expanded', 'false');
+
+		await page.keyboard.press('ArrowDown');
+		await expect(raster).toBeVisible();
+		await knop.click();
+		await expect(raster).toHaveCount(0);
+
+		await knop.click();
+		await page.locator('main').click({ position: { x: 5, y: 400 } });
+		await expect(raster).toHaveCount(0);
+
+		await knop.click();
+		await raster.locator('a[href$="/20"]').click();
+		await expect(raster).toHaveCount(0);
+		await expect(page).toHaveURL(new RegExp(`${hoofdstukAdres(20)}$`));
+		await expect(titel).toHaveText('Lukas 20');
+		await page.locator('table.verzen tr.vers').first().waitFor();
+		expect(fouten).toEqual([]);
+	});
+
+	test('Hoofdstuk n-1 en Hoofdstuk n+1 bladeren; de titel en de knoppen blijven op hun plek', async ({ page }) => {
+		const fouten = volgFouten(page);
+		await page.setViewportSize({ width: 1280, height: 900 });
+		await wachtOpHoofdstuk(page, 1);
+		const laatste = boek.verzen_per_hoofdstuk.length;
+		const titel = page.locator('.hoofdstukkeuze-naam');
+		const vorige = page.locator('.hoofdstuk-bladeren button').first();
+		const volgende = page.locator('.hoofdstuk-bladeren button').last();
+		const plekken = () =>
+			page.evaluate(() => {
+				const x = (selector: string) => Math.round(document.querySelector(selector)?.getBoundingClientRect().x ?? -1);
+				return [x('.hoofdstukkeuze-knop'), x('.hoofdstuk-bladeren button:first-child'), x('.hoofdstuk-bladeren button:last-child'), x('.bovenbalk-acties')];
+			});
+		await expect.poll(plekken).not.toContain(0);
+		const plekBijEerste = await plekken();
+
+		await expect(vorige).toBeHidden();
+		await expect(vorige).toBeDisabled();
+		await expect(volgende).toHaveText('Hoofdstuk 2 ›');
+		await expect(volgende).toHaveAttribute('title', 'Lukas 2');
+
+		for (let nummer = 2; nummer <= laatste; nummer++) {
+			await volgende.click();
+			await expect(titel).toHaveText(`Lukas ${nummer}`);
+			expect((await plekken()).slice(0, 3), `plekken bij hoofdstuk ${nummer}`).toEqual(plekBijEerste.slice(0, 3));
+			await expect.poll(plekken, `plekken na laden van hoofdstuk ${nummer}`).toEqual(plekBijEerste);
+		}
+		await expect(volgende).toBeHidden();
+		await expect(volgende).toBeDisabled();
+		await expect(vorige).toHaveText(`‹ Hoofdstuk ${laatste - 1}`);
+		await expect(vorige).toHaveAttribute('title', `Lukas ${laatste - 1}`);
+
+		await vorige.click();
+		await expect(titel).toHaveText(`Lukas ${laatste - 1}`);
+		await expect(page).toHaveURL(new RegExp(`${hoofdstukAdres(laatste - 1)}$`));
 		expect(fouten).toEqual([]);
 	});
 

@@ -11,10 +11,10 @@ import { Galerij } from './galerij/Galerij';
 import { HoofdstukScherm } from './HoofdstukScherm';
 import { useAdres, useLaden } from './hooks';
 import { Indeling } from './Indeling';
+import { HoofdstukKeuze } from './navigatie/HoofdstukKeuze';
 import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { useWeergave, type Weergavebeheer } from './weergave/useWeergave';
 import { Welkom } from './welkom/Welkom';
-import { statusKlasse } from './Zijbalk';
 
 type BoekMetReferentie = { boek: BoekData; referentie: Referentie };
 
@@ -163,26 +163,11 @@ function HoofdstukPagina({ weergavebeheer, boek, referentie, info, gekozenVers }
 			pagina="hoofdstuk"
 			huidigHoofdstuk={nummer}
 			tabblad={null}
-			titel={<HoofdstukTitel boek={boek} info={info} />}
+			titel={<HoofdstukKeuze boek={boek} referentie={referentie} info={info} />}
 			acties={geladen !== null && weergave !== null ? <Hoofdstukacties boek={boek} repo={geladen} weergave={weergave} tussenstand={tussenstand} openVragen={referentie.openVragen} /> : null}
 		>
 			{inhoud}
 		</Indeling>
-	);
-}
-
-/** De hoofdstuktitel met status en versie, voor de bovenbalk. */
-function HoofdstukTitel({ boek, info }: { boek: BoekData; info: HoofdstukInfo }) {
-	return (
-		<>
-			<h1 class="bovenbalk-hoofdstuktitel">
-				{boek.naam} {info.nummer}
-			</h1>
-			<span data-help="hoofdstuk-status" class={`status status-${statusKlasse(info.status)}`} title={info.versie === '' ? info.status : `${info.status} ${info.versie}`}>
-				{info.status}
-			</span>
-			{info.versie !== '' && <span class="versie">{info.versie}</span>}
-		</>
 	);
 }
 

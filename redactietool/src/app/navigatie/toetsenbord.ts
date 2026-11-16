@@ -50,13 +50,21 @@ export function sprongRichting(toets: Toets, doel: Toetsdoel | null): Richting |
 }
 
 /**
- * De volgende stop in de hoofdstukstrip bij een pijltjestoets: links en rechts, Home en End.
- * Blijft aan de randen staan; `null` voor een andere toets.
+ * De volgende stop in een raster met `kolommen` per rij bij een pijltjestoets: links, rechts, omhoog, omlaag, Home en End.
+ * Links en rechts lopen over de rijgrens heen. Omlaag vanuit een rij boven een kortere laatste rij gaat naar de laatste stop.
+ * Aan de randen (begin en eind van de lijst, eerste en laatste rij) blijft de focus staan.
+ * `null` voor een andere toets.
  */
-export function stripStop(huidig: number, aantal: number, toets: string): number | null {
+export function rasterStop(huidig: number, aantal: number, kolommen: number, toets: string): number | null {
 	const laatste = aantal - 1;
 	if (toets === 'ArrowRight') return Math.min(huidig + 1, laatste);
 	if (toets === 'ArrowLeft') return Math.max(huidig - 1, 0);
+	if (toets === 'ArrowUp') return huidig - kolommen >= 0 ? huidig - kolommen : huidig;
+	if (toets === 'ArrowDown') {
+		if (huidig + kolommen <= laatste) return huidig + kolommen;
+		const opLaatsteRij = Math.floor(huidig / kolommen) === Math.floor(laatste / kolommen);
+		return opLaatsteRij ? huidig : laatste;
+	}
 	if (toets === 'Home') return 0;
 	if (toets === 'End') return laatste;
 	return null;

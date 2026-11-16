@@ -5,7 +5,7 @@ import './bovenbalk.css';
 type Props = {
 	/** Het boek: de naam en de plekken in het boek als tabbladen. */
 	boek: ComponentChildren;
-	/** De hoofdstuktitel met status; zonder titel en acties (`null`) heeft de pagina geen hoofdstukbalk. */
+	/** De hoofdstukkeuze (titel met status en bladerknoppen); zonder titel en acties (`null`) heeft de pagina geen hoofdstukbalk. */
 	titel: ComponentChildren;
 	/** Hoofdstuk kopiëren voor Word en Export voor Claude; `null` buiten een hoofdstuk. */
 	acties: ComponentChildren;
@@ -15,15 +15,13 @@ type Props = {
 	grootte: ComponentChildren;
 	/** De knop Help met zijn venster. */
 	help: ComponentChildren;
-	/** De hoofdstukstrip in de hoofdstukbalk tussen titel en acties; `null` buiten een hoofdstuk. */
-	strip: ComponentChildren;
 };
 
 /**
- * De balk bovenaan die blijft staan bij scrollen: een boekbalk (boek, bewaarstatus, grootte, Help) met daaronder een hoofdstukbalk (titel, strip, acties).
+ * De balk bovenaan die blijft staan bij scrollen: een boekbalk (boek, bewaarstatus, grootte, Help) met daaronder een hoofdstukbalk (hoofdstukkeuze, acties).
  * Zet de hoogte als `--balk-hoogte` op `<html>`, zodat `scroll-padding-top` en de pagina Opgeslagen eronder beginnen.
  */
-export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, help, strip }: Props) {
+export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, help }: Props) {
 	const balk = useRef<HTMLElement>(null);
 	useLayoutEffect(() => {
 		const element = balk.current;
@@ -53,11 +51,6 @@ export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, help, st
 			{(titel !== null || acties !== null) && (
 				<div class="bovenbalk-rij bovenbalk-hoofdstukbalk">
 					<div class="bovenbalk-titel">{titel}</div>
-					{strip !== null && (
-						<div class="bovenbalk-strip" data-help="hoofdstukstrip">
-							{strip}
-						</div>
-					)}
 					<div class="bovenbalk-acties">{acties}</div>
 				</div>
 			)}

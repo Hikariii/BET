@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buurVers, moetKopFocus, sprongRichting, stripStop, type Toets, type Toetsdoel } from './toetsenbord';
+import { buurVers, moetKopFocus, rasterStop, sprongRichting, type Toets, type Toetsdoel } from './toetsenbord';
 
 describe('buurVers', () => {
 	const bewerkbaar = [1, 2, 4, 7];
@@ -74,25 +74,42 @@ describe('sprongRichting', () => {
 	});
 });
 
-describe('stripStop', () => {
-	it('gaat met de pijltjes een stop verder of terug', () => {
-		expect(stripStop(3, 24, 'ArrowRight')).toBe(4);
-		expect(stripStop(3, 24, 'ArrowLeft')).toBe(2);
+describe('rasterStop', () => {
+	const stop = (huidig: number, toets: string) => rasterStop(huidig, 24, 8, toets);
+
+	it('gaat met links en rechts een stop verder of terug, ook over de rijgrens', () => {
+		expect(stop(3, 'ArrowRight')).toBe(4);
+		expect(stop(3, 'ArrowLeft')).toBe(2);
+		expect(stop(7, 'ArrowRight')).toBe(8);
+		expect(stop(8, 'ArrowLeft')).toBe(7);
+	});
+
+	it('gaat met omhoog en omlaag een rij verder of terug', () => {
+		expect(stop(3, 'ArrowDown')).toBe(11);
+		expect(stop(11, 'ArrowUp')).toBe(3);
 	});
 
 	it('blijft aan de randen staan', () => {
-		expect(stripStop(23, 24, 'ArrowRight')).toBe(23);
-		expect(stripStop(0, 24, 'ArrowLeft')).toBe(0);
+		expect(stop(23, 'ArrowRight')).toBe(23);
+		expect(stop(0, 'ArrowLeft')).toBe(0);
+		expect(stop(3, 'ArrowUp')).toBe(3);
+		expect(stop(20, 'ArrowDown')).toBe(20);
 	});
 
-	it('springt met Home en End naar het eerste en het laatste hoofdstuk', () => {
-		expect(stripStop(9, 24, 'Home')).toBe(0);
-		expect(stripStop(9, 24, 'End')).toBe(23);
+	it('gaat omlaag naar de laatste stop als de rij eronder korter is', () => {
+		expect(rasterStop(13, 20, 8, 'ArrowDown')).toBe(19);
+		expect(rasterStop(19, 20, 8, 'ArrowDown')).toBe(19);
+		expect(rasterStop(10, 20, 8, 'ArrowDown')).toBe(18);
+	});
+
+	it('springt met Home en End naar de eerste en de laatste stop', () => {
+		expect(stop(9, 'Home')).toBe(0);
+		expect(stop(9, 'End')).toBe(23);
 	});
 
 	it('laat andere toetsen met rust', () => {
-		expect(stripStop(9, 24, 'ArrowDown')).toBeNull();
-		expect(stripStop(9, 24, 'Tab')).toBeNull();
+		expect(stop(9, 'Tab')).toBeNull();
+		expect(stop(9, 'Enter')).toBeNull();
 	});
 });
 

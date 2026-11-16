@@ -8,7 +8,6 @@ import { helpPlekBijPagina, type Pagina } from './help/onderdelen';
 import { Bovenbalk } from './bovenbalk/Bovenbalk';
 import { GrootteKeuze } from './GrootteKeuze';
 import type { Plek } from './navigatie/boekplekken';
-import { HoofdstukStrip } from './navigatie/HoofdstukStrip';
 import { SprongNaarInhoud } from './navigatie/SprongNaarInhoud';
 import { useBoekPlekken } from './navigatie/useBoekPlekken';
 import { useKopFocus } from './navigatie/useKopFocus';
@@ -31,7 +30,7 @@ type Props = {
 };
 
 /**
- * De indeling van een boekpagina: de bovenbalk (boekbalk met de plekken van het boek, hoofdstukbalk met titel, hoofdstukstrip en acties) en de inhoud.
+ * De indeling van een boekpagina: de bovenbalk (boekbalk met de plekken van het boek, hoofdstukbalk met de hoofdstukkeuze en acties) en de inhoud.
  * Alleen een hoofdstuk heeft een hoofdstukbalk; elders staat de naam van de plek al in de balk en als kop op de pagina.
  */
 export function Indeling({ weergavebeheer, boek, referentie, pagina, huidigHoofdstuk, tabblad, titel, acties, children }: Props) {
@@ -56,7 +55,6 @@ export function Indeling({ weergavebeheer, boek, referentie, pagina, huidigHoofd
 				bewaarstatus={<BewaarStatus boek={boek} overzichtOpen={pagina === 'bewaard'} />}
 				help={<Help boek={boek} plek={helpPlekBijPagina(pagina, tabblad)} plekken={plekken} />}
 				grootte={<GrootteKeuze grootte={weergavebeheer.weergave.grootte} onKies={weergavebeheer.zetGrootte} />}
-				strip={opHoofdstukPagina ? <HoofdstukStrip boek={boek} referentie={referentie} huidigHoofdstuk={huidigHoofdstuk} /> : null}
 			/>
 			<div class="indeling">
 				<main tabIndex={-1}>{children}</main>

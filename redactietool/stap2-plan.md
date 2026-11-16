@@ -16,7 +16,7 @@ De tool staat op https://hikariii.github.io/BET/ en wordt bij elke push naar `ma
 | **8. Vragen beantwoorden** | Markering wisselen, varianten, bereik van een vraag, terugdraaien per vers, Kiezen per optie en antwoord zonder wijziging; genuanceerd antwoord (toelichting of regel, eigen antwoord, meer keuzes onder één antwoord); in de export de structurele keuzes met overgeslagen plekken en de beantwoorde vragen (back-up en export versie 3). Opties komen uit de vrije kolom Alternatief; alleen Gezegend heeft nu echte opties | Niets in dit plan. De route is af: bij elke optie Kiezen (waar de tool kan invullen) of Zoek de plekken, het `?` in een vertaalregel linkt naar de vraag, en antwoorden staan in Opgeslagen en in de back-up. Wat nog mist staat in `TAKEN.md` |
 | **Help** | Knop Help en toets `?` met uitleg per pagina en "Wijs aan", welkom bij het eerste bezoek, "Laatste back-up" met herinnering, tip bij een lege browser | Niets in dit plan |
 | **9a. Opmaak en waarschuwingen** | Opmaakwaarschuwing bij een weggevallen markering; waarschuwingen staan als tekst in de export | De opmaakwerkbalk, waarschuwingen voor oude vormen en vaste begrippen uit één gedeelde lijst; zie [Fase 9a](#fase-9a-opmaak-en-waarschuwingen-open) |
-| **9b. Verschil en terug** | Terug naar de tekst van Claude per vers | Verschil zichtbaar, terug per hoofdstuk, stip in de hoofdstukstrip; zie [Fase 9b](#fase-9b-verschil-en-terug-open) |
+| **9b. Verschil en terug** | Terug naar de tekst van Claude per vers | Verschil zichtbaar, terug per hoofdstuk, stip in de hoofdstukkeuze; zie [Fase 9b](#fase-9b-verschil-en-terug-open) |
 | **10. Keuzes in de tekst** | Niets | Menu bij een woord; zie [Fase 10](#fase-10-keuzes-in-de-tekst-open) |
 
 Wat uit stap 1 gebouwd is en blijft: lezen (bron, vereenvoudiging en regels per vers, kolom Regels, zijpaneel met richtlijn, markering vraag, status en open vragen), de tabbladen Vertaalkeuzes, Zo vertaald, Vertaalvragen en Zoeken en vervangen, bewerken met tussenstand, en kopiëren naar Word en Export voor Claude.
@@ -73,7 +73,7 @@ Alleen bouwen als 6a of 6b laat zien dat de redacteur het mist.
 
 - **Verschil zichtbaar** van wat de vertaler veranderde, naast de tekst van Claude. Het verschil met de bron is Claudes werk en staat al in de kolom Vertaalregels; overweeg dat niet te bouwen.
 - **Terug per hoofdstuk**, in één keer, met ongedaan maken.
-- **Stip bij een hoofdstuk met wijzigingen**, in de hoofdstukstrip (`KortHoofdstuk`, gevoed met het aantal bewerkte verzen per hoofdstuk; `useOpslagTeller` bestaat). De zijbalk bestaat niet meer.
+- **Stip bij een hoofdstuk met wijzigingen**, in de hoofdstukkeuze (`HoofdstukCel`, gevoed met het aantal bewerkte verzen per hoofdstuk; `useOpslagTeller` bestaat). De zijbalk bestaat niet meer.
 - **Aanpak:**
   - `terugNaarRepo(opslag, boek, hoofdstuk, vers)` bestaat (`src/bewerken/terugNaarRepo.ts`) en werkt tussenstand én keuze bij, via `draaiVersTerug` als het vers van een keuze komt; de knop Vers terugzetten gebruikt hem. Terug per hoofdstuk is dan een lus eroverheen.
   - Eén diffmodule (bijvoorbeeld `uitlijning/verschil.ts`). `lijnVersUit` is gemaakt om bronwoorden aan vertalingen te koppelen en negeert leestekens en hoofdletters: een wijziging van alleen een komma geeft er geen verschil. De module tokeniseert mét leestekens, vergelijkt exact en hergebruikt het algoritme uit `overeenkomendeWoorden` (nu niet geëxporteerd). Vergelijk met `bewerkt.basis`, niet met de huidige repo, anders toont een verouderde bewerking andermans wijzigingen. Dezelfde module dient de conflictweergave.
@@ -132,12 +132,12 @@ Gebouwd en gekozen; hieronder staat wat het ontwerp bepaalt, voor wie eraan werk
 
 **Namen (2026-11-15):** het scherm heet **Keuzes en vragen**, met de tabbladen **Vertaalkeuzes** (was Besloten), **Zo vertaald** (was Gevonden), **Vertaalvragen** en **Zoeken en vervangen** (was Vervangen). De kolom per vers heet **Vertaalregels**. De adressen (`#/lukas/begrippen/besloten` enz.) en de bestandsnamen in de code blijven gelijk. Een uitgevoerde zoek-en-vervang heet een **vervanging** (eigenaar, 2026-11-16).
 
-**Gekozen (2026-11-16): v8e.** De eigenaar kiest de boekbalk met de plekken als tabbladen met pictogrammen en Opgeslagen rechts, één hoofdstukbalk met titelblok (status als pictogram), hoofdstukstrip met pijltjes en de acties, geen zijbalk, de hele breedte met een letter die meegroeit, en de dichte verzen (d4). Dit is de tool zonder parameter. De css staat in `src/app/indeling.css`. Verslag van de ronde: `ontwerp/ronde4/v7-v8.md`. Eerdere rondes (layouts a tot f, ronde 3) staan als notities in `ontwerp/`; de schermafbeeldingen zijn uit de werkboom en alleen nog in de git-geschiedenis te vinden.
+**Gekozen (2026-11-16): v8e.** De eigenaar kiest de boekbalk met de plekken als tabbladen met pictogrammen en Opgeslagen rechts, één hoofdstukbalk met titelblok (status als pictogram), hoofdstukstrip met pijltjes (later een dropdown, zie onder) en de acties, geen zijbalk, de hele breedte met een letter die meegroeit, en de dichte verzen (d4). Dit is de tool zonder parameter. De css staat in `src/app/indeling.css`. Verslag van de ronde: `ontwerp/ronde4/v7-v8.md`. Eerdere rondes (layouts a tot f, ronde 3) staan als notities in `ontwerp/`; de schermafbeeldingen zijn uit de werkboom en alleen nog in de git-geschiedenis te vinden.
 
 **Keuzes van de eigenaar (2026-11-16), gebouwd na v8e:**
-- Het statuswoord is uit de hoofdstukstrip; de status blijft een pictogram.
-- Het open hoofdstuk is in de strip een heel rood blok.
-- De strip schuift alleen als het open hoofdstuk niet in beeld staat.
+- Het statuswoord is uit de hoofdstukkeuze; de status blijft een pictogram.
+- Het open hoofdstuk is in het raster van de hoofdstukkeuze licht gemarkeerd (`--gekozen`), niet klikbaar en zonder hover; de andere hoofdstukken krijgen bij hover en focus een rand in de toolkleur.
+- De hoofdstukstrip is vervangen door een dropdown (keuze eigenaar, 2026-11-16): de titel "Lukas 4 ▾" opent een raster met alle hoofdstukken, met naast de titel de knoppen "‹ Hoofdstuk 3" en "Hoofdstuk 5 ›". De strip verspringde bij schuiven en centreren, vooral in Firefox.
 - In de vertaalregels is de § in de tekst zelf klikbaar.
 - De vertaalregels staan weer in hun oude, kleinere maat.
 - De naslagkaart staat weer over de hele breedte.

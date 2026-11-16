@@ -44,8 +44,11 @@ Met de vier letters rechts in de balk maak je de tekst kleiner of groter. De too
 
 {{wijs grootte | Lettergrootte | Rechtsboven in de balk, naast Help.}}
 
-## De hoofdstukkenbalk
+## De hoofdstukkeuze
 
-Op de pagina van een hoofdstuk staat onder de balk een tweede rij met de hoofdstukken. Elk hoofdstuk heeft een nummer, een vinkje als het goedgekeurd is en het aantal open vragen. Schuif zijwaarts als niet alles past.
+Op de pagina van een hoofdstuk is de titel in de balk een knop, bijvoorbeeld **Lukas 4 ▾**. Klik erop en onder de balk opent een raster met alle hoofdstukken van het boek. Elk hoofdstuk heeft een nummer, een vinkje als het goedgekeurd is en het aantal open vragen. Het hoofdstuk dat open staat heeft een lichtgrijs vak en is niet klikbaar. Wijs een ander hoofdstuk aan: het krijgt een rand. Kies het om het te openen; het raster sluit dan. Het raster sluit ook met Escape, met een klik ernaast en met een tweede klik op de titel.
 
-{{wijs hoofdstukstrip | Hoofdstukken | Onder de balk, alleen op de pagina van een hoofdstuk.}}
+Naast de titel staan twee knoppen met het nummer van het vorige en het volgende hoofdstuk, bijvoorbeeld **‹ Hoofdstuk 3** en **Hoofdstuk 5 ›**. Zo blader je met één klik. Bij het eerste en het laatste hoofdstuk ontbreekt de knop die nergens heen kan; de andere blijft op zijn plek.
+
+{{wijs hoofdstukkeuze | Hoofdstukkeuze | Op de pagina van een hoofdstuk, de titel in de balk.}}
+{{wijs hoofdstuk-bladeren | Vorige en volgende hoofdstuk | Naast de titel, alleen op de pagina van een hoofdstuk.}}

@@ -227,8 +227,10 @@
 	border: 0;
 }
 
-.help-voorbeeld .help-balk .bovenbalk-strip {
-	min-width: 0;
+.help-voorbeeld .help-balk .hoofdstukkeuze-venster {
+	position: static;
+	max-height: none;
+	box-shadow: none;
 }
 
 .help-statussen {

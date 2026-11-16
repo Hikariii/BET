@@ -3,7 +3,8 @@ import type { BoekData, Status } from '../../data/types';
 import { GrootteKeuze } from '../GrootteKeuze';
 import { BoekTabbladen } from '../bovenbalk/BoekTabbladen';
 import type { BoekPlek } from '../navigatie/boekplekken';
-import { KortHoofdstuk } from '../navigatie/KortHoofdstuk';
+import { HoofdstukCel } from '../navigatie/HoofdstukCel';
+import { BladerKnop } from '../navigatie/HoofdstukKeuze';
 import { statusKlasse } from '../Zijbalk';
 import { plekSleutel } from './wijsAan';
 
@@ -59,21 +60,33 @@ function Hoofdstukken({ boek }: { boek: BoekData }) {
 	const goedgekeurd = boek.hoofdstukken.find((hoofdstuk) => hoofdstuk.status === 'goedgekeurd');
 	const ander = boek.hoofdstukken.find((hoofdstuk) => hoofdstuk.status !== 'goedgekeurd');
 	if (goedgekeurd === undefined || ander === undefined) return null;
+	const nietsDoen = () => undefined;
 	return (
 		<div class="bovenbalk help-balk">
-			<div class="bovenbalk-strip">
-				<nav class="hoofdstukstrip" aria-label="Voorbeeld van de hoofdstukstrip">
-					<ul>
-						<li>
-							<KortHoofdstuk boek={boek.id} hoofdstuk={goedgekeurd} aantalOpenVragen={0} huidig={false} tabstop={false} />
-						</li>
-						<li>
-							<KortHoofdstuk boek={boek.id} hoofdstuk={ander} aantalOpenVragen={3} huidig={false} tabstop={false} />
-						</li>
-					</ul>
-				</nav>
-			</div>
+			<nav class="hoofdstukkeuze-venster" aria-label="Voorbeeld van de hoofdstukkeuze">
+				<ul style="--kolommen: 2">
+					<li>
+						<HoofdstukCel boek={boek.id} hoofdstuk={goedgekeurd} aantalOpenVragen={0} huidig={false} tabstop={false} bijKies={nietsDoen} />
+					</li>
+					<li>
+						<HoofdstukCel boek={boek.id} hoofdstuk={ander} aantalOpenVragen={3} huidig={false} tabstop={false} bijKies={nietsDoen} />
+					</li>
+				</ul>
+			</nav>
 		</div>
+	);
+}
+
+function Bladeren({ boek }: { boek: BoekData }) {
+	const [, , derde, , vijfde] = boek.hoofdstukken;
+	if (derde === undefined || vijfde === undefined) return null;
+	return (
+		<span class="bovenbalk help-balk">
+			<span class="hoofdstuk-bladeren">
+				<BladerKnop boek={boek} hoofdstuk={derde} richting="vorige" />
+				<BladerKnop boek={boek} hoofdstuk={vijfde} richting="volgende" />
+			</span>
+		</span>
 	);
 }
 
@@ -93,8 +106,10 @@ function voorbeeldVan({ sleutel, naam, context }: Props): ComponentChildren {
 	switch (sleutel) {
 		case 'hoofdstuk-status':
 			return <Statussen />;
-		case 'hoofdstukstrip':
+		case 'hoofdstukkeuze':
 			return <Hoofdstukken boek={context.boek} />;
+		case 'hoofdstuk-bladeren':
+			return <Bladeren boek={context.boek} />;
 		case 'grootte':
 			return <GrootteKeuze grootte={0} onKies={() => undefined} />;
 		case 'nog-n-regels':
