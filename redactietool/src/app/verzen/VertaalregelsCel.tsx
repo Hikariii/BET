@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { celToestand, overloopNaMeting } from './celToestand';
+import { celToestand, kanUitklappen, overloopNaMeting } from './celToestand';
 import { useAanwijzen } from './useAanwijzen';
 import './verzen.css';
 
@@ -20,11 +20,11 @@ type Props = {
  * De punaise rechtsonder zet een uitgeklapt vak vast in de kolom met alle regels, net als zolang de naslagkaart onder het vers open staat.
  */
 export function VertaalregelsCel({ nummer, naslagOpen, alleVast, regels }: Props) {
-	const { open, sluitend, handelers } = useAanwijzen();
 	const celRef = useRef<HTMLTableCellElement>(null);
 	const inhoudRef = useRef<HTMLDivElement>(null);
 	const [overloopt, zetOverloopt] = useState(false);
 	const [vastgezet, zetVastgezet] = useState(false);
+	const { open, sluitend, handelers } = useAanwijzen(kanUitklappen({ naslagOpen, vastgezet, alleVast, overloopt }));
 	const toestand = celToestand({ naslagOpen, vastgezet, alleVast, overloopt, open });
 	const vastRef = useRef(toestand.vast);
 	vastRef.current = toestand.vast;
