@@ -5,7 +5,7 @@ export type Celtoestand = {
 	klassen: string;
 	/** Alleen een zwevend vak waar iets uit wegvalt neemt toetsenbordfocus, zodat het met het toetsenbord uit te klappen is. */
 	focusbaar: boolean;
-	/** De punaise staat in een uitgeklapt vak (om vast te zetten) en in een vastgezet vak (om los te maken). */
+	/** De punaise staat in een uitgeklapt vak en bij een open naslagkaart (om vast te zetten), en in een vastgezet vak (om los te maken). */
 	punaise: boolean;
 };
 
@@ -33,6 +33,6 @@ export function celToestand({ naslagOpen, vastgezet, overloopt, open }: Invoer):
 		vast,
 		klassen: klassen.filter((naam) => naam !== false).join(' '),
 		focusbaar: zwevendMetOverloop,
-		punaise: vastgezet || uitgeklapt,
+		punaise: vastgezet || naslagOpen || uitgeklapt,
 	};
 }

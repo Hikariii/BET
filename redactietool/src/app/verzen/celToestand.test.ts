@@ -18,8 +18,8 @@ describe('celToestand', () => {
 		expect(celToestand({ ...rust, overloopt: true, open: true })).toEqual({ vast: false, klassen: 'zweefvak overloopt open', focusbaar: true, punaise: true });
 	});
 
-	it('zet de cel vast zolang de naslagkaart open staat, zonder punaise, ook als hij overloopt of uitgeklapt is', () => {
-		const verwacht = { vast: true, klassen: 'zweefvak vast', focusbaar: false, punaise: false };
+	it('zet de cel vast zolang de naslagkaart open staat, met de punaise om hem daarna vast te houden', () => {
+		const verwacht = { vast: true, klassen: 'zweefvak vast', focusbaar: false, punaise: true };
 		expect(celToestand({ ...rust, naslagOpen: true })).toEqual(verwacht);
 		expect(celToestand({ ...rust, naslagOpen: true, overloopt: true })).toEqual(verwacht);
 		expect(celToestand({ ...rust, naslagOpen: true, overloopt: true, open: true })).toEqual(verwacht);
