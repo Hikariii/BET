@@ -54,6 +54,14 @@ Taken per boek staan in `bijbel/<boek>/TAKEN.md`. `[x]` = klaar, `[ ]` = open, `
   - [ ] `draaiKeuzeTerug` (alles terugdraaien) registreert bij een gedeeltelijke terugdraai de echt teruggedraaide verzen niet als `teruggedraaid`, anders dan `draaiVersTerug`.
   - [ ] Back-up inladen: bij antwoorden ook tonen welke een lokaal antwoord overschrijven of blijven staan (zoals bij verzen).
   - [ ] Opties: machine-leesbare opties in `open-vragen.md` overwegen als meer vragen echte opties krijgen (keuze eigenaar).
+- [x] Redactietool: Help en opslaan (branch `help-en-bewaren`): knop Help met uitleg per pagina en "Wijs aan", welkom bij het eerste bezoek, laatste back-up met herinnering, tip bij een lege browser; Bewaard heet nu Opgeslagen; vertaalregels blijven 400 ms open na verlaten en zijn vast te zetten met een punaise; Antwoord vastleggen in de breedte.
+- [ ] Redactietool, uit de review van Help en opslaan:
+  - [ ] Test voor de knopteksten in de help: de tekst van het element met die `data-help` lezen in plaats van zoeken in het bestand.
+  - [ ] Test voor `useAanwijzen` (wachttijd na verlaten, terugkomen binnen die tijd); hoort bij de componenttests met een DOM-omgeving.
+  - [ ] Opslagstatus: schermlezer leest de herinnering twee keer (zichtbaar label en verborgen regel).
+  - [ ] Help: tekst slepen die in de achtergrond eindigt, sluit het venster; de melding "staat niet op deze pagina" altijd renderen zodat hij voorgelezen wordt.
+  - [ ] Help: test dat elk algemeen onderdeel in het menu van het venster staat (nu met de hand opgesomd naast `ALGEMENE_ONDERDELEN`); titels van onderdelen in verwijzingen invullen (`{{onderdeel:...}}`) in plaats van overtypen.
+  - [ ] Punaise: na vastzetten via een open naslagkaart in een vak dat nooit overliep, verdwijnt de punaise bij losmaken en valt de focus weg.
 - [ ] Redactietool, uit de review van het genuanceerde antwoord:
   - [ ] Voorvertoning bij back-up inladen toont niet dat een antwoord verandert of een toelichting verloren gaat (samenvoegen neemt het nieuwste antwoord, met een eventueel lege toelichting).
   - [ ] Export: een antwoord met keuzes ook opnemen in de hoofdstukken van de vraagverzen (unie van de hoofdstukken van de keuzes en van de verzen).
