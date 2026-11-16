@@ -106,4 +106,22 @@ describe('waarschuwingenVoorVers', () => {
 		};
 		expect(waarschuwingenVoorVers(bron, bewerkt)).toEqual([]);
 	});
+
+	it('waarschuwt als een markering uit het tweede deel van het vers weg is', () => {
+		const bron: VersInhoud = {
+			delen: [
+				{ stijl: null, stukken: [{ soort: 'tekst', tekst: ' eerste', opmaak: [] }] },
+				{ stijl: 'god', stukken: [{ soort: 'tekst', tekst: 'tweede', opmaak: ['zonde'] }] },
+			],
+		};
+		const bewerkt: VersInhoud = {
+			delen: [
+				{ stijl: null, stukken: [{ soort: 'tekst', tekst: ' eerste', opmaak: [] }] },
+				{ stijl: 'god', stukken: [{ soort: 'tekst', tekst: 'tweede', opmaak: [] }] },
+			],
+		};
+		expect(waarschuwingenVoorVers(bron, bewerkt)).toEqual([
+			{ soort: 'opmaak-weg', opmaak: 'zonde', tekst: 'De markering zonde uit de bron staat niet meer in dit vers.' },
+		]);
+	});
 });

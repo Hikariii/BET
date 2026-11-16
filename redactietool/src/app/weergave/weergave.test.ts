@@ -3,12 +3,8 @@ import { GeheugenOpslag } from '../../bewaren/testhulp';
 import { bewaarWeergave, GROOTTE_STAPPEN, leesWeergave, schaalVan } from './weergave';
 
 describe('schaalVan', () => {
-	it('groeit met elke stap en is 1 bij stap 0, zodat de standaard de tool ongewijzigd laat', () => {
-		const schalen = GROOTTE_STAPPEN.map(schaalVan);
-
-		expect(schaalVan(0)).toBe(1);
-		expect(schalen).toEqual([...schalen].sort((een, ander) => een - ander));
-		expect(new Set(schalen).size).toBe(GROOTTE_STAPPEN.length);
+	it('geeft de vaste lettergrootte per stap, met 1 bij stap 0 zodat de standaard de tool ongewijzigd laat', () => {
+		expect(GROOTTE_STAPPEN.map(schaalVan)).toEqual([0.92, 1, 1.08, 1.16]);
 	});
 });
 

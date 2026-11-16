@@ -16,4 +16,12 @@ describe('middenBinnen', () => {
 		expect(middenBinnen({ left: 10, right: 90, top: 95, bottom: 135 }, vak)).toBe(false);
 		expect(middenBinnen({ left: 10, right: 90, top: 150, bottom: 170 }, vak)).toBe(false);
 	});
+
+	it.each([
+		['links', { left: -90, right: -10, top: 40, bottom: 60 }],
+		['rechts', { left: 210, right: 290, top: 40, bottom: 60 }],
+		['boven', { left: 10, right: 90, top: -40, bottom: -10 }],
+	])('telt een element met het midden buiten het vak (%s) als afgekapt', (_richting, element) => {
+		expect(middenBinnen(element, vak)).toBe(false);
+	});
 });

@@ -17,10 +17,7 @@ describe('tijdVan', () => {
 	});
 
 	it('toont ook de datum als het eerder was', () => {
-		const tekst = tijdVan(lokaal(11, 15, 9, 5).toISOString(), lokaal(11, 16, 20, 0));
-
-		expect(tekst).toContain('15');
-		expect(tekst).toContain('09:05');
+		expect(tijdVan(lokaal(11, 15, 9, 5).toISOString(), lokaal(11, 16, 20, 0))).toBe('15 nov, 09:05');
 	});
 });
 

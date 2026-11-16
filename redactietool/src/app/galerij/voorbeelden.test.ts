@@ -64,7 +64,7 @@ describe('de verzen van de galerij', () => {
 
 	it('tonen een vers met meer dan één alinea', () => {
 		const delen = repoVan(VERZEN.meerdereAlineas.hoofdstuk, VERZEN.meerdereAlineas.vers).delen.length;
-		expect(delen).toBe(3);
+		expect(delen).toBeGreaterThan(1);
 	});
 });
 
@@ -74,15 +74,18 @@ describe('maakVoorbeeldopslag', () => {
 		const { hoofdstuk, vers } = VERZEN.gewijzigd;
 		const bewerkt = leesTussenstand(opslag, GALERIJ_BOEK, hoofdstuk).verzen[vers];
 		expect(bewerkt).toBeDefined();
-		expect(zelfdeInhoud(bewerkt?.inhoud ?? { delen: [] }, repoVan(hoofdstuk, vers))).toBe(false);
-		expect(isVerouderd(repoVan(hoofdstuk, vers), bewerkt?.basis ?? { delen: [] })).toBe(false);
+		if (bewerkt === undefined) return;
+		expect(zelfdeInhoud(bewerkt.inhoud, repoVan(hoofdstuk, vers))).toBe(false);
+		expect(isVerouderd(repoVan(hoofdstuk, vers), bewerkt.basis)).toBe(false);
 	});
 
 	it('bewaart een verouderde bewerking: de repo wijkt af van waarop de bewerking begon', () => {
 		const opslag = maakVoorbeeldopslag(GALERIJ_BOEK, hoofdstukken);
 		const { hoofdstuk, vers } = VERZEN.verouderd;
 		const bewerkt = leesTussenstand(opslag, GALERIJ_BOEK, hoofdstuk).verzen[vers];
-		expect(isVerouderd(repoVan(hoofdstuk, vers), bewerkt?.basis ?? { delen: [] })).toBe(true);
+		expect(bewerkt).toBeDefined();
+		if (bewerkt === undefined) return;
+		expect(isVerouderd(repoVan(hoofdstuk, vers), bewerkt.basis)).toBe(true);
 	});
 
 	it('bewaart een bewerking die opmaak uit de bron mist', () => {

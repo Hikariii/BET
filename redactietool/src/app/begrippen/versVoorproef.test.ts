@@ -27,6 +27,12 @@ const HOOFDSTUKKEN: HoofdstukData[] = [
 		vereenvoudigd: hoofdstuk([1, ' Eenvoudig een.'], [2, ' Eenvoudig twee.']),
 		log: { verzen: [], algemeneVragen: [] },
 	},
+	{
+		nummer: 5,
+		bron: hoofdstuk([1, ' Bron vijf.'], [2, ' Bron zes.']),
+		vereenvoudigd: hoofdstuk([1, ' Eenvoudig vijf.'], [2, ' Eenvoudig zes.']),
+		log: { verzen: [], algemeneVragen: [] },
+	},
 ];
 
 describe('zoekVersVoorproef', () => {
@@ -41,19 +47,19 @@ describe('zoekVersVoorproef', () => {
 	});
 
 	it('toont de bewerking uit de tussenstand van dat hoofdstuk, met de bron uit de repo', () => {
-		const tussenstand: Tussenstand = {
-			verzen: { 2: { inhoud: inhoud(' Zelf getypt.'), basis: inhoud(' Eenvoudig twee.'), bewaard: '2026-11-15T10:00:00.000Z', herkomst: 'zelf getypt' } },
-		};
-		const gevraagd: number[] = [];
+		const bewerking = (tekstInhoud: string): Tussenstand => ({
+			verzen: { 2: { inhoud: inhoud(tekstInhoud), basis: inhoud(' Eenvoudig twee.'), bewaard: '2026-11-15T10:00:00.000Z', herkomst: 'zelf getypt' } },
+		});
+		const tussenstanden: Record<number, Tussenstand> = { 4: bewerking(' Zelf getypt in vier.'), 5: bewerking(' Zelf getypt in vijf.') };
+		const perHoofdstuk = (nummer: number) => tussenstanden[nummer] ?? GEEN_TUSSENSTAND;
 
-		const voorproef = zoekVersVoorproef(HOOFDSTUKKEN, (nummer) => (gevraagd.push(nummer), tussenstand), 4, 2);
+		const voorproef = zoekVersVoorproef(HOOFDSTUKKEN, perHoofdstuk, 4, 2);
 
-		expect(gevraagd).toEqual([4]);
-		expect(voorproef).toMatchObject({ vereenvoudigd: inhoud(' Zelf getypt.'), bron: inhoud(' Bron twee.'), bewerkt: true });
+		expect(voorproef).toMatchObject({ vereenvoudigd: inhoud(' Zelf getypt in vier.'), bron: inhoud(' Bron twee.'), bewerkt: true });
 	});
 
 	it('geeft null voor een vers of hoofdstuk dat niet bestaat', () => {
 		expect(zoekVersVoorproef(HOOFDSTUKKEN, () => GEEN_TUSSENSTAND, 4, 9)).toBeNull();
-		expect(zoekVersVoorproef(HOOFDSTUKKEN, () => GEEN_TUSSENSTAND, 5, 1)).toBeNull();
+		expect(zoekVersVoorproef(HOOFDSTUKKEN, () => GEEN_TUSSENSTAND, 6, 1)).toBeNull();
 	});
 });
