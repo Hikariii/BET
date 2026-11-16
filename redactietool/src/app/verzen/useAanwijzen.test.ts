@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, renderHook } from '@testing-library/preact';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useAanwijzen } from './useAanwijzen';
+import { useAanwijzen, VERLAATVERTRAGING_MS } from './useAanwijzen';
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => {
@@ -42,7 +42,7 @@ describe('useAanwijzen', () => {
 		act(() => vak.result.current.handelers.onPointerLeave());
 		expect(vak.result.current).toMatchObject({ open: true, sluitend: true });
 
-		wacht(399);
+		wacht(VERLAATVERTRAGING_MS - 1);
 		expect(vak.result.current).toMatchObject({ open: true, sluitend: true });
 
 		wacht(1);

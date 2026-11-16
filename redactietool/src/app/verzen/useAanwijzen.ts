@@ -5,7 +5,7 @@ import { dialoogOpen } from '../help/dialoogOpen';
 const AANWIJSVERTRAGING_MS = 180;
 
 /** Zo lang blijft het vak open nadat de aanwijzer het verlaat, zodat wie net over de rand schuift het niet kwijtraakt. */
-const VERLAATVERTRAGING_MS = 400;
+export const VERLAATVERTRAGING_MS = 400;
 
 /**
  * Het vak dat nu door aanwijzen is uitgeklapt, gedeeld door alle cellen: zolang het open is (ook tijdens de verlaatvertraging) klapt geen ander vak uit door aanwijzen.
