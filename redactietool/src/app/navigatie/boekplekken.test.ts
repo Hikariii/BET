@@ -18,19 +18,20 @@ const referentie: Referentie = {
 describe('boekPlekken', () => {
 	it('geeft de plekken in vaste volgorde met de adressen van de tabbladen', () => {
 		const plekken = boekPlekken('lukas', referentie, 9);
-		expect(plekken.map((plek) => plek.naam)).toEqual(['Hoofdstukken', 'Vertaalkeuzes', 'Zo vertaald', 'Vertaalvragen', 'Zoeken en vervangen']);
+		expect(plekken.map((plek) => plek.naam)).toEqual(['Hoofdstukken', 'Vertaalkeuzes', 'Zo vertaald', 'Vertaalvragen', 'Zoeken en vervangen', 'Richtlijn']);
 		expect(plekken.map((plek) => plek.adres)).toEqual([
 			'#/lukas/9',
 			'#/lukas/begrippen/besloten',
 			'#/lukas/begrippen/gevonden',
 			'#/lukas/begrippen/vragen',
 			'#/lukas/begrippen/vervangen',
+			'#/lukas/richtlijn',
 		]);
 	});
 
 	it('telt de vertaalkeuzes en alleen de open vragen uit het register, niet de besloten', () => {
 		const plekken = boekPlekken('lukas', referentie, 1);
-		expect(plekken.map((plek) => plek.aantal?.tekst ?? null)).toEqual([null, '3 vertaalkeuzes', null, '2 open vragen', null]);
+		expect(plekken.map((plek) => plek.aantal?.tekst ?? null)).toEqual([null, '3 vertaalkeuzes', null, '2 open vragen', null, null]);
 	});
 
 	it('gebruikt het enkelvoud bij één open vraag', () => {

@@ -32,6 +32,12 @@ Een woord of zin in het hele boek vervangen, of alleen de markering van dezelfde
 
 {{wijs plek-vervangen | {{plek:vervangen}} | Bovenaan in de balk.}}
 
+## {{plek:richtlijn}}
+
+De hele redactierichtlijn als tekst, met per paragraaf een vak om te reageren en onderaan een vak voor een nieuwe regel.
+
+{{wijs plek-richtlijn | {{plek:richtlijn}} | Bovenaan in de balk, achter {{plek:vervangen}}.}}
+
 ## {{plek:bewaard}}
 
 Rechts in de balk staat wat de browser van je werk opslaat. Klik erop voor het overzicht en voor de back-up.

@@ -24,10 +24,11 @@ export function alleOnderdelen(): HelpOnderdeel[] {
 }
 
 /** Welke pagina binnen het boek open staat, voor `aria-current`, de strip in de bovenbalk en de help. */
-export type Pagina = 'hoofdstuk' | 'begrippen' | 'bewaard';
+export type Pagina = 'hoofdstuk' | 'begrippen' | 'bewaard' | 'richtlijn';
 
 /** De plek waar de lezer is, uit de pagina en het tabblad van de indeling. */
 export function helpPlekBijPagina(pagina: Pagina, tabblad: Tabblad | null): HelpPlek {
 	if (pagina === 'bewaard') return 'bewaard';
+	if (pagina === 'richtlijn') return 'richtlijn';
 	return pagina === 'begrippen' && tabblad !== null ? tabblad : 'hoofdstukken';
 }

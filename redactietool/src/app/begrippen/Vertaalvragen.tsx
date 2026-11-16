@@ -13,7 +13,7 @@ import {
 	type Antwoord,
 	type Uitkomst,
 } from '../../antwoorden/antwoorden';
-import { leesReacties, type Reactie } from '../../reacties/reacties';
+import { bewaarReactie, haalReactieWeg, leesReacties, type Reactie } from '../../reacties/reacties';
 import { leesKeuzes, type StructureleKeuze } from '../../vervangen/keuzes';
 import { isHoudOptie, maakVoorstel, splitsOpties } from '../../begrippen/opties';
 import { deelVragenIn, filterVragen, FILTERSTATUSSEN, GEEN_FILTER, groepeerLogVragen, type VragenFilter } from '../../begrippen/vragenOverzicht';
@@ -28,7 +28,7 @@ import { maakAdres } from '../adres';
 import { useAdres } from '../hooks';
 import { eigenAntwoordUitleg, eigenAntwoordVastgelegd } from './antwoordTeksten';
 import { optieActie, type OptieActie } from './optieActie';
-import { ReactieVak } from './ReactieVak';
+import { ReactieVak, type ReactieTeksten } from '../reageren/ReactieVak';
 import { browseropslag } from '../bewerken/useTussenstand';
 import { useOpslagTeller } from '../bewaren/useOpslagTeller';
 import type { TabbladProps } from './tabbladProps';
@@ -626,9 +626,16 @@ function Lijstgroep({ titelId, titel, open, children }: LijstgroepProps) {
 	);
 }
 
+const REACTIE_OP_OPMERKING: ReactieTeksten = {
+	veld: 'Je reactie voor Claude',
+	vinkje: 'Maak hier een vertaalvraag van',
+	uitleg: 'Claude zet de vraag in de lijst met open vragen als je de export teruggeeft.',
+};
+
 /** Een opmerking van Claude uit een log: ingeklapt, tenzij een link naar dit nummer hier uitkomt. */
 function LogVraag({ boek, vraag, doel, reactie }: { boek: string; vraag: Vertaalvraag; doel: boolean; reactie: Reactie | null }) {
 	const rij = useDoel<HTMLLIElement>(doel);
+	const hoofdstukVanOpmerking = vraag.herkomst.soort === 'register' ? null : vraag.herkomst.hoofdstuk;
 	return (
 		<li class={doel ? 'vraag-doel' : undefined} ref={rij} tabIndex={doel ? -1 : undefined}>
 			<details open={doel}>
@@ -646,8 +653,18 @@ function LogVraag({ boek, vraag, doel, reactie }: { boek: string; vraag: Vertaal
 					<p>
 						{vraag.verzen.length === 0 ? <span class="geen-verzen">{GEEN_VERS_IN_KOP}</span> : <VersLinks boek={boek} verzen={vraag.verzen} />}
 					</p>
-					{vraag.herkomst.soort !== 'register' && (
-						<ReactieVak boek={boek} opmerking={{ nr: vraag.nr, hoofdstuk: vraag.herkomst.hoofdstuk, kwestie: vraag.kwestie }} reactie={reactie} />
+					{hoofdstukVanOpmerking !== null && (
+						<div data-help="reactie-vak">
+							<ReactieVak
+								naam={`Reageren op ${vraag.nr}: ${vraag.kwestie}`}
+								teksten={REACTIE_OP_OPMERKING}
+								reactie={reactie === null ? null : { tekst: reactie.tekst, vinkje: reactie.wordtVraag }}
+								bewaar={(tekst, wordtVraag) =>
+									bewaarReactie(browseropslag(), boek, { nr: vraag.nr, hoofdstuk: hoofdstukVanOpmerking, kwestie: vraag.kwestie, tekst, wordtVraag, gegeven: new Date().toISOString() })
+								}
+								haalWeg={() => haalReactieWeg(browseropslag(), boek, vraag.nr)}
+							/>
+						</div>
 					)}
 				</div>
 			</details>

@@ -20,9 +20,14 @@ describe('onderdelen van de help', () => {
 		expect(paginaOnderdeel(helpPlekBijPagina('bewaard', null))).toBe('pagina-bewaard');
 	});
 
+	it('geeft bij de pagina Richtlijn de plek Richtlijn en het bijbehorende onderdeel', () => {
+		expect(helpPlekBijPagina('richtlijn', null)).toBe('richtlijn');
+		expect(paginaOnderdeel(helpPlekBijPagina('richtlijn', null))).toBe('pagina-richtlijn');
+	});
+
 	it('heeft een onderdeel voor elke plek in de balk en voor Opgeslagen', () => {
 		const plekken = boekPlekken('lukas', { precedenten: [], openVragen: [] }, 1).map((plek) => plek.plek);
-		expect(plekken).toHaveLength(5);
+		expect(plekken).toHaveLength(6);
 		for (const plek of plekken) expect(HELP_PLEKKEN).toContain(plek);
 		expect(HELP_PLEKKEN).toContain('bewaard');
 		expect(alleOnderdelen()).toEqual(expect.arrayContaining(plekken.map(paginaOnderdeel)));

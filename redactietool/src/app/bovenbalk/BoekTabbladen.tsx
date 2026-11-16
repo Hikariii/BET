@@ -20,6 +20,7 @@ const LIJNEN: Record<Plek, string> = {
 	gevonden: 'M3 7h12 M12 4l3 3-3 3 M17 13H5 M8 10l-3 3 3 3',
 	vragen: 'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14z M8 8c0-1.2.9-2 2-2s2 .8 2 2c0 1.5-2 1.7-2 3.2 M10 14v.5',
 	vervangen: 'M9 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10z M12.8 12.8l4.2 4.2',
+	richtlijn: 'M5 3h7l3 3v11H5z M12 3v3h3 M7.5 9h5 M7.5 12h5 M7.5 15h3',
 };
 
 function PlekIcoon({ plek }: { plek: Plek }) {

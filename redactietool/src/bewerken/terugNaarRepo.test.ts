@@ -37,6 +37,7 @@ function exportVan(opslag: GeheugenOpslag) {
 		keuzes: leesKeuzes(opslag, 'lukas'),
 		antwoorden: leesAntwoorden(opslag, 'lukas'),
 		reacties: [],
+		richtlijnReacties: [],
 		opmerkingVerzen: new Map(),
 		vragen: new Map(),
 		repoCommit: null,

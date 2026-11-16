@@ -10,11 +10,11 @@ export const TABBLADTITEL: Record<Tabblad, string> = {
 	vervangen: 'Zoeken en vervangen',
 };
 
-/** De plekken in een boek, behalve Bewaard: de hoofdstukken en de vier tabbladen van het scherm Keuzes en vragen. */
-export type Plek = 'hoofdstukken' | Tabblad;
+/** De plekken in een boek, behalve Opgeslagen: de hoofdstukken, de vier tabbladen van het scherm Keuzes en vragen en de pagina Richtlijn. */
+export type Plek = 'hoofdstukken' | Tabblad | 'richtlijn';
 
 /** De volledige naam van elke plek, voor de tabbladen en voor de help. */
-export const PLEKNAAM: Record<Plek, string> = { hoofdstukken: 'Hoofdstukken', ...TABBLADTITEL };
+export const PLEKNAAM: Record<Plek, string> = { hoofdstukken: 'Hoofdstukken', ...TABBLADTITEL, richtlijn: 'Richtlijn' };
 
 /** De naam van de pagina Bewaard; die staat niet als tabblad in de balk maar als link naar de bewaarstatus. */
 export const BEWAARD_NAAM = 'Opgeslagen';
@@ -54,5 +54,6 @@ export function boekPlekken(boek: string, referentie: Referentie, laatsteHoofdst
 			adres: maakAdres({ soort: 'begrippen', boek, tabblad }),
 			aantal: aantallen[tabblad],
 		})),
+		{ plek: 'richtlijn', naam: PLEKNAAM.richtlijn, adres: maakAdres({ soort: 'richtlijn', boek, paragraaf: null }), aantal: null },
 	];
 }

@@ -45,6 +45,19 @@ describe('leesAdres', () => {
 		expect(leesAdres('#/lukas/bewaard')).toEqual({ soort: 'bewaard', boek: 'lukas' });
 	});
 
+	it('leest de pagina Richtlijn met en zonder paragraaf, ook met een slash achteraan', () => {
+		expect(leesAdres('#/lukas/richtlijn')).toEqual({ soort: 'richtlijn', boek: 'lukas', paragraaf: null });
+		expect(leesAdres('#/lukas/richtlijn/')).toEqual({ soort: 'richtlijn', boek: 'lukas', paragraaf: null });
+		expect(leesAdres('#/lukas/richtlijn/17B')).toEqual({ soort: 'richtlijn', boek: 'lukas', paragraaf: '17B' });
+		expect(leesAdres('#/lukas/richtlijn/11/')).toEqual({ soort: 'richtlijn', boek: 'lukas', paragraaf: '11' });
+	});
+
+	it('leest een paragraaf met een kleine letter als hoofdletter en weigert wat geen paragraafnummer is', () => {
+		expect(leesAdres('#/lukas/richtlijn/17b')).toEqual({ soort: 'richtlijn', boek: 'lukas', paragraaf: '17B' });
+		expect(leesAdres('#/lukas/richtlijn/over-deze-versie')).toBeNull();
+		expect(leesAdres('#/lukas/richtlijn/17B/2')).toBeNull();
+	});
+
 	it('leest de galerij, ook met een slash achteraan', () => {
 		expect(leesAdres('#/galerij')).toEqual({ soort: 'galerij' });
 		expect(leesAdres('#/galerij/')).toEqual({ soort: 'galerij' });
@@ -76,6 +89,8 @@ describe('leesAdres', () => {
 			{ soort: 'hoofdstuk', boek: 'het boek', hoofdstuk: 4, vers: 18 },
 			{ soort: 'begrippen', boek: 'het boek', tabblad: 'vragen' },
 			{ soort: 'bewaard', boek: 'het boek' },
+			{ soort: 'richtlijn', boek: 'het boek', paragraaf: '7A' },
+			{ soort: 'richtlijn', boek: 'het boek', paragraaf: null },
 			{ soort: 'galerij' },
 		];
 		for (const adres of adressen) expect(leesAdres(maakAdres(adres))).toEqual(adres);
@@ -88,6 +103,8 @@ describe('maakAdres', () => {
 		expect(maakAdres({ soort: 'hoofdstuk', boek: 'lukas', hoofdstuk: 9, vers: null })).toBe('#/lukas/9');
 		expect(maakAdres({ soort: 'begrippen', boek: 'lukas', tabblad: 'gevonden' })).toBe('#/lukas/begrippen/gevonden');
 		expect(maakAdres({ soort: 'bewaard', boek: 'lukas' })).toBe('#/lukas/opgeslagen');
+		expect(maakAdres({ soort: 'richtlijn', boek: 'lukas', paragraaf: null })).toBe('#/lukas/richtlijn');
+		expect(maakAdres({ soort: 'richtlijn', boek: 'lukas', paragraaf: '17B' })).toBe('#/lukas/richtlijn/17B');
 		expect(maakAdres({ soort: 'galerij' })).toBe('#/galerij');
 	});
 });

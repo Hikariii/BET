@@ -1,0 +1,69 @@
+/* Het vak Reageren: een wit vak met een dunne rand, ingeklapt alleen de knop. Het staat bij een opmerking van Claude en bij een paragraaf van de richtlijn. */
+.reactievak {
+	max-width: 32rem;
+	margin-top: 0.6rem;
+}
+
+.reactievak .antwoordformulier {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.6rem 0.75rem;
+	background: #fff;
+	border: 1px solid var(--rand);
+}
+
+.reactievak .antwoordtoelichting {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	min-width: 0;
+}
+
+.reactievak .antwoordformulier label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	font-size: 0.75rem;
+}
+
+.reactievak .antwoordformulier label.reactievinkje {
+	flex-direction: row;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.9rem;
+}
+
+.reactievak .antwoordformulier textarea {
+	width: 100%;
+	font: inherit;
+	box-sizing: border-box;
+}
+
+.reactievak .toelichting {
+	margin: 0 0 0.5rem;
+	white-space: pre-wrap;
+}
+
+.reactievak .knoppen {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.reactievak .veldhulp {
+	margin: 0;
+	color: var(--gedempt);
+	font-size: 0.75rem;
+}
+
+.reactievak .veldfout {
+	margin: 0;
+	padding-left: 0.5rem;
+	border-left: 2px solid var(--rood);
+	font-weight: 600;
+}
+
+.reactievak .reactiemelding:empty {
+	display: none;
+}

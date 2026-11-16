@@ -3,6 +3,7 @@ import type { Opslag } from '../bewerken/tussenstand';
 import type { BewerktVers } from '../bewerken/types';
 import { alsAntwoord, antwoordenSleutel, leesAntwoorden, schrijfAntwoorden, type Antwoord } from '../antwoorden/antwoorden';
 import { alsReactie, leesReacties, reactiesSleutel, schrijfReacties, type Reactie } from '../reacties/reacties';
+import { alsRichtlijnReactie, leesRichtlijnReacties, RICHTLIJN_REACTIES_SLEUTEL, schrijfRichtlijnReacties, type RichtlijnReactie } from '../reacties/richtlijnReacties';
 import { alsKeuze, keuzesSleutel, leesKeuzes, schrijfKeuzes, type StructureleKeuze } from '../vervangen/keuzes';
 import type { BoekMetHoofdstukken } from './types';
 
@@ -28,6 +29,12 @@ export type Backup = {
 	antwoorden: Antwoord[];
 	/** Reacties op opmerkingen van Claude, op volgorde van bewaren. Een back-up zonder dit veld is geldig: een lege lijst. */
 	reacties: Reactie[];
+	/**
+	 * Reacties op de richtlijn en voorstellen voor een nieuwe regel, op volgorde van bewaren.
+	 * Die staan in de browser bij geen boek (de richtlijn geldt voor alle boeken) en gaan in elke back-up mee.
+	 * Een back-up zonder dit veld is geldig: een lege lijst.
+	 */
+	richtlijnReacties: RichtlijnReactie[];
 };
 
 /**
@@ -58,6 +65,7 @@ export function maakBackup(opslag: Opslag, boek: BoekMetHoofdstukken, repoCommit
 		keuzes: leesKeuzes(opslag, boek.id).reverse(),
 		antwoorden: leesAntwoorden(opslag, boek.id),
 		reacties: leesReacties(opslag, boek.id),
+		richtlijnReacties: leesRichtlijnReacties(opslag),
 	};
 }
 
@@ -118,6 +126,19 @@ function leesReactiesUitBackup(waarde: unknown): Reactie[] | string {
 	return reacties;
 }
 
+function leesRichtlijnReactiesUitBackup(waarde: unknown): RichtlijnReactie[] | string {
+	if (waarde === undefined) return [];
+	if (!Array.isArray(waarde)) return 'De reacties op de richtlijn in de back-up hebben een onbekende vorm.';
+	const reacties: RichtlijnReactie[] = [];
+	for (const ruw of waarde) {
+		const reactie = alsRichtlijnReactie(ruw);
+		if (reactie === null) return 'Een reactie op de richtlijn in de back-up is onleesbaar.';
+		if (reacties.some((bestaand) => bestaand.id === reactie.id)) return `De reactie op de richtlijn met id ${reactie.id} staat twee keer in de back-up.`;
+		reacties.push(reactie);
+	}
+	return reacties;
+}
+
 /**
  * Controleert een back-upbestand streng: elk onderdeel moet de verwachte vorm hebben, anders wordt het hele bestand geweigerd.
  * `boek` is het boek waarin ingeladen wordt; een back-up van een ander boek wordt geweigerd.
@@ -167,7 +188,9 @@ export function leesBackup(tekst: string, boek: string): LeesUitkomst {
 	if (typeof antwoorden === 'string') return beschadigd(antwoorden);
 	const reacties = leesReactiesUitBackup(json['reacties']);
 	if (typeof reacties === 'string') return beschadigd(reacties);
-	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 3, boek, gemaakt, repoCommit, tussenstanden, keuzes, antwoorden, reacties } };
+	const richtlijnReacties = leesRichtlijnReactiesUitBackup(json['richtlijnReacties']);
+	if (typeof richtlijnReacties === 'string') return beschadigd(richtlijnReacties);
+	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 3, boek, gemaakt, repoCommit, tussenstanden, keuzes, antwoorden, reacties, richtlijnReacties } };
 }
 
 /**
@@ -182,6 +205,8 @@ type AntwoordVergelijking = { kwestie: string; optie: string; soort: 'nieuw' | '
 
 type ReactieVergelijking = { nr: string; soort: 'nieuw' | 'overschrijft' | 'jouwe-blijft' | 'gelijk' };
 
+type RichtlijnReactieVergelijking = { id: string; soort: 'nieuw' | 'overschrijft' | 'jouwe-blijft' | 'gelijk' };
+
 export type InlaadVoorbeeld = {
 	/** Per vers in de back-up wat inladen ermee doet, op oplopend hoofdstuk en vers. */
 	verzen: VersVergelijking[];
@@ -190,9 +215,20 @@ export type InlaadVoorbeeld = {
 	antwoorden: AntwoordVergelijking[];
 	/** Per reactie in de back-up wat inladen ermee doet. */
 	reacties: ReactieVergelijking[];
-	telling: { nieuw: number; overschrijft: number; jouweBlijft: number; gelijk: number; keuzesNieuw: number; antwoordenNieuw: number; reactiesNieuw: number };
-	/** Wat Vervangen wist omdat het niet in de back-up staat. */
-	vervangenWist: { verzen: number; keuzes: number; antwoorden: number; reacties: number };
+	/** Per reactie op de richtlijn in de back-up wat inladen ermee doet. */
+	richtlijnReacties: RichtlijnReactieVergelijking[];
+	telling: {
+		nieuw: number;
+		overschrijft: number;
+		jouweBlijft: number;
+		gelijk: number;
+		keuzesNieuw: number;
+		antwoordenNieuw: number;
+		reactiesNieuw: number;
+		richtlijnReactiesNieuw: number;
+	};
+	/** Wat Vervangen wist omdat het niet in de back-up staat. De reacties op de richtlijn horen bij geen boek, dus Vervangen wist die voor alle boeken. */
+	vervangenWist: { verzen: number; keuzes: number; antwoorden: number; reacties: number; richtlijnReacties: number };
 };
 
 function zelfdeBewerking(lokaal: BewerktVers, uitBackup: BewerktVers): boolean {
@@ -233,6 +269,21 @@ function zelfdeReactie(lokaal: Reactie, uitBackup: Reactie): boolean {
 
 /** Bij samenvoegen wint per nummer de nieuwste reactie; bij gelijke tijd de back-up. */
 function lokaleReactieIsNieuwer(lokaal: Reactie, uitBackup: Reactie): boolean {
+	return Date.parse(lokaal.gegeven) > Date.parse(uitBackup.gegeven);
+}
+
+function zelfdeRichtlijnReactie(lokaal: RichtlijnReactie, uitBackup: RichtlijnReactie): boolean {
+	return (
+		lokaal.tekst === uitBackup.tekst &&
+		lokaal.voorstel === uitBackup.voorstel &&
+		lokaal.paragraaf === uitBackup.paragraaf &&
+		lokaal.titel === uitBackup.titel &&
+		lokaal.gegeven === uitBackup.gegeven
+	);
+}
+
+/** Bij samenvoegen wint per id de nieuwste reactie op de richtlijn; bij gelijke tijd de back-up. */
+function lokaleRichtlijnReactieIsNieuwer(lokaal: RichtlijnReactie, uitBackup: RichtlijnReactie): boolean {
 	return Date.parse(lokaal.gegeven) > Date.parse(uitBackup.gegeven);
 }
 
@@ -280,12 +331,20 @@ export function voorbeeldInladen(opslag: Opslag, boek: BoekMetHoofdstukken, back
 		if (zelfdeReactie(eigen, uitBackup)) return { nr: uitBackup.nr, soort: 'gelijk' };
 		return { nr: uitBackup.nr, soort: lokaleReactieIsNieuwer(eigen, uitBackup) ? 'jouwe-blijft' : 'overschrijft' };
 	});
+	const lokaleRichtlijnReacties = leesRichtlijnReacties(opslag);
+	const richtlijnReacties = backup.richtlijnReacties.map((uitBackup): RichtlijnReactieVergelijking => {
+		const eigen = lokaleRichtlijnReacties.find((lokaal) => lokaal.id === uitBackup.id);
+		if (eigen === undefined) return { id: uitBackup.id, soort: 'nieuw' };
+		if (zelfdeRichtlijnReactie(eigen, uitBackup)) return { id: uitBackup.id, soort: 'gelijk' };
+		return { id: uitBackup.id, soort: lokaleRichtlijnReactieIsNieuwer(eigen, uitBackup) ? 'jouwe-blijft' : 'overschrijft' };
+	});
 	const soortAantal = (soort: VersVergelijking['soort']) => verzen.filter((vers) => vers.soort === soort).length;
 	return {
 		verzen,
 		keuzes,
 		antwoorden,
 		reacties,
+		richtlijnReacties,
 		telling: {
 			nieuw: soortAantal('nieuw'),
 			overschrijft: soortAantal('overschrijft'),
@@ -294,19 +353,21 @@ export function voorbeeldInladen(opslag: Opslag, boek: BoekMetHoofdstukken, back
 			keuzesNieuw: keuzes.filter((keuze) => keuze.soort === 'nieuw').length,
 			antwoordenNieuw: antwoorden.filter((antwoord) => antwoord.soort === 'nieuw').length,
 			reactiesNieuw: reacties.filter((reactie) => reactie.soort === 'nieuw').length,
+			richtlijnReactiesNieuw: richtlijnReacties.filter((reactie) => reactie.soort === 'nieuw').length,
 		},
 		vervangenWist: {
 			verzen: wistVerzen,
 			keuzes: lokaleKeuzes.filter((lokaal) => !backup.keuzes.some((keuze) => keuze.id === lokaal.id)).length,
 			antwoorden: lokaleAntwoorden.filter((lokaal) => !backup.antwoorden.some((antwoord) => antwoord.kwestie === lokaal.kwestie)).length,
 			reacties: lokaleReacties.filter((lokaal) => !backup.reacties.some((reactie) => reactie.nr === lokaal.nr)).length,
+			richtlijnReacties: lokaleRichtlijnReacties.filter((lokaal) => !backup.richtlijnReacties.some((reactie) => reactie.id === lokaal.id)).length,
 		},
 	};
 }
 
 export type InlaadUitkomst = {
-	/** Het aantal verzen, keuzes, antwoorden en reacties dat nu in de opslag staat dankzij het inladen. */
-	geschreven: { verzen: number; keuzes: number; antwoorden: number; reacties: number };
+	/** Het aantal verzen, keuzes, antwoorden, reacties en reacties op de richtlijn dat nu in de opslag staat dankzij het inladen. */
+	geschreven: { verzen: number; keuzes: number; antwoorden: number; reacties: number; richtlijnReacties: number };
 	/** Leeg als alles gelukt is. */
 	meldingen: string[];
 };
@@ -330,10 +391,11 @@ function nietBewaard(hoofdstuk: number): string {
 const KEUZES_NIET_BEWAARD = `De vervangingen konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
 const ANTWOORDEN_NIET_BEWAARD = `De antwoorden konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
 const REACTIES_NIET_BEWAARD = `De reacties konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
+const RICHTLIJN_REACTIES_NIET_BEWAARD = `De reacties op de richtlijn konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
 
 function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst {
 	const meldingen: string[] = [];
-	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 };
+	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0, richtlijnReacties: 0 };
 	for (const { hoofdstuk, verzen: uitBackup } of backup.tussenstanden) {
 		const verzen = leesTussenstand(opslag, boek, hoofdstuk).verzen;
 		let veranderd = 0;
@@ -386,16 +448,30 @@ function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst
 		if (schrijfReacties(opslag, boek, samenReacties)) geschreven.reacties += veranderdeReacties;
 		else meldingen.push(REACTIES_NIET_BEWAARD);
 	}
+	const samenRichtlijnReacties = leesRichtlijnReacties(opslag);
+	let veranderdeRichtlijnReacties = 0;
+	for (const reactie of backup.richtlijnReacties) {
+		const index = samenRichtlijnReacties.findIndex((eigen) => eigen.id === reactie.id);
+		const eigen = samenRichtlijnReacties[index];
+		if (eigen === undefined) samenRichtlijnReacties.push(reactie);
+		else if (zelfdeRichtlijnReactie(eigen, reactie) || lokaleRichtlijnReactieIsNieuwer(eigen, reactie)) continue;
+		else samenRichtlijnReacties[index] = reactie;
+		veranderdeRichtlijnReacties++;
+	}
+	if (veranderdeRichtlijnReacties > 0) {
+		if (schrijfRichtlijnReacties(opslag, samenRichtlijnReacties)) geschreven.richtlijnReacties += veranderdeRichtlijnReacties;
+		else meldingen.push(RICHTLIJN_REACTIES_NIET_BEWAARD);
+	}
 	return { geschreven, meldingen };
 }
 
 function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): InlaadUitkomst {
-	const sleutels = [...betrokkenHoofdstukken(boek, backup).map((hoofdstuk) => tussenstandSleutel(boek.id, hoofdstuk)), keuzesSleutel(boek.id), antwoordenSleutel(boek.id), reactiesSleutel(boek.id)];
+	const sleutels = [...betrokkenHoofdstukken(boek, backup).map((hoofdstuk) => tussenstandSleutel(boek.id, hoofdstuk)), keuzesSleutel(boek.id), antwoordenSleutel(boek.id), reactiesSleutel(boek.id), RICHTLIJN_REACTIES_SLEUTEL];
 	const oudeWaarden = new Map(sleutels.map((sleutel) => [sleutel, opslag.getItem(sleutel)]));
 	for (const sleutel of sleutels) opslag.removeItem(sleutel);
 
 	const meldingen: string[] = [];
-	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 };
+	const geschreven = { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0, richtlijnReacties: 0 };
 	for (const { hoofdstuk, verzen } of backup.tussenstanden) {
 		if (schrijfHoofdstuk(opslag, boek.id, hoofdstuk, verzen)) geschreven.verzen += Object.keys(verzen).length;
 		else meldingen.push(nietBewaard(hoofdstuk));
@@ -412,6 +488,10 @@ function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): Inl
 		if (schrijfReacties(opslag, boek.id, backup.reacties)) geschreven.reacties = backup.reacties.length;
 		else meldingen.push(REACTIES_NIET_BEWAARD);
 	}
+	if (backup.richtlijnReacties.length > 0) {
+		if (schrijfRichtlijnReacties(opslag, backup.richtlijnReacties)) geschreven.richtlijnReacties = backup.richtlijnReacties.length;
+		else meldingen.push(RICHTLIJN_REACTIES_NIET_BEWAARD);
+	}
 	if (meldingen.length === 0) return { geschreven, meldingen };
 
 	try {
@@ -419,7 +499,7 @@ function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): Inl
 			if (waarde === null) opslag.removeItem(sleutel);
 			else opslag.setItem(sleutel, waarde);
 		}
-		return { geschreven: { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0 }, meldingen: [...meldingen, 'Er is niets veranderd: de oude stand is teruggezet.'] };
+		return { geschreven: { verzen: 0, keuzes: 0, antwoorden: 0, reacties: 0, richtlijnReacties: 0 }, meldingen: [...meldingen, 'Er is niets veranderd: de oude stand is teruggezet.'] };
 	} catch {
 		return { geschreven, meldingen: [...meldingen, 'De oude stand kon niet worden teruggezet. Laad de back-up opnieuw of kopieer je tekst.'] };
 	}
@@ -429,8 +509,8 @@ function vervang(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup): Inl
  * Schrijft de back-up in de opslag.
  * Samenvoegen houdt wat er is; bij een vers wint het nieuwste, bij gelijke tijd de back-up; keuzes die al bestaan blijven.
  * Een antwoord in beide krijgt optie en toelichting van het nieuwste (bij gelijke tijd de back-up) en de keuzes van beide.
- * Een reactie op dezelfde opmerking: de nieuwste blijft staan (bij gelijke tijd de back-up).
- * Vervangen wist eerst alles van dit boek; lukt het schrijven niet helemaal, dan komt de oude stand terug.
+ * Een reactie op dezelfde opmerking: de nieuwste blijft staan (bij gelijke tijd de back-up). Voor een reactie op de richtlijn met hetzelfde id geldt dat ook.
+ * Vervangen wist eerst alles van dit boek en ook alle reacties op de richtlijn; lukt het schrijven niet helemaal, dan komt de oude stand terug.
  */
 export function pasBackupToe(opslag: Opslag, boek: BoekMetHoofdstukken, backup: Backup, modus: InlaadModus): InlaadUitkomst {
 	return modus === 'samenvoegen' ? voegSamen(opslag, boek.id, backup) : vervang(opslag, boek, backup);

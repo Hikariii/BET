@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { bewaarAntwoord } from '../antwoorden/antwoorden';
 import { bewaarReactie } from '../reacties/reacties';
+import { bewaarRichtlijnReactie } from '../reacties/richtlijnReacties';
 import { bewaarVers } from '../bewerken/tussenstand';
 import { knipVers } from '../bewerken/versknip';
 import { pasKeuzeToe } from '../vervangen/keuzes';
@@ -26,7 +27,8 @@ describe('bewaardOverzicht', () => {
 		expect(overzicht.hoofdstukken).toEqual([]);
 		expect(overzicht.keuzes).toEqual([]);
 		expect(overzicht.antwoorden).toEqual([]);
-		expect(overzicht.totaal).toEqual({ verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0 });
+		expect(overzicht.totaal).toEqual({ verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0, richtlijnReacties: 0 });
+		expect(overzicht.richtlijnReacties).toEqual([]);
 		expect(overzicht.laatstBewaard).toBeNull();
 	});
 
@@ -129,6 +131,23 @@ describe('bewaardOverzicht', () => {
 		]);
 		expect(overzicht.totaal).toMatchObject({ verzen: 1, reacties: 2 });
 		expect(overzicht.laatstBewaard).toBe('2099-01-01T00:00:00.000Z');
+	});
+
+	it('toont de reacties op de richtlijn, nieuwste eerst, voor elk boek hetzelfde, en telt ze mee in het laatste bewaarmoment', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarVers(opslag, 'lukas', 1, 1, inhoud(' a'), inhoud(' b'));
+		bewaarRichtlijnReactie(opslag, { id: '§17B', paragraaf: '17B', titel: 'Messias / Christus', tekst: 'Altijd Messias.', voorstel: false, gegeven: '2026-11-16T09:00:00.000Z' });
+		bewaarRichtlijnReactie(opslag, { id: 'nieuw-1', paragraaf: null, titel: '', tekst: 'Bronspelling bij namen.', voorstel: true, gegeven: '2099-01-01T00:00:00.000Z' });
+
+		const overzicht = bewaardOverzicht(opslag, BOEK, REPO);
+
+		expect(overzicht.richtlijnReacties).toEqual([
+			{ id: 'nieuw-1', paragraaf: null, titel: '', tekst: 'Bronspelling bij namen.', voorstel: true, gegeven: '2099-01-01T00:00:00.000Z' },
+			{ id: '§17B', paragraaf: '17B', titel: 'Messias / Christus', tekst: 'Altijd Messias.', voorstel: false, gegeven: '2026-11-16T09:00:00.000Z' },
+		]);
+		expect(overzicht.totaal).toMatchObject({ verzen: 1, richtlijnReacties: 2 });
+		expect(overzicht.laatstBewaard).toBe('2099-01-01T00:00:00.000Z');
+		expect(bewaardOverzicht(opslag, { ...BOEK, id: 'johannes', hoofdstukken: [] }, []).richtlijnReacties).toHaveLength(2);
 	});
 
 	it('toont niets van een ander boek', () => {

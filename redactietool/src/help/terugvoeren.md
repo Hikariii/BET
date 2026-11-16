@@ -15,13 +15,17 @@ Op verzoek van de eigenaar neemt Claude je Word-bestand over (dat heet terugvoer
 
 ## Waarvoor de export dient
 
-**Export voor Claude** is uitleg. Hij bevat wel de tekst van de verzen die je hebt bewerkt, maar Claude gebruikt die nooit als bron voor de tekst: de tekst komt altijd uit Word. Hij laat Claude zien welke verzen je hebt bewerkt, welke vervangingen je hebt toegepast, welke vragen je hebt beantwoord (met je toelichting) en waar je hebt gereageerd op een opmerking van Claude. Verschilt de tekst in de export van die in Word, dan volgt Claude Word en meldt het verschil.
+**Export voor Claude** is uitleg. Hij bevat wel de tekst van de verzen die je hebt bewerkt, maar Claude gebruikt die nooit als bron voor de tekst: de tekst komt altijd uit Word. Hij laat Claude zien welke verzen je hebt bewerkt, welke vervangingen je hebt toegepast, welke vragen je hebt beantwoord (met je toelichting), waar je hebt gereageerd op een opmerking van Claude en wat je over de richtlijn hebt geschreven. Verschilt de tekst in de export van die in Word, dan volgt Claude Word en meldt het verschil.
 
 De export is niet nodig: Word alleen is genoeg. Hij helpt Claude wel om te begrijpen waarom je iets hebt gedaan.
 
 ## Je reactie op een opmerking van Claude
 
 Heb je bij {{plek:vragen}} gereageerd op een opmerking van Claude uit dit hoofdstuk, dan staat die reactie in de export. Claude leest hem en verwerkt hem, in de tekst of bij de opmerkingen van het hoofdstuk, pas na akkoord van de eigenaar. Heb je het vinkje **Maak hier een vertaalvraag van** aangezet, dan zet Claude de opmerking als nieuwe vraag in de lijst met open vragen, ook na akkoord van de eigenaar.
+
+## Je reactie op de richtlijn
+
+Heb je bij {{plek:richtlijn}} gereageerd op een paragraaf of een nieuwe regel voorgesteld, dan staat dat in elke export, van elk hoofdstuk, want de richtlijn geldt voor alle boeken. Claude schrijft per reactie of voorstel een tekstvoorstel voor de richtlijn. Pas als de eigenaar akkoord geeft, past Claude de richtlijn aan en krijgt hij een nieuwe versie met een markering bij de regel. Dubbele reacties herkent Claude aan het nummer en de tijd.
 
 ## Je toelichting wordt een regel, na akkoord
 

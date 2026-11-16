@@ -4,6 +4,7 @@ import type { HoofdstukData, VersRef } from '../data/types';
 import { EIGEN_ANTWOORD, type Antwoord } from '../antwoorden/antwoorden';
 import { parseerHoofdstuk } from '../formaat/parseer';
 import type { Reactie } from '../reacties/reacties';
+import type { RichtlijnReactie } from '../reacties/richtlijnReacties';
 import type { StructureleKeuze } from '../vervangen/keuzes';
 import { exportBestandsnaam, maakExport } from './maakExport';
 import type { ExportInvoer } from './maakExport';
@@ -54,6 +55,7 @@ function invoer(
 	vragen: Record<string, { nr: string; verzen: VersRef[] }> = {},
 	reacties: Reactie[] = [],
 	opmerkingVerzen: Record<string, VersRef[]> = {},
+	richtlijnReacties: RichtlijnReactie[] = [],
 ): ExportInvoer {
 	return {
 		boek: 'lukas',
@@ -62,6 +64,7 @@ function invoer(
 		keuzes,
 		antwoorden,
 		reacties,
+		richtlijnReacties,
 		opmerkingVerzen: new Map(Object.entries(opmerkingVerzen)),
 		vragen: new Map(Object.entries(vragen)),
 		repoCommit: 'abc123',
@@ -84,6 +87,7 @@ describe('maakExport', () => {
 			structureleKeuzes: [],
 			beantwoordeVragen: [],
 			reactiesOpOpmerkingen: [],
+			reactiesOpRichtlijn: [],
 		});
 	});
 
@@ -388,6 +392,33 @@ describe('maakExport met reacties op opmerkingen', () => {
 
 		expect(uitkomst.verzen).toEqual([]);
 		expect(uitkomst.reactiesOpOpmerkingen.map((reactie) => reactie.nr)).toEqual(['O4.3']);
+	});
+});
+
+describe('maakExport met reacties op de richtlijn', () => {
+	const OP_PARAGRAAF: RichtlijnReactie = { id: '§17B', paragraaf: '17B', titel: 'Messias / Christus', tekst: 'Liever altijd Messias.', voorstel: false, gegeven: '2026-11-15T10:00:00.000Z' };
+	const NIEUWE_REGEL: RichtlijnReactie = { id: 'nieuw-1', paragraaf: null, titel: '', tekst: 'Bronspelling bij namen.', voorstel: true, gegeven: '2026-11-15T10:05:00.000Z' };
+	const exportMet = (hoofdstuk: HoofdstukData, richtlijnReacties: RichtlijnReactie[]) =>
+		maakExport({ ...invoer({ verzen: {} }, '', [], [], {}, [], {}, richtlijnReacties), hoofdstuk });
+
+	it('neemt alle reacties op de richtlijn op, ook die van een voorstel voor een nieuwe regel', () => {
+		const { reactiesOpRichtlijn } = maakExport(invoer({ verzen: {} }, '', [], [], {}, [], {}, [OP_PARAGRAAF, NIEUWE_REGEL]));
+
+		expect(reactiesOpRichtlijn).toEqual([OP_PARAGRAAF, NIEUWE_REGEL]);
+	});
+
+	it('zet ze in de export van elk hoofdstuk, want de richtlijn hoort bij geen hoofdstuk', () => {
+		const ander: HoofdstukData = { ...HOOFDSTUK, nummer: 9 };
+
+		expect(exportMet(HOOFDSTUK, [OP_PARAGRAAF]).reactiesOpRichtlijn).toEqual([OP_PARAGRAAF]);
+		expect(exportMet(ander, [OP_PARAGRAAF]).reactiesOpRichtlijn).toEqual([OP_PARAGRAAF]);
+	});
+
+	it('houdt de versie op 3 en geeft een lege lijst zonder reacties op de richtlijn', () => {
+		const uitkomst = maakExport(invoer({ verzen: {} }));
+
+		expect(uitkomst.versie).toBe(3);
+		expect(uitkomst.reactiesOpRichtlijn).toEqual([]);
 	});
 });
 

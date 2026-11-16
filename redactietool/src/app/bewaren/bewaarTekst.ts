@@ -18,15 +18,16 @@ export function tijdVan(iso: string, nu: Date = new Date()): string {
 	return (zelfdeDag(moment, nu) ? TIJD : DATUM_EN_TIJD).format(moment);
 }
 
-/** Het aantal verzen, hoofdstukken, vervangingen, antwoorden en reacties in één zin, zonder de tijd: "12 verzen in 3 hoofdstukken, 1 antwoord, 2 reacties". */
+/** Het aantal verzen, hoofdstukken, vervangingen, antwoorden en reacties in één zin, zonder de tijd: "12 verzen in 3 hoofdstukken, 1 antwoord, 2 reacties, 1 reactie op de richtlijn". */
 export function bewaarTelling(overzicht: BewaardOverzicht): string {
-	const { verzen, hoofdstukken, keuzes, antwoorden, reacties } = overzicht.totaal;
-	if (verzen === 0 && keuzes === 0 && antwoorden === 0 && reacties === 0) return 'nog niets';
+	const { verzen, hoofdstukken, keuzes, antwoorden, reacties, richtlijnReacties } = overzicht.totaal;
+	if (verzen === 0 && keuzes === 0 && antwoorden === 0 && reacties === 0 && richtlijnReacties === 0) return 'nog niets';
 	const delen: string[] = [];
 	if (verzen > 0) delen.push(`${meervoud(verzen, 'vers', 'verzen')} in ${meervoud(hoofdstukken, 'hoofdstuk', 'hoofdstukken')}`);
 	if (keuzes > 0) delen.push(meervoud(keuzes, 'vervanging', 'vervangingen'));
 	if (antwoorden > 0) delen.push(meervoud(antwoorden, 'antwoord', 'antwoorden'));
 	if (reacties > 0) delen.push(meervoud(reacties, 'reactie', 'reacties'));
+	if (richtlijnReacties > 0) delen.push(`${meervoud(richtlijnReacties, 'reactie', 'reacties')} op de richtlijn`);
 	return delen.join(', ');
 }
 

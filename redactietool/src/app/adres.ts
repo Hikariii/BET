@@ -4,7 +4,7 @@ export type Tabblad = (typeof TABBLADEN)[number];
 
 /**
  * Het adres in de browser.
- * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden; `#/lukas/begrippen/vragen/<sleutel>` is één vraag op het tabblad Vertaalvragen; `#/lukas/opgeslagen` is het overzicht van wat de browser bewaart; `#/galerij` is de galerij met de componenten. Een slash achteraan mag.
+ * `#/lukas/9/22` is Lukas 9, vers 22; `#/lukas/begrippen/gevonden` is het tabblad Gevonden; `#/lukas/begrippen/vragen/<sleutel>` is één vraag op het tabblad Vertaalvragen; `#/lukas/richtlijn` is de pagina Richtlijn en `#/lukas/richtlijn/17B` die pagina bij §17B; `#/lukas/opgeslagen` is het overzicht van wat de browser bewaart; `#/galerij` is de galerij met de componenten. Een slash achteraan mag.
  */
 export type Adres = BoekAdres | { soort: 'galerij' };
 
@@ -24,12 +24,19 @@ export type BoekAdres =
 			/** De sleutel van één vraag (zie `vraagSleutels`); alleen op het tabblad Vertaalvragen. Ontbreekt als het adres naar het hele tabblad wijst. */
 			vraag?: string;
 	  }
-	| { soort: 'bewaard'; boek: string };
+	| { soort: 'bewaard'; boek: string }
+	| {
+			soort: 'richtlijn';
+			boek: string;
+			/** Het nummer van de paragraaf zonder §, bv. "17B"; `null` als het adres naar de hele pagina wijst. */
+			paragraaf: string | null;
+	  };
 
 const HOOFDSTUK = /^#\/([^/]+)\/(\d+)(?:\/(\d+))?\/?$/;
 const BEGRIPPEN = /^#\/([^/]+)\/begrippen(?:\/([a-z]+)(?:\/([^/]+))?)?\/?$/;
 /** De pagina heette eerst Bewaard; oude links en bladwijzers naar `bewaard` werken nog. */
 const BEWAARD = /^#\/([^/]+)\/(?:opgeslagen|bewaard)\/?$/;
+const RICHTLIJN = /^#\/([^/]+)\/richtlijn(?:\/(\d+[A-Za-z]?))?\/?$/;
 const GALERIJ = /^#\/galerij\/?$/;
 
 /** Geeft `null` voor een leeg of onbegrijpelijk adres. */
@@ -58,6 +65,11 @@ export function leesAdres(hash: string): Adres | null {
 		const boekNaam = decodeerDeel(bewaard[1] ?? '');
 		return boekNaam === null ? null : { soort: 'bewaard', boek: boekNaam };
 	}
+	const richtlijn = RICHTLIJN.exec(hash);
+	if (richtlijn !== null) {
+		const boekNaam = decodeerDeel(richtlijn[1] ?? '');
+		return boekNaam === null ? null : { soort: 'richtlijn', boek: boekNaam, paragraaf: richtlijn[2]?.toUpperCase() ?? null };
+	}
 	return null;
 }
 
@@ -69,6 +81,7 @@ export function maakAdres(adres: Adres): string {
 		return adres.vraag === undefined ? tabblad : `${tabblad}/${encodeURIComponent(adres.vraag)}`;
 	}
 	if (adres.soort === 'bewaard') return `${boek}/opgeslagen`;
+	if (adres.soort === 'richtlijn') return adres.paragraaf === null ? `${boek}/richtlijn` : `${boek}/richtlijn/${adres.paragraaf}`;
 	const hoofdstukAdres = `${boek}/${adres.hoofdstuk}`;
 	return adres.vers === null ? hoofdstukAdres : `${hoofdstukAdres}/${adres.vers}`;
 }

@@ -319,6 +319,7 @@ describe('herkomst', () => {
 			keuzes: leesKeuzes(opslag, 'lukas'),
 			antwoorden: [],
 			reacties: [],
+			richtlijnReacties: [],
 			opmerkingVerzen: new Map(),
 			vragen: new Map(),
 			toelichting: '',

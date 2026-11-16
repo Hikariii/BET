@@ -6,6 +6,7 @@ import { exportBestandsnaam, maakExport } from '../../export/maakExport';
 import type { Hoofdstuk } from '../../formaat/types';
 import { maakKlembordInhoud, vulKopieerGebeurtenis } from '../../klembord/kopieer';
 import { leesReacties } from '../../reacties/reacties';
+import { leesRichtlijnReacties } from '../../reacties/richtlijnReacties';
 import { verzamelVragen } from '../../begrippen/verzamelVragen';
 import { leesKeuzes } from '../../vervangen/keuzes';
 import { meervoud, verouderdMelding } from '../bewaren/bewaarTekst';
@@ -73,6 +74,7 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 			keuzes: leesKeuzes(browseropslag(), boek.id),
 			antwoorden: leesAntwoorden(browseropslag(), boek.id),
 			reacties: leesReacties(browseropslag(), boek.id),
+			richtlijnReacties: leesRichtlijnReacties(browseropslag()),
 			opmerkingVerzen: new Map(verzamelVragen([], [repo]).map((vraag) => [vraag.nr, vraag.verzen])),
 			vragen: new Map(openVragen.map((vraag) => [vraag.kwestie, { nr: vraag.nr, verzen: vraag.verzen }])),
 			repoCommit: __REPO_COMMIT__,
@@ -80,8 +82,8 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 			nu: new Date(),
 		});
 	const { aantalBewerkt, aantalReacties, verouderdeVerzen } = useMemo(() => {
-		const { verzen, reactiesOpOpmerkingen } = bouwExport('');
-		return { aantalBewerkt: verzen.length, aantalReacties: reactiesOpOpmerkingen.length, verouderdeVerzen: verzen.filter((vers) => vers.verouderd).map((vers) => `vers ${vers.vers}`) };
+		const { verzen, reactiesOpOpmerkingen, reactiesOpRichtlijn } = bouwExport('');
+		return { aantalBewerkt: verzen.length, aantalReacties: reactiesOpOpmerkingen.length + reactiesOpRichtlijn.length, verouderdeVerzen: verzen.filter((vers) => vers.verouderd).map((vers) => `vers ${vers.vers}`) };
 	}, [boek.id, repo, tussenstand]);
 
 	const kopieer = () => {

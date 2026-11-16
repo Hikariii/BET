@@ -15,8 +15,8 @@ function overzichtMetBewerking(bewaard: Date): BewaardOverzicht {
 		hoofdstukken: [{ hoofdstuk: 1, verzen: [{ vers: 1, bewaard: bewaard.toISOString(), verouderd: false, herkomst: 'zelf getypt' }] }],
 		keuzes: [],
 		antwoorden: [],
-		reacties: [],
-		totaal: { verzen: 1, hoofdstukken: 1, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0 },
+		reacties: [], richtlijnReacties: [],
+		totaal: { verzen: 1, hoofdstukken: 1, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0, richtlijnReacties: 0 },
 		verouderdBekend: true,
 		laatstBewaard: bewaard.toISOString(),
 	};
@@ -26,8 +26,8 @@ const LEEG_OVERZICHT: BewaardOverzicht = {
 	hoofdstukken: [],
 	keuzes: [],
 	antwoorden: [],
-	reacties: [],
-	totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0 },
+	reacties: [], richtlijnReacties: [],
+	totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0, richtlijnReacties: 0 },
 	verouderdBekend: true,
 	laatstBewaard: null,
 };
@@ -100,7 +100,7 @@ describe('backupHerinnering', () => {
 		const overzicht: BewaardOverzicht = {
 			...LEEG_OVERZICHT,
 			keuzes: [{ id: 'k', soort: 'tekst', zoekterm: 'a', nieuw: 'b', van: null, naar: null, toegepast: lokaal(11, 10).toISOString(), aantalVerzen: 2 }],
-			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 1, antwoorden: 0, reacties: 0 },
+			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 1, antwoorden: 0, reacties: 0, richtlijnReacties: 0 },
 			laatstBewaard: lokaal(11, 10).toISOString(),
 		};
 
@@ -112,7 +112,20 @@ describe('backupHerinnering', () => {
 		const overzicht: BewaardOverzicht = {
 			...LEEG_OVERZICHT,
 			reacties: [{ nr: 'O1.1', hoofdstuk: 1, kwestie: 'Vrije weergave', wordtVraag: false, heeftTekst: true, gegeven }],
-			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 1 },
+			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 1, richtlijnReacties: 0 },
+			laatstBewaard: gegeven,
+		};
+
+		expect(backupHerinnering(overzicht, null, NU)).toBe('Maak een back-up: je hebt er nog geen gemaakt.');
+		expect(backupHerinnering(overzicht, lokaal(11, 8).toISOString(), NU)).toBe('Maak een back-up: je laatste is van 12 dagen geleden.');
+	});
+
+	it('telt een reactie op de richtlijn als bewerking, zonder back-up en na een oude back-up', () => {
+		const gegeven = lokaal(11, 10).toISOString();
+		const overzicht: BewaardOverzicht = {
+			...LEEG_OVERZICHT,
+			richtlijnReacties: [{ id: 'nieuw-1', paragraaf: null, titel: '', tekst: 'Nieuwe regel.', voorstel: true, gegeven }],
+			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0, reacties: 0, richtlijnReacties: 1 },
 			laatstBewaard: gegeven,
 		};
 
@@ -125,7 +138,7 @@ describe('backupHerinnering', () => {
 		const overzicht: BewaardOverzicht = {
 			...LEEG_OVERZICHT,
 			antwoorden: [{ kwestie: 'Harde man', optie: 'a) zachte', gegeven }],
-			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 1, reacties: 0 },
+			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 1, reacties: 0, richtlijnReacties: 0 },
 			laatstBewaard: gegeven,
 		};
 

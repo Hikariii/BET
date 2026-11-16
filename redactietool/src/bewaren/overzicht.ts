@@ -3,6 +3,7 @@ import { knipVers } from '../bewerken/versknip';
 import { leesAntwoorden } from '../antwoorden/antwoorden';
 import type { HoofdstukData } from '../data/types';
 import { leesReacties } from '../reacties/reacties';
+import { leesRichtlijnReacties } from '../reacties/richtlijnReacties';
 import { leesKeuzes, type StructureleKeuze } from '../vervangen/keuzes';
 import type { BoekMetHoofdstukken } from './types';
 
@@ -50,6 +51,19 @@ export type BewaardeReactie = {
 	gegeven: string;
 };
 
+/** Een reactie op de richtlijn of een voorstel voor een nieuwe regel, zoals het overzicht het toont. */
+export type BewaardeRichtlijnReactie = {
+	id: string;
+	/** Het nummer van de paragraaf zonder §; `null` bij een voorstel voor een nieuwe regel. */
+	paragraaf: string | null;
+	titel: string;
+	voorstel: boolean;
+	/** De tekst zelf, zodat het overzicht een nieuwe regel kan tonen zonder paragraaf. */
+	tekst: string;
+	/** ISO-tijd waarop de reactie voor het laatst is vastgelegd. */
+	gegeven: string;
+};
+
 export type BewaardOverzicht = {
 	/** Alleen hoofdstukken met bewerkte verzen, op oplopend nummer. */
 	hoofdstukken: BewaardHoofdstuk[];
@@ -59,10 +73,12 @@ export type BewaardOverzicht = {
 	antwoorden: BewaardAntwoord[];
 	/** Nieuwste eerst. */
 	reacties: BewaardeReactie[];
-	totaal: { verzen: number; hoofdstukken: number; verouderd: number; keuzes: number; antwoorden: number; reacties: number };
+	/** Nieuwste eerst. Horen bij geen boek: het overzicht van elk boek toont dezelfde lijst. */
+	richtlijnReacties: BewaardeRichtlijnReactie[];
+	totaal: { verzen: number; hoofdstukken: number; verouderd: number; keuzes: number; antwoorden: number; reacties: number; richtlijnReacties: number };
 	/** Waar elk hoofdstuk met bewerkingen uit de repo bekend was, zodat `verouderd` iets zegt. */
 	verouderdBekend: boolean;
-	/** ISO-tijd van het laatste bewaren van een vers, toepassen van een keuze of geven van een antwoord of een reactie; `null` als er niets bewaard is. */
+	/** ISO-tijd van het laatste bewaren van een vers, toepassen van een keuze of geven van een antwoord of een reactie (ook op de richtlijn); `null` als er niets bewaard is. */
 	laatstBewaard: string | null;
 };
 
@@ -80,7 +96,7 @@ function laatsteTijd(tijden: readonly string[]): string | null {
 }
 
 /**
- * Wat er in de opslag bewaard is voor dit boek: de bewerkte verzen per hoofdstuk, de toegepaste keuzes de antwoorden op vertaalvragen en de reacties op opmerkingen van Claude.
+ * Wat er in de opslag bewaard is voor dit boek: de bewerkte verzen per hoofdstuk, de toegepaste keuzes de antwoorden op vertaalvragen, de reacties op opmerkingen van Claude en de reacties op de richtlijn.
  * `repo` zijn de hoofdstukken uit de repo; zonder het hoofdstuk van een bewerkt vers weet het overzicht niet of die verouderd is.
  */
 export function bewaardOverzicht(opslag: Opslag, boek: BoekMetHoofdstukken, repo: readonly HoofdstukData[]): BewaardOverzicht {
@@ -112,12 +128,14 @@ export function bewaardOverzicht(opslag: Opslag, boek: BoekMetHoofdstukken, repo
 	const reacties = leesReacties(opslag, boek.id)
 		.map(({ nr, hoofdstuk, kwestie, wordtVraag, tekst, gegeven }): BewaardeReactie => ({ nr, hoofdstuk, kwestie, wordtVraag, heeftTekst: tekst !== '', gegeven }))
 		.sort((een, ander) => Date.parse(ander.gegeven) - Date.parse(een.gegeven));
+	const richtlijnReacties = leesRichtlijnReacties(opslag).sort((een, ander) => Date.parse(ander.gegeven) - Date.parse(een.gegeven));
 	const alleVerzen = hoofdstukken.flatMap((hoofdstuk) => hoofdstuk.verzen);
 	return {
 		hoofdstukken,
 		keuzes,
 		antwoorden,
 		reacties,
+		richtlijnReacties,
 		totaal: {
 			verzen: alleVerzen.length,
 			hoofdstukken: hoofdstukken.length,
@@ -125,8 +143,9 @@ export function bewaardOverzicht(opslag: Opslag, boek: BoekMetHoofdstukken, repo
 			keuzes: keuzes.length,
 			antwoorden: antwoorden.length,
 			reacties: reacties.length,
+			richtlijnReacties: richtlijnReacties.length,
 		},
 		verouderdBekend,
-		laatstBewaard: laatsteTijd([...alleVerzen.map((vers) => vers.bewaard), ...keuzes.map((keuze) => keuze.toegepast), ...antwoorden.map((antwoord) => antwoord.gegeven), ...reacties.map((reactie) => reactie.gegeven)]),
+		laatstBewaard: laatsteTijd([...alleVerzen.map((vers) => vers.bewaard), ...keuzes.map((keuze) => keuze.toegepast), ...antwoorden.map((antwoord) => antwoord.gegeven), ...reacties.map((reactie) => reactie.gegeven), ...richtlijnReacties.map((reactie) => reactie.gegeven)]),
 	};
 }

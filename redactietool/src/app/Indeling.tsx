@@ -36,7 +36,7 @@ type Props = {
 export function Indeling({ weergavebeheer, boek, referentie, pagina, huidigHoofdstuk, tabblad, titel, acties, children }: Props) {
 	const plekken = useBoekPlekken(boek, referentie, huidigHoofdstuk);
 	const opHoofdstukPagina = pagina === 'hoofdstuk';
-	const huidigPlek: Plek | null = opHoofdstukPagina ? 'hoofdstukken' : tabblad;
+	const huidigPlek: Plek | null = opHoofdstukPagina ? 'hoofdstukken' : pagina === 'richtlijn' ? 'richtlijn' : tabblad;
 	useKopFocus(huidigPlek ?? pagina);
 	return (
 		<>

@@ -43,7 +43,7 @@ export function Naslagkaart({ naslag, boekId, referentie, id, onSluit }: Props) 
 				</button>
 			</header>
 			{naslag.soort === 'richtlijn' ? (
-				<RichtlijnInhoud paragraaf={naslag.paragraaf} />
+				<RichtlijnInhoud paragraaf={naslag.paragraaf} boekId={boekId} />
 			) : (
 				<PrecedentenInhoud precedenten={precedentenBijRegel(naslag.regel, referentie.precedenten)} aantalInTabel={referentie.precedenten.length} boekId={boekId} />
 			)}
@@ -51,7 +51,7 @@ export function Naslagkaart({ naslag, boekId, referentie, id, onSluit }: Props) 
 	);
 }
 
-function RichtlijnInhoud({ paragraaf }: { paragraaf: string }) {
+function RichtlijnInhoud({ paragraaf, boekId }: { paragraaf: string; boekId: string }) {
 	const richtlijn = useLaden(laadRichtlijn, []);
 	if (richtlijn.soort === 'laden') {
 		return <p>De richtlijn wordt geladen.</p>;
@@ -59,13 +59,16 @@ function RichtlijnInhoud({ paragraaf }: { paragraaf: string }) {
 	if (richtlijn.soort === 'fout') {
 		return <p role="alert">De richtlijn kon niet geladen worden: {richtlijn.melding}</p>;
 	}
-	const sectie = zoekSectie(richtlijn.waarde, paragraaf);
+	const sectie = zoekSectie(richtlijn.waarde.secties, paragraaf);
 	if (sectie === null) {
 		return <p>§{paragraaf} staat niet in de richtlijn.</p>;
 	}
 	return (
 		<>
 			<p class="sectietitel">{sectie.titel}</p>
+			<p class="naslagmelding">
+				<a href={maakAdres({ soort: 'richtlijn', boek: boekId, paragraaf: sectie.paragraaf })}>Lees in de richtlijn</a>
+			</p>
 			<Markdownweergave markdown={sectie.markdown} />
 		</>
 	);

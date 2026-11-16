@@ -414,27 +414,6 @@
 	outline-offset: 2px;
 }
 
-/* Het vak Reageren bij een opmerking van Claude: dezelfde vormgeving als het antwoordvak, onder de verzen van de opmerking. */
-.vertaalvragen .reactievak {
-	max-width: 32rem;
-	margin-top: .6rem;
-}
-
-.vertaalvragen .reactievak .toelichting {
-	margin: 0 0 .5rem;
-}
-
-.vertaalvragen .reactievak .reactiemelding:empty {
-	display: none;
-}
-
-.vertaalvragen .antwoordformulier label.reactievinkje {
-	flex-direction: row;
-	align-items: center;
-	gap: .4rem;
-	font-size: .9rem;
-}
-
 /* De labels in de rij van een opmerking zijn rustig: alleen een kleur die past bij het gedempte van de rij, geen status die om aandacht vraagt. */
 .vertaalvragen .status-reactie {
 	color: var(--gedempt);

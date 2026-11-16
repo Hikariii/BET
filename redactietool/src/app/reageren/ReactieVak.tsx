@@ -1,20 +1,35 @@
 import { useEffect, useId, useRef, useState } from 'preact/hooks';
-import { bewaarReactie, haalReactieWeg, type Reactie } from '../../reacties/reacties';
-import { browseropslag } from '../bewerken/useTussenstand';
+import type { Uitkomst } from '../../antwoorden/antwoorden';
+import './reageren.css';
 
-type Props = {
-	boek: string;
-	/** Het O-nummer, het hoofdstuk van het log en de kwestie van de opmerking waarop gereageerd wordt. */
-	opmerking: Pick<Reactie, 'nr' | 'hoofdstuk' | 'kwestie'>;
-	/** De bewaarde reactie op deze opmerking, of `null`. */
-	reactie: Reactie | null;
+/** De teksten van het vak: wat het veld en het vinkje heten en wat het vinkje betekent. */
+export type ReactieTeksten = {
+	veld: string;
+	vinkje: string;
+	uitleg: string;
 };
 
-const UITLEG_VINKJE = 'Claude zet de vraag in de lijst met open vragen als je de export teruggeeft.';
+/** Wat de vertaler bewaard heeft: de tekst en of het vinkje aanstaat. */
+export type GegevenReactie = {
+	tekst: string;
+	vinkje: boolean;
+};
+
+type Props = {
+	/** Waar de reactie over gaat, bv. "Reageren op O4.1: kwestie"; de knop en het formulier dragen deze naam. */
+	naam: string;
+	teksten: ReactieTeksten;
+	/** De bewaarde reactie, of `null`. */
+	reactie: GegevenReactie | null;
+	/** Bewaart tekst en vinkje; een lege tekst zonder vinkje haalt de reactie weg. */
+	bewaar: (tekst: string, vinkje: boolean) => Uitkomst;
+	haalWeg: () => Uitkomst;
+};
+
 const NIETS_INGEVULD = 'Schrijf een reactie of zet het vinkje aan.';
 
-/** Het vak Reageren bij een opmerking van Claude: ingeklapt alleen de knop Reageren, daarna het formulier. Escape en Annuleren klappen het weer in. */
-export function ReactieVak({ boek, opmerking, reactie }: Props) {
+/** Het vak Reageren: ingeklapt alleen de knop Reageren, daarna het formulier. Escape en Annuleren klappen het weer in. */
+export function ReactieVak({ naam, teksten, reactie, bewaar, haalWeg }: Props) {
 	const [open, zetOpen] = useState(false);
 	const [melding, zetMelding] = useState('');
 	const knop = useRef<HTMLButtonElement>(null);
@@ -27,9 +42,9 @@ export function ReactieVak({ boek, opmerking, reactie }: Props) {
 	}
 
 	return (
-		<div class="antwoordvak reactievak" data-help="reactie-vak">
+		<div class="antwoordvak reactievak">
 			{open ? (
-				<ReactieFormulier boek={boek} opmerking={opmerking} reactie={reactie} sluit={sluit} />
+				<ReactieFormulier naam={naam} teksten={teksten} reactie={reactie} bewaar={bewaar} haalWeg={haalWeg} sluit={sluit} />
 			) : (
 				<>
 					{reactie !== null && reactie.tekst !== '' && (
@@ -42,7 +57,7 @@ export function ReactieVak({ boek, opmerking, reactie }: Props) {
 					<button
 						type="button"
 						ref={knop}
-						aria-label={`Reageren op ${opmerking.nr}: ${opmerking.kwestie}`}
+						aria-label={naam}
 						onClick={() => {
 							zetMelding('');
 							zetOpen(true);
@@ -59,11 +74,11 @@ export function ReactieVak({ boek, opmerking, reactie }: Props) {
 	);
 }
 
-type FormulierProps = Pick<Props, 'boek' | 'opmerking' | 'reactie'> & { sluit: (melding: string) => void };
+type FormulierProps = Pick<Props, 'naam' | 'teksten' | 'reactie' | 'bewaar' | 'haalWeg'> & { sluit: (melding: string) => void };
 
-function ReactieFormulier({ boek, opmerking, reactie, sluit }: FormulierProps) {
+function ReactieFormulier({ naam, teksten, reactie, bewaar, haalWeg, sluit }: FormulierProps) {
 	const [tekst, zetTekst] = useState(reactie?.tekst ?? '');
-	const [wordtVraag, zetWordtVraag] = useState(reactie?.wordtVraag ?? false);
+	const [vinkje, zetVinkje] = useState(reactie?.vinkje ?? false);
 	const [fout, zetFout] = useState('');
 	const veld = useRef<HTMLTextAreaElement>(null);
 	const id = useId();
@@ -74,22 +89,22 @@ function ReactieFormulier({ boek, opmerking, reactie, sluit }: FormulierProps) {
 
 	function opslaan(gebeurtenis: Event) {
 		gebeurtenis.preventDefault();
-		if (tekst.trim() === '' && !wordtVraag && reactie === null) {
+		if (tekst.trim() === '' && !vinkje && reactie === null) {
 			zetFout(NIETS_INGEVULD);
 			veld.current?.focus();
 			return;
 		}
-		const uitkomst = bewaarReactie(browseropslag(), boek, { ...opmerking, tekst, wordtVraag, gegeven: new Date().toISOString() });
+		const uitkomst = bewaar(tekst, vinkje);
 		if (!uitkomst.gelukt) {
 			zetFout(uitkomst.melding);
 			veld.current?.focus();
 			return;
 		}
-		sluit(tekst.trim() === '' && !wordtVraag ? 'Reactie weggehaald.' : 'Reactie opgeslagen.');
+		sluit(tekst.trim() === '' && !vinkje ? 'Reactie weggehaald.' : 'Reactie opgeslagen.');
 	}
 
-	function haalWeg() {
-		const uitkomst = haalReactieWeg(browseropslag(), boek, opmerking.nr);
+	function verwijder() {
+		const uitkomst = haalWeg();
 		if (!uitkomst.gelukt) {
 			zetFout(uitkomst.melding);
 			return;
@@ -100,7 +115,7 @@ function ReactieFormulier({ boek, opmerking, reactie, sluit }: FormulierProps) {
 	return (
 		<form
 			class="antwoordformulier"
-			aria-label={`Reageren op ${opmerking.nr}: ${opmerking.kwestie}`}
+			aria-label={naam}
 			noValidate
 			onSubmit={opslaan}
 			onKeyDown={(gebeurtenis) => {
@@ -111,7 +126,7 @@ function ReactieFormulier({ boek, opmerking, reactie, sluit }: FormulierProps) {
 		>
 			<div class="antwoordtoelichting">
 				<label>
-					Je reactie voor Claude
+					{teksten.veld}
 					<textarea
 						ref={veld}
 						rows={3}
@@ -122,15 +137,15 @@ function ReactieFormulier({ boek, opmerking, reactie, sluit }: FormulierProps) {
 					/>
 				</label>
 				<label class="reactievinkje">
-					<input type="checkbox" checked={wordtVraag} aria-describedby={`${id}-uitleg`} onChange={(gebeurtenis) => zetWordtVraag(gebeurtenis.currentTarget.checked)} /> Maak hier een vertaalvraag van
+					<input type="checkbox" checked={vinkje} aria-describedby={`${id}-uitleg`} onChange={(gebeurtenis) => zetVinkje(gebeurtenis.currentTarget.checked)} /> {teksten.vinkje}
 				</label>
 				<p class="veldhulp" id={`${id}-uitleg`}>
-					{UITLEG_VINKJE}
+					{teksten.uitleg}
 				</p>
 				<div class="knoppen">
 					<button type="submit">Opslaan</button>
 					{reactie !== null && (
-						<button type="button" onClick={haalWeg}>
+						<button type="button" onClick={verwijder}>
 							Weghalen
 						</button>
 					)}

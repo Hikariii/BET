@@ -6,6 +6,7 @@ import { versAdres, type BoekAdres } from './adres';
 import { laadBoek, laadBoeken, laadHoofdstuk, laadReferentie } from './gegevens';
 import { BegrippenScherm } from './begrippen/BegrippenScherm';
 import { BewaardOverzicht } from './bewaren/BewaardOverzicht';
+import { Richtlijnpagina } from './richtlijn/Richtlijnpagina';
 import { useTussenstand } from './bewerken/useTussenstand';
 import { Galerij } from './galerij/Galerij';
 import { HoofdstukScherm } from './HoofdstukScherm';
@@ -82,6 +83,13 @@ function BoekScherm({ adres, boeken, weergavebeheer }: BoekSchermProps) {
 		return (
 			<Indeling {...gedeeld} pagina="begrippen" huidigHoofdstuk={null} tabblad={adres.tabblad} titel={null} acties={null}>
 				<BegrippenScherm boek={boek} referentie={referentie} tabblad={adres.tabblad} />
+			</Indeling>
+		);
+	}
+	if (adres.soort === 'richtlijn') {
+		return (
+			<Indeling {...gedeeld} pagina="richtlijn" huidigHoofdstuk={null} tabblad={null} titel={null} acties={null}>
+				<Richtlijnpagina boek={boek.id} paragraaf={adres.paragraaf} />
 			</Indeling>
 		);
 	}

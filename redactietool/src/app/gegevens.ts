@@ -1,5 +1,5 @@
 import { hoofdstukJsonNaam } from '../data/bestandsnamen';
-import type { BoekData, BoekLijst, HoofdstukData, Referentie, RichtlijnSectie } from '../data/types';
+import type { BoekData, BoekLijst, HoofdstukData, Referentie, Richtlijn } from '../data/types';
 
 const DATAMAP = `${import.meta.env.BASE_URL}data`;
 
@@ -33,6 +33,6 @@ export function laadAlleHoofdstukken(boek: BoekData): Promise<HoofdstukData[]> {
 	return Promise.all(boek.hoofdstukken.map(({ nummer }) => laadHoofdstuk(boek.id, nummer)));
 }
 
-export function laadRichtlijn(): Promise<RichtlijnSectie[]> {
+export function laadRichtlijn(): Promise<Richtlijn> {
 	return laadJson('richtlijn.json');
 }

@@ -9,7 +9,7 @@ import type {
 	Log,
 	OpenVraag,
 	Referentie,
-	RichtlijnSectie,
+	Richtlijn,
 } from '../data/types';
 import type { Hoofdstuk } from '../formaat/types';
 import { parseerHoofdstuk } from '../formaat/parseer';
@@ -61,7 +61,7 @@ export function bouwData({ hoofdmap, uitvoermap }: BouwOpties): void {
 	}
 	schrijfJson(path.join(uitvoermap, 'boeken.json'), boeken);
 
-	const richtlijn: RichtlijnSectie[] = leesBestand(path.join(hoofdmap, RICHTLIJN_PAD), leesRichtlijn);
+	const richtlijn: Richtlijn = leesBestand(path.join(hoofdmap, RICHTLIJN_PAD), leesRichtlijn);
 	schrijfJson(path.join(uitvoermap, 'richtlijn.json'), richtlijn);
 }
 

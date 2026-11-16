@@ -1,7 +1,7 @@
 import { useRef, useState } from 'preact/hooks';
-import type { BewaardOverzicht } from '../../bewaren/overzicht';
+import type { BewaardeRichtlijnReactie, BewaardOverzicht } from '../../bewaren/overzicht';
 import type { BoekData, OpenVraag } from '../../data/types';
-import { versAdres } from '../adres';
+import { maakAdres, versAdres } from '../adres';
 import { vraagAdres } from '../begrippen/vraagAdres';
 import { BackupInladen } from './BackupInladen';
 import { kortUit, optieOmschrijving } from '../begrippen/vervangenVoorbeeld';
@@ -43,9 +43,9 @@ export function BewaardOverzicht({ boek, openVragen }: { boek: BoekData; openVra
 				{melding}
 			</p>
 			<BackupInladen boek={boek} focusNaSluiten={inladenKnop} invoer={invoer} />
-			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && overzicht.totaal.antwoorden === 0 && overzicht.totaal.reacties === 0 && (
+			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && overzicht.totaal.antwoorden === 0 && overzicht.totaal.reacties === 0 && overzicht.totaal.richtlijnReacties === 0 && (
 				<div class="bewaard-leeg">
-					<p class="melding">Er is niets opgeslagen. Bewerk een vers, pas een vervanging toe, beantwoord een vertaalvraag of reageer op een opmerking van Claude en het staat hier.</p>
+					<p class="melding">Er is niets opgeslagen. Bewerk een vers, pas een vervanging toe, beantwoord een vertaalvraag, reageer op een opmerking van Claude of op de richtlijn en het staat hier.</p>
 					<p class="bewaard-leeg-tip">Werkte je eerder in een andere browser of op een andere computer? Laad dan je back-up in.</p>
 					<p>
 						<button type="button" onClick={() => invoer.current?.click()}>
@@ -116,7 +116,33 @@ export function BewaardOverzicht({ boek, openVragen }: { boek: BoekData; openVra
 					</ul>
 				</section>
 			)}
+			{overzicht.richtlijnReacties.length > 0 && (
+				<section class="bewaard-antwoorden" aria-labelledby="bewaard-richtlijn-titel">
+					<h2 id="bewaard-richtlijn-titel">Reacties op de richtlijn</h2>
+					<ul>
+						{overzicht.richtlijnReacties.map((reactie) => (
+							<li>
+								<RichtlijnReactieKop boekId={boek.id} reactie={reactie} />, gegeven {tijdVan(reactie.gegeven)}
+								{reactie.tekst === '' ? ', zonder tekst.' : '.'}
+								{reactie.voorstel && <span class="bewaard-label">voorstel</span>}
+							</li>
+						))}
+					</ul>
+				</section>
+			)}
 		</section>
+	);
+}
+
+/** De paragraaf van een reactie op de richtlijn als link naar die paragraaf; een voorstel voor een nieuwe regel heeft geen paragraaf en toont het begin van de tekst, met een link naar de pagina. */
+function RichtlijnReactieKop({ boekId, reactie }: { boekId: string; reactie: BewaardeRichtlijnReactie }) {
+	if (reactie.paragraaf === null) {
+		return <a href={maakAdres({ soort: 'richtlijn', boek: boekId, paragraaf: null })}>Nieuwe regel: {kortUit(reactie.tekst, 80)}</a>;
+	}
+	return (
+		<a href={maakAdres({ soort: 'richtlijn', boek: boekId, paragraaf: reactie.paragraaf })}>
+			§{reactie.paragraaf} {reactie.titel}
+		</a>
 	);
 }
 

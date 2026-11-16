@@ -6,7 +6,7 @@
 //   <boek>/boek.json                 BoekData
 //   <boek>/hoofdstuk-NN.json         HoofdstukData
 //   <boek>/referentie.json           Referentie
-//   richtlijn.json                   RichtlijnSectie[]
+//   richtlijn.json                   Richtlijn
 import type { Hoofdstuk } from '../formaat/types';
 
 export type BoekLijst = { id: string; naam: string }[];
@@ -104,12 +104,33 @@ export type Referentie = {
 	openVragen: OpenVraag[];
 };
 
+/** De soorten versiemarkering achter een kop van de richtlijn, bv. `[v1.4 open]`. */
+export type MarkeringSoort = 'nieuw' | 'gewijzigd' | 'open';
+
+/** Een versiemarkering uit een kop van de richtlijn: `[v1.4 nieuw]` is `{ versie: '1.4', soort: 'nieuw' }`. */
+export type Markering = {
+	versie: string;
+	soort: MarkeringSoort;
+};
+
 /** Een paragraaf (## of ###) uit richtlijn/redactierichtlijn.md. */
 export type RichtlijnSectie = {
 	/** Nummer zonder §, bv. "11", "7A", "17B"; leeg voor koppen zonder nummer. */
 	paragraaf: string;
+	/** De titel zonder nummer en zonder versiemarkering. */
 	titel: string;
+	/** De versiemarkering uit de kop; `null` als de kop er geen heeft (of een die de tool niet kent). */
+	markering: Markering | null;
 	niveau: 2 | 3;
-	/** Inhoud onder de kop, tot de volgende kop van gelijk of hoger niveau. */
+	/** Inhoud onder de kop, tot de volgende kop van gelijk of hoger niveau; bij niveau 2 dus met de subparagrafen. */
 	markdown: string;
+	/** Alleen de eigen tekst: de inhoud tot de eerste kop van niveau 2 of 3 eronder. Gelijk aan `markdown` bij een sectie zonder subparagrafen. */
+	eigenMarkdown: string;
+};
+
+/** De hele richtlijn: de titel boven aan het bestand en de secties. */
+export type Richtlijn = {
+	/** De kop van niveau 1, bv. "Redactierichtlijn v1.4 (concept)". */
+	titel: string;
+	secties: RichtlijnSectie[];
 };

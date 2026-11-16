@@ -103,6 +103,49 @@ test.describe('de gebouwde app', () => {
 		expect(fouten).toEqual([]);
 	});
 
+	test('Richtlijn: een adres met paragraaf geeft die paragraaf de focus; reageren en een nieuwe regel komen terug in de Export voor Claude', async ({ page }) => {
+		const fouten = volgFouten(page);
+		await page.goto('#/lukas/richtlijn/17B');
+		const kop = page.locator('#richtlijn-17B');
+		await expect(kop).toBeFocused();
+		await expect(kop).toContainText('§17B');
+		await expect(kop).toContainText('open in v1.4');
+		await expect(page.getByRole('navigation', { name: 'Inhoud' }).getByRole('link', { name: /^§17B / })).toBeVisible();
+
+		const paragraaf = page.locator('section.richtlijn-sectie', { has: kop });
+		await paragraaf.getByRole('button', { name: /^Reageren op §17B/ }).click();
+		await expect(paragraaf.getByLabel('Je reactie voor Claude')).toBeFocused();
+		await page.keyboard.type('Rooktest-reactie op de richtlijn');
+		await paragraaf.getByLabel('Voorstel voor een nieuwe of andere regel').check();
+		await paragraaf.getByRole('button', { name: 'Opslaan' }).click();
+		await expect(page.getByRole('navigation', { name: 'Inhoud' }).getByText('voorstel', { exact: true })).toBeVisible();
+
+		const nieuweRegel = page.locator('#richtlijn-nieuwe-regel');
+		await nieuweRegel.getByLabel('Je voorstel voor een nieuwe regel').fill('Rooktest-voorstel voor een nieuwe regel');
+		await nieuweRegel.getByRole('button', { name: 'Voorstel opslaan' }).click();
+		await expect(nieuweRegel.getByText('Rooktest-voorstel voor een nieuwe regel')).toBeVisible();
+
+		await wachtOpHoofdstuk(page, 2);
+		await page.locator('[data-help="export-voor-claude"]').click();
+		const downloadWacht = page.waitForEvent('download');
+		await page.locator('.hoofdstukacties-export button[type="submit"]').click();
+		const download = await downloadWacht;
+		const uitvoer = JSON.parse(readFileSync(await download.path(), 'utf-8')) as {
+			versie: number;
+			hoofdstuk: number;
+			reactiesOpRichtlijn: { id: string; paragraaf: string | null; titel: string; tekst: string; voorstel: boolean }[];
+		};
+
+		expect(uitvoer.hoofdstuk).toBe(2);
+		expect(uitvoer.versie).toBe(exportversieUitBron());
+		expect(uitvoer.reactiesOpRichtlijn).toMatchObject([
+			{ id: '§17B', paragraaf: '17B', titel: 'Messias / Christus', tekst: 'Rooktest-reactie op de richtlijn', voorstel: true },
+			{ paragraaf: null, titel: '', tekst: 'Rooktest-voorstel voor een nieuwe regel', voorstel: true },
+		]);
+		expect(uitvoer.reactiesOpRichtlijn[1]?.id).toMatch(/^nieuw-\d+/);
+		expect(fouten).toEqual([]);
+	});
+
 	test('de galerij laadt zijn voorbeelden', async ({ page }) => {
 		const fouten = volgFouten(page);
 		await page.goto('#/galerij');

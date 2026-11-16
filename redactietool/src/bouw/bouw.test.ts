@@ -5,7 +5,7 @@ import { strToU8, zipSync } from 'fflate';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { hoofdstukJsonNaam } from '../data/bestandsnamen';
 import { ALINEASTIJL_NAAR_WORD, DOMEIN_NAAR_WORD, TITEL_WORD } from '../data/stijlkoppeling';
-import type { BoekData, BoekLijst, HoofdstukData, Referentie, RichtlijnSectie, Status } from '../data/types';
+import type { BoekData, BoekLijst, HoofdstukData, Referentie, Richtlijn, Status } from '../data/types';
 import type { Hoofdstuk } from '../formaat/types';
 import { bouwData } from './bouw';
 import { leesStylesXml } from './leesStylesXml';
@@ -257,12 +257,13 @@ describe('bouwData op de echte repo', () => {
 	});
 
 	it('schrijft in richtlijn.json paragraaf 11 met zijn titel', () => {
-		const richtlijn = leesJson(path.join(uitvoermap, 'richtlijn.json')) as RichtlijnSectie[];
+		const richtlijn = leesJson(path.join(uitvoermap, 'richtlijn.json')) as Richtlijn;
 
-		expect(richtlijn.find((sectie) => sectie.paragraaf === '11')).toMatchObject({
+		expect(richtlijn.titel).toMatch(/^Redactierichtlijn/);
+		expect(richtlijn.secties.find((sectie) => sectie.paragraaf === '11')).toMatchObject({
 			titel: 'Ouderwets Nederlands moderniseren',
 			niveau: 2,
 		});
-		expect(richtlijn.length).toBeGreaterThan(20);
+		expect(richtlijn.secties.length).toBeGreaterThan(20);
 	});
 });

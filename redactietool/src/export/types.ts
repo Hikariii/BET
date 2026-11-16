@@ -1,11 +1,12 @@
 import type { Antwoord } from '../antwoorden/antwoorden';
 import type { Reactie } from '../reacties/reacties';
+import type { RichtlijnReactie } from '../reacties/richtlijnReacties';
 import type { Domein } from '../formaat/types';
 import type { KeuzeVariant, StructureleKeuze } from '../vervangen/keuzes';
 
 /**
  * Het bestand `<prefix>-NN.redactie.json` dat de vertaler aan Claude geeft; een toelichting, nooit een bron van tekst.
- * Alleen versie 3 bestaat; `reactiesOpOpmerkingen` is er later aan toegevoegd. Elk antwoord heeft een `toelichting` en `keuzeIds` (nul of meer keuzes).
+ * Alleen versie 3 bestaat; `reactiesOpOpmerkingen` en `reactiesOpRichtlijn` zijn er later aan toegevoegd. Elk antwoord heeft een `toelichting` en `keuzeIds` (nul of meer keuzes).
  */
 export type RedactieExport = {
 	formaat: 'bet-redactie-export';
@@ -27,6 +28,12 @@ export type RedactieExport = {
 	beantwoordeVragen: ExportAntwoord[];
 	/** De reacties van de vertaler op opmerkingen van Claude (`O`-nummers) uit de wijzigingslog van dit hoofdstuk. */
 	reactiesOpOpmerkingen: ExportReactie[];
+	/**
+	 * Alle reacties van de vertaler op de richtlijn en alle voorstellen voor een nieuwe regel (`paragraaf` is dan `null`), ook als ze niet bij dit hoofdstuk horen.
+	 * De richtlijn geldt voor alle boeken, dus elke export neemt ze mee; Claude ontdubbelt op `id` en `gegeven`.
+	 * `voorstel`: de vertaler wil een nieuwe of andere regel; Claude schrijft een tekstvoorstel voor de richtlijn, pas na akkoord van de eigenaar.
+	 */
+	reactiesOpRichtlijn: RichtlijnReactie[];
 };
 
 /**

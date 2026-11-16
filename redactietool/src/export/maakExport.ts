@@ -6,6 +6,7 @@ import type { Tussenstand, VersInhoud } from '../bewerken/types';
 import { knipVers } from '../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../bewerken/waarschuwingen';
 import type { Reactie } from '../reacties/reacties';
+import type { RichtlijnReactie } from '../reacties/richtlijnReacties';
 import type { StructureleKeuze } from '../vervangen/keuzes';
 import type { ExportAntwoord, ExportKeuze, ExportReactie, GewijzigdVers, RedactieExport } from './types';
 
@@ -20,6 +21,8 @@ export type ExportInvoer = {
 	antwoorden: readonly Antwoord[];
 	/** Alle reacties van het boek; de export neemt die op opmerkingen uit dit hoofdstuk. */
 	reacties: readonly Reactie[];
+	/** Alle reacties op de richtlijn; ze horen bij geen boek en gaan in elke export mee. */
+	richtlijnReacties: readonly RichtlijnReactie[];
 	/** De verzen per opmerking (`O`-nummer) uit het log van dit hoofdstuk; een nummer dat hier niet in staat, geeft een reactie zonder verzen. */
 	opmerkingVerzen: ReadonlyMap<string, readonly VersRef[]>;
 	/** Nummer en verzen per kwestie uit de ingelezen open vragen; een kwestie die er niet in staat, heeft geen nummer en geen verzen. */
@@ -130,6 +133,7 @@ export function maakExport(invoer: ExportInvoer): RedactieExport {
 		structureleKeuzes,
 		beantwoordeVragen: invoer.antwoorden.flatMap((antwoord) => exportAntwoord(antwoord, keuzeIds, bestaandeKeuzes, invoer) ?? []),
 		reactiesOpOpmerkingen: invoer.reacties.filter((reactie) => reactie.hoofdstuk === invoer.hoofdstuk.nummer).map((reactie) => exportReactie(reactie, invoer)),
+		reactiesOpRichtlijn: [...invoer.richtlijnReacties],
 	};
 }
 

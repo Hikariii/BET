@@ -141,6 +141,7 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 				<li>{meervoud(telling.keuzesNieuw, 'vervanging komt', 'vervangingen komen')} erbij.</li>
 				<li>{meervoud(telling.antwoordenNieuw, 'antwoord komt', 'antwoorden komen')} erbij.</li>
 				<li>{meervoud(telling.reactiesNieuw, 'reactie komt', 'reacties komen')} erbij.</li>
+				<li>{meervoud(telling.richtlijnReactiesNieuw, 'reactie op de richtlijn komt', 'reacties op de richtlijn komen')} erbij.</li>
 			</ul>
 			{voorbeeld.verzen.length > 0 && (
 				<details class="bewaren-voorbeeld-verzen">
@@ -156,9 +157,9 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 			)}
 			<p class="bewaren-venster-uitleg">
 				<strong>Samenvoegen</strong> houdt alles wat je nu hebt en zet de back-up erbij; staat een vers in beide, dan blijft de nieuwste versie staan.{' '}
-				<strong>Vervangen</strong> wist eerst alles wat deze browser van het boek opslaat
-				{vervangenWist.verzen + vervangenWist.keuzes + vervangenWist.antwoorden + vervangenWist.reacties > 0 &&
-					`, dus ook ${meervoud(vervangenWist.verzen, 'vers', 'verzen')}, ${meervoud(vervangenWist.keuzes, 'vervanging', 'vervangingen')}, ${meervoud(vervangenWist.antwoorden, 'antwoord', 'antwoorden')} en ${meervoud(vervangenWist.reacties, 'reactie', 'reacties')} die niet in de back-up staan`}
+				<strong>Vervangen</strong> wist eerst alles wat deze browser van het boek opslaat en al je reacties op de richtlijn
+				{vervangenWist.verzen + vervangenWist.keuzes + vervangenWist.antwoorden + vervangenWist.reacties + vervangenWist.richtlijnReacties > 0 &&
+					`, dus ook ${meervoud(vervangenWist.verzen, 'vers', 'verzen')}, ${meervoud(vervangenWist.keuzes, 'vervanging', 'vervangingen')}, ${meervoud(vervangenWist.antwoorden, 'antwoord', 'antwoorden')}, ${meervoud(vervangenWist.reacties, 'reactie', 'reacties')} en ${meervoud(vervangenWist.richtlijnReacties, 'reactie op de richtlijn', 'reacties op de richtlijn')} die niet in de back-up staan`}
 				.
 			</p>
 			<p class="bewaren-venster-knoppen">
@@ -183,7 +184,7 @@ function Klaar({ toestand, onSluit }: { toestand: Extract<Toestand, { soort: 'kl
 		<>
 			<p role={gelukt ? 'status' : 'alert'}>
 				{gelukt
-					? `Klaar: ${meervoud(geschreven.verzen, 'vers', 'verzen')}, ${meervoud(geschreven.keuzes, 'vervanging', 'vervangingen')}, ${meervoud(geschreven.antwoorden, 'antwoord', 'antwoorden')} en ${meervoud(geschreven.reacties, 'reactie', 'reacties')} opgeslagen (${toestand.modus === 'samenvoegen' ? 'samengevoegd' : 'alles vervangen'}).`
+					? `Klaar: ${meervoud(geschreven.verzen, 'vers', 'verzen')}, ${meervoud(geschreven.keuzes, 'vervanging', 'vervangingen')}, ${meervoud(geschreven.antwoorden, 'antwoord', 'antwoorden')}, ${meervoud(geschreven.reacties, 'reactie', 'reacties')} en ${meervoud(geschreven.richtlijnReacties, 'reactie op de richtlijn', 'reacties op de richtlijn')} opgeslagen (${toestand.modus === 'samenvoegen' ? 'samengevoegd' : 'alles vervangen'}).`
 					: 'Het inladen is niet helemaal gelukt. Sluit dit venster en laad de back-up opnieuw in; lukt het weer niet, maak dan ruimte vrij in de browser.'}
 			</p>
 			{!gelukt && (
