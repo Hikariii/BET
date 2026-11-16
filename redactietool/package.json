@@ -8,11 +8,17 @@
     "build": "npm run data && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:dekking": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@preact/preset-vite": "^2.10.6",
+    "@testing-library/preact": "^3.2.6",
     "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.0",
+    "happy-dom": "^21.0.4",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
     "vitest": "^5.1.0"

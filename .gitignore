@@ -18,3 +18,7 @@ node_modules/
 # Gegenereerde data en build van de tool
 redactietool/public/data/
 redactietool/dist/
+
+# Uitvoer van de rooktest en de dekkingsmeting
+redactietool/test-results/
+redactietool/coverage/
