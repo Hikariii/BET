@@ -14,7 +14,8 @@ function overzichtMetBewerking(bewaard: Date): BewaardOverzicht {
 	return {
 		hoofdstukken: [{ hoofdstuk: 1, verzen: [{ vers: 1, bewaard: bewaard.toISOString(), verouderd: false, herkomst: 'zelf getypt' }] }],
 		keuzes: [],
-		totaal: { verzen: 1, hoofdstukken: 1, verouderd: 0, keuzes: 0 },
+		antwoorden: [],
+		totaal: { verzen: 1, hoofdstukken: 1, verouderd: 0, keuzes: 0, antwoorden: 0 },
 		verouderdBekend: true,
 		laatstBewaard: bewaard.toISOString(),
 	};
@@ -23,7 +24,8 @@ function overzichtMetBewerking(bewaard: Date): BewaardOverzicht {
 const LEEG_OVERZICHT: BewaardOverzicht = {
 	hoofdstukken: [],
 	keuzes: [],
-	totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0 },
+	antwoorden: [],
+	totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0 },
 	verouderdBekend: true,
 	laatstBewaard: null,
 };
@@ -85,11 +87,25 @@ describe('backupHerinnering', () => {
 		const overzicht: BewaardOverzicht = {
 			...LEEG_OVERZICHT,
 			keuzes: [{ id: 'k', zoekterm: 'a', nieuw: 'b', toegepast: lokaal(11, 10).toISOString(), aantalVerzen: 2 }],
-			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 1 },
+			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 1, antwoorden: 0 },
 			laatstBewaard: lokaal(11, 10).toISOString(),
 		};
 
 		expect(backupHerinnering(overzicht, null, NU)).not.toBeNull();
+	});
+
+	it('telt een gegeven antwoord als bewerking, zonder back-up en na een oude back-up', () => {
+		const gegeven = lokaal(11, 10).toISOString();
+		const overzicht: BewaardOverzicht = {
+			...LEEG_OVERZICHT,
+			antwoorden: [{ kwestie: 'Harde man', optie: 'a) zachte', gegeven }],
+			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 1 },
+			laatstBewaard: gegeven,
+		};
+
+		expect(backupHerinnering(overzicht, null, NU)).toBe('Maak een back-up: je hebt er nog geen gemaakt.');
+		expect(backupHerinnering(overzicht, lokaal(11, 8).toISOString(), NU)).toBe('Maak een back-up: je laatste is van 12 dagen geleden.');
+		expect(backupHerinnering(overzicht, lokaal(11, 12).toISOString(), NU)).toBeNull();
 	});
 
 	it('herinnert als er na een oude back-up bewerkt is', () => {

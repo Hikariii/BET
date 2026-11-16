@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { bewaarAntwoord } from '../antwoorden/antwoorden';
 import { bewaarVers } from '../bewerken/tussenstand';
 import { knipVers } from '../bewerken/versknip';
 import { pasKeuzeToe } from '../vervangen/keuzes';
@@ -23,7 +24,8 @@ describe('bewaardOverzicht', () => {
 
 		expect(overzicht.hoofdstukken).toEqual([]);
 		expect(overzicht.keuzes).toEqual([]);
-		expect(overzicht.totaal).toEqual({ verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0 });
+		expect(overzicht.antwoorden).toEqual([]);
+		expect(overzicht.totaal).toEqual({ verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0 });
 		expect(overzicht.laatstBewaard).toBeNull();
 	});
 
@@ -93,10 +95,33 @@ describe('bewaardOverzicht', () => {
 		expect(overzicht.hoofdstukken.find((h) => h.hoofdstuk === 2)?.verzen[0]?.herkomst).toBe('structurele keuze');
 	});
 
+	it('toont de antwoorden op vertaalvragen, nieuwste eerst, en telt ze mee in het laatste bewaarmoment', () => {
+		const opslag = new GeheugenOpslag();
+		bewaarVers(opslag, 'lukas', 1, 1, inhoud(' a'), inhoud(' b'));
+		const zonderAntwoorden = bewaardOverzicht(opslag, BOEK, REPO);
+		expect(zonderAntwoorden.totaal.antwoorden).toBe(0);
+		bewaarAntwoord(opslag, 'lukas', { kwestie: 'Houden', optie: 'b) niets doen', toelichting: 'Eerst zo.', keuzeIds: [], gegeven: '2026-11-16T09:00:00.000Z' });
+		bewaarAntwoord(opslag, 'lukas', { kwestie: 'Gezegend', optie: 'a) genade', toelichting: '', keuzeIds: ['k1'], gegeven: '2099-01-01T00:00:00.000Z' });
+		expect(zonderAntwoorden.laatstBewaard).not.toBe('2099-01-01T00:00:00.000Z');
+
+		const overzicht = bewaardOverzicht(opslag, BOEK, REPO);
+
+		expect(overzicht.antwoorden).toEqual([
+			{ kwestie: 'Gezegend', optie: 'a) genade', gegeven: '2099-01-01T00:00:00.000Z' },
+			{ kwestie: 'Houden', optie: 'b) niets doen', gegeven: '2026-11-16T09:00:00.000Z' },
+		]);
+		expect(overzicht.totaal).toMatchObject({ verzen: 1, antwoorden: 2 });
+		expect(overzicht.laatstBewaard).toBe('2099-01-01T00:00:00.000Z');
+	});
+
 	it('toont niets van een ander boek', () => {
 		const opslag = new GeheugenOpslag();
 		bewaarVers(opslag, 'johannes', 1, 1, inhoud(' a'), inhoud(' b'));
 
-		expect(bewaardOverzicht(opslag, BOEK, REPO).totaal.verzen).toBe(0);
+		bewaarAntwoord(opslag, 'johannes', { kwestie: 'x', optie: 'y', toelichting: '', keuzeIds: [], gegeven: '2026-11-16T09:00:00.000Z' });
+
+		const overzicht = bewaardOverzicht(opslag, BOEK, REPO);
+
+		expect(overzicht.totaal).toMatchObject({ verzen: 0, antwoorden: 0 });
 	});
 });

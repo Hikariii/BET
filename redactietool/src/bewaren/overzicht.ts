@@ -1,5 +1,6 @@
 import { isBewerkingVerouderd, leesTussenstand, type Opslag } from '../bewerken/tussenstand';
 import { knipVers } from '../bewerken/versknip';
+import { leesAntwoorden } from '../antwoorden/antwoorden';
 import type { HoofdstukData } from '../data/types';
 import { leesKeuzes } from '../vervangen/keuzes';
 import type { BoekMetHoofdstukken } from './types';
@@ -27,15 +28,26 @@ export type BewaardeKeuze = {
 	aantalVerzen: number;
 };
 
+/** Een antwoord op een vertaalvraag, zoals het overzicht het toont. */
+export type BewaardAntwoord = {
+	kwestie: string;
+	/** De gekozen optie, of "eigen antwoord". */
+	optie: string;
+	/** ISO-tijd waarop optie en toelichting voor het laatst zijn vastgelegd. */
+	gegeven: string;
+};
+
 export type BewaardOverzicht = {
 	/** Alleen hoofdstukken met bewerkte verzen, op oplopend nummer. */
 	hoofdstukken: BewaardHoofdstuk[];
 	/** Nieuwste eerst. */
 	keuzes: BewaardeKeuze[];
-	totaal: { verzen: number; hoofdstukken: number; verouderd: number; keuzes: number };
+	/** Nieuwste eerst. */
+	antwoorden: BewaardAntwoord[];
+	totaal: { verzen: number; hoofdstukken: number; verouderd: number; keuzes: number; antwoorden: number };
 	/** Waar elk hoofdstuk met bewerkingen uit de repo bekend was, zodat `verouderd` iets zegt. */
 	verouderdBekend: boolean;
-	/** ISO-tijd van het laatste bewaren of toepassen van een keuze; `null` als er niets bewaard is. */
+	/** ISO-tijd van het laatste bewaren van een vers, toepassen van een keuze of geven van een antwoord; `null` als er niets bewaard is. */
 	laatstBewaard: string | null;
 };
 
@@ -53,7 +65,7 @@ function laatsteTijd(tijden: readonly string[]): string | null {
 }
 
 /**
- * Wat er in de opslag bewaard is voor dit boek: de bewerkte verzen per hoofdstuk en de toegepaste keuzes.
+ * Wat er in de opslag bewaard is voor dit boek: de bewerkte verzen per hoofdstuk, de toegepaste keuzes en de antwoorden op vertaalvragen.
  * `repo` zijn de hoofdstukken uit de repo; zonder het hoofdstuk van een bewerkt vers weet het overzicht niet of die verouderd is.
  */
 export function bewaardOverzicht(opslag: Opslag, boek: BoekMetHoofdstukken, repo: readonly HoofdstukData[]): BewaardOverzicht {
@@ -79,17 +91,22 @@ export function bewaardOverzicht(opslag: Opslag, boek: BoekMetHoofdstukken, repo
 	const keuzes = leesKeuzes(opslag, boek.id).map(
 		({ id, zoekterm, nieuw, toegepast, verzen }): BewaardeKeuze => ({ id, zoekterm, nieuw, toegepast, aantalVerzen: verzen.length }),
 	);
+	const antwoorden = leesAntwoorden(opslag, boek.id)
+		.map(({ kwestie, optie, gegeven }): BewaardAntwoord => ({ kwestie, optie, gegeven }))
+		.sort((een, ander) => Date.parse(ander.gegeven) - Date.parse(een.gegeven));
 	const alleVerzen = hoofdstukken.flatMap((hoofdstuk) => hoofdstuk.verzen);
 	return {
 		hoofdstukken,
 		keuzes,
+		antwoorden,
 		totaal: {
 			verzen: alleVerzen.length,
 			hoofdstukken: hoofdstukken.length,
 			verouderd: alleVerzen.filter((vers) => vers.verouderd).length,
 			keuzes: keuzes.length,
+			antwoorden: antwoorden.length,
 		},
 		verouderdBekend,
-		laatstBewaard: laatsteTijd([...alleVerzen.map((vers) => vers.bewaard), ...keuzes.map((keuze) => keuze.toegepast)]),
+		laatstBewaard: laatsteTijd([...alleVerzen.map((vers) => vers.bewaard), ...keuzes.map((keuze) => keuze.toegepast), ...antwoorden.map((antwoord) => antwoord.gegeven)]),
 	};
 }

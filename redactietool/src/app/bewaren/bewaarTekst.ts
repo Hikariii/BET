@@ -17,13 +17,14 @@ export function tijdVan(iso: string, nu: Date = new Date()): string {
 	return (zelfdeDag(moment, nu) ? TIJD : DATUM_EN_TIJD).format(moment);
 }
 
-/** Het aantal verzen, hoofdstukken en keuzes in één zin, zonder de tijd: "12 verzen in 3 hoofdstukken". */
+/** Het aantal verzen, hoofdstukken, keuzes en antwoorden in één zin, zonder de tijd: "12 verzen in 3 hoofdstukken". */
 export function bewaarTelling(overzicht: BewaardOverzicht): string {
-	const { verzen, hoofdstukken, keuzes } = overzicht.totaal;
-	if (verzen === 0 && keuzes === 0) return 'nog niets';
+	const { verzen, hoofdstukken, keuzes, antwoorden } = overzicht.totaal;
+	if (verzen === 0 && keuzes === 0 && antwoorden === 0) return 'nog niets';
 	const delen: string[] = [];
 	if (verzen > 0) delen.push(`${meervoud(verzen, 'vers', 'verzen')} in ${meervoud(hoofdstukken, 'hoofdstuk', 'hoofdstukken')}`);
 	if (keuzes > 0) delen.push(meervoud(keuzes, 'keuze', 'keuzes'));
+	if (antwoorden > 0) delen.push(meervoud(antwoorden, 'antwoord', 'antwoorden'));
 	return delen.join(', ');
 }
 
