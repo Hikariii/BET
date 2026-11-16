@@ -2,18 +2,35 @@ import { alsInhoud, bewaarKeuzeVers, bewaarVers, leesTussenstand, wisVers, zelfd
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
 import { vervangInVers } from './zoekEnVervang';
+import type { Domein } from '../formaat/types';
 import type { HoofdstukVerzen, Vondst } from './types';
+import type { Plek, Zoekopdracht } from './zoekopdracht';
 
 /** Een toegepaste structurele keuze, bewaard om hem in één keer terug te draaien. */
 export type StructureleKeuze = {
 	id: string;
+	/** `tekst`: zoekterm wordt `nieuw`. `markering`: op de zoekterm wordt domein `van` vervangen door `naar` (de tekst blijft). */
+	soort: 'tekst' | 'markering';
 	zoekterm: string;
+	/** De vervangende tekst; leeg bij een markeringswissel. */
 	nieuw: string;
+	van: Domein | null;
+	naar: Domein | null;
+	/** Per gevonden variant (kleine letters) de vervanging die is toegepast; bij een markeringswissel leeg, de wissel geldt dan ook voor varianten. */
+	varianten: KeuzeVariant[];
 	/** ISO-tijd van toepassen. */
 	toegepast: string;
 	/** Per vers de inhoud voor en na de vervanging. */
 	verzen: KeuzeVers[];
+	/** Plekken die bij toepassen bewust niet zijn meegenomen, met de reden; Claude behandelt die bij het terugvoeren als bewust anders. */
+	overgeslagen: OvergeslagenPlek[];
+	/** De kwestie van de vertaalvraag die met deze keuze beantwoord is; `null` als de keuze niet vanuit een vraag kwam. */
+	vraag: string | null;
 };
+
+export type KeuzeVariant = { vorm: string; nieuw: string };
+
+export type OvergeslagenPlek = { hoofdstuk: number; vers: number; gevonden: string; reden: 'goedgekeurd' | 'met de hand' | 'uitgevinkt' };
 
 type KeuzeVers = { hoofdstuk: number; vers: number; voor: VersInhoud; na: VersInhoud };
 
@@ -49,7 +66,8 @@ export function alsKeuze(waarde: unknown): StructureleKeuze | null {
 		if (keuzeVers === null) return null;
 		verzen.push(keuzeVers);
 	}
-	return { id, zoekterm, nieuw, toegepast, verzen };
+	// Keuzes van vóór fase 8 hebben de nieuwe velden niet: dat waren tekstvervangingen zonder varianten, overgeslagen plekken of vraag.
+	return { id, soort: 'tekst', zoekterm, nieuw, van: null, naar: null, varianten: [], toegepast, verzen, overgeslagen: [], vraag: null };
 }
 
 /** Alle bewaarde keuzes op volgorde van toepassen (oudste eerst); onleesbare opslag geeft een lege lijst. */
@@ -116,7 +134,19 @@ export function pasKeuzeToe(
 	nu: Date,
 ): ToepasUitkomst {
 	const bewaard = leesOpVolgorde(opslag, boek);
-	const keuze: StructureleKeuze = { id: nieuwId(nu, bewaard), zoekterm, nieuw, toegepast: nu.toISOString(), verzen: [] };
+	const keuze: StructureleKeuze = {
+		id: nieuwId(nu, bewaard),
+		soort: 'tekst',
+		zoekterm,
+		nieuw,
+		van: null,
+		naar: null,
+		varianten: [],
+		toegepast: nu.toISOString(),
+		verzen: [],
+		overgeslagen: [],
+		vraag: null,
+	};
 	const meldingen: string[] = [];
 	for (const groep of groepeerPerVers(aangevinkt)) {
 		const gevonden = hoofdstukken.find((h) => h.hoofdstuk === groep.hoofdstuk)?.verzen.find((v) => v.vers === groep.vers);
@@ -196,4 +226,32 @@ export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): 
 	});
 	schrijfKeuzes(opslag, boek, nieuweLijst);
 	return meldingen;
+}
+
+/** Alles wat bij het toepassen van een zoekopdracht hoort, buiten de opslag en de tijd. */
+export type Toepassing = {
+	hoofdstukken: readonly HoofdstukVerzen[];
+	opdracht: Zoekopdracht;
+	aangevinkt: readonly Plek[];
+	overgeslagen: readonly OvergeslagenPlek[];
+	variantVervangingen: ReadonlyMap<string, string>;
+	/** De kwestie van de vraag die hiermee beantwoord wordt, of `null`. */
+	vraag: string | null;
+};
+
+/**
+ * Past een zoekopdracht (tekst of markering, met varianten) toe zoals `pasKeuzeToe`, en bewaart de keuze met soort, varianten,
+ * overgeslagen plekken en vraag. Komt in de plaats van `pasKeuzeToe`. Wordt ingevuld.
+ */
+export function pasOpdrachtToe(_opslag: Opslag, _boek: string, _toepassing: Toepassing, _nu: Date): ToepasUitkomst {
+	throw new Error('pasOpdrachtToe: nog niet gebouwd');
+}
+
+/**
+ * Draait één vers van een keuze terug, met dezelfde regels als `draaiKeuzeTerug` (niet als een latere keuze of eigen bewerking
+ * het vers veranderde). Het vers gaat uit de keuze; gaat het laatste vers eruit, dan verdwijnt de keuze en ook een antwoord dat
+ * ernaar wijst. Geeft de meldingen. Wordt ingevuld.
+ */
+export function draaiVersTerug(_opslag: Opslag, _boek: string, _keuzeId: string, _hoofdstuk: number, _vers: number): string[] {
+	return [];
 }
