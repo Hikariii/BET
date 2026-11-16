@@ -3,7 +3,7 @@ import { Selection, TextSelection } from 'prosemirror-state';
 
 /**
  * Waar in de vers-tekst geklikt is: het alinea-deel (vanaf 0) en het aantal tekens vóór de klik in dat deel.
- * De weergave laat de spaties aan het begin van een deel weg; de editor houdt ze, dus `teken` telt vanaf het eerste zichtbare teken.
+ * `teken` telt vanaf het eerste zichtbare teken: de weergave laat de spaties aan het begin van een deel weg, en de editor ook (`zonderRandwitruimte`).
  */
 export type KlikPlek = {
 	alinea: number;

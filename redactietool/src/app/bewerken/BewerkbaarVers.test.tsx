@@ -87,7 +87,7 @@ describe('BewerkbaarVers', () => {
 	it('opent de editor met de tekst van het vers als de tekst wordt aangeklikt', () => {
 		const editor = startBewerken();
 
-		expect(editor.textContent).toBe(' Eerste vers.');
+		expect(editor.textContent).toBe('Eerste vers.');
 		expect(opgeslagenTekst()).toBeNull();
 	});
 
@@ -96,7 +96,7 @@ describe('BewerkbaarVers', () => {
 
 		await typ(editor, ' Amen.');
 
-		expect(editor.textContent).toBe(' Eerste vers. Amen.');
+		expect(editor.textContent).toBe('Eerste vers. Amen.');
 		expect(opgeslagenTekst()).toBe(' Eerste vers. Amen.');
 		expect(document.querySelector('[data-help="vers-gewijzigd"]')).not.toBeNull();
 	});
@@ -146,9 +146,9 @@ describe('BewerkbaarVers', () => {
 		expect(screen.getByRole('toolbar', { name: 'Opmaak' })).not.toBeNull();
 	});
 
-	it('zet vet op de geselecteerde tekst zonder de spatie ervoor, en bewaart dat', async () => {
+	it('zet vet op de geselecteerde tekst zonder de spatie erna, en bewaart dat met de spatie van het bestand ervoor', async () => {
 		const editor = startBewerken();
-		selecteer(editor, 0, 8);
+		selecteer(editor, 0, 7);
 		await waitFor(() => expect((screen.getByRole('button', { name: 'Vet' }) as HTMLButtonElement).disabled).toBe(false));
 
 		fireEvent.click(screen.getByRole('button', { name: 'Vet' }));
@@ -160,7 +160,7 @@ describe('BewerkbaarVers', () => {
 
 	it('kiest een kleur met het toetsenbord en sluit het menu terwijl de editor open blijft', async () => {
 		const editor = startBewerken();
-		selecteer(editor, 1, 7);
+		selecteer(editor, 0, 6);
 		await waitFor(() => expect(screen.getByRole('button', { name: /Kleur/ }).getAttribute('title')).toContain('Kleur kiezen'));
 
 		fireEvent.keyDown(screen.getByRole('button', { name: /Kleur/ }), { key: 'ArrowDown' });
@@ -187,7 +187,7 @@ describe('BewerkbaarVers', () => {
 
 	it('zet de focus met Escape in het kleurmenu terug in de editor, die open blijft, en sluit het menu', async () => {
 		const editor = startBewerken();
-		selecteer(editor, 1, 7);
+		selecteer(editor, 0, 6);
 		await waitFor(() => expect(screen.getByRole('button', { name: /Kleur/ }).getAttribute('title')).toContain('Kleur kiezen'));
 		fireEvent.keyDown(screen.getByRole('button', { name: /Kleur/ }), { key: 'ArrowDown' });
 		expect(screen.getByRole('menu')).not.toBeNull();

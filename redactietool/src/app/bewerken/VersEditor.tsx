@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import type { WordStijl } from '../../data/types';
 import type { VersInhoud } from '../../bewerken/types';
 import { documentNaarVersInhoud, versInhoudNaarDocument } from '../../editor/versDocument';
+import { metRandwitruimte, zonderRandwitruimte } from '../../editor/randwitruimte';
 import { versEditorPlugins, type Richting } from '../../editor/versEditorPlugins';
 import { vetteOpmaakVan } from '../../editor/vetteOpmaak';
 import { commandVoorActie, werkbalkToestand, type WerkbalkActie } from '../../editor/werkbalk';
@@ -67,8 +68,10 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 	const [vette] = useState(() => vetteOpmaakVan(stijlen));
 	const [mac] = useState(opMac);
 	const [kleurmenuOpen, zetKleurmenuOpen] = useState(false);
+	// De spaties rond het versnummer horen bij het bestand: de editor laat ze weg en zet ze bij elke wijziging terug.
+	const [{ inhoud: bewerkbaar, randen }] = useState(() => zonderRandwitruimte(inhoud));
 	const [beginstand] = useState(() => {
-		const startDocument = versInhoudNaarDocument(inhoud);
+		const startDocument = versInhoudNaarDocument(bewerkbaar);
 		const acties = {
 			onSluit: () => laatsteOnSluit.current(),
 			naarBuur: (richting: Richting) => laatsteOnNaarBuur.current(richting),
@@ -91,7 +94,7 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 				const nieuw = oud.apply(transactie);
 				view.updateState(nieuw);
 				zetToestand(werkbalkToestand(nieuw, vette));
-				if (nieuw.doc !== oud.doc) laatsteOnWijzig.current(documentNaarVersInhoud(nieuw.doc, vette));
+				if (nieuw.doc !== oud.doc) laatsteOnWijzig.current(metRandwitruimte(documentNaarVersInhoud(nieuw.doc, vette), randen));
 			},
 		});
 		weergave.current = view;

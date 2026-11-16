@@ -89,8 +89,8 @@ test.describe('de gebouwde app', () => {
 		await expect(werkbalk).toBeVisible();
 		await expect(editor).toBeFocused();
 
-		// De vers-tekst begint met een spatie: de selectie " Veel" mag die spatie niet in de opmaak meenemen.
-		await selecteerTekst(page, ' Veel');
+		// De selectie "Veel " (met de spatie erna) mag die spatie niet in de opmaak meenemen.
+		await selecteerTekst(page, 'Veel ');
 		await werkbalk.getByRole('button', { name: 'Vet' }).click();
 		await expect(werkbalk.getByRole('button', { name: 'Vet' })).toHaveAttribute('aria-pressed', 'true');
 		await expect(editor).toBeFocused();
