@@ -136,6 +136,40 @@
 	gap: .25rem .75rem;
 	padding: 0;
 	cursor: pointer;
+	list-style: none;
+}
+
+.vertaalvragen .vragenlijst summary::-webkit-details-marker {
+	display: none;
+}
+
+/* Een pijltje vooraan zegt dat de hele rij openklapt; open wijst het omlaag. Bij aanwijzen van de rij wordt de kwestie onderstreept. */
+.vertaalvragen .vragenlijst summary::before {
+	content: '›' / '';
+	display: inline-block;
+	width: .8rem;
+	color: var(--gedempt);
+	font-weight: 600;
+	text-align: center;
+	transition: transform .15s ease;
+}
+
+.vertaalvragen .vragenlijst details[open] > summary::before {
+	transform: rotate(90deg);
+}
+
+.vertaalvragen .vragenlijst summary:hover {
+	text-decoration: none;
+}
+
+.vertaalvragen .vragenlijst summary:hover .kwestie {
+	text-decoration: underline;
+	text-decoration-color: var(--rand-donker);
+	text-underline-offset: .2em;
+}
+
+.vertaalvragen .vragenlijst summary:hover::before {
+	color: var(--tekst);
 }
 
 .vertaalvragen .kwestie {
@@ -150,6 +184,11 @@
 
 .vertaalvragen .vraagtekst {
 	padding: .4rem 0 0;
+}
+
+/* De uitgeklapte tekst van een opmerking begint onder de kwestie, niet onder het pijltje en het nummer. */
+.vertaalvragen .vragenlijst details > .vraagtekst {
+	padding-left: calc(.8rem + .75rem + var(--vraagnr-breedte, 3.5rem) + .75rem);
 }
 
 .vertaalvragen .vraagtekst p {
