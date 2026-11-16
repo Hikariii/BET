@@ -13,6 +13,7 @@ import { useAdres, useLaden } from './hooks';
 import { Indeling } from './Indeling';
 import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { useWeergave, type Weergavebeheer } from './weergave/useWeergave';
+import { Welkom } from './welkom/Welkom';
 import { statusKlasse } from './Zijbalk';
 
 type BoekMetReferentie = { boek: BoekData; referentie: Referentie };
@@ -44,7 +45,12 @@ export function App() {
 	if (huidig === null) {
 		return <p class="melding">Er zijn geen boeken.</p>;
 	}
-	return <BoekScherm adres={huidig} boeken={boeken.waarde} weergavebeheer={weergavebeheer} />;
+	return (
+		<>
+			<Welkom />
+			<BoekScherm adres={huidig} boeken={boeken.waarde} weergavebeheer={weergavebeheer} />
+		</>
+	);
 }
 
 function standaardAdres(boeken: BoekLijst): BoekAdres | null {

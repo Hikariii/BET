@@ -4,12 +4,14 @@ import { versAdres } from '../adres';
 import { BackupInladen } from './BackupInladen';
 import { bewaarRegel, meervoud, tijdVan } from './bewaarTekst';
 import { downloadBackup } from './downloadBackup';
+import { useBackupStand } from './useBackupStand';
 import { useBewaardOverzicht } from './useBewaardOverzicht';
 import './bewaren.css';
 
 /** De pagina `#/<boek>/bewaard`: wat de browser bewaart per hoofdstuk, de toegepaste keuzes en de back-upknoppen. */
 export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 	const overzicht = useBewaardOverzicht(boek);
+	const backup = useBackupStand(boek.id, overzicht);
 	const [melding, zetMelding] = useState('');
 	const invoer = useRef<HTMLInputElement>(null);
 	const inladenKnop = useRef<HTMLButtonElement>(null);
@@ -18,6 +20,8 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 		<section class="bewaard-overzicht" aria-labelledby="bewaard-titel">
 			<h1 id="bewaard-titel">Bewaard in deze browser</h1>
 			<p class="bewaard-regel">{bewaarRegel(overzicht)}</p>
+			<p class="bewaard-backupregel">{backup.regel}</p>
+			{backup.herinnering !== null && <p class="bewaard-herinnering">{backup.herinnering}</p>}
 			<p class="bewaard-acties">
 				<button type="button" onClick={() => zetMelding(`Back-up gedownload als ${downloadBackup(boek)}.`)}>
 					Back-up downloaden
@@ -31,7 +35,15 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 			</p>
 			<BackupInladen boek={boek} focusNaSluiten={inladenKnop} invoer={invoer} />
 			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && (
-				<p class="melding">Er is niets bewaard. Bewerk een vers of pas een keuze toe en het staat hier.</p>
+				<div class="bewaard-leeg">
+					<p class="melding">Er is niets bewaard. Bewerk een vers of pas een keuze toe en het staat hier.</p>
+					<p class="bewaard-leeg-tip">Werkte je eerder in een andere browser of op een andere computer? Laad dan je back-up in.</p>
+					<p>
+						<button type="button" onClick={() => invoer.current?.click()}>
+							Back-up inladen
+						</button>
+					</p>
+				</div>
 			)}
 			{overzicht.totaal.verouderd > 0 && (
 				<p class="bewaard-verouderd">

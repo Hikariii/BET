@@ -182,3 +182,52 @@
 	padding: 0.25rem 0;
 	border-bottom: 1px solid var(--rand);
 }
+
+/* ---------- Laatste back-up, herinnering en lege browser ---------- */
+
+/* De regel Laatste back-up hoort bij de samenvatting erboven; de ruimte onder de samenvatting komt na deze regels. */
+.indeling .bewaard-overzicht .bewaard-regel:has(+ .bewaard-backupregel) {
+	margin-bottom: 0.15rem;
+}
+
+.indeling .bewaard-overzicht .bewaard-backupregel {
+	margin: 0 0 1.75rem;
+	color: var(--gedempt);
+	font-size: 0.9375rem;
+}
+
+.indeling .bewaard-overzicht .bewaard-backupregel:has(+ .bewaard-herinnering) {
+	margin-bottom: 0.75rem;
+}
+
+.indeling .bewaard-overzicht .bewaard-herinnering {
+	margin: 0 0 1.75rem;
+	padding: 0.5rem 0.75rem;
+	background: var(--vlak);
+	border-left: 3px solid var(--rand-donker);
+	color: var(--tekst);
+	font-size: 0.9375rem;
+}
+
+.indeling .bewaard-overzicht .bewaard-leeg {
+	margin: 0 0 1.75rem;
+}
+
+.indeling .bewaard-overzicht .bewaard-leeg p {
+	margin: 0 0 0.6rem;
+}
+
+.indeling .bewaard-overzicht .bewaard-leeg .bewaard-leeg-tip {
+	max-width: 36rem;
+	font-size: 0.9375rem;
+	line-height: 1.5;
+}
+
+.bewaarstatus .bewaarstatus-herinnering {
+	flex: none;
+	padding: 0 0.4rem;
+	border: 1px solid var(--rand-donker);
+	color: var(--gedempt);
+	font-size: 0.6875rem;
+	white-space: nowrap;
+}

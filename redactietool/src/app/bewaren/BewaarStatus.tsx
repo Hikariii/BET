@@ -1,6 +1,7 @@
 import type { BoekData } from '../../data/types';
 import { maakAdres } from '../adres';
 import { bewaarRegel, bewaarTelling } from './bewaarTekst';
+import { useBackupStand } from './useBackupStand';
 import { useBewaardOverzicht } from './useBewaardOverzicht';
 import './bewaren.css';
 
@@ -22,11 +23,13 @@ function OpslagIcoon() {
 /** Laat zien dat en wat de browser bewaart, als link naar de pagina Bewaard; Back-up downloaden en inladen staan op die pagina. */
 export function BewaarStatus({ boek, overzichtOpen }: Props) {
 	const overzicht = useBewaardOverzicht(boek);
-	const regel = bewaarRegel(overzicht);
+	const backup = useBackupStand(boek.id, overzicht);
+	const regel = [bewaarRegel(overzicht), backup.regel, backup.herinnering].filter((deel) => deel !== null).join('. ');
 	return (
 		<a class="bewaarstatus bewaarstatus-pagina" href={maakAdres({ soort: 'bewaard', boek: boek.id })} aria-current={overzichtOpen ? 'page' : undefined} title={regel}>
 			<OpslagIcoon />
 			<span class="bewaarstatus-tekst">Bewaard: {bewaarTelling(overzicht)}</span>
+			{backup.herinnering !== null && <span class="bewaarstatus-herinnering">Maak een back-up</span>}
 			<span class="alleen-lezers">. {regel}</span>
 		</a>
 	);
