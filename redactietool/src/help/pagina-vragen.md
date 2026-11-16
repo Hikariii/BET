@@ -1,14 +1,14 @@
 # {{plek:vragen}}
 
-De pagina heeft drie groepen: **Open vragen** (vragen aan de redactie; alleen die kun je beantwoorden en alleen die tellen mee in het getal bij de naam en bij een hoofdstuk), **Vragen met een besluit**, en **Opmerkingen van Claude** (door Claude geschreven bij een hoofdstuk, ter informatie en ingeklapt). Een vraag heeft een vast nummer (`V12`), een opmerking een nummer met het hoofdstuk erin (`O5.2`), en je kunt op beide zoeken.
+De pagina heeft drie groepen: **Open vragen** (vragen aan de redactie waar nog geen besluit over is; alleen die tellen mee in het getal bij de naam en bij een hoofdstuk), **Vragen met een besluit** (die kun je ook beantwoorden), en **Opmerkingen van Claude** (door Claude geschreven bij een hoofdstuk). Bovenaan de opmerkingen staat **Waar Claude nog twijfelde**; de rest staat ingeklapt per hoofdstuk. Een vraag heeft een vast nummer (`V12`), een opmerking een nummer met het hoofdstuk erin (`O5.2`), en je kunt op beide zoeken.
 
 Hier beantwoord je een vraag. Je komt ook bij een vraag via het vraagteken naast een versnummer, of via de link bij *vraag* in de kolom Vertaalregels: de vraag staat dan open en in beeld.
 
 ## Vragen vinden
 
-Filter op status, soort en hoofdstuk, of zoek in de tekst. Met **Nog niet door mij beantwoord** zie je alleen de vragen waar nog geen antwoord van jou op staat. Boven de lijst staat hoeveel vragen er bij je filters passen, hoeveel daarvan open zijn en hoeveel je er zelf hebt beantwoord.
+Filter op status, soort en hoofdstuk, of zoek in de tekst. Met **Nog niet door mij beantwoord** zie je van de vragen alleen die waar nog geen antwoord van jou op staat; de opmerkingen van Claude blijven staan. Boven de lijst staat hoeveel vragen er bij je filters passen, hoeveel daarvan open zijn en hoeveel je er zelf hebt beantwoord.
 
-Een vraag met opties heeft opties om uit te kiezen. Een opmerking van Claude bij het hoofdstuk is alleen een melding met links naar de verzen.
+Een vraag met opties heeft opties om uit te kiezen. Een opmerking van Claude is een melding met links naar de verzen, met daaronder het vak **Reageren**.
 
 De status zegt waar de vraag staat. **open**: er is nog geen besluit; dat staat alleen bij een vraag aan de redactie. **Claude twijfelde nog**: bij een opmerking van Claude stond "open" in de tekst. **voorlopig besloten**: de redactie heeft een besluit genomen dat nog bevestigd moet worden. **besloten**: het besluit staat vast. **onbeslist**: er staat geen statuswoord bij.
 

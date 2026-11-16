@@ -16,13 +16,13 @@ De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een ma
 
 ## Met het toetsenbord
 
-De eerste Tab brengt je bij **Naar de verzen**. De titel van het hoofdstuk is een knop: Enter, de spatiebalk of pijl omlaag opent het raster met hoofdstukken. Daarin loop je met de pijltjes, Home en End langs de hoofdstukken en opent Enter het gekozen hoofdstuk. Escape sluit het raster en brengt je terug bij de titel. Met **j** en **k** spring je naar het volgende of vorige vers (niet terwijl je typt). In de editor gaat **Alt+pijl omlaag** of **omhoog** naar het volgende of vorige vers.
+De eerste Tab brengt je bij **Naar de verzen**. De titel van het hoofdstuk is een knop: Enter, de spatiebalk of pijl omlaag opent het raster met hoofdstukken. Daarin loop je met de pijltjes, Home en End langs de hoofdstukken en opent Enter het gekozen hoofdstuk. Escape sluit het raster en brengt je terug bij de titel; met Tab naar buiten sluit het ook. Met **j** en **k** spring je naar het volgende of vorige vers (niet terwijl je typt). In de editor gaat **Alt+pijl omlaag** of **omhoog** naar het volgende of vorige vers.
 
 ## De vertaalregels
 
 Rechts van elk vers staat wat Claude bij dit vers heeft veranderd en op grond van welke regel. Heeft Claude niets aangepast, dan staat er *Claude heeft bij dit vers niets aangepast*. Het vak is zo hoog als het vers. Is het vers korter dan de regels ernaast, dan vervaagt de tekst onderaan: er past niet meer in. Wijs het vak aan of tab erheen en het klapt uit over de verzen eronder, zodat je alles ziet.
 
-Heeft een vers veel vertaalregels (meer dan drie), dan staan er eerst drie. De rest zit achter **nog 3 vertaalregels** (of een ander aantal). Een klik daarop toont de rest. De knop heet dan **minder vertaalregels**; een klik daarop klapt de regels weer in.
+Heeft een vers vijf of meer vertaalregels, dan staan er eerst drie. De rest zit achter **nog 2 vertaalregels** (of een ander aantal). Een klik daarop toont de rest. De knop heet dan **minder vertaalregels**; een klik daarop klapt de regels weer in.
 
 Rechtsonder in een uitgeklapt vak staat een punaise. Met **Vertaalregels vastzetten** blijft het vak open in de kolom, met alle regels. Nog een klik maakt het weer los. Het vak blijft ook een moment open nadat je de muis ervan weghaalt, zodat je rustig kunt lezen.
 
@@ -33,24 +33,24 @@ Wil je alle vertaalregels tegelijk vast, zoals in een gewone kolom? Klik dan op 
 
 ## Een regel naslaan
 
-Achter een regel staat soms **§11** of **vertaalkeuze**. Klik erop en onder het vers opent een kaart. Bij een § staat daar de paragraaf uit de richtlijn. Bij vertaalkeuze staan daar de vertaalkeuzes die bij de regel horen. Sluit de kaart met **Sluiten** of Escape. De punaise staat ook als een kaart open is. Heb je het vak vastgezet, dan blijft het vastgezet nadat je de kaart sluit.
+In de tekst van een regel is een paragraafteken met nummer, zoals **§11**, klikbaar, en ook het woord **precedent**. Dat woord komt uit de tekst van Claude en betekent een vertaalkeuze. Klik erop en onder het vers opent een kaart. Bij een § staat daar de paragraaf uit de richtlijn, met de link **Lees in de richtlijn**. Bij *precedent* staan daar de vertaalkeuzes die bij de regel horen. Is de kaart lang, dan scrolt alleen de inhoud; de titel en **Sluiten** blijven bovenaan staan. Sluit de kaart met **Sluiten** of Escape. De punaise staat ook als een kaart open is. Heb je het vak vastgezet, dan blijft het vastgezet nadat je de kaart sluit.
 
-{{wijs naslag-verwijzing | § en vertaalkeuze | In de kolom Vertaalregels, achter een regel.}}
-{{wijs naslagkaart | De naslagkaart | Verschijnt onder het vers nadat je op § of vertaalkeuze klikt.}}
+{{wijs naslag-verwijzing | § en precedent | In de kolom Vertaalregels, achter een regel.}}
+{{wijs naslagkaart | De naslagkaart | Verschijnt onder het vers nadat je op § of precedent klikt.}}
 
 ## Een vraagteken bij het versnummer
 
-Een vraagteken naast het versnummer betekent dat het vers bij een vertaalvraag hoort. Klik erop: je komt bij die vraag op {{plek:vragen}}, open en in beeld. Dezelfde link staat bij *vraag* in de kolom Vertaalregels.
+Een vraagteken naast het versnummer betekent dat het vers bij een vertaalvraag hoort, of bij een opmerking waar Claude nog over twijfelde. Meestal kun je erop klikken: je komt bij die vraag of opmerking op {{plek:vragen}}, open en in beeld. Dezelfde link staat bij *vraag* in de kolom Vertaalregels.
 
 {{wijs vraagmarkering | Vraagteken bij een vers | Naast het versnummer, alleen bij verzen met een vertaalvraag.}}
 
 ## De balk van het hoofdstuk
 
-Onder de boekbalk staat de balk van dit hoofdstuk: de titel met de status als pictogram, de hoofdstukken, en rechts de twee knoppen voor Word en Claude.
+Onder de boekbalk staat de balk van dit hoofdstuk: de titel met de status, de knoppen naar het vorige en volgende hoofdstuk, en rechts de twee knoppen voor Word en Claude. Daarnaast staat hoeveel verzen je in dit hoofdstuk hebt bewerkt.
 
 **Hoofdstuktekst kopiëren voor Word** zet de tekst van het hele hoofdstuk op het klembord, met de Word-opmaak. Er staat dan *Gekopieerd. Plak het in Word.* Plak hem daarna in Word. Dat werkt in Chrome en Edge, niet in Safari. Staat er een melding dat Claude een vers heeft veranderd nadat jij het bewerkte, lees dat vers dan eerst na. Wil je de tekst van Claude, kies dan bij dat vers **Vers terugzetten**; je eigen wijziging gaat dan weg.
 
-**Export voor Claude** opent een formulier met een veld voor je toelichting en de knop **Downloaden**. Het bestand dat je downloadt bevat je wijzigingen, vervangingen en antwoorden voor dit hoofdstuk. Daarna staat er welk bestand het is en hoeveel verzen erin zitten. Lees *Je werk doorgeven aan Claude* voor wat Claude ermee doet.
+**Export voor Claude** opent een formulier met een veld voor je toelichting en de knop **Downloaden**. Het bestand dat je downloadt bevat je wijzigingen, vervangingen en antwoorden voor dit hoofdstuk, je reacties op opmerkingen van Claude bij dit hoofdstuk en al je reacties op de richtlijn. Daarna staat er welk bestand het is en hoeveel verzen erin zitten. Lees *Je werk doorgeven aan Claude* voor wat Claude ermee doet.
 
 {{wijs hoofdstuk-kopieren | Hoofdstuktekst kopiëren voor Word | Rechtsboven in de balk van het hoofdstuk.}}
 {{wijs export-voor-claude | Export voor Claude | Rechtsboven in de balk van het hoofdstuk.}}

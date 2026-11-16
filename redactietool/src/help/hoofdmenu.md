@@ -1,6 +1,6 @@
 # Het hoofdmenu
 
-Bovenaan blijft een balk staan, ook als je scrolt. De naam van het boek ({{boek}}) brengt je naar hoofdstuk 1. Daarnaast staan de plekken van het boek. De plek waar je bent, heeft een streep eronder. Rechts staan {{plek:bewaard}}, de lettergrootte en Help.
+Bovenaan blijft een balk staan, ook als je scrolt. De naam van het boek ({{boek}}) brengt je naar hoofdstuk 1. Daarnaast staan de plekken van het boek. De plek waar je bent, heeft een streep eronder. Rechts staan {{plek:bewaard}}, de lettergrootte en Help. De toets **?** opent ook de Help bij de pagina waar je bent (niet terwijl je typt).
 
 ## {{plek:hoofdstukken}}
 
@@ -46,7 +46,7 @@ Rechts in de balk staat wat de browser van je werk opslaat. Klik erop voor het o
 
 ## De lettergrootte
 
-Met de vier letters rechts in de balk maak je de tekst kleiner of groter. De tool onthoudt je keuze.
+Met de vier knoppen A−, A, A+ en A++ rechts in de balk maak je de tekst kleiner of groter. De tool onthoudt je keuze.
 
 {{wijs grootte | Lettergrootte | Rechtsboven in de balk, naast Help.}}
 
