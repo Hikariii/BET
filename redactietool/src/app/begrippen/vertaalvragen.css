@@ -168,8 +168,14 @@
 	text-underline-offset: .2em;
 }
 
+/* Bij aanwijzen staat het pijltje alvast in de stand na een klik: omlaag om te openen, naar rechts om te sluiten. */
 .vertaalvragen .vragenlijst summary:hover::before {
 	color: var(--tekst);
+	transform: rotate(90deg);
+}
+
+.vertaalvragen .vragenlijst details[open] > summary:hover::before {
+	transform: rotate(0deg);
 }
 
 .vertaalvragen .kwestie {

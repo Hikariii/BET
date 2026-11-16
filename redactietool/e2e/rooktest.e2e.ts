@@ -154,6 +154,29 @@ test.describe('de gebouwde app', () => {
 		}
 	});
 
+	test('de pijltjes van de hoofdstukstrip schuiven heen en terug, en een buurhoofdstuk laat de rest staan', async ({ page }) => {
+		const fouten = volgFouten(page);
+		await page.setViewportSize({ width: 1440, height: 900 });
+		await wachtOpHoofdstuk(page, 4);
+		const lijst = page.locator('.hoofdstukstrip ul');
+		const scroll = () => lijst.evaluate((element) => element.scrollLeft);
+		const begin = await scroll();
+
+		await page.locator('.strip-pijl-verder').click();
+		await expect.poll(scroll).toBeGreaterThan(begin);
+		const verder = await scroll();
+		await page.locator('.strip-pijl-terug').click();
+		await expect.poll(scroll).toBeLessThan(verder);
+
+		await wachtOpHoofdstuk(page, 15);
+		const posities = () => page.locator('.hoofdstuk-kort').evaluateAll((links) => links.map((link) => Math.round(link.getBoundingClientRect().x)));
+		const bij15 = await posities();
+		await page.locator('.hoofdstuk-kort[href$="/16"]').click();
+		await expect(page.locator('.hoofdstuk-kort[aria-current="page"]')).toHaveAttribute('href', /\/16$/);
+		expect(await posities()).toEqual(bij15);
+		expect(fouten).toEqual([]);
+	});
+
 	test('de versrijen van elk hoofdstuk komen overeen met boek.json', async ({ page }) => {
 		for (const hoofdstuk of HOOFDSTUKKEN) {
 			expect(await wachtOpHoofdstuk(page, hoofdstuk), `hoofdstuk ${hoofdstuk} op ${hoofdstukAdres(hoofdstuk)}`).toBe(
