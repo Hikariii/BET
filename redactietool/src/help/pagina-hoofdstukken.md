@@ -14,6 +14,10 @@ De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een ma
 {{wijs vers-gewijzigd | gewijzigd | Verschijnt onder een vers dat je hebt aangepast.}}
 {{wijs terug-naar-de-repo | Vers terugzetten | Verschijnt onder een vers dat je hebt aangepast.}}
 
+## Met het toetsenbord
+
+De eerste Tab brengt je bij **Naar de verzen**. De hoofdstukstrip is één tabstop: met pijl links en rechts, Home en End loop je langs de hoofdstukken, Enter opent. Met **j** en **k** spring je naar het volgende of vorige vers (niet terwijl je typt). In de editor gaat **Alt+pijl omlaag** of **omhoog** naar het volgende of vorige vers.
+
 ## De vertaalregels
 
 Rechts van elk vers staat wat Claude bij dit vers heeft veranderd en op grond van welke regel. Heeft Claude niets aangepast, dan staat er *Claude heeft bij dit vers niets aangepast*. Het vak is zo hoog als het vers. Is het vers korter dan de regels ernaast, dan vervaagt de tekst onderaan: er past niet meer in. Wijs het vak aan of tab erheen en het klapt uit over de verzen eronder, zodat je alles ziet.

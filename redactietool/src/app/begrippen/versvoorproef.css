@@ -11,7 +11,7 @@
 	border-radius: 3px;
 	color: var(--tekst);
 	font-family: var(--tool);
-	font-size: 0.8125rem;
+	font-size: var(--t-klein);
 	pointer-events: none;
 }
 
@@ -32,7 +32,7 @@
 .versvoorproef-tekst {
 	color: #000;
 	font-family: var(--boek);
-	font-size: 1.15rem;
+	font-size: var(--t-kop2);
 	line-height: 1.5;
 }
 
@@ -47,7 +47,7 @@
 	border-top: 1px solid var(--rand);
 	color: #000;
 	font-family: var(--boek);
-	font-size: 0.95rem;
+	font-size: var(--t-kop3);
 	line-height: 1.45;
 }
 
@@ -55,7 +55,7 @@
 	margin-bottom: 0.2rem;
 	color: var(--gedempt);
 	font-family: var(--tool);
-	font-size: 0.75rem;
+	font-size: var(--t-klein);
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
 }

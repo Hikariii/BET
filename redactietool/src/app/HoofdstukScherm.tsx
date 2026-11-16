@@ -7,6 +7,10 @@ import { groepeerPerVers, type VersGroep } from './groepeerPerVers';
 import { maakVersVraagAdres } from './begrippen/vraagAdres';
 import { Naslagkaart } from './Naslagkaart';
 import { wisselNaslag, type Naslag, type OpenNaslag } from './naslag';
+import { knipVers } from '../bewerken/versknip';
+import type { Richting } from '../editor/versEditorPlugins';
+import { buurVers } from './navigatie/toetsenbord';
+import { useSprongNaarVers } from './navigatie/useSprongNaarVers';
 import { Regels } from './Regels';
 import { vragenBijVers } from './vertaalvragen';
 import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
@@ -53,12 +57,24 @@ export function HoofdstukScherm({
 	herlees,
 }: Props) {
 	const [bewerktAdres, zetBewerktAdres] = useState<string | null>(null);
+	const [geopendMetPijl, zetGeopendMetPijl] = useState(false);
 	const [openNaslag, zetOpenNaslag] = useState<OpenNaslag | null>(null);
 	const verwijzing = useRef<HTMLElement | null>(null);
 	const weergave = pasTussenstandToe(hoofdstuk.vereenvoudigd, tussenstand);
 	const groepen = groepeerPerVers(hoofdstuk.bron, weergave);
 	const vraagAdresBij = useMemo(() => maakVersVraagAdres(boek.id, referentie.openVragen, hoofdstuk), [boek.id, referentie, hoofdstuk]);
 	const adresVan = (nummer: number | null) => (nummer === null ? null : versAdres(boek.id, hoofdstuk.nummer, nummer));
+
+	const bewerkbareVerzen = () =>
+		groepen.flatMap((groep) => (groep.nummer !== null && knipVers(hoofdstuk.vereenvoudigd, groep.nummer) !== null ? [groep.nummer] : []));
+	const bewerkBuur = (vanaf: number, richting: Richting) => {
+		const buur = buurVers(bewerkbareVerzen(), vanaf, richting);
+		if (buur === null) return;
+		zetGeopendMetPijl(true);
+		zetBewerktAdres(adresVan(buur));
+	};
+
+	useSprongNaarVers(bewerkbareVerzen);
 
 	const sluitNaslag = useCallback(() => {
 		zetOpenNaslag(null);
@@ -101,8 +117,13 @@ export function HoofdstukScherm({
 							onSluitNaslag={sluitNaslag}
 							bewerkt={groep.nummer === null ? null : (tussenstand.verzen[groep.nummer] ?? null)}
 							bewerken={bewerktAdres !== null && bewerktAdres === adresVan(groep.nummer)}
-							onBewerk={() => zetBewerktAdres(adresVan(groep.nummer))}
+							beginAanBegin={geopendMetPijl}
+							onBewerk={() => {
+								zetGeopendMetPijl(false);
+								zetBewerktAdres(adresVan(groep.nummer));
+							}}
 							onSluit={() => zetBewerktAdres(null)}
+							onNaarBuur={(richting) => groep.nummer !== null && bewerkBuur(groep.nummer, richting)}
 							onOpslagGewijzigd={herlees}
 						/>
 					))}
@@ -128,8 +149,11 @@ type VersRijProps = {
 	/** De bewaarde bewerking van dit vers; `null` als het vers gelijk is aan de repo. */
 	bewerkt: BewerktVers | null;
 	bewerken: boolean;
+	/** De editor is met Alt+pijl vanuit een ander vers geopend. */
+	beginAanBegin: boolean;
 	onBewerk: () => void;
 	onSluit: () => void;
+	onNaarBuur: (richting: Richting) => void;
 	onOpslagGewijzigd: () => void;
 };
 
@@ -145,8 +169,10 @@ export function VersRij({
 	onSluitNaslag,
 	bewerkt,
 	bewerken,
+	beginAanBegin,
 	onBewerk,
 	onSluit,
+	onNaarBuur,
 	onOpslagGewijzigd,
 }: VersRijProps) {
 	const rijRef = useRef<HTMLTableRowElement>(null);
@@ -199,8 +225,10 @@ export function VersRij({
 							delen={groep.vereenvoudigd}
 							bewerkt={bewerkt}
 							bewerken={bewerken}
+							beginAanBegin={beginAanBegin}
 							onBewerk={onBewerk}
 							onSluit={onSluit}
+							onNaarBuur={onNaarBuur}
 							onOpslagGewijzigd={onOpslagGewijzigd}
 						/>
 					)}

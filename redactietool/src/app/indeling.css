@@ -16,7 +16,7 @@
 
 .bovenbalk .bovenbalk-boekbalk {
 	min-height: 3rem;
-	padding: 0.55rem 1.5rem;
+	padding: 0.55rem var(--marge-inhoud);
 	gap: 0.4rem 2rem;
 	border-bottom: 1px solid var(--rand);
 }
@@ -26,12 +26,12 @@
 }
 
 .bovenbalk .bovenbalk-boeknaam {
-	font-size: 1rem;
+	font-size: var(--t-kop3);
 	letter-spacing: 0;
 }
 
 .bovenbalk .bovenbalk-hoofdstuktitel {
-	font-size: 1rem;
+	font-size: var(--t-kop3);
 }
 
 /* ---------- Plekken in het boek: tabbladen met pictogram ---------- */
@@ -50,7 +50,7 @@
 	gap: 0.35rem;
 	padding: 0.25rem 0.1rem 0.2rem;
 	border-bottom: 2px solid transparent;
-	font-size: 0.8125rem;
+	font-size: var(--t-klein);
 	font-weight: 500;
 }
 
@@ -70,8 +70,46 @@
 
 .bovenbalk .boekplek-aantal {
 	color: var(--gedempt);
-	font-size: 0.75rem;
+	font-size: var(--t-klein);
 	font-weight: 500;
+}
+
+/*
+ * Smalle boekbalk: de balk breekt niet maar wordt compacter. Alleen de open plek houdt zijn naam, de andere tabs zijn een pictogram
+ * (de naam blijft in de tooltip en voor schermlezers) en de bewaarstatus is alleen het pictogram.
+ * De drempel is in rem, dus hij schuift mee met de lettergrootte: de balk heeft ongeveer 79rem nodig, met speling voor een langere bewaarstatus.
+ */
+.bovenbalk .bovenbalk-boekbalk {
+	container-type: inline-size;
+	container-name: boekbalk;
+}
+
+@container boekbalk (max-width: 84rem) {
+	.bovenbalk .boekplek:not([aria-current='page']) .boekplek-naam,
+	.bovenbalk .bewaarstatus-pagina:not([aria-current='page']) .bewaarstatus-tekst,
+	.bovenbalk .bewaarstatus-herinnering {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+	}
+
+	.bovenbalk .boekplekken ul {
+		gap: 1rem;
+	}
+
+	/* De herinnering "maak een back-up" is er alleen als het nodig is; zonder woorden wordt het een stip op het pictogram. */
+	.bovenbalk .bewaarstatus-pagina:has(.bewaarstatus-herinnering)::before {
+		content: '';
+		position: absolute;
+		top: 0.15rem;
+		left: 1rem;
+		width: 0.5rem;
+		height: 0.5rem;
+		background: var(--tekst);
+		border-radius: 50%;
+	}
 }
 
 /* ---------- Grootte: vier letters met een streep onder de gekozen, geen kaders ---------- */
@@ -107,7 +145,7 @@
 	border: 0;
 	border-bottom: 2px solid transparent;
 	color: var(--tekst);
-	font-size: 0.8125rem;
+	font-size: var(--t-klein);
 	font-weight: 500;
 }
 
@@ -125,7 +163,7 @@
 	content: '\203A';
 	margin-left: -0.1rem;
 	color: var(--gedempt);
-	font-size: 1rem;
+	font-size: var(--t-kop3);
 	line-height: 1;
 }
 
@@ -140,15 +178,20 @@
  * de balk zelf heeft geen ruimte boven en onder; titel en acties krijgen die zelf, de strip rekt mee.
  */
 .bovenbalk .bovenbalk-hoofdstukbalk {
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
 	align-items: stretch;
 	gap: 0 1rem;
 	min-height: 2.75rem;
-	padding: 0 1.5rem;
+	padding: 0 var(--marge-inhoud);
 }
 
 .bovenbalk .bovenbalk-hoofdstukbalk > :is(.bovenbalk-titel, .bovenbalk-acties) {
 	align-self: center;
+}
+
+/* In een smal venster passen de acties niet naast titel en strip: ze komen op een eigen regel, in plaats van de pagina zijwaarts te laten schuiven. */
+.bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-acties {
+	padding: 0.3rem 0;
 }
 
 /*
@@ -269,7 +312,7 @@
 	padding: 0.05rem 0.3rem;
 	background: none;
 	border: 0;
-	font-size: 0.8125rem;
+	font-size: var(--t-klein);
 	font-weight: 600;
 	text-align: center;
 }
@@ -325,7 +368,7 @@
 /* De strip neemt alleen de ruimte die over is; de acties blijven op één regel. */
 .bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-strip {
 	flex: 1 1 0;
-	min-width: 6rem;
+	min-width: 14rem;
 }
 
 .bovenbalk .bovenbalk-hoofdstukbalk > .bovenbalk-acties {
@@ -379,25 +422,36 @@
 /* ---------- Inhoud: de hele breedte, smalle marges ---------- */
 
 .indeling main {
-	padding: 0.5rem 1rem 3rem;
+	padding: var(--kop-ruimte) var(--marge-inhoud) 3rem;
 }
 
-/* Keuzes en vragen: de kop is de naam van het gekozen onderdeel. */
-.begrippen h1 {
-	margin-top: 0.75rem;
+/* Een hoofdstuk heeft zijn kop in de balk en begint direct onder de balk. */
+.indeling main:has(.hoofdstuk) {
+	padding-top: 0.5rem;
+}
+
+/* De cijfers van de versnummers staan op de linkermarge; hun streepje voor het gekozen vers staat ernaast. */
+.indeling .hoofdstuk table.verzen {
+	width: calc(100% + 1rem - 3px);
+	margin-left: calc(3px - 1rem);
+}
+
+.indeling .begrippen {
+	padding: 0 0 1rem;
+}
+
+/* Keuzes, vragen en Opgeslagen: de kop begint op dezelfde plek, onder de ruimte van main. */
+.indeling .begrippen h1,
+.indeling .bewaard-overzicht h1 {
+	margin-top: 0;
 }
 
 /* ---------- Overzichtspagina Bewaard: kop en samenvatting links, back-up rechts ---------- */
-
-.indeling main:has(.bewaard-overzicht) {
-	padding: 1.25rem 1rem 3rem;
-}
 
 .indeling .bewaard-overzicht {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) 17rem;
 	column-gap: 3.5rem;
-	max-width: 72rem;
 }
 
 .indeling .bewaard-overzicht > :not(.bewaard-acties) {
@@ -406,7 +460,7 @@
 
 .indeling .bewaard-overzicht h1 {
 	margin: 0 0 0.35rem;
-	font-size: 1.375rem;
+	font-size: var(--t-kop1);
 	font-weight: 600;
 	letter-spacing: -0.015em;
 }
@@ -414,7 +468,7 @@
 .indeling .bewaard-overzicht .bewaard-regel {
 	margin: 0 0 1.75rem;
 	color: var(--gedempt);
-	font-size: 0.9375rem;
+	font-size: var(--t-kop3);
 }
 
 /* De back-up: een vaste kolom naast de lijst, zonder kader, met een dunne lijn aan de linkerkant. */
@@ -436,7 +490,7 @@
 	content: 'Back-up';
 	margin-bottom: 0.15rem;
 	color: var(--zacht);
-	font-size: 0.6875rem;
+	font-size: var(--t-klein);
 	font-weight: 500;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -446,7 +500,7 @@
 	content: 'Eén bestand met je bewerkte verzen en keuzes. Laad het in op een andere computer, of als je browser leeg is gemaakt.';
 	margin-top: 0.35rem;
 	color: var(--gedempt);
-	font-size: 0.8125rem;
+	font-size: var(--t-klein);
 	line-height: 1.5;
 }
 
@@ -475,7 +529,7 @@
 
 .indeling .bewaard-overzicht .melding {
 	padding: 0;
-	font-size: 0.9375rem;
+	font-size: var(--t-kop3);
 }
 
 .indeling .bewaard-overzicht .bewaard-verouderd {
@@ -490,7 +544,7 @@
 	margin: 0;
 	padding: 0 0 0.45rem;
 	border-bottom: 1px solid var(--rand-donker);
-	font-size: 0.9375rem;
+	font-size: var(--t-kop3);
 	font-weight: 600;
 }
 
@@ -503,7 +557,8 @@
 }
 
 .indeling .bewaard-hoofdstuk,
-.indeling .bewaard-keuzes {
+.indeling .bewaard-keuzes,
+.indeling .bewaard-antwoorden {
 	margin-bottom: 1.75rem;
 }
 
@@ -527,7 +582,7 @@
 
 .indeling .bewaard-tijd {
 	color: var(--gedempt);
-	font-size: 0.75rem;
+	font-size: var(--t-klein);
 	font-variant-numeric: tabular-nums;
 }
 
@@ -535,7 +590,7 @@
 	grid-column: auto;
 	padding: 0.05rem 0.45rem;
 	color: var(--gedempt);
-	font-size: 0.6875rem;
+	font-size: var(--t-klein);
 	letter-spacing: 0.02em;
 }
 
@@ -545,7 +600,8 @@
 	color: #fff;
 }
 
-.indeling .bewaard-keuzes li {
+.indeling .bewaard-keuzes li,
+.indeling .bewaard-antwoorden li {
 	padding: 0.6rem 0;
 	border-bottom: 1px solid #efefef;
 }
@@ -590,7 +646,7 @@
 	margin: 0 0 1rem;
 	padding: 0 0 0.5rem;
 	border-bottom: 1px solid var(--rand-donker);
-	font-size: 1.125rem;
+	font-size: var(--t-kop2);
 	font-weight: 600;
 }
 
@@ -600,9 +656,4 @@
 	border-top: 1px solid var(--rand);
 }
 
-/* Beneden 60rem staan de kolommen in vormgeving.css al onder elkaar; de marges mogen dan nog smaller. */
-@media (max-width: 60rem) {
-	.indeling main {
-		padding-inline: 0.75rem;
-	}
-}
+

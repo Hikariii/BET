@@ -1,6 +1,6 @@
 .hoofdstukacties {
 	margin: 0.75rem 0 0;
-	font-size: 0.9rem;
+	font-size: var(--t-basis);
 }
 
 .hoofdstukacties-knoppen {

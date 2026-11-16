@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { BoekData, Referentie } from '../../data/types';
 import { aantalOpenVragen } from '../vertaalvragen';
+import { stripStatusWoord } from './hoofdstukLabel';
 import { KortHoofdstuk } from './KortHoofdstuk';
+import { stripStop } from './toetsenbord';
+import { gewoneStatusVan } from '../Zijbalk';
 import { schuifAfstand, schuifstand, type Schuifstand } from './stripSchuiven';
 
 type Props = {
@@ -22,26 +25,27 @@ function centreerHuidig(lijst: HTMLElement): void {
 /**
  * Alle hoofdstukken als horizontale strip in de hoofdstukbalk: per hoofdstuk nummer, vinkje en aantal open vragen.
  * Past hij niet, dan schuift hij zijwaarts: met pijltjes aan de randen (alleen als ze iets doen) of met het muiswiel.
+ * Met het toetsenbord is de strip één tabstop: Tab komt bij het open hoofdstuk, links en rechts lopen langs de rest.
  */
 export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 	const strip = useRef<HTMLElement>(null);
 	const lijst = useRef<HTMLUListElement>(null);
 	const [stand, zetStand] = useState<Schuifstand>({ terug: false, verder: false });
+	const huidigeIndex = Math.max(0, boek.hoofdstukken.findIndex((hoofdstuk) => hoofdstuk.nummer === huidigHoofdstuk));
+	const [tabstop, zetTabstop] = useState(huidigeIndex);
+	const gewoneStatus = gewoneStatusVan(boek.hoofdstukken.map((hoofdstuk) => hoofdstuk.status));
 
 	useEffect(() => {
 		const element = lijst.current;
 		if (element === null) return;
 		const meet = () => zetStand(schuifstand(element.scrollLeft, element.clientWidth, element.scrollWidth));
-		let gecentreerd = false;
+		// Een andere venster- of lettergrootte verschuift het open hoofdstuk; de strip zet het dan opnieuw in het midden.
 		const waarnemer = new ResizeObserver(() => {
-			// De eerste keer dat de strip een breedte heeft, het huidige hoofdstuk in het midden zetten.
-			if (!gecentreerd && element.clientWidth > 0) {
-				centreerHuidig(element);
-				gecentreerd = true;
-			}
+			if (element.clientWidth > 0) centreerHuidig(element);
 			meet();
 		});
 		waarnemer.observe(element);
+		for (const hoofdstuk of element.children) waarnemer.observe(hoofdstuk);
 		element.addEventListener('scroll', meet, { passive: true });
 		// Een gewoon muiswiel scrolt verticaal; in de strip betekent dat zijwaarts.
 		const wiel = (gebeurtenis: WheelEvent) => {
@@ -59,7 +63,24 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 
 	useEffect(() => {
 		if (lijst.current !== null) centreerHuidig(lijst.current);
+		zetTabstop(huidigeIndex);
 	}, [huidigHoofdstuk]);
+
+	const hoofdstukLinks = () => [...(lijst.current?.querySelectorAll<HTMLElement>('a') ?? [])];
+
+	const bijToets = (gebeurtenis: KeyboardEvent) => {
+		const links = hoofdstukLinks();
+		const volgende = stripStop(tabstop, links.length, gebeurtenis.key);
+		if (volgende === null) return;
+		gebeurtenis.preventDefault();
+		links[volgende]?.focus();
+	};
+
+	// Ook een klik zet de tabstop, zodat Shift+Tab terugkomt waar je was.
+	const bijFocus = (gebeurtenis: FocusEvent) => {
+		const index = hoofdstukLinks().findIndex((link) => link === gebeurtenis.target);
+		if (index >= 0) zetTabstop(index);
+	};
 
 	const schuif = (richting: 1 | -1) => {
 		const element = lijst.current;
@@ -69,22 +90,24 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 
 	return (
 		<nav class="hoofdstukstrip" ref={strip} aria-label={`Hoofdstukken van ${boek.naam}`}>
-			<button type="button" class="strip-pijl strip-pijl-terug" hidden={!stand.terug} onClick={() => schuif(-1)} aria-label="Eerdere hoofdstukken tonen">
+			<button type="button" class="strip-pijl strip-pijl-terug" hidden={!stand.terug} tabIndex={-1} onClick={() => schuif(-1)} aria-label="Eerdere hoofdstukken tonen">
 				‹
 			</button>
-			<ul ref={lijst}>
-				{boek.hoofdstukken.map((hoofdstuk) => (
+			<ul ref={lijst} onKeyDown={bijToets} onFocusIn={bijFocus}>
+				{boek.hoofdstukken.map((hoofdstuk, index) => (
 					<li>
 						<KortHoofdstuk
 							boek={boek.id}
 							hoofdstuk={hoofdstuk}
 							aantalOpenVragen={aantalOpenVragen(referentie.openVragen, hoofdstuk.nummer)}
 							huidig={hoofdstuk.nummer === huidigHoofdstuk}
+							statusWoord={stripStatusWoord(hoofdstuk.status, gewoneStatus, hoofdstuk.nummer === huidigHoofdstuk)}
+							tabstop={index === tabstop}
 						/>
 					</li>
 				))}
 			</ul>
-			<button type="button" class="strip-pijl strip-pijl-verder" hidden={!stand.verder} onClick={() => schuif(1)} aria-label="Latere hoofdstukken tonen">
+			<button type="button" class="strip-pijl strip-pijl-verder" hidden={!stand.verder} tabIndex={-1} onClick={() => schuif(1)} aria-label="Latere hoofdstukken tonen">
 				›
 			</button>
 		</nav>

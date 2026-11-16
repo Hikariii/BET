@@ -39,9 +39,9 @@ export function BoekTabbladen({ boekNaam, plekken, huidig }: Props) {
 					const aantal = toonAantal(plek);
 					return (
 						<li>
-							<a class="boekplek" href={plek.adres} data-help={plekSleutel(plek.plek)} aria-current={plek.plek === huidig ? 'page' : undefined}>
+							<a class="boekplek" href={plek.adres} title={plek.naam} data-help={plekSleutel(plek.plek)} aria-current={plek.plek === huidig ? 'page' : undefined}>
 								<PlekIcoon plek={plek.plek} />
-								{plek.naam}
+								<span class="boekplek-naam">{plek.naam}</span>
 								{aantal !== null && (
 									<span class="boekplek-aantal">
 										{aantal}

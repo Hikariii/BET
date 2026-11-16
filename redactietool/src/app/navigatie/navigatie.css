@@ -8,7 +8,7 @@
 	padding: 0.15rem 0.3rem;
 	border: 1px solid transparent;
 	color: var(--tekst);
-	font-size: 0.75rem;
+	font-size: var(--t-klein);
 	text-decoration: none;
 	white-space: nowrap;
 }
@@ -38,9 +38,14 @@
 	text-align: center;
 }
 
+.hoofdstuk-kort .hoofdstuk-kort-status {
+	color: var(--gedempt);
+	font-weight: 500;
+}
+
 .hoofdstuk-kort .hoofdstuk-kort-vragen {
 	color: var(--gedempt);
-	font-size: 0.6875rem;
+	font-size: var(--t-klein);
 	font-variant-numeric: tabular-nums;
 	font-weight: 500;
 }
@@ -83,7 +88,7 @@
 	border: 1px solid var(--rand);
 	border-radius: 3px;
 	color: var(--tekst);
-	font-size: 1rem;
+	font-size: var(--t-kop3);
 	line-height: 1;
 }
 
@@ -93,4 +98,31 @@
 
 .hoofdstukstrip .strip-pijl[hidden] {
 	display: none;
+}
+
+/* ---------- Sprong naar de inhoud: pas zichtbaar als hij de focus heeft ---------- */
+
+.sprong-naar-inhoud {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 30;
+	padding: 0.4rem 0.8rem;
+	background: #fff;
+	border: 1px solid var(--tekst);
+	transform: translateY(-120%);
+}
+
+.sprong-naar-inhoud:focus {
+	transform: none;
+}
+
+main:focus {
+	outline: none;
+}
+
+/* De kop die na een paginawissel de focus krijgt; de titel in de balk is afgekapt, dus de rand ligt binnen de kop. */
+h1:focus-visible {
+	outline: 2px solid var(--tekst);
+	outline-offset: -2px;
 }

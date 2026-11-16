@@ -18,7 +18,7 @@ const EIND_EERSTE_DEEL = 1 + EERSTE_TEKST.length;
 const BEGIN_TWEEDE_DEEL = EIND_EERSTE_DEEL + 2;
 
 function beginstand(): EditorState {
-	return EditorState.create({ doc: versInhoudNaarDocument(TWEE_DELEN), plugins: versEditorPlugins(() => {}) });
+	return EditorState.create({ doc: versInhoudNaarDocument(TWEE_DELEN), plugins: versEditorPlugins(() => {}, () => {}) });
 }
 
 function metCursor(state: EditorState, positie: number): EditorState {
@@ -28,7 +28,7 @@ function metCursor(state: EditorState, positie: number): EditorState {
 /** Voert een toets uit en geeft of de toets is opgevangen en de stand erna. */
 function drukToets(state: EditorState, toets: string): { opgevangen: boolean; na: EditorState } {
 	let na = state;
-	const command: Command = versEditorToetsen(() => {})[toets]!;
+	const command: Command = versEditorToetsen(() => {}, () => {})[toets]!;
 	const opgevangen = command(state, (transactie) => {
 		na = state.apply(transactie);
 	});

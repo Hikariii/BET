@@ -2,6 +2,7 @@
 
 .boekplekken ul {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: baseline;
 	margin: 0;
 	padding: 0;

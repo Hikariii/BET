@@ -3,7 +3,7 @@
 }
 
 .begrippen h1 {
-	font-size: 1.4rem;
+	font-size: var(--t-kop1);
 	margin: 1rem 0 .5rem;
 }
 
@@ -13,7 +13,7 @@
 
 .verslinks .meer {
 	margin-left: .4rem;
-	font-size: .85em;
+	font-size: var(--t-basis);
 }
 
 .geen-verzen {

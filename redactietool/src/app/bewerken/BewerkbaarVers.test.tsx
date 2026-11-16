@@ -32,6 +32,8 @@ function VersMetToestand() {
 			bewerken={bewerken}
 			onBewerk={() => zetBewerken(true)}
 			onSluit={() => zetBewerken(false)}
+			onNaarBuur={() => {}}
+			beginAanBegin={false}
 			onOpslagGewijzigd={() => zetTeller((teller) => teller + 1)}
 		/>
 	);

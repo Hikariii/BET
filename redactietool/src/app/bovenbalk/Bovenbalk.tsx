@@ -21,7 +21,7 @@ type Props = {
 
 /**
  * De balk bovenaan die blijft staan bij scrollen: een boekbalk (boek, bewaarstatus, grootte, Help) met daaronder een hoofdstukbalk (titel, strip, acties).
- * Zet de hoogte als `--balk-hoogte` op `<html>`, zodat `scroll-margin-top` en de pagina Bewaard eronder beginnen.
+ * Zet de hoogte als `--balk-hoogte` op `<html>`, zodat `scroll-padding-top` en de pagina Opgeslagen eronder beginnen.
  */
 export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, help, strip }: Props) {
 	const balk = useRef<HTMLElement>(null);

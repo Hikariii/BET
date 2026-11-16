@@ -9,7 +9,9 @@ import { Bovenbalk } from './bovenbalk/Bovenbalk';
 import { GrootteKeuze } from './GrootteKeuze';
 import type { Plek } from './navigatie/boekplekken';
 import { HoofdstukStrip } from './navigatie/HoofdstukStrip';
+import { SprongNaarInhoud } from './navigatie/SprongNaarInhoud';
 import { useBoekPlekken } from './navigatie/useBoekPlekken';
+import { useKopFocus } from './navigatie/useKopFocus';
 import type { Weergavebeheer } from './weergave/useWeergave';
 
 type Props = {
@@ -36,8 +38,10 @@ export function Indeling({ weergavebeheer, boek, referentie, pagina, huidigHoofd
 	const plekken = useBoekPlekken(boek, referentie, huidigHoofdstuk);
 	const opHoofdstukPagina = pagina === 'hoofdstuk';
 	const huidigPlek: Plek | null = opHoofdstukPagina ? 'hoofdstukken' : tabblad;
+	useKopFocus(huidigPlek ?? pagina);
 	return (
 		<>
+			<SprongNaarInhoud opHoofdstuk={opHoofdstukPagina} />
 			<Bovenbalk
 				boek={
 					<>
@@ -55,7 +59,7 @@ export function Indeling({ weergavebeheer, boek, referentie, pagina, huidigHoofd
 				strip={opHoofdstukPagina ? <HoofdstukStrip boek={boek} referentie={referentie} huidigHoofdstuk={huidigHoofdstuk} /> : null}
 			/>
 			<div class="indeling">
-				<main>{children}</main>
+				<main tabIndex={-1}>{children}</main>
 			</div>
 		</>
 	);

@@ -7,7 +7,7 @@
 	border: 0;
 	color: var(--gedempt);
 	font-family: var(--tool);
-	font-size: 0.71875rem;
+	font-size: var(--t-basis);
 	font-weight: 500;
 	text-decoration: underline;
 	text-decoration-color: var(--rand-donker);

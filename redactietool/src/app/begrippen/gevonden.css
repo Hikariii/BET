@@ -16,8 +16,19 @@
 
 .gevonden table {
 	border-collapse: collapse;
+	table-layout: fixed;
 	width: 100%;
 }
+
+/* Bron heeft dezelfde breedte als in Vertaalkeuzes (besloten.css). */
+.gevonden th:nth-child(1) {
+	width: 14%;
+}
+
+.gevonden th:nth-child(2) {
+	width: 8%;
+}
+
 
 .gevonden th,
 .gevonden td {
@@ -29,7 +40,7 @@
 
 .gevonden tbody th {
 	font-weight: bold;
-	white-space: nowrap;
+	overflow-wrap: anywhere;
 }
 
 .gevonden .getal {

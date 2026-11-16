@@ -13,6 +13,9 @@ const aantalAlineasBlijftGelijk = new Plugin({
 	filterTransaction: (transactie, state) => !transactie.docChanged || transactie.doc.childCount === state.doc.childCount,
 });
 
+/** Naar het volgende (1) of vorige (-1) vers. */
+export type Richting = 1 | -1;
+
 /** Vangt de toets op zonder iets te doen, zodat de browser er ook niets mee doet. */
 const doeNiets: Command = () => true;
 
@@ -21,7 +24,7 @@ const aanHetEind: Command = (state) =>
 	state.selection.empty && state.selection.$from.parentOffset === state.selection.$from.parent.content.size;
 
 /** Toetsen van de vers-editor. Backspace en Delete worden alleen opgevangen waar ze alinea's zouden samenvoegen. */
-export function versEditorToetsen(onSluit: () => void): Record<string, Command> {
+export function versEditorToetsen(onSluit: () => void, naarBuur: (richting: Richting) => void): Record<string, Command> {
 	return {
 		Enter: doeNiets,
 		'Shift-Enter': doeNiets,
@@ -32,6 +35,14 @@ export function versEditorToetsen(onSluit: () => void): Record<string, Command> 
 		'Shift-Mod-z': redo,
 		Escape: () => {
 			onSluit();
+			return true;
+		},
+		'Alt-ArrowDown': () => {
+			naarBuur(1);
+			return true;
+		},
+		'Alt-ArrowUp': () => {
+			naarBuur(-1);
 			return true;
 		},
 	};
@@ -51,6 +62,6 @@ const plakAlsPlatteTekst = new Plugin({
 	},
 });
 
-export function versEditorPlugins(onSluit: () => void): Plugin[] {
-	return [history(), keymap(versEditorToetsen(onSluit)), aantalAlineasBlijftGelijk, versnummersZonderOpmaak, plakAlsPlatteTekst];
+export function versEditorPlugins(onSluit: () => void, naarBuur: (richting: Richting) => void): Plugin[] {
+	return [history(), keymap(versEditorToetsen(onSluit, naarBuur)), aantalAlineasBlijftGelijk, versnummersZonderOpmaak, plakAlsPlatteTekst];
 }

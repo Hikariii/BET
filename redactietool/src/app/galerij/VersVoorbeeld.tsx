@@ -66,6 +66,8 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 					onSluitNaslag={() => zetOpenNaslag(null)}
 					bewerkt={tussenstand.verzen[vers] ?? null}
 					bewerken={bewerken}
+					beginAanBegin={false}
+					onNaarBuur={() => {}}
 					onBewerk={() => zetBewerken(true)}
 					onSluit={() => zetBewerken(false)}
 					onOpslagGewijzigd={herlees}

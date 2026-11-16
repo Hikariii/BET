@@ -10,7 +10,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
-	font-size: 0.9rem;
+	font-size: var(--t-basis);
 }
 
 .besloten-filters input,
@@ -26,13 +26,14 @@
 .besloten-samenvatting {
 	margin: 0.5rem 0;
 	color: var(--gedempt, #59636e);
-	font-size: 0.9rem;
+	font-size: var(--t-basis);
 }
 
 .besloten-tabel {
 	width: 100%;
+	table-layout: fixed;
 	border-collapse: collapse;
-	font-size: 0.9rem;
+	font-size: var(--t-basis);
 }
 
 .besloten-tabel th,
@@ -71,5 +72,40 @@
 .besloten-tabel .onzeker {
 	margin: 0.25rem 0 0;
 	color: var(--gedempt, #59636e);
-	font-size: 0.85em;
+	font-size: var(--t-klein);
+}
+
+/*
+ * Vaste kolomverhoudingen, naar de inhoud: Toegepast en Bronvorm houden tot 185 verwijzingen, Bron en Vereenvoudigd korte woorden.
+ * Bron heeft dezelfde breedte als in Zo vertaald (gevonden.css), zodat het raster bij het wisselen van tabblad niet verspringt.
+ */
+.besloten-tabel th:nth-child(1) {
+	width: 14%;
+}
+
+.besloten-tabel th:nth-child(2) {
+	width: 14%;
+}
+
+.besloten-tabel th:nth-child(3) {
+	width: 6%;
+}
+
+.besloten-tabel th:nth-child(4) {
+	width: 24%;
+}
+
+.besloten-tabel th:nth-child(5) {
+	width: 22%;
+}
+
+.besloten-tabel th:nth-child(6) {
+	width: 8%;
+}
+
+/* Smal scherm: de tabel krijgt zijn eigen breedte en schuift binnen de rand, niet over de hele pagina. */
+@media (max-width: 60rem) {
+	.besloten-tabel {
+		min-width: 56rem;
+	}
 }

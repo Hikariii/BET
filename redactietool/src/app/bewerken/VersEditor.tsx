@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import type { WordStijl } from '../../data/types';
 import type { VersInhoud } from '../../bewerken/types';
 import { documentNaarVersInhoud, versInhoudNaarDocument } from '../../editor/versDocument';
-import { versEditorPlugins } from '../../editor/versEditorPlugins';
+import { versEditorPlugins, type Richting } from '../../editor/versEditorPlugins';
 import { OPMAAK_VOLGORDE, type Alineastijl } from '../../formaat/types';
 import { alineaOpmaakstijl, tekststukOpmaakstijl, type Opmaakstijl } from '../stijl';
 import { selectieBijPlek, type KlikPlek } from './klikPlek';
@@ -20,6 +20,8 @@ type Props = {
 	/** Na elke wijziging; de inhoud houdt evenveel delen. */
 	onWijzig: (inhoud: VersInhoud) => void;
 	onSluit: () => void;
+	/** Alt+pijl: sluit deze editor en opent die van het volgende (1) of vorige (-1) vers. */
+	onNaarBuur: (richting: Richting) => void;
 };
 
 function zetOpmaak(element: HTMLElement, opmaak: Opmaakstijl): void {
@@ -49,12 +51,14 @@ function opmaakViews(stijlen: readonly WordStijl[]): Record<string, MarkViewCons
 }
 
 /** ProseMirror-editor voor één vers, met een alinea per deel. */
-export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSluit }: Props) {
+export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSluit, onNaarBuur }: Props) {
 	const houder = useRef<HTMLDivElement>(null);
 	const laatsteOnWijzig = useRef(onWijzig);
 	const laatsteOnSluit = useRef(onSluit);
 	laatsteOnWijzig.current = onWijzig;
 	laatsteOnSluit.current = onSluit;
+	const laatsteOnNaarBuur = useRef(onNaarBuur);
+	laatsteOnNaarBuur.current = onNaarBuur;
 
 	useEffect(() => {
 		const doel = houder.current;
@@ -63,7 +67,7 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 		const view = new EditorView(doel, {
 			state: EditorState.create({
 				doc: startDocument,
-				plugins: versEditorPlugins(() => laatsteOnSluit.current()),
+				plugins: versEditorPlugins(() => laatsteOnSluit.current(), (richting) => laatsteOnNaarBuur.current(richting)),
 				selection: selectieBijPlek(startDocument, startPlek),
 			}),
 			nodeViews: { alinea: alineaView(stijlen) },
@@ -77,6 +81,7 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 			},
 		});
 		view.focus();
+		doel.scrollIntoView({ block: 'nearest' });
 		return () => view.destroy();
 	}, []);
 
@@ -87,7 +92,10 @@ export function VersEditor({ inhoud, stijlen, label, startPlek, onWijzig, onSlui
 				<button type="button" onClick={onSluit}>
 					Klaar
 				</button>
-				<span class="verseditor-tip"> Escape sluit ook. Enter doet niets: alinea's blijven zoals Claude ze maakte.</span>
+				<span class="verseditor-tip">
+					{' '}
+					Escape sluit ook. Alt+pijl omlaag of omhoog gaat naar het volgende of vorige vers. Enter doet niets: alinea's blijven zoals Claude ze maakte.
+				</span>
 			</p>
 		</div>
 	);

@@ -10,6 +10,7 @@ import { VersTekst } from '../VersTekst';
 import { browseropslag } from './useTussenstand';
 import { plekVanKlik, type KlikPlek } from './klikPlek';
 import { VersEditor } from './VersEditor';
+import type { Richting } from '../../editor/versEditorPlugins';
 import './versklik.css';
 
 type Props = {
@@ -23,19 +24,27 @@ type Props = {
 	bewerken: boolean;
 	onBewerk: () => void;
 	onSluit: () => void;
+	/** Alt+pijl in de editor: naar het volgende (1) of vorige (-1) vers. */
+	onNaarBuur: (richting: Richting) => void;
+	/** De editor is geopend met Alt+pijl vanuit een ander vers: de cursor staat aan het begin. */
+	beginAanBegin: boolean;
 	/** Na elke wijziging in de opslag. */
 	onOpslagGewijzigd: () => void;
 };
 
+const BEGIN_VAN_VERS: KlikPlek = { alinea: 0, teken: 0 };
+
 /** De cel "vereenvoudigd" van een vers: de tekst of de editor, met markering, melding en waarschuwingen. */
-export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerken, onBewerk, onSluit, onOpslagGewijzigd }: Props) {
+export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerken, onBewerk, onSluit, onNaarBuur, beginAanBegin, onOpslagGewijzigd }: Props) {
 	const [opslagmelding, zetOpslagmelding] = useState<string | null>(null);
 	const klikbareTekst = useRef<HTMLDivElement>(null);
 	const tekstWeergave = useRef<HTMLDivElement>(null);
 	const startPlek = useRef<KlikPlek | null>(null);
 	const eerderBewerkt = useRef(false);
 	useEffect(() => {
-		if (eerderBewerkt.current && !bewerken) klikbareTekst.current?.focus();
+		// Opent Alt+pijl de editor van een buurvers, dan heeft die de focus al; de focus gaat alleen terug naar de tekst als hij nergens is.
+		const focusKwijt = document.activeElement === null || document.activeElement === document.body;
+		if (eerderBewerkt.current && !bewerken && focusKwijt) klikbareTekst.current?.focus();
 		eerderBewerkt.current = bewerken;
 	}, [bewerken]);
 
@@ -88,9 +97,10 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 					inhoud={startInhoud}
 					stijlen={boek.stijlen}
 					label={`Vereenvoudigde tekst van vers ${nummer}`}
-					startPlek={startPlek.current}
+					startPlek={beginAanBegin ? BEGIN_VAN_VERS : startPlek.current}
 					onWijzig={bewaar}
 					onSluit={onSluit}
+					onNaarBuur={onNaarBuur}
 				/>
 			) : repo === null ? (
 				<VersTekst delen={delen} stijlen={boek.stijlen} />
