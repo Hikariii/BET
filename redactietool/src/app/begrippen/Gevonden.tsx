@@ -24,7 +24,7 @@ export function Gevonden({ boek, hoofdstukken }: TabbladProps) {
 				<strong>Automatisch afgeleid</strong> uit de vergelijking van bron en vereenvoudiging, woord voor woord. Bij vrij herschreven
 				zinnen kan de koppeling niet kloppen; controleer het via de verzen.
 			</p>
-			<div class="filterbalk">
+			<div class="filterbalk" data-help="gevonden-filters">
 				<label>
 					Zoeken{' '}
 					<input
@@ -51,7 +51,7 @@ export function Gevonden({ boek, hoofdstukken }: TabbladProps) {
 					{getoond.length} van {alle.length} bronwoorden
 				</span>
 			</div>
-			<table>
+			<table data-help="gevonden-tabel">
 				<thead>
 					<tr>
 						<th scope="col">Bron</th>

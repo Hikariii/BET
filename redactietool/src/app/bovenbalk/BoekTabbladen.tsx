@@ -1,3 +1,4 @@
+import { plekSleutel } from '../help/wijsAan';
 import type { BoekPlek, Plek } from '../navigatie/boekplekken';
 import './boekplekken.css';
 
@@ -38,7 +39,7 @@ export function BoekTabbladen({ boekNaam, plekken, huidig }: Props) {
 					const aantal = toonAantal(plek);
 					return (
 						<li>
-							<a class="boekplek" href={plek.adres} aria-current={plek.plek === huidig ? 'page' : undefined}>
+							<a class="boekplek" href={plek.adres} data-help={plekSleutel(plek.plek)} aria-current={plek.plek === huidig ? 'page' : undefined}>
 								<PlekIcoon plek={plek.plek} />
 								{plek.naam}
 								{aantal !== null && (

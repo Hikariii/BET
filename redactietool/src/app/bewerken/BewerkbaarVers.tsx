@@ -97,6 +97,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 				<div
 					ref={klikbareTekst}
 					class="versklik"
+					data-help="vers-bewerken"
 					role="button"
 					tabIndex={0}
 					aria-label={`Vers ${nummer} bewerken`}
@@ -110,9 +111,11 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 				</div>
 			)}
 			<div class="versacties">
-				{bewerkt !== null && <span class="versmarkering">gewijzigd</span>}
+				{bewerkt !== null && <span class="versmarkering" data-help="vers-gewijzigd">
+						gewijzigd
+					</span>}
 				{bewerkt !== null && (
-					<button type="button" onClick={terugNaarRepo} aria-label={`Terug naar de repo, vers ${nummer}`}>
+					<button type="button" data-help="terug-naar-de-repo" onClick={terugNaarRepo} aria-label={`Terug naar de repo, vers ${nummer}`}>
 						Terug naar de repo
 					</button>
 				)}

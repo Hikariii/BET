@@ -102,7 +102,7 @@ function PlekRegel({ boek, plek, wijziging, stijlen, aangevinkt, bijWissel }: Pl
 		);
 	}
 	return (
-		<li class="vondst">
+		<li class="vondst" data-help="vervangen-vinkjes">
 			<input id={`vondst-${sleutel}`} type="checkbox" checked={aangevinkt} onChange={(gebeurtenis) => bijWissel(plek, gebeurtenis.currentTarget.checked)} />
 			<label for={`vondst-${sleutel}`} class="context">
 				<span class="alleen-lezers">Vers {verslabel}: </span>
@@ -370,7 +370,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 			)}
 
 			<form class="vervangen-formulier" onSubmit={zoeken}>
-				<fieldset class="soortkeuze">
+				<fieldset class="soortkeuze" data-help="vervangen-soort">
 					<legend>Wat wil je doen</legend>
 					<label>
 						<input type="radio" name="soort" checked={soort === 'tekst'} onChange={() => zetSoort('tekst')} /> Tekst vervangen
@@ -394,15 +394,17 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 						<DomeinKeuze label="Naar" waarde={naar} stijlen={boek.stijlen} bijWijziging={zetNaar} veldRef={naarveld} />
 					</>
 				)}
-				<button ref={zoekknop} type="submit">
+				<button ref={zoekknop} type="submit" data-help="vervangen-zoeken">
 					Zoeken
 				</button>
 			</form>
 
 			{vraag === null ? (
-				<p class="bereik">Bereik: het hele boek.</p>
+				<p class="bereik" data-help="vervangen-bereik">
+					Bereik: het hele boek.
+				</p>
 			) : (
-				<div class="bereik">
+				<div class="bereik" data-help="vervangen-bereik">
 					<label>
 						<input type="checkbox" checked={heleBoek} onChange={(gebeurtenis) => wisselHeleBoek(gebeurtenis.currentTarget.checked)} /> Hele boek
 					</label>
@@ -420,7 +422,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 					<HoofdstukGroepen titel="Plekken" hoofdstukken={groepen.open} wijziging={wijziging} {...lijstprops} />
 					<HoofdstukGroepen titel="Goedgekeurd (standaard uit)" hoofdstukken={groepen.goedgekeurd} wijziging={wijziging} {...lijstprops} />
 					{groepen.varianten.length > 0 && (
-						<section class="vondstgroep varianten">
+						<section class="vondstgroep varianten" data-help="vervangen-varianten">
 							<h2>Varianten (standaard uit)</h2>
 							<p class="uitleg">
 								{huidigeSoort === 'tekst'
@@ -460,7 +462,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 							<PlekkenLijst boek={boek.id} plekken={groepen.metDeHand} wijziging={wijziging} stijlen={boek.stijlen} aangevinkt={new Set()} bijWissel={wissel} />
 						</section>
 					)}
-					<button type="button" class="toepassen" disabled={verdeling.toe.length === 0} onClick={toepassen}>
+					<button type="button" class="toepassen" data-help="vervangen-toepassen" disabled={verdeling.toe.length === 0} onClick={toepassen}>
 						{plekkenTekst(verdeling.toe.length)} toepassen
 					</button>
 				</div>

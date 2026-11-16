@@ -43,6 +43,7 @@ export function Regels({ logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenN
 										<button
 											type="button"
 											class="verwijzing"
+											data-help="naslag-verwijzing"
 											aria-expanded={openNaslag !== null && zelfdeNaslag(openNaslag, naslag)}
 											aria-controls={kaartId}
 											onClick={(gebeurtenis) => onOpenNaslag(naslag, gebeurtenis.currentTarget)}
@@ -58,7 +59,7 @@ export function Regels({ logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenN
 				),
 			)}
 			{inklapbaar > 0 && (
-				<button type="button" class="meerregels" aria-expanded={uitgeklapt} onClick={() => zetUitgeklapt(!uitgeklapt)}>
+				<button type="button" class="meerregels" data-help="nog-n-regels" aria-expanded={uitgeklapt} onClick={() => zetUitgeklapt(!uitgeklapt)}>
 					{uitgeklapt ? 'minder regels' : `nog ${inklapbaar} regels`}
 				</button>
 			)}

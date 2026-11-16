@@ -1,0 +1,283 @@
+/*
+ * De knop Help, het helpvenster en het oplichten van een aangewezen onderdeel.
+ * Geen rood in het venster en rondom de tekstkolommen: het oplichten gebruikt de toolkleur.
+ */
+
+/* ---------- Knop in de boekbalk ---------- */
+
+.bovenbalk .helpknop {
+	padding: 0.25rem 0.1rem 0.2rem;
+	background: none;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--tekst);
+	font-size: 0.8125rem;
+	font-weight: 500;
+}
+
+.bovenbalk .helpknop:hover:not(:disabled) {
+	background: none;
+	border-bottom-color: var(--rand-donker);
+	color: var(--tekst);
+}
+
+/* ---------- Venster ---------- */
+
+.helpvenster {
+	width: min(48rem, 94vw);
+	height: min(40rem, 88vh);
+	max-height: 88vh;
+	padding: 0;
+	background: #fff;
+	border: 1px solid var(--tekst);
+	color: var(--toolkleur);
+	font-family: var(--tool);
+	font-size: 0.8125rem;
+	overflow: hidden;
+}
+
+.helpvenster[open] {
+	display: flex;
+	flex-direction: column;
+}
+
+.helpvenster::backdrop {
+	background: rgb(0 0 0 / 35%);
+}
+
+.helpvenster-kop {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.7rem 1.25rem;
+	border-bottom: 1px solid var(--rand);
+}
+
+.helpvenster-kop h2 {
+	margin: 0;
+	font-size: 1.125rem;
+}
+
+.helpvenster-lijf {
+	display: grid;
+	flex: 1;
+	grid-template-columns: 13rem minmax(0, 1fr);
+	min-height: 0;
+}
+
+/* ---------- Onderdelen ---------- */
+
+.helpnav {
+	padding: 0.75rem 0.5rem 1rem;
+	overflow-y: auto;
+	border-right: 1px solid var(--rand);
+	background: var(--vlak);
+}
+
+.helpnav ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.helpnav-kop {
+	margin: 0.9rem 0.6rem 0.25rem;
+	color: var(--gedempt);
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.helpnav-onder {
+	margin-top: 0.9rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--rand);
+}
+
+.helpnav .help-onderdeel {
+	display: block;
+	width: 100%;
+	padding: 0.3rem 0.6rem;
+	background: none;
+	border: 0;
+	border-left: 3px solid transparent;
+	color: var(--tekst);
+	font-weight: 500;
+	text-align: left;
+}
+
+.helpnav .help-onderdeel:hover:not(:disabled) {
+	background: var(--gekozen);
+	color: var(--tekst);
+}
+
+.helpnav .help-onderdeel[aria-current='true'] {
+	border-left-color: var(--tekst);
+	background: #fff;
+	font-weight: 700;
+}
+
+@media (max-width: 40rem) {
+	.helpvenster-lijf {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto minmax(0, 1fr);
+	}
+
+	.helpnav {
+		max-height: 9rem;
+		border-right: 0;
+		border-bottom: 1px solid var(--rand);
+	}
+}
+
+/* ---------- Tekst ---------- */
+
+.helpinhoud {
+	padding: 0.5rem 1.5rem 2rem;
+	overflow-y: auto;
+	line-height: 1.55;
+}
+
+.helpinhoud:focus {
+	outline: none;
+}
+
+.helpinhoud h3 {
+	margin: 0.75rem 0 0.5rem;
+	font-size: 1.25rem;
+}
+
+.helpinhoud h4 {
+	margin: 1.25rem 0 0.25rem;
+	font-size: 0.9375rem;
+}
+
+.helpinhoud p,
+.helpinhoud ul,
+.helpinhoud ol {
+	margin: 0.4rem 0;
+}
+
+.helpinhoud li + li {
+	margin-top: 0.25rem;
+}
+
+.helpinhoud table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.helpinhoud th,
+.helpinhoud td {
+	padding: 0.35rem 0.6rem 0.35rem 0;
+	border-bottom: 1px solid var(--rand);
+	text-align: left;
+	vertical-align: top;
+}
+
+.helpinhoud code {
+	font-size: 0.9em;
+}
+
+/* ---------- Een onderdeel aanwijzen ---------- */
+
+.help-wijsrij {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 0.35rem 1rem;
+	align-items: center;
+	margin: 0.5rem 0;
+	padding: 0.6rem 0.75rem;
+	background: var(--vlak);
+}
+
+.help-wijsrij .help-voorbeeld {
+	grid-column: 1 / -1;
+}
+
+.help-wijstekst {
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	min-width: 0;
+}
+
+.help-wijstekst span {
+	color: var(--gedempt);
+}
+
+/* Het voorbeeld is een echt onderdeel in een ander kader: hij mag de balk niet meenemen. */
+.help-voorbeeld {
+	pointer-events: none;
+}
+
+.help-voorbeeld .help-balk {
+	position: static;
+	z-index: auto;
+	display: inline-flex;
+	padding: 0;
+	background: none;
+	border: 0;
+}
+
+.help-voorbeeld .help-balk .bovenbalk-titel {
+	width: auto;
+	padding: 0;
+	border: 0;
+}
+
+.help-voorbeeld .help-balk .bovenbalk-strip {
+	min-width: 0;
+}
+
+.help-statussen {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+	gap: 0.3rem 1rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.help-statussen li {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.help-legenda-voorbeeld {
+	font-family: var(--boek);
+	font-size: 0.9375rem;
+}
+
+/* ---------- Oplichten op de pagina ---------- */
+
+[data-help].help-licht {
+	outline: 3px solid var(--toolkleur);
+	outline-offset: 3px;
+	animation: help-licht 2.4s ease-out forwards;
+}
+
+@keyframes help-licht {
+	0% {
+		outline-color: transparent;
+		outline-offset: 10px;
+	}
+
+	15%,
+	75% {
+		outline-color: var(--toolkleur);
+		outline-offset: 3px;
+	}
+
+	100% {
+		outline-color: transparent;
+		outline-offset: 3px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-help].help-licht {
+		animation: none;
+	}
+}

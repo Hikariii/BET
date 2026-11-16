@@ -68,7 +68,7 @@ export function Vertaalvragen({ boek, referentie, hoofdstukken }: TabbladProps) 
 
 	return (
 		<div class="vertaalvragen">
-			<form class="filters" role="search" aria-label="Vertaalvragen filteren" onSubmit={(gebeurtenis) => gebeurtenis.preventDefault()}>
+			<form class="filters" data-help="vragen-filters" role="search" aria-label="Vertaalvragen filteren" onSubmit={(gebeurtenis) => gebeurtenis.preventDefault()}>
 				<label>
 					Status
 					<select value={filter.status} onChange={(gebeurtenis) => zetFilter({ ...filter, status: leesStatus(gebeurtenis.currentTarget.value) })}>
@@ -201,7 +201,7 @@ function RegisterVraag({ boek, vraag, antwoord, bestaandeKeuzes, acties }: Regis
 							{opties.map((optie) => (
 								<li key={optie}>
 									<span class="optietekst">{optie}</span>
-									<button type="button" aria-label={`Kiezen: ${optie}`} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
+									<button type="button" data-help="vragen-kiezen" aria-label={`Kiezen: ${optie}`} onClick={() => zetMelding(acties.kies(vraag, optie) ?? '')}>
 										Kiezen
 									</button>
 								</li>
@@ -271,7 +271,7 @@ function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps
 	}
 
 	return (
-		<form class="antwoordformulier" aria-label={`Antwoord vastleggen: ${vraag.kwestie}`} noValidate onSubmit={vastleggen}>
+		<form class="antwoordformulier" data-help="antwoord-formulier" aria-label={`Antwoord vastleggen: ${vraag.kwestie}`} noValidate onSubmit={vastleggen}>
 			<h4>Antwoord vastleggen</h4>
 			<label>
 				Antwoord
@@ -289,7 +289,7 @@ function AntwoordFormulier({ vraag, opties, acties, zetMelding }: FormulierProps
 					<option value={EIGEN_ANTWOORD}>Eigen antwoord (genuanceerd)</option>
 				</select>
 			</label>
-			<label>
+			<label data-help="antwoord-toelichting">
 				Toelichting of regel{eigen ? ' (verplicht)' : ' (optioneel)'}
 				<textarea
 					ref={toelichtingveld}
@@ -395,7 +395,7 @@ function GegevenAntwoord({ boek, vraag, antwoord, bestaandeKeuzes, acties, zetMe
 	}
 
 	return (
-		<section class="antwoord" aria-labelledby={`${id}-kop`}>
+		<section class="antwoord" data-help="antwoord-gegeven" aria-labelledby={`${id}-kop`}>
 			<h4 id={`${id}-kop`}>Beantwoord in deze browser</h4>
 			<dl>
 				<dt>Antwoord</dt>

@@ -22,7 +22,7 @@ function toegepastOp(keuze: StructureleKeuze): string {
 /** De toegepaste keuzes van het boek, elk uit te klappen tot de verzen, met terugdraaien per keuze en per vers. */
 export function ToegepasteKeuzes({ boek, keuzes, antwoorden, onTerugdraaien, onVersTerugdraaien }: Props) {
 	return (
-		<section class="toegepaste-keuzes">
+		<section class="toegepaste-keuzes" data-help="vervangen-terugdraaien">
 			<h2>Toegepaste keuzes</h2>
 			{keuzes.length === 0 && <p class="melding">Nog geen keuzes toegepast.</p>}
 			<ul>

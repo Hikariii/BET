@@ -32,7 +32,7 @@ export function Naslagkaart({ naslag, boekId, referentie, id, onSluit }: Props) 
 
 	const titel = naslag.soort === 'richtlijn' ? `Richtlijn §${naslag.paragraaf}` : 'Precedenten';
 	return (
-		<aside class="naslagkaart" id={id} aria-labelledby={`${id}-titel`}>
+		<aside class="naslagkaart" data-help="naslagkaart" id={id} aria-labelledby={`${id}-titel`}>
 			<header>
 				<h2 id={`${id}-titel`} tabIndex={-1} ref={kopRef}>
 					{titel}

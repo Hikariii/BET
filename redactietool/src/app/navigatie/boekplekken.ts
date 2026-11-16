@@ -14,6 +14,12 @@ export const TABBLADTITEL: Record<Tabblad, string> = {
 /** De plekken in een boek, behalve Bewaard: de hoofdstukken en de vier tabbladen van het scherm Keuzes en vragen. */
 export type Plek = 'hoofdstukken' | Tabblad;
 
+/** De volledige naam van elke plek, voor de tabbladen en voor de help. */
+export const PLEKNAAM: Record<Plek, string> = { hoofdstukken: 'Hoofdstukken', ...TABBLADTITEL };
+
+/** De naam van de pagina Bewaard; die staat niet als tabblad in de balk maar als link naar de bewaarstatus. */
+export const BEWAARD_NAAM = 'Bewaard';
+
 type Aantal = { getal: number; tekst: string };
 
 export type BoekPlek = {
@@ -52,10 +58,10 @@ export function boekPlekken(
 		vervangen: null,
 	};
 	return [
-		{ plek: 'hoofdstukken', naam: 'Hoofdstukken', adres: versAdres(boek, laatsteHoofdstuk), aantal: null },
+		{ plek: 'hoofdstukken', naam: PLEKNAAM.hoofdstukken, adres: versAdres(boek, laatsteHoofdstuk), aantal: null },
 		...TABBLADEN.map((tabblad) => ({
 			plek: tabblad,
-			naam: TABBLADTITEL[tabblad],
+			naam: PLEKNAAM[tabblad],
 			adres: maakAdres({ soort: 'begrippen', boek, tabblad }),
 			aantal: aantallen[tabblad],
 		})),

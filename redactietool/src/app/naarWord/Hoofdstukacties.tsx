@@ -91,10 +91,10 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 	return (
 		<section class="hoofdstukacties" aria-label="Acties voor dit hoofdstuk">
 			<div class="hoofdstukacties-knoppen">
-				<button type="button" onClick={kopieer}>
+				<button type="button" data-help="hoofdstuk-kopieren" onClick={kopieer}>
 					Hoofdstuktekst kopiëren voor Word
 				</button>
-				<button type="button" aria-expanded={exportOpen} onClick={() => zetExportOpen(!exportOpen)}>
+				<button type="button" data-help="export-voor-claude" aria-expanded={exportOpen} onClick={() => zetExportOpen(!exportOpen)}>
 					Export voor Claude
 				</button>
 				<span class="hoofdstukacties-aantal">{meervoud(aantalBewerkt, 'vers bewerkt', 'verzen bewerkt')}</span>

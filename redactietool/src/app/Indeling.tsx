@@ -3,6 +3,8 @@ import type { BoekData, Referentie } from '../data/types';
 import { versAdres, type Tabblad } from './adres';
 import { BewaarStatus } from './bewaren/BewaarStatus';
 import { BoekTabbladen } from './bovenbalk/BoekTabbladen';
+import { Help } from './help/Help';
+import { helpPlekBijPagina } from './help/onderdelen';
 import { Bovenbalk } from './bovenbalk/Bovenbalk';
 import { GrootteKeuze } from './GrootteKeuze';
 import type { Plek } from './navigatie/boekplekken';
@@ -51,6 +53,7 @@ export function Indeling({ weergavebeheer, boek, referentie, pagina, huidigHoofd
 				titel={titel}
 				acties={acties}
 				bewaarstatus={<BewaarStatus boek={boek} overzichtOpen={pagina === 'bewaard'} />}
+				help={<Help boek={boek} plek={helpPlekBijPagina(pagina, tabblad)} plekken={plekken} />}
 				grootte={<GrootteKeuze grootte={weergavebeheer.weergave.grootte} onKies={weergavebeheer.zetGrootte} />}
 				strip={opHoofdstukPagina ? <HoofdstukStrip boek={boek} referentie={referentie} huidigHoofdstuk={huidigHoofdstuk} /> : null}
 			/>

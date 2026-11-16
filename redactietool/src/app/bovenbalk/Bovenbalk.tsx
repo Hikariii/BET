@@ -13,15 +13,17 @@ type Props = {
 	bewaarstatus: ComponentChildren;
 	/** Het grootte-keuzeblok. */
 	grootte: ComponentChildren;
+	/** De knop Help met zijn venster. */
+	help: ComponentChildren;
 	/** De hoofdstukstrip in de hoofdstukbalk tussen titel en acties; `null` buiten een hoofdstuk. */
 	strip: ComponentChildren;
 };
 
 /**
- * De balk bovenaan die blijft staan bij scrollen: een boekbalk (boek, bewaarstatus, grootte) met daaronder een hoofdstukbalk (titel, strip, acties).
+ * De balk bovenaan die blijft staan bij scrollen: een boekbalk (boek, bewaarstatus, grootte, Help) met daaronder een hoofdstukbalk (titel, strip, acties).
  * Zet de hoogte als `--balk-hoogte` op `<html>`, zodat `scroll-margin-top` en de pagina Bewaard eronder beginnen.
  */
-export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, strip }: Props) {
+export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, help, strip }: Props) {
 	const balk = useRef<HTMLElement>(null);
 	useLayoutEffect(() => {
 		const element = balk.current;
@@ -40,13 +42,22 @@ export function Bovenbalk({ boek, titel, acties, bewaarstatus, grootte, strip }:
 		<header class="bovenbalk" ref={balk}>
 			<div class="bovenbalk-rij bovenbalk-boekbalk">
 				<div class="bovenbalk-boek">{boek}</div>
-				<div class="bovenbalk-bewaarstatus">{bewaarstatus}</div>
-				<div class="bovenbalk-grootte">{grootte}</div>
+				<div class="bovenbalk-bewaarstatus" data-help="bewaarstatus">
+					{bewaarstatus}
+				</div>
+				<div class="bovenbalk-grootte" data-help="grootte">
+					{grootte}
+				</div>
+				<div class="bovenbalk-help">{help}</div>
 			</div>
 			{(titel !== null || acties !== null) && (
 				<div class="bovenbalk-rij bovenbalk-hoofdstukbalk">
 					<div class="bovenbalk-titel">{titel}</div>
-					{strip !== null && <div class="bovenbalk-strip">{strip}</div>}
+					{strip !== null && (
+						<div class="bovenbalk-strip" data-help="hoofdstukstrip">
+							{strip}
+						</div>
+					)}
 					<div class="bovenbalk-acties">{acties}</div>
 				</div>
 			)}

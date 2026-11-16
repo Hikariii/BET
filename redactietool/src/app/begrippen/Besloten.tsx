@@ -57,7 +57,7 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 
 	return (
 		<div class="besloten">
-			<div class="besloten-filters">
+			<div class="besloten-filters" data-help="besloten-filters">
 				<label>
 					Zoeken in bron en vereenvoudigd
 					<input type="search" value={zoekterm} onInput={(gebeurtenis) => zetZoekterm(gebeurtenis.currentTarget.value)} />
@@ -81,7 +81,7 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 				{beslotenSamenvatting(zichtbaar, tellingen.length)}
 			</p>
 			<div class="tabelrand">
-				<table class="besloten-tabel">
+				<table class="besloten-tabel" data-help="besloten-tabel">
 					<caption class="alleen-lezers">Vertaalkeuzes (precedenten) met het aantal plekken in het boek</caption>
 					<thead>
 						<tr>

@@ -84,7 +84,11 @@ export function HoofdstukScherm({
 						<th scope="col">Vers</th>
 						<th scope="col">Bron</th>
 						<th scope="col">Vereenvoudigd</th>
-						{regelsAltijdZichtbaar && <th scope="col">Vertaalregels</th>}
+						{regelsAltijdZichtbaar && (
+							<th scope="col" data-help="vertaalregels-kolom">
+								Vertaalregels
+							</th>
+						)}
 					</tr>
 				</thead>
 				<tbody>
@@ -109,7 +113,7 @@ export function HoofdstukScherm({
 				</tbody>
 			</table>
 			<p class="regelsschakelaar">
-				<button type="button" aria-pressed={regelsAltijdZichtbaar} onClick={onWisselRegels}>
+				<button type="button" data-help="regels-altijd-tonen" aria-pressed={regelsAltijdZichtbaar} onClick={onWisselRegels}>
 					Vertaalregels altijd tonen
 				</button>
 				<span> Klik in de vereenvoudigde tekst om een vers te bewerken.</span>
@@ -189,7 +193,7 @@ export function VersRij({
 				<th scope="row" class="versnummer">
 					{adres === null ? null : <a href={adres}>{nummer}</a>}
 					{heeftVraag && (
-						<span class="vraagmarkering" role="img" aria-label="Dit vers hoort bij een vertaalvraag" title="Vertaalvraag">
+						<span class="vraagmarkering" data-help="vraagmarkering" role="img" aria-label="Dit vers hoort bij een vertaalvraag" title="Vertaalvraag">
 							?
 						</span>
 					)}

@@ -23,10 +23,10 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 			<p class="bewaard-backupregel">{backup.regel}</p>
 			{backup.herinnering !== null && <p class="bewaard-herinnering">{backup.herinnering}</p>}
 			<p class="bewaard-acties">
-				<button type="button" onClick={() => zetMelding(`Back-up gedownload als ${downloadBackup(boek)}.`)}>
+				<button type="button" data-help="back-up-downloaden" onClick={() => zetMelding(`Back-up gedownload als ${downloadBackup(boek)}.`)}>
 					Back-up downloaden
 				</button>
-				<button type="button" ref={inladenKnop} onClick={() => invoer.current?.click()}>
+				<button type="button" data-help="back-up-inladen" ref={inladenKnop} onClick={() => invoer.current?.click()}>
 					Back-up inladen
 				</button>
 			</p>

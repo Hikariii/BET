@@ -7,6 +7,7 @@ De broncode van de tool. Het plan staat in [`stap1-plan.md`](stap1-plan.md) (afg
 | `src/formaat/` | parser en serializer voor het Markdown-formaat uit [`../FORMAAT.md`](../FORMAAT.md) |
 | `src/bouw/` | bouwscript: zet `bijbel/` en de richtlijn om naar JSON in `public/data/` |
 | `src/app/` | de Preact-app die die JSON toont. De boekpagina heeft een bovenbalk (boekbalk met de plekken van het boek als tabbladen, Bewaard en de grootte; hoofdstukbalk met titel, hoofdstukstrip en acties). De css daarvan staat in `src/app/indeling.css`, die `main.tsx` na `vormgeving.css` laadt |
+| `src/help/`, `src/app/help/` | de help: de tekst als Markdown per onderdeel (`src/help/*.md`) en het venster dat hem toont (knop Help in de boekbalk, toets `?`). In de tekst vullen `{{plek:…}}`, `{{boek}}`, `{{back-upbestand}}` en `{{exportbestand}}` namen in uit de code, `{{legenda}}` toont de legenda uit het Word-sjabloon en `{{wijs sleutel \| naam \| waar}}` maakt een regel met een knop "Wijs aan" die het element met `data-help="sleutel"` laat oplichten. `sleutels.test.ts` bewaakt dat de sleutels in de tekst en in de schermen gelijk zijn |
 | `ontwerp/` | analyse en ontwerpvarianten van fase 7 (schermafbeeldingen, `opmaakcontrole.mjs`, de meting van de omzetting naar v8e in `v8e-omzetting/`); geen onderdeel van de build |
 | `src/data/` | het gegevenscontract (types) tussen bouwscript en app |
 | `src/log/`, `src/referentie/`, `src/sjabloon/` | de lezers voor wijzigingslogs, referentiebestanden, `STATUS.md`, richtlijn en Word-stijlen |
