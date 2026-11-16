@@ -137,7 +137,6 @@ input[type='checkbox'] {
 /* Tekstknoppen: lijken op een link, geen kader */
 .verwijzing,
 .verslinks .meer,
-.regelsschakelaar button,
 .versacties button {
 	padding: 0;
 	background: none;
@@ -153,14 +152,8 @@ input[type='checkbox'] {
 
 .verwijzing:hover:not(:disabled),
 .verslinks .meer:hover:not(:disabled),
-.regelsschakelaar button:hover:not(:disabled),
 .versacties button:hover:not(:disabled) {
 	background: none;
-	color: var(--tekst);
-	text-decoration-color: var(--tekst);
-}
-
-.regelsschakelaar button[aria-pressed='true'] {
 	color: var(--tekst);
 	text-decoration-color: var(--tekst);
 }
@@ -446,8 +439,7 @@ tr.vers:hover th {
 	background: #fafafa;
 }
 
-tr.vers-gekozen > *,
-tr.vers-gekozen + tr.regels-onder > * {
+tr.vers-gekozen > * {
 	background: var(--vlak);
 }
 
@@ -509,11 +501,6 @@ table.verzen td.regels {
 	line-height: 1.55;
 }
 
-tr.regels-onder td {
-	padding: 0.4rem 1rem 1rem 4rem;
-	font-size: 0.71875rem;
-}
-
 .logblok ul {
 	margin: 0;
 	padding: 0;
@@ -566,12 +553,6 @@ tr.regels-onder td {
 
 .vraagstatus {
 	color: var(--zacht);
-}
-
-.regelsschakelaar {
-	margin: 1rem 0 0;
-	color: var(--zacht);
-	font-size: 0.75rem;
 }
 
 /* Vers-editor */
@@ -1033,7 +1014,6 @@ h1,
 h2,
 h3,
 .indeling table.verzen td.regels,
-.indeling table.verzen tr.regels-onder td,
 .indeling table.verzen thead th {
 	color: var(--toolkleur);
 }

@@ -14,7 +14,7 @@ import { VertaalregelsCel } from './verzen/VertaalregelsCel';
 
 const LABEL_GOEDGEKEURD = 'Goedgekeurd, referentie voor de rest van het boek. Wijzigingen gaan opnieuw langs de redactie.';
 
-const KOLOMMEN_ZONDER_REGELS = 3;
+const KOLOMMEN = 4;
 
 type Props = {
 	boek: BoekData;
@@ -22,8 +22,6 @@ type Props = {
 	hoofdstuk: HoofdstukData;
 	info: HoofdstukInfo;
 	gekozenVers: number | null;
-	regelsAltijdZichtbaar: boolean;
-	onWisselRegels: () => void;
 	/** De tussenstand van dit hoofdstuk, door de pagina gelezen omdat de acties in de bovenbalk dezelfde stand nodig hebben. */
 	tussenstand: Tussenstand;
 	herlees: () => void;
@@ -50,8 +48,6 @@ export function HoofdstukScherm({
 	hoofdstuk,
 	info,
 	gekozenVers,
-	regelsAltijdZichtbaar,
-	onWisselRegels,
 	tussenstand,
 	herlees,
 }: Props) {
@@ -84,11 +80,9 @@ export function HoofdstukScherm({
 						<th scope="col">Vers</th>
 						<th scope="col">Bron</th>
 						<th scope="col">Vereenvoudigd</th>
-						{regelsAltijdZichtbaar && (
-							<th scope="col" data-help="vertaalregels-kolom">
-								Vertaalregels
-							</th>
-						)}
+						<th scope="col" data-help="vertaalregels-kolom">
+							Vertaalregels
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -99,7 +93,6 @@ export function HoofdstukScherm({
 							hoofdstuk={hoofdstuk}
 							referentie={referentie}
 							geselecteerd={groep.nummer !== null && groep.nummer === gekozenVers}
-							regelsInKolom={regelsAltijdZichtbaar}
 							openNaslag={openNaslag?.rij === index ? openNaslag.naslag : null}
 							onOpenNaslag={(naslag, opener) => openNaslagBij(index, naslag, opener)}
 							onSluitNaslag={sluitNaslag}
@@ -112,13 +105,6 @@ export function HoofdstukScherm({
 					))}
 				</tbody>
 			</table>
-			<p class="regelsschakelaar">
-				<button type="button" data-help="regels-altijd-tonen" aria-pressed={regelsAltijdZichtbaar} onClick={onWisselRegels}>
-					Vertaalregels altijd tonen
-				</button>
-				<span> Klik in de vereenvoudigde tekst om een vers te bewerken.</span>
-				{!regelsAltijdZichtbaar && <span> Klik op een vers om de vertaalregels erbij te zien.</span>}
-			</p>
 		</article>
 	);
 }
@@ -130,7 +116,6 @@ type VersRijProps = {
 	referentie: Referentie;
 	geselecteerd: boolean;
 	/** De vertaalregels staan in een eigen kolom; anders onder het vers als het gekozen is. */
-	regelsInKolom: boolean;
 	/** De naslag die als kaart onder dit vers open staat, of `null`. */
 	openNaslag: Naslag | null;
 	onOpenNaslag: (naslag: Naslag, verwijzing: HTMLElement) => void;
@@ -149,7 +134,6 @@ export function VersRij({
 	hoofdstuk,
 	referentie,
 	geselecteerd,
-	regelsInKolom,
 	openNaslag,
 	onOpenNaslag,
 	onSluitNaslag,
@@ -174,13 +158,6 @@ export function VersRij({
 		<Regels logVerzen={logVerzen} vragen={vragen} gekapt={gekapt} openNaslag={openNaslag} kaartId={kaartId} onOpenNaslag={onOpenNaslag} />
 	);
 
-	const kiesVers = (gebeurtenis: MouseEvent) => {
-		const opInteractiefElement = (gebeurtenis.target as Element).closest('a, button, summary, [contenteditable]') !== null;
-		if (adres !== null && !opInteractiefElement) {
-			window.location.hash = adres;
-		}
-	};
-
 	return (
 		<>
 			<tr
@@ -188,7 +165,6 @@ export function VersRij({
 				id={nummer === null ? undefined : `vers-${nummer}`}
 				class={geselecteerd ? 'vers vers-gekozen' : 'vers'}
 				aria-current={geselecteerd ? 'location' : undefined}
-				onClick={kiesVers}
 			>
 				<th scope="row" class="versnummer">
 					{adres === null ? null : <a href={adres}>{nummer}</a>}
@@ -218,16 +194,11 @@ export function VersRij({
 						/>
 					)}
 				</td>
-				{regelsInKolom && <VertaalregelsCel nummer={nummer} naslagOpen={openNaslag !== null} regels={regels} />}
+				<VertaalregelsCel nummer={nummer} naslagOpen={openNaslag !== null} regels={regels} />
 			</tr>
-			{!regelsInKolom && geselecteerd && (
-				<tr class="regels-onder">
-					<td colSpan={KOLOMMEN_ZONDER_REGELS}>{regels(false)}</td>
-				</tr>
-			)}
 			{openNaslag !== null && (
 				<tr class="naslagrij">
-					<td colSpan={regelsInKolom ? KOLOMMEN_ZONDER_REGELS + 1 : KOLOMMEN_ZONDER_REGELS}>
+					<td colSpan={KOLOMMEN}>
 						<Naslagkaart naslag={openNaslag} boekId={boek.id} referentie={referentie} id={kaartId} onSluit={onSluitNaslag} />
 					</td>
 				</tr>

@@ -22,10 +22,7 @@ Heeft een vers veel regels (meer dan drie), dan staan er eerst drie. De rest zit
 
 Rechtsonder in een uitgeklapt vak staat een punaise. Met **Vertaalregels vastzetten** blijft het vak open in de kolom, met alle regels. Nog een klik maakt het weer los. Het vak blijft ook een moment open nadat je de muis ervan weghaalt, zodat je rustig kunt lezen.
 
-Met **Vertaalregels altijd tonen** zet je de kolom aan of uit. Staat hij uit, dan klik je op een vers om de regels onder dat vers te zien.
-
 {{wijs vertaalregels-kolom | Kolom Vertaalregels | Bovenaan de tabel, rechts van Vereenvoudigd.}}
-{{wijs regels-altijd-tonen | Vertaalregels altijd tonen | Onder de tabel, onderaan het hoofdstuk.}}
 {{wijs nog-n-regels | nog N regels | In de kolom Vertaalregels bij een vers met veel regels.}}
 
 ## Een regel naslaan

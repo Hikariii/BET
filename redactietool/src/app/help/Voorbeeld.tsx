@@ -26,7 +26,6 @@ export const ALLE_STATUSSEN = Object.keys(STATUSSEN) as Status[];
 export const KNOPSLEUTELS: readonly string[] = [
 	'hoofdstuk-kopieren',
 	'export-voor-claude',
-	'regels-altijd-tonen',
 	'terug-naar-de-repo',
 	'vragen-kiezen',
 	'vervangen-zoeken',

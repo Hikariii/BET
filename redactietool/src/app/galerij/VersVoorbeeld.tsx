@@ -59,7 +59,6 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 					hoofdstuk={hoofdstuk}
 					referentie={referentie}
 					geselecteerd={gekozen}
-					regelsInKolom
 					openNaslag={openNaslag?.naslag ?? null}
 					onOpenNaslag={(naslag: Naslag) => zetOpenNaslag(wisselNaslag(openNaslag, 0, naslag))}
 					onSluitNaslag={() => zetOpenNaslag(null)}

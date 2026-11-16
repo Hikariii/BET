@@ -61,7 +61,6 @@ function standaardAdres(boeken: BoekLijst): BoekAdres | null {
 type BoekSchermProps = { adres: BoekAdres; boeken: BoekLijst; weergavebeheer: Weergavebeheer };
 
 function BoekScherm({ adres, boeken, weergavebeheer }: BoekSchermProps) {
-	const [regelsAltijdZichtbaar, zetRegelsAltijdZichtbaar] = useState(true);
 	const boekGegevens = useLaden(() => laadBoekMetReferentie(adres.boek), [adres.boek]);
 
 	if (!boeken.some((boek) => boek.id === adres.boek)) {
@@ -106,8 +105,6 @@ function BoekScherm({ adres, boeken, weergavebeheer }: BoekSchermProps) {
 			{...gedeeld}
 			info={info}
 			gekozenVers={adres.vers}
-			regelsAltijdZichtbaar={regelsAltijdZichtbaar}
-			onWisselRegels={() => zetRegelsAltijdZichtbaar(!regelsAltijdZichtbaar)}
 		/>
 	);
 }
@@ -118,15 +115,13 @@ type HoofdstukPaginaProps = {
 	referentie: Referentie;
 	info: HoofdstukInfo;
 	gekozenVers: number | null;
-	regelsAltijdZichtbaar: boolean;
-	onWisselRegels: () => void;
 };
 
 /**
  * Laadt het hoofdstuk en bouwt de pagina. Titel en acties staan in de bovenbalk, daarom lezen we de tussenstand hier
  * en niet pas in het hoofdstuk: balk en tekst delen dezelfde stand.
  */
-function HoofdstukPagina({ weergavebeheer, boek, referentie, info, gekozenVers, regelsAltijdZichtbaar, onWisselRegels }: HoofdstukPaginaProps) {
+function HoofdstukPagina({ weergavebeheer, boek, referentie, info, gekozenVers }: HoofdstukPaginaProps) {
 	const nummer = info.nummer;
 	const hoofdstuk = useLaden(() => laadHoofdstuk(boek.id, nummer), [boek.id, nummer]);
 	const { tussenstand, herlees } = useTussenstand(boek.id, nummer);
@@ -153,8 +148,6 @@ function HoofdstukPagina({ weergavebeheer, boek, referentie, info, gekozenVers, 
 				hoofdstuk={hoofdstuk.waarde}
 				info={info}
 				gekozenVers={gekozenVers}
-				regelsAltijdZichtbaar={regelsAltijdZichtbaar}
-				onWisselRegels={onWisselRegels}
 				tussenstand={tussenstand}
 				herlees={herlees}
 			/>

@@ -184,18 +184,12 @@ tr.vers {
 	scroll-margin-top: 3rem;
 }
 
-tr.vers-gekozen > *,
-tr.vers-gekozen + tr.regels-onder > * {
+tr.vers-gekozen > * {
 	background: var(--gekozen);
 }
 
 table.verzen td.regels {
 	width: 30%;
-	font-size: 0.9rem;
-}
-
-tr.regels-onder td {
-	padding-left: 4.5rem;
 	font-size: 0.9rem;
 }
 
@@ -251,11 +245,6 @@ tr.regels-onder td {
 }
 
 .vraagstatus {
-	color: var(--gedempt);
-}
-
-.regelsschakelaar {
-	margin-top: 1rem;
 	color: var(--gedempt);
 }
 

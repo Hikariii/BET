@@ -76,7 +76,7 @@ Kleine punten (toegankelijkheid, componenttests, rooktest, woordgrenzen bij een 
   - De drie andere kolommen worden dan naar verhouding breder.
   - De keuze onthouden (in de browser) en toegankelijk maken (`aria-expanded`, toetsenbord).
 - **Bovenbalk los en sticky**: de knop Keuzes en vragen, de hoofdstuktitel en de acties (Hoofdstuktekst kopiëren voor Word, Export voor Claude) staan in een balk bovenaan die blijft staan bij scrollen en niet mee inklapt met de navigatiekolom.
-- **Kolom Vertaalregels inklappen**: twijfel. Er is al een schakelaar "Vertaalregels altijd tonen" (anders onder het gekozen vers); bekijken of een ingeklapte smalle kolom met alleen labels (§7A, precedent, vraag) beter is.
+- **Kolom Vertaalregels inklappen**: twijfel. De schakelaar "Vertaalregels altijd tonen" en het kiezen van een rij zijn weg (eigenaar, 2026-11-16); de kolom staat er altijd, met de punaise per vers. Bekijken of een ingeklapte smalle kolom met alleen labels (§7A, precedent, vraag) beter is.
 
 **Grootte instelbaar (eigenaar, 2026-11-16; nog niet ontworpen):** de tool leest wat priegelig (nu: basis 13 px, vereenvoudiging 19 px, bron 14 px, vertaalregels 11,5 px).
 - **Weergave-instelling** in de bovenbalk, bv. `A− · A · A+` of "Normaal / Groter / Grootst" (+1 en +2 pt), onthouden in de browser. Standaard blijft zoals nu; groter alleen als de vertaler dat kiest.
