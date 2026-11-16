@@ -99,7 +99,7 @@ MAX_BLANK_LINES = 2
 TAG_RE = re.compile(r"\{(/?)([^{}\s]*)\}|==|\[(\d+)\]")
 TITLE_LINE_RE = re.compile(r"^# (\S.*?)\s*$")
 PSTYLE_RE = re.compile(r"^@(\S+)(?:\s(.*))?$")
-INVALID_XML_RE = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f￾￿]")
+INVALID_XML_RE = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]")
 FORMAT_TAGS = frozenset([*CHAR_STYLES, *DIRECT, RED])
 
 
@@ -216,7 +216,7 @@ def parse_md(pad):
 # ---------------------------------------------------------------------------
 
 LOG_VERS_RE = re.compile(r"^##\s+Vers\s+(\d+)(?:\s*[-\N{EN DASH}\N{EM DASH}]\s*(\d+))?\s*:?\s*$", re.I)
-LEGE_VRAGEN = ("", "optioneel", "geen", "nee", "n.v.t.", "nvt", "-", "\N{EM DASH}")
+LEGE_VRAGEN = ("", "optioneel", "geen", "nee", "n.v.t", "nvt", "-", "\N{EM DASH}")
 
 
 def parse_log(pad):
@@ -281,7 +281,7 @@ def parse_log(pad):
                     doel[-1] += " " + regel.strip()
                 else:
                     doel.append(regel.strip())
-        vraag = [v for v in vraag if v.strip("() ").lower() not in LEGE_VRAGEN]
+        vraag = [v for v in vraag if v.strip("() .").lower() not in LEGE_VRAGEN]
         for k, n in enumerate(verzen):
             label = f"vers {verzen[0]}\N{EN DASH}{verzen[-1]}" if len(verzen) > 1 else ""
             if k == 0:
