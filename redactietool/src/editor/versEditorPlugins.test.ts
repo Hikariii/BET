@@ -92,11 +92,27 @@ describe('de plugins van de vers-editor', () => {
 			expect(na.doc.eq(begin.doc)).toBe(true);
 		});
 
-		it('Alt-k vraagt om het kleurmenu', () => {
-			let gevraagd = 0;
-			const command = versEditorToetsen(acties({ openKleurmenu: () => (gevraagd += 1) }), GEEN_VETTE_OPMAAK)['Alt-k']!;
-			expect(command(beginstand())).toBe(true);
-			expect(gevraagd).toBe(1);
+		describe('Alt-k', () => {
+			const MET_SPATIES: VersInhoud = { delen: [{ stijl: null, stukken: [{ soort: 'tekst', tekst: 'een   woord', opmaak: [] }] }] };
+			const SPATIES_VAN = 4;
+			const SPATIES_TOT = 7;
+
+			/** Drukt Alt-k met de selectie van `van` tot `tot` en geeft of de toets is opgevangen en hoe vaak het menu openging. */
+			function drukAltK(van: number, tot: number): { opgevangen: boolean; geopend: number } {
+				let geopend = 0;
+				const doc = versInhoudNaarDocument(MET_SPATIES);
+				const state = EditorState.create({ doc, selection: TextSelection.create(doc, van, tot) });
+				const command = versEditorToetsen(acties({ openKleurmenu: () => (geopend += 1) }), GEEN_VETTE_OPMAAK)['Alt-k']!;
+				return { opgevangen: command(state), geopend };
+			}
+
+			it('opent het kleurmenu bij een selectie op een woord', () => {
+				expect(drukAltK(SPATIES_TOT, SPATIES_TOT + 5)).toEqual({ opgevangen: true, geopend: 1 });
+			});
+
+			it('opent het kleurmenu niet bij een selectie van alleen spaties, maar vangt de toets wel op', () => {
+				expect(drukAltK(SPATIES_VAN, SPATIES_TOT)).toEqual({ opgevangen: true, geopend: 0 });
+			});
 		});
 	});
 

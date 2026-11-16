@@ -1,6 +1,10 @@
 export const ALINEASTIJLEN = ['jezus', 'god', 'engel', 'citaat-ot'] as const;
 export type Alineastijl = (typeof ALINEASTIJLEN)[number];
 
+export function isAlineastijl(naam: string): naam is Alineastijl {
+	return (ALINEASTIJLEN as readonly string[]).includes(naam);
+}
+
 export const DOMEINEN = [
 	'eeuwigleven',
 	'genade',

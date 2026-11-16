@@ -3,6 +3,7 @@ import type { WordStijl } from '../data/types';
 import {
 	ALINEASTIJLEN,
 	DOMEINEN,
+	isDomein,
 	type Alinea,
 	type Domein,
 	type Hoofdstuk,
@@ -43,7 +44,7 @@ function cssTekst(waarde: string): string {
 }
 
 function eersteDomein(opmaak: readonly Opmaak[]): Domein | null {
-	return opmaak.find((soort): soort is Domein => (DOMEINEN as readonly string[]).includes(soort)) ?? null;
+	return opmaak.find(isDomein) ?? null;
 }
 
 /**

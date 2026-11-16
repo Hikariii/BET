@@ -1,7 +1,9 @@
 type Sneltoets = 'vet' | 'onderstreept' | 'kleur' | 'wissen';
 
+type ToetsPerPlatform = { mac: string; overig: string };
+
 /** Op een Mac neemt Spotlight Cmd+Spatie, daarom wist daar Cmd+\ (zie `versEditorToetsen`). */
-const TOETSEN: Record<Sneltoets, { mac: string; overig: string }> = {
+const TOETSEN: Record<Sneltoets, ToetsPerPlatform> = {
 	vet: { mac: '⌘B', overig: 'Ctrl+B' },
 	onderstreept: { mac: '⌘U', overig: 'Ctrl+U' },
 	kleur: { mac: '⌥K', overig: 'Alt+K' },

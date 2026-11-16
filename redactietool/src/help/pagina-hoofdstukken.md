@@ -8,7 +8,7 @@ Klik in de vereenvoudigde tekst van het vers en typ. Met het toetsenbord ga je m
 
 De tool slaat je wijziging meteen op. Bij een gewijzigd vers staat het woord *gewijzigd*. Met **Vers terugzetten** zet je de vereenvoudiging van Claude terug; je wijzigingen in dat vers gaan weg.
 
-De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een markering uit de bron uit het vers, dan waarschuwt de tool en zegt wat je kunt doen: de markering terugzetten met de opmaakbalk, of het vers terugzetten. Een verdwenen alineastijl zet je in Word terug. Zie *Kleuren en markeringen*.
+De opmaak (kleuren, vet, cursief) blijft bij het typen bestaan. Verdwijnt een markering uit de bron uit het vers, dan waarschuwt de tool en zegt wat je kunt doen: de markering terugzetten, of het vers terugzetten. Een verdwenen kleur, vet, onderstreept of markeren zet je terug met de opmaakbalk. Cursief en een verdwenen alineastijl zet je in Word terug. Zie *Kleuren en markeringen*.
 
 {{wijs vers-bewerken | Een vers bewerken | Klik in de vereenvoudigde tekst van een vers.}}
 {{wijs vers-gewijzigd | gewijzigd | Verschijnt onder een vers dat je hebt aangepast.}}

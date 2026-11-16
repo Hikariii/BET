@@ -1,8 +1,8 @@
 import type { Node } from 'prosemirror-model';
-import { ALINEASTIJLEN, isDomein, OPMAAK_VOLGORDE, type Alineastijl, type Opmaak, type Tekststuk } from '../formaat/types';
+import { ALINEASTIJLEN, OPMAAK_VOLGORDE, type Alineastijl, type Opmaak, type Tekststuk } from '../formaat/types';
 import type { VersAlineadeel, VersInhoud } from '../bewerken/types';
 import { schema } from './schema';
-import type { VetteOpmaak } from './vetteOpmaak';
+import { isVetDoorStijl, type VetteOpmaak } from './vetteOpmaak';
 
 /** Zet de inhoud van één vers om in een document met één alinea per deel. */
 export function versInhoudNaarDocument(inhoud: VersInhoud): Node {
@@ -82,10 +82,8 @@ function witruimteAanRandBuitenOpmaak(tekens: readonly Teken[], opmaak: Opmaak):
 
 /** Een domein en een alineastijl die zelf vet zijn, geven geen `{vet}`: FORMAAT.md en `docx_naar_md.py` laten het weg. */
 function vetDoorStijlWeg(tekens: readonly Teken[], stijl: Alineastijl | null, vette: VetteOpmaak): void {
-	const vetteAlinea = stijl !== null && vette.alineastijlen.has(stijl);
 	for (const teken of tekens) {
-		const vetDomein = teken.opmaak.some((naam) => isDomein(naam) && vette.domeinen.has(naam));
-		if (vetteAlinea || vetDomein) zonderOpmaak(teken, 'vet');
+		if (isVetDoorStijl(vette, teken.opmaak, stijl)) zonderOpmaak(teken, 'vet');
 	}
 }
 

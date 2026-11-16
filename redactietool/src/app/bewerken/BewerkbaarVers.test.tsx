@@ -3,7 +3,10 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/pr
 import { useState } from 'preact/hooks';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { leesTussenstand } from '../../bewerken/tussenstand';
+import type { BewerktVers } from '../../bewerken/types';
+import { knipVers } from '../../bewerken/versknip';
 import { repoHoofdstuk } from '../../bewaren/testhulp';
+import { parseerHoofdstuk } from '../../formaat/parseer';
 import type { BoekData } from '../../data/types';
 import { groepeerPerVers } from '../groepeerPerVers';
 import { BewerkbaarVers } from './BewerkbaarVers';
@@ -169,5 +172,86 @@ describe('BewerkbaarVers', () => {
 		expect(screen.queryByRole('menu')).toBeNull();
 		expect(screen.queryByRole('textbox')).not.toBeNull();
 	});
-});
 
+	it('zet de focus met Escape op een knop van de balk terug in de editor, die open blijft', () => {
+		const editor = startBewerken();
+		const vet = screen.getByRole('button', { name: 'Vet' });
+		vet.focus();
+		expect(document.activeElement).toBe(vet);
+
+		fireEvent.keyDown(vet, { key: 'Escape' });
+
+		expect(document.activeElement).toBe(screen.getByRole('textbox'));
+		expect(screen.getByRole('textbox')).toBe(editor);
+	});
+
+	it('zet de focus met Escape in het kleurmenu terug in de editor, die open blijft, en sluit het menu', async () => {
+		const editor = startBewerken();
+		selecteer(editor, 1, 7);
+		await waitFor(() => expect(screen.getByRole('button', { name: /Kleur/ }).getAttribute('title')).toContain('Kleur kiezen'));
+		fireEvent.keyDown(screen.getByRole('button', { name: /Kleur/ }), { key: 'ArrowDown' });
+		expect(screen.getByRole('menu')).not.toBeNull();
+		expect(document.activeElement).not.toBe(editor);
+
+		fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+
+		expect(screen.queryByRole('menu')).toBeNull();
+		expect(document.activeElement).toBe(screen.getByRole('textbox'));
+		expect(screen.getByRole('textbox')).toBe(editor);
+	});
+
+	describe('waarschuwing bij verdwenen opmaak', () => {
+		/** Toont een vers waarvan de bron `bronTekst` heeft en de vereenvoudiging geen opmaak, en geeft de waarschuwing. */
+		function waarschuwingBij(bronTekst: string): string {
+			const hoofdstuk = { ...HOOFDSTUK, bron: parseerHoofdstuk(`# Lukas 1\n${bronTekst}\n`) };
+			const repo = knipVers(hoofdstuk.vereenvoudigd, 1)!;
+			const bewerkt: BewerktVers = { herkomst: 'zelf getypt', inhoud: repo, basis: repo, bewaard: '2026-01-01T00:00:00.000Z' };
+			render(
+				<BewerkbaarVers
+					boek={BOEK}
+					hoofdstuk={hoofdstuk}
+					nummer={1}
+					delen={DELEN_VAN_VERS_1}
+					bewerkt={bewerkt}
+					bewerken={false}
+					onBewerk={() => {}}
+					onSluit={() => {}}
+					onNaarBuur={() => {}}
+					beginAanBegin={false}
+					onOpslagGewijzigd={() => {}}
+				/>,
+			);
+			return screen.getByRole('list', { name: 'Waarschuwingen bij vers 1' }).textContent ?? '';
+		}
+
+		it('verwijst bij verdwenen cursief naar Word, want de balk heeft geen cursief', () => {
+			const tekst = waarschuwingBij('[1] Eerste {cursief}vers{/cursief}.');
+
+			expect(tekst).toContain('De markering cursief uit de bron staat niet meer in dit vers.');
+			expect(tekst).toContain('Zet de markering in Word, of kies Vers terugzetten.');
+			expect(tekst).not.toContain('opmaakbalk');
+		});
+
+		it('verwijst bij verdwenen vet naar de opmaakbalk', () => {
+			const tekst = waarschuwingBij('[1] Eerste {vet}vers{/vet}.');
+
+			expect(tekst).toContain('De markering vet uit de bron staat niet meer in dit vers.');
+			expect(tekst).toContain('zet de markering terug met de opmaakbalk, of kies Vers terugzetten.');
+		});
+
+		it('verwijst bij een verdwenen begripsdomein naar de opmaakbalk', () => {
+			const tekst = waarschuwingBij('[1] Eerste {genade}vers{/genade}.');
+
+			expect(tekst).toContain('De markering genade uit de bron staat niet meer in dit vers.');
+			expect(tekst).toContain('zet de markering terug met de opmaakbalk, of kies Vers terugzetten.');
+		});
+
+		it('verwijst bij een verdwenen alineastijl naar Word', () => {
+			const tekst = waarschuwingBij('@jezus [1] Eerste vers.');
+
+			expect(tekst).toContain('De alineastijl jezus uit de bron staat niet meer in dit vers.');
+			expect(tekst).toContain('Zet de alineastijl in Word, of kies Vers terugzetten.');
+			expect(tekst).not.toContain('opmaakbalk');
+		});
+	});
+});

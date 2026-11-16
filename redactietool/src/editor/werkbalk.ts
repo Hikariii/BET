@@ -3,12 +3,18 @@ import type { Command, EditorState } from 'prosemirror-state';
 import { DOMEINEN, isDomein, type Alineastijl, type Domein } from '../formaat/types';
 import { schema } from './schema';
 import { alineastijlVan } from './versDocument';
-import type { VetteOpmaak } from './vetteOpmaak';
+import { isVetDoorStijl, type VetteOpmaak } from './vetteOpmaak';
 
 /** Eén keuze van Kleur ▾: een begripsdomein of Onderwijs. */
 export type Kleur = Domein | 'onderwijs';
 
 export const KLEUREN: readonly Kleur[] = [...DOMEINEN, 'onderwijs'];
+
+/** De opmaak die de werkbalk kan zetten: vet, onderstreept, markeren en de kleuren. Cursief ontbreekt. */
+export const OPMAAK_VAN_WERKBALK: ReadonlySet<string> = new Set(['vet', 'onderstreept', 'highlight', ...KLEUREN]);
+
+/** De kleur die de hele selectie heeft; `gemengd` bij meer dan één kleur in de selectie, `null` zonder kleur. */
+export type ActieveKleur = Kleur | 'gemengd' | null;
 
 export type KnopToestand = { soort: 'aan' } | { soort: 'uit' } | { soort: 'uitgeschakeld'; reden: string };
 
@@ -19,8 +25,7 @@ export type WerkbalkToestand = {
 	/** `aan` als de selectie een kleur heeft. */
 	kleur: KnopToestand;
 	wissen: KnopToestand;
-	/** De kleur die de hele selectie heeft; `gemengd` bij meer dan één kleur in de selectie. */
-	actieveKleur: Kleur | 'gemengd' | null;
+	actieveKleur: ActieveKleur;
 };
 
 const ALLEEN_SPATIES = 'De selectie bevat alleen spaties.';
@@ -50,7 +55,10 @@ function knipRandwitruimte(delen: readonly Tekstdeel[]): Tekstdeel[] {
 	});
 }
 
-/** De tekststukken in de selectie, per alinea bijgeknipt tot zonder witruimte aan de rand. Alleen witruimte geeft een lege lijst. */
+/**
+ * De tekststukken in de selectie, per alinea bijgeknipt tot zonder witruimte aan de rand.
+ * Een selectie van alleen witruimte geeft een lege lijst.
+ */
 function stukkenInSelectie(doc: Node, van: number, tot: number): Stuk[] {
 	const stukken: Stuk[] = [];
 	doc.nodesBetween(van, tot, (alinea, alineaPositie) => {
@@ -81,16 +89,15 @@ function heeftMark(stuk: Stuk, naam: string): boolean {
 	return stuk.marks.some((mark) => mark.type.name === naam);
 }
 
-function isVetDoorStijl(stuk: Stuk, vette: VetteOpmaak): boolean {
-	const domein = stuk.marks.map((mark) => mark.type.name).find(isDomein);
-	return (domein !== undefined && vette.domeinen.has(domein)) || (stuk.alineastijl !== null && vette.alineastijlen.has(stuk.alineastijl));
+function stukIsVetDoorStijl(stuk: Stuk, vette: VetteOpmaak): boolean {
+	return isVetDoorStijl(vette, stuk.marks.map((mark) => mark.type.name), stuk.alineastijl);
 }
 
 function kleurenVan(stuk: Stuk): Kleur[] {
 	return KLEUREN.filter((kleur) => heeftMark(stuk, kleur));
 }
 
-function actieveKleurVan(stukken: readonly Stuk[]): Kleur | 'gemengd' | null {
+function actieveKleurVan(stukken: readonly Stuk[]): ActieveKleur {
 	const kleuren = stukken.map(kleurenVan);
 	const eerste = kleuren[0]?.[0] ?? null;
 	if (kleuren.every((kleur) => kleur.length === 0)) return null;
@@ -106,7 +113,7 @@ function schakelaarToestand(stukken: readonly Stuk[], naam: string): KnopToestan
 }
 
 function vetToestand(stukken: readonly Stuk[], vette: VetteOpmaak): KnopToestand {
-	const nietVet = stukken.some((stuk) => !heeftMark(stuk, 'vet') && !isVetDoorStijl(stuk, vette));
+	const nietVet = stukken.some((stuk) => !heeftMark(stuk, 'vet') && !stukIsVetDoorStijl(stuk, vette));
 	if (nietVet) return { soort: 'uit' };
 	return stukken.some((stuk) => heeftMark(stuk, 'vet')) ? { soort: 'aan' } : AL_VET;
 }
@@ -141,7 +148,10 @@ function markType(naam: string): MarkType {
 	return type;
 }
 
-/** Past de handeling toe op elk stuk van de selectie, of op de stored marks bij een cursor. Geeft `false` als er niets is om op toe te passen. */
+/**
+ * Past de handeling toe op elk stuk van de selectie, of op de stored marks bij een cursor.
+ * Geeft `false` als er niets is om op toe te passen.
+ */
 function voerHandelingUit(state: EditorState, dispatch: Parameters<Command>[1], handelingVoor: (stuk: Stuk) => Handeling): boolean {
 	const stukken = stukkenVan(state);
 	if (stukken.length === 0) return false;
@@ -162,8 +172,10 @@ function voerHandelingUit(state: EditorState, dispatch: Parameters<Command>[1], 
 }
 
 /**
- * Vet aan of uit. Aanzetten zet `vet` alleen op tekst die niet al vet is door haar domein of alineastijl (FORMAAT.md);
- * uitzetten haalt `vet` weg. Geeft `false` als alles al vet is door de stijl.
+ * Vet aan of uit.
+ * Aanzetten zet `vet` alleen op tekst die niet al vet is door haar domein of alineastijl (FORMAAT.md).
+ * Uitzetten haalt `vet` weg.
+ * Geeft `false` als alles al vet is door de stijl.
  */
 export function schakelVet(vette: VetteOpmaak): Command {
 	return (state, dispatch) => {
@@ -173,7 +185,7 @@ export function schakelVet(vette: VetteOpmaak): Command {
 		return voerHandelingUit(state, dispatch, (stuk) =>
 			toestand.soort === 'aan'
 				? { haalWeg: [vet], voegToe: [] }
-				: { haalWeg: [], voegToe: heeftMark(stuk, 'vet') || isVetDoorStijl(stuk, vette) ? [] : [vet] },
+				: { haalWeg: [], voegToe: heeftMark(stuk, 'vet') || stukIsVetDoorStijl(stuk, vette) ? [] : [vet] },
 		);
 	};
 }

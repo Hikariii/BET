@@ -1,6 +1,6 @@
 import {
-	ALINEASTIJLEN,
 	FormaatFout,
+	isAlineastijl,
 	nestingniveau,
 	openTag,
 	OPMAAK_MET_TAGNAAM,
@@ -17,10 +17,6 @@ const MAXIMAAL_LEGE_REGELS_ACHTER_ELKAAR = 2;
 const OPMAAKTEKEN = /\{(\/?)([^{}\s]*)\}|==|\[(\d+)\]/g;
 const KOP = /^# (\S.*?)\s*$/;
 const ALINEASTIJL = /^@(\S+)(?:\s(.*))?$/;
-
-function isAlineastijl(naam: string): naam is Alineastijl {
-	return (ALINEASTIJLEN as readonly string[]).includes(naam);
-}
 
 function isOpmaakMetTagnaam(naam: string): naam is Opmaak {
 	return (OPMAAK_MET_TAGNAAM as readonly string[]).includes(naam);

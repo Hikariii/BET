@@ -5,7 +5,7 @@ import { Plugin, type Command } from 'prosemirror-state';
 import { schema } from './schema';
 import { versnummersZonderOpmaak } from './versnummersZonderOpmaak';
 import type { VetteOpmaak } from './vetteOpmaak';
-import { schakelOpmaak, schakelVet, wisOpmaak } from './werkbalk';
+import { schakelOpmaak, schakelVet, werkbalkToestand, wisOpmaak } from './werkbalk';
 
 /**
  * Alineagrenzen horen bij de repo: een bewerking houdt evenveel alinea's.
@@ -52,8 +52,8 @@ export function versEditorToetsen({ onSluit, naarBuur, openKleurmenu }: EditorAc
 		'Mod-\\': opgevangen(wisOpmaak),
 		/** Er is geen cursief in de werkbalk; zonder dit zet de browser zelf cursief. */
 		'Mod-i': doeNiets,
-		'Alt-k': () => {
-			openKleurmenu();
+		'Alt-k': (state) => {
+			if (werkbalkToestand(state, vette).kleur.soort !== 'uitgeschakeld') openKleurmenu();
 			return true;
 		},
 		Enter: doeNiets,

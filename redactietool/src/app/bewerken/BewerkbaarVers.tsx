@@ -5,7 +5,8 @@ import { bewaarOfWis, terugNaarRepo } from '../../bewerken/terugNaarRepo';
 import type { BewerktVers, VersInhoud } from '../../bewerken/types';
 import { knipVers } from '../../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../../bewerken/waarschuwingen';
-import { ALINEASTIJLEN } from '../../formaat/types';
+import { OPMAAK_VAN_WERKBALK } from '../../editor/werkbalk';
+import { isAlineastijl } from '../../formaat/types';
 import type { VersDeel } from '../groepeerPerVers';
 import { VersTekst } from '../VersTekst';
 import { browseropslag } from './useTussenstand';
@@ -34,6 +35,13 @@ type Props = {
 };
 
 const BEGIN_VAN_VERS: KlikPlek = { alinea: 0, teken: 0 };
+
+/** Wat de vertaler doet om een verdwenen alineastijl of markering terug te zetten: de balk kan alleen opmaak zetten die hij kent. */
+function herstelAdvies(opmaak: string): string {
+	if (isAlineastijl(opmaak)) return 'Zet de alineastijl in Word';
+	if (!OPMAAK_VAN_WERKBALK.has(opmaak)) return 'Zet de markering in Word';
+	return 'Open het vers en zet de markering terug met de opmaakbalk';
+}
 
 /** De cel "vereenvoudigd" van een vers: de tekst of de editor, met markering, melding en waarschuwingen. */
 export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerken, onBewerk, onSluit, onNaarBuur, beginAanBegin, onOpslagGewijzigd }: Props) {
@@ -165,7 +173,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 				<ul class="verswaarschuwingen" aria-label={`Waarschuwingen bij vers ${nummer}`}>
 					{waarschuwingen.map((waarschuwing) => (
 						<li>
-							{waarschuwing.tekst} {(ALINEASTIJLEN as readonly string[]).includes(waarschuwing.opmaak) ? 'Zet de alineastijl in Word' : 'Open het vers en zet de markering terug met de opmaakbalk'}, of kies Vers terugzetten.
+							{waarschuwing.tekst} {herstelAdvies(waarschuwing.opmaak)}, of kies Vers terugzetten.
 						</li>
 					))}
 				</ul>
