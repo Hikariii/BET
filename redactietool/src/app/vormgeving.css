@@ -612,8 +612,7 @@ table.verzen td.regels :is(.meerregels, .vraagkoppeling-link, .verwijzing) {
 .verseditor .ProseMirror:focus-visible {
 	border-color: var(--tekst);
 	box-shadow: none;
-	outline: 1px solid var(--tekst);
-	outline-offset: 0;
+	outline: none;
 }
 
 .verseditor-acties {

@@ -2,7 +2,7 @@
  * Eén aaneengesloten balk, vast boven het tekstveld en even breed.
  * De editor (vormgeving.css) steekt met een negatieve marge 0.35rem boven en 0.5rem opzij uit, zodat de tekst op zijn plek blijft;
  * de balk steekt opzij net zo ver uit en de editor schuift er met zijn bovenmarge tegenaan.
- * Rand en omlijning zijn die van de editor met focus; de bovenrand van de editor scheidt de balk van de tekst.
+ * De rand is die van de editor; de bovenrand van de editor scheidt de balk van de tekst.
  */
 .werkbalk {
 	display: flex;
@@ -12,8 +12,6 @@
 	background: var(--vlak);
 	border: 1px solid var(--tekst);
 	border-bottom: 0;
-	outline: 1px solid var(--tekst);
-	outline-offset: 0;
 }
 
 .werkbalk > :not(:first-child) {
