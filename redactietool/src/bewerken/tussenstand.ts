@@ -1,6 +1,7 @@
 import { ALINEASTIJLEN, OPMAAK_VOLGORDE } from '../formaat/types';
 import type { Alineastijl, Hoofdstuk, Opmaak, Tekststuk } from '../formaat/types';
 import type { BewerktVers, Tussenstand, VersAlineadeel, VersInhoud } from './types';
+import { nietOpgeslagen, RUIMTE_MAKEN } from './opslagVol';
 import { knipVers, vervangVers } from './versknip';
 
 /** Het deel van de browseropslag dat de tussenstand gebruikt; in tests een eenvoudige vervanger. */
@@ -64,13 +65,12 @@ export function alsBewerktVers(waarde: unknown): BewerktVers | null {
 	const inhoud = alsInhoud(waarde['inhoud']);
 	const basis = alsInhoud(waarde['basis']);
 	if (inhoud === null || basis === null) return null;
-	const vers: BewerktVers = { inhoud, basis, bewaard: waarde['bewaard'] };
-	// Een onbekende herkomst telt als niet gezet: dan geldt 'zelf getypt'.
-	if (waarde['herkomst'] === 'zelf getypt') return { ...vers, herkomst: 'zelf getypt' };
+	const { bewaard } = waarde;
+	if (waarde['herkomst'] === 'zelf getypt') return { inhoud, basis, bewaard, herkomst: 'zelf getypt' };
 	if (waarde['herkomst'] === 'structurele keuze' && typeof waarde['keuzeId'] === 'string') {
-		return { ...vers, herkomst: 'structurele keuze', keuzeId: waarde['keuzeId'] };
+		return { inhoud, basis, bewaard, herkomst: 'structurele keuze', keuzeId: waarde['keuzeId'] };
 	}
-	return vers;
+	return null;
 }
 
 /** Leest de tussenstand van een hoofdstuk; leeg als er niets bewaard is of de opslag onleesbaar is. Een vers met een onbruikbare vorm valt weg. */
@@ -110,7 +110,7 @@ function schrijfVers(opslag: Opslag, boek: string, hoofdstuk: number, vers: numb
 	} catch {
 		return {
 			gelukt: false,
-			melding: `Vers ${vers} kon niet in de browser worden bewaard, waarschijnlijk is de opslag vol. Kopieer je tekst voordat je op Klaar drukt.`,
+			melding: `${nietOpgeslagen(`Vers ${vers}`)} Kopieer je tekst voordat je op Klaar drukt. ${RUIMTE_MAKEN}`,
 		};
 	}
 }
@@ -161,30 +161,6 @@ export function bewaarKeuzeVers(
 /** Of een bewaarde bewerking dezelfde indeling in alinea's heeft als het vers in de repo; zo niet, dan kan ze er niet in worden gezet. */
 export function pastOpRepo(repo: VersInhoud, bewerkt: BewerktVers): boolean {
 	return repo.delen.length === bewerkt.inhoud.delen.length;
-}
-
-/**
- * Bewaart de bewerking, of wist haar als het vers weer gelijk is aan de repo.
- * Een bestaande bewerking houdt haar oude basis, zodat een verouderde bewerking verouderd blijft;
- * past de bestaande bewerking niet meer op de repo (ander aantal delen), dan is de repo de nieuwe basis.
- * Een vers zonder repo-inhoud (`repo` is `null`) laat de opslag ongemoeid.
- */
-export function bewaarOfWis(
-	opslag: Opslag,
-	boek: string,
-	hoofdstuk: number,
-	vers: number,
-	inhoud: VersInhoud,
-	repo: VersInhoud | null,
-): BewaarUitkomst {
-	if (repo === null) return { gelukt: true };
-	const bestaand = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
-	const basis = bestaand !== undefined && pastOpRepo(repo, bestaand) ? bestaand.basis : repo;
-	if (zelfdeInhoud(inhoud, repo) && zelfdeInhoud(basis, repo)) {
-		wisVers(opslag, boek, hoofdstuk, vers);
-		return { gelukt: true };
-	}
-	return bewaarVers(opslag, boek, hoofdstuk, vers, inhoud, basis);
 }
 
 /** Haalt één vers uit de tussenstand (terug naar de versie uit de repo). */

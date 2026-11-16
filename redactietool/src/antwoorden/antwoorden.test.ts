@@ -5,7 +5,7 @@ import {
 	bewaarAntwoord,
 	controleerKeuze,
 	EIGEN_ANTWOORD,
-	haalKeuzeUitAntwoorden,
+	haalKeuzesUitAntwoorden,
 	leesAntwoorden,
 	legAntwoordVast,
 	levendeKeuzeIds,
@@ -80,13 +80,12 @@ describe('leesAntwoorden bij onleesbare opslag', () => {
 	});
 });
 
-describe('leesAntwoorden met oude antwoorden', () => {
-	it('zet een antwoord met één keuzeId om naar keuzeIds met een lege toelichting, en null naar geen keuzes', () => {
-		const oudMetKeuze = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-16T10:00:00.000Z' };
-		const oudZonderKeuze = { kwestie: 'Houden', optie: 'b) niets doen', keuzeId: null, gegeven: '2026-11-16T10:05:00.000Z' };
-		opslag.setItem(antwoordenSleutel('lukas'), JSON.stringify([oudMetKeuze, oudZonderKeuze]));
+describe('leesAntwoorden met een verouderde vorm', () => {
+	it('slaat een antwoord met één keuzeId en zonder toelichting over en houdt het huidige antwoord', () => {
+		const oud = { kwestie: 'Gezegend', optie: 'a) genade', keuzeId: 'k1', gegeven: '2026-11-16T10:00:00.000Z' };
+		opslag.setItem(antwoordenSleutel('lukas'), JSON.stringify([oud, HOUDEN]));
 
-		expect(leesAntwoorden(opslag, 'lukas')).toEqual([GEZEGEND, HOUDEN]);
+		expect(leesAntwoorden(opslag, 'lukas')).toEqual([HOUDEN]);
 	});
 });
 
@@ -170,11 +169,11 @@ describe('voegKeuzeToe', () => {
 	});
 });
 
-describe('haalKeuzeUitAntwoorden', () => {
+describe('haalKeuzesUitAntwoorden', () => {
 	it('haalt alleen die keuze uit het antwoord en laat het antwoord met de andere staan', () => {
 		bewaarAntwoord(opslag, 'lukas', { ...GEZEGEND, keuzeIds: ['k1', 'k2'] });
 
-		haalKeuzeUitAntwoorden(opslag, 'lukas', 'k1');
+		haalKeuzesUitAntwoorden(opslag, 'lukas', ['k1']);
 
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ ...GEZEGEND, keuzeIds: ['k2'] }]);
 	});
@@ -185,8 +184,8 @@ describe('haalKeuzeUitAntwoorden', () => {
 		bewaarAntwoord(opslag, 'lukas', metToelichting);
 		bewaarAntwoord(opslag, 'lukas', zonderToelichting);
 
-		haalKeuzeUitAntwoorden(opslag, 'lukas', 'k1');
-		haalKeuzeUitAntwoorden(opslag, 'lukas', 'k2');
+		haalKeuzesUitAntwoorden(opslag, 'lukas', ['k1']);
+		haalKeuzesUitAntwoorden(opslag, 'lukas', ['k2']);
 
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([{ ...metToelichting, keuzeIds: [] }]);
 	});
@@ -195,7 +194,7 @@ describe('haalKeuzeUitAntwoorden', () => {
 		bewaarAntwoord(opslag, 'lukas', GEZEGEND);
 		bewaarAntwoord(opslag, 'lukas', HOUDEN);
 
-		haalKeuzeUitAntwoorden(opslag, 'lukas', 'k1');
+		haalKeuzesUitAntwoorden(opslag, 'lukas', ['k1']);
 
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([HOUDEN]);
 	});

@@ -71,7 +71,7 @@ export function bewaardOverzicht(opslag: Opslag, boek: BoekMetHoofdstukken, repo
 				vers: nummerVers,
 				bewaard: vers.bewaard,
 				verouderd: uitRepo !== undefined && isBewerkingVerouderd(repoVers, vers),
-				herkomst: vers.herkomst ?? 'zelf getypt',
+				herkomst: vers.herkomst,
 			};
 		});
 		hoofdstukken.push({ hoofdstuk: nummer, verzen });

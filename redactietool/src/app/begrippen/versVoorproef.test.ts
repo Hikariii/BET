@@ -42,7 +42,7 @@ describe('zoekVersVoorproef', () => {
 
 	it('toont de bewerking uit de tussenstand van dat hoofdstuk, met de bron uit de repo', () => {
 		const tussenstand: Tussenstand = {
-			verzen: { 2: { inhoud: inhoud(' Zelf getypt.'), basis: inhoud(' Eenvoudig twee.'), bewaard: '2026-11-15T10:00:00.000Z' } },
+			verzen: { 2: { inhoud: inhoud(' Zelf getypt.'), basis: inhoud(' Eenvoudig twee.'), bewaard: '2026-11-15T10:00:00.000Z', herkomst: 'zelf getypt' } },
 		};
 		const gevraagd: number[] = [];
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData } from '../../data/types';
-import { bewaarOfWis, isVerouderd, pastOpRepo, wisVers } from '../../bewerken/tussenstand';
+import { isVerouderd, pastOpRepo } from '../../bewerken/tussenstand';
+import { bewaarOfWis, terugNaarRepo } from '../../bewerken/terugNaarRepo';
 import type { BewerktVers, VersInhoud } from '../../bewerken/types';
 import { knipVers } from '../../bewerken/versknip';
 import { waarschuwingenVoorVers } from '../../bewerken/waarschuwingen';
@@ -67,9 +68,9 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 		onOpslagGewijzigd();
 	};
 
-	const terugNaarRepo = () => {
-		wisVers(opslag, boek.id, hoofdstuk.nummer, nummer);
-		zetOpslagmelding(null);
+	const zetVersTerug = () => {
+		const uitkomst = terugNaarRepo(opslag, boek.id, hoofdstuk.nummer, nummer);
+		zetOpslagmelding(uitkomst.gelukt ? null : uitkomst.melding);
 		onOpslagGewijzigd();
 		onSluit();
 	};
@@ -120,7 +121,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 					<button
 						type="button"
 						data-help="terug-naar-de-repo"
-						onClick={terugNaarRepo}
+						onClick={zetVersTerug}
 						aria-label={`Vers ${nummer} terugzetten`}
 						title="Zet de vereenvoudiging van Claude terug; je wijzigingen in dit vers gaan weg."
 					>

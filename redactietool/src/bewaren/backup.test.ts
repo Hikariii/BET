@@ -46,11 +46,18 @@ function teruglezen(opslag: GeheugenOpslag): Backup {
 	return uitkomst.backup;
 }
 
-function weigering(tekst: string, boek = 'lukas'): string {
+function weigeringMetDetails(tekst: string, boek = 'lukas'): { melding: string; details: string } {
 	const uitkomst = leesBackup(tekst, boek);
 	if (uitkomst.gelukt) throw new Error('De back-up is niet geweigerd.');
-	return uitkomst.melding;
+	return { melding: uitkomst.melding, details: uitkomst.details };
 }
+
+function weigering(tekst: string, boek = 'lukas'): string {
+	return weigeringMetDetails(tekst, boek).melding;
+}
+
+const GEEN_BACKUP = 'Dit is geen back-up van deze tool. Kies het bestand dat je met Back-up downloaden hebt gemaakt; de naam eindigt op .bet-bewaard.json.';
+const BESCHADIGD = 'Deze back-up is beschadigd en kan niet worden ingeladen. Maak met Back-up downloaden een nieuwe, of kies een eerdere back-up.';
 
 describe('maakBackup', () => {
 	it('bevat de tussenstanden per hoofdstuk, de keuzes, het boek, de datum en de repo-commit', () => {
@@ -87,64 +94,70 @@ describe('leesBackup', () => {
 		expect(teruglezen(opslag)).toEqual(maakBackup(opslag, BOEK, 'abc123', NU));
 	});
 
-	it('weigert een back-up van een ander boek, met beide namen in de melding', () => {
+	it('weigert een back-up van een ander boek met de stap, en zet de namen in de details', () => {
 		const tekst = JSON.stringify(maakBackup(gevuldeOpslag(), BOEK, null, NU));
 
 		expect(leesBackup(tekst, 'lukas').gelukt).toBe(true);
-		expect(weigering(tekst, 'johannes')).toBe('Deze back-up is van het boek "lukas", niet van "johannes".');
+		expect(weigeringMetDetails(tekst, 'johannes')).toEqual({
+			melding: 'Deze back-up hoort bij een ander boek. Open eerst het boek "lukas" en laad de back-up daar.',
+			details: 'Het boek in de back-up is "lukas", het geopende boek is "johannes".',
+		});
 	});
 
-	it('weigert kapotte JSON', () => {
-		expect(weigering('{"formaat": "bet-bew')).toContain('geen geldige JSON');
+	it('zegt bij kapotte JSON dat het geen back-up is, met de reden in de details', () => {
+		expect(weigeringMetDetails('{"formaat": "bet-bew')).toEqual({ melding: GEEN_BACKUP, details: 'De inhoud is geen geldige JSON.' });
 	});
 
-	it('weigert een ander formaat, ook de export voor Claude', () => {
-		expect(weigering(JSON.stringify({ formaat: 'bet-redactie-export', versie: 1, boek: 'lukas' }))).toContain('bet-bewaard');
-		expect(weigering('[1, 2]')).toContain('bet-bewaard');
+	it('zegt bij een ander formaat, ook de export voor Claude, dat het geen back-up is', () => {
+		expect(weigeringMetDetails(JSON.stringify({ formaat: 'bet-redactie-export', versie: 1, boek: 'lukas' }))).toEqual({
+			melding: GEEN_BACKUP,
+			details: 'Het formaat is niet "bet-bewaard".',
+		});
+		expect(weigering('[1, 2]')).toBe(GEEN_BACKUP);
 	});
 
-	it('weigert een andere versie', () => {
+	it('weigert een nieuwere versie met de stap om de pagina te verversen', () => {
 		const backup = { ...maakBackup(gevuldeOpslag(), BOEK, null, NU), versie: 4 };
 
-		expect(weigering(JSON.stringify(backup))).toContain('versie 4');
-	});
-
-	it('leest een back-up van versie 1, zonder antwoorden, en geeft hem als versie 3 terug', () => {
-		const { antwoorden, ...huidige } = maakBackup(gevuldeOpslag(), BOEK, 'abc123', NU);
-		expect(antwoorden).toHaveLength(1);
-
-		const uitkomst = leesBackup(JSON.stringify({ ...huidige, versie: 1 }), 'lukas');
-
-		if (!uitkomst.gelukt) throw new Error(uitkomst.melding);
-		expect(uitkomst.backup).toEqual({ ...huidige, antwoorden: [] });
-	});
-
-	it('leest een back-up van versie 2, met antwoorden met één keuzeId of null en zonder toelichting, en geeft hem als versie 3 terug', () => {
-		const { antwoorden, ...huidige } = maakBackup(gevuldeOpslag(), BOEK, 'abc123', NU);
-		const oudMetKeuze = { kwestie: 'Harde man', optie: 'a) zachte', keuzeId: 'k1', gegeven: '2026-11-15T09:01:00.000Z' };
-		const oudZonderKeuze = { kwestie: 'Houden', optie: 'b) niets doen', keuzeId: null, gegeven: '2026-11-15T09:02:00.000Z' };
-		expect(antwoorden).toHaveLength(1);
-
-		const uitkomst = leesBackup(JSON.stringify({ ...huidige, versie: 2, antwoorden: [oudMetKeuze, oudZonderKeuze] }), 'lukas');
-
-		if (!uitkomst.gelukt) throw new Error(uitkomst.melding);
-		expect(uitkomst.backup).toEqual({
-			...huidige,
-			antwoorden: [
-				{ kwestie: 'Harde man', optie: 'a) zachte', toelichting: '', keuzeIds: ['k1'], gegeven: '2026-11-15T09:01:00.000Z' },
-				{ kwestie: 'Houden', optie: 'b) niets doen', toelichting: '', keuzeIds: [], gegeven: '2026-11-15T09:02:00.000Z' },
-			],
+		expect(weigeringMetDetails(JSON.stringify(backup))).toEqual({
+			melding: 'Deze back-up komt van een nieuwere versie van de tool. Ververs de pagina om de nieuwste versie te laden en probeer het opnieuw.',
+			details: 'De back-up heeft versie 4; deze tool leest alleen versie 3.',
 		});
+	});
+
+	it('weigert een oudere versie, ook als de rest nog past, met een nette melding', () => {
+		const huidige = maakBackup(gevuldeOpslag(), BOEK, 'abc123', NU);
+		const melding = 'Deze back-up komt van een oudere versie van de tool en kan niet meer worden ingeladen. Vraag de eigenaar om hulp.';
+
+		expect(weigeringMetDetails(JSON.stringify({ ...huidige, versie: 2 }))).toEqual({ melding, details: 'De back-up heeft versie 2; deze tool leest alleen versie 3.' });
+		expect(weigering(JSON.stringify({ ...huidige, versie: 1 }))).toBe(melding);
+	});
+
+	it('weigert een versie die geen geheel getal is als beschadigd', () => {
+		const huidige = maakBackup(gevuldeOpslag(), BOEK, null, NU);
+
+		expect(weigeringMetDetails(JSON.stringify({ ...huidige, versie: '3' }))).toEqual({ melding: BESCHADIGD, details: 'De versie "3" is geen geheel getal.' });
+		expect(weigering(JSON.stringify({ ...huidige, versie: 2.5 }))).toBe(BESCHADIGD);
+	});
+
+	it('weigert een antwoord in de oude vorm met één keuzeId als beschadigd', () => {
+		const { antwoorden, ...basis } = maakBackup(gevuldeOpslag(), BOEK, 'abc123', NU);
+		expect(antwoorden).toHaveLength(1);
+		const oud = { kwestie: 'Harde man', optie: 'a) zachte', keuzeId: 'k1', gegeven: '2026-11-15T09:01:00.000Z' };
+
+		expect(weigeringMetDetails(JSON.stringify({ ...basis, antwoorden: [oud] }))).toEqual({ melding: BESCHADIGD, details: 'Een antwoord in de back-up is onleesbaar.' });
 	});
 
 	it('weigert een versie 3 zonder antwoorden, met een onleesbaar antwoord en met twee antwoorden op dezelfde vraag', () => {
 		const { antwoorden, ...basis } = maakBackup(gevuldeOpslag(), BOEK, null, NU);
 		const antwoord = antwoorden[0];
 		if (antwoord === undefined) throw new Error('Geen antwoord in de testdata.');
+		const details = (tekst: string) => weigeringMetDetails(tekst).details;
 
-		expect(weigering(JSON.stringify(basis))).toBe('In de back-up ontbreken de antwoorden.');
-		expect(weigering(JSON.stringify({ ...basis, antwoorden: [{ kwestie: 'x' }] }))).toBe('Een antwoord in de back-up is onleesbaar.');
-		expect(weigering(JSON.stringify({ ...basis, antwoorden: [antwoord, { ...antwoord, optie: 'b)' }] }))).toBe('Een vraag heeft in de back-up twee antwoorden.');
+		expect(details(JSON.stringify(basis))).toBe('In de back-up ontbreken de antwoorden.');
+		expect(details(JSON.stringify({ ...basis, antwoorden: [{ kwestie: 'x' }] }))).toBe('Een antwoord in de back-up is onleesbaar.');
+		expect(details(JSON.stringify({ ...basis, antwoorden: [antwoord, { ...antwoord, optie: 'b)' }] }))).toBe('Een vraag heeft in de back-up twee antwoorden.');
+		expect(weigering(JSON.stringify(basis))).toBe(BESCHADIGD);
 	});
 
 	it('houdt een keuze met markering, varianten, overgeslagen plekken en vraag intact door de back-up heen', () => {
@@ -168,7 +181,7 @@ describe('leesBackup', () => {
 		if (eerste === undefined) throw new Error('Geen hoofdstuk in de testdata.');
 		eerste.verzen['2'] = { inhoud: 'geen inhoud' };
 
-		expect(weigering(JSON.stringify(backup))).toBe('Vers 1:2 in de back-up is onleesbaar.');
+		expect(weigeringMetDetails(JSON.stringify(backup))).toEqual({ melding: BESCHADIGD, details: 'Vers 1:2 in de back-up is onleesbaar.' });
 	});
 
 	it('weigert een onleesbare keuze, een dubbel hoofdstuk en een ongeldige datum', () => {
@@ -177,11 +190,13 @@ describe('leesBackup', () => {
 			tussenstanden: unknown[];
 		};
 
-		expect(weigering(JSON.stringify({ ...basis, keuzes: [{ id: 'x' }] }))).toBe('Een keuze in de back-up is onleesbaar.');
-		expect(weigering(JSON.stringify({ ...basis, tussenstanden: [...basis.tussenstanden, basis.tussenstanden[0]] }))).toBe(
+		const details = (tekst: string) => weigeringMetDetails(tekst).details;
+
+		expect(details(JSON.stringify({ ...basis, keuzes: [{ id: 'x' }] }))).toBe('Een vervanging in de back-up is onleesbaar.');
+		expect(details(JSON.stringify({ ...basis, tussenstanden: [...basis.tussenstanden, basis.tussenstanden[0]] }))).toBe(
 			'Hoofdstuk 1 staat twee keer in de back-up.',
 		);
-		expect(weigering(JSON.stringify({ ...basis, gemaakt: 'gisteren' }))).toContain('datum');
+		expect(details(JSON.stringify({ ...basis, gemaakt: 'gisteren' }))).toContain('datum');
 	});
 });
 

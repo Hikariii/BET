@@ -4,8 +4,7 @@ import type { KeuzeVariant, StructureleKeuze } from '../vervangen/keuzes';
 
 /**
  * Het bestand `<prefix>-NN.redactie.json` dat de vertaler aan Claude geeft; een toelichting, nooit een bron van tekst.
- * Versie 1 had geen keuzes of vragen (de lijsten waren altijd leeg); versie 2 vulde ze met antwoorden met één `keuzeId`;
- * versie 3 geeft elk antwoord een `toelichting` en `keuzeIds` (nul of meer keuzes).
+ * Alleen versie 3 bestaat: elk antwoord heeft een `toelichting` en `keuzeIds` (nul of meer keuzes).
  */
 export type RedactieExport = {
 	formaat: 'bet-redactie-export';
@@ -79,7 +78,7 @@ export type GewijzigdVers = {
 	repo: string[];
 	/** De bewerkte tekst, één regel per deel, in FORMAAT-notatie. */
 	bewerkt: string[];
-	/** Hoe de bewerking ontstond; een vers zonder bewaarde herkomst geldt als "zelf getypt". */
+	/** Hoe de bewerking ontstond. */
 	herkomst: 'zelf getypt' | 'structurele keuze';
 	/** Het id van de structurele keuze achter de bewerking; `null` bij "zelf getypt". */
 	keuzeId: string | null;

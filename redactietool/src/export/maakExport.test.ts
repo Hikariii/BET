@@ -42,7 +42,7 @@ const VERS_3_REPO: VersInhoud = {
 };
 
 function bewerkt(inhoud: VersInhoud, basis: VersInhoud): BewerktVers {
-	return { inhoud, basis, bewaard: '2026-11-15T15:00:00.000Z' };
+	return { inhoud, basis, bewaard: '2026-11-15T15:00:00.000Z', herkomst: 'zelf getypt' };
 }
 
 function invoer(

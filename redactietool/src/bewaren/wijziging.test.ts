@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { bewaarOfWis, bewaarVers, wisVers } from '../bewerken/tussenstand';
+import { bewaarVers, wisVers } from '../bewerken/tussenstand';
+import { bewaarOfWis } from '../bewerken/terugNaarRepo';
 import { draaiKeuzeTerug, pasKeuzeToe } from '../vervangen/keuzes';
 import { zoekVondsten } from '../vervangen/zoekEnVervang';
 import type { HoofdstukVerzen } from '../vervangen/types';

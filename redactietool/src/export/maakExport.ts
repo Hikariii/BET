@@ -43,8 +43,8 @@ function gewijzigdVers(nummer: number, invoer: ExportInvoer): GewijzigdVers | nu
 		vers: nummer,
 		repo: repo === null ? [] : opFormaatRegels(repo),
 		bewerkt: opFormaatRegels(bewerkt.inhoud),
-		herkomst: bewerkt.herkomst ?? 'zelf getypt',
-		keuzeId: bewerkt.keuzeId ?? null,
+		herkomst: bewerkt.herkomst,
+		keuzeId: bewerkt.herkomst === 'structurele keuze' ? bewerkt.keuzeId : null,
 		waarschuwingen: bron === null ? [] : waarschuwingenVoorVers(bron, bewerkt.inhoud).map((waarschuwing) => waarschuwing.tekst),
 		verouderd,
 	};

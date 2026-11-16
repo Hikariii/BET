@@ -1,3 +1,4 @@
+import { nietOpgeslagen, RUIMTE_MAKEN, TEKST_BLIJFT } from '../bewerken/opslagVol';
 import type { Opslag } from '../bewerken/tussenstand';
 
 /** De vaste waarde van `optie` bij een antwoord dat geen van de opties van de vraag is maar een eigen, genuanceerd antwoord. */
@@ -24,26 +25,13 @@ export function antwoordenSleutel(boek: string): string {
 	return `bet-antwoorden/${boek}`;
 }
 
-/**
- * Leest één antwoord uit opgeslagen JSON; `null` bij een onbruikbare vorm.
- * Een oud antwoord (met `keuzeId: string | null` en zonder toelichting) wordt `keuzeIds` met nul of één keuze en een lege toelichting.
- */
+/** Leest één antwoord uit opgeslagen JSON; `null` bij een onbruikbare vorm. Dubbele keuze-ids worden één. */
 export function alsAntwoord(waarde: unknown): Antwoord | null {
 	if (typeof waarde !== 'object' || waarde === null || Array.isArray(waarde)) return null;
-	const { kwestie, optie, gegeven, keuzeIds, keuzeId, toelichting } = waarde as Record<string, unknown>;
-	if (typeof kwestie !== 'string' || typeof optie !== 'string' || typeof gegeven !== 'string') return null;
-	if (toelichting !== undefined && typeof toelichting !== 'string') return null;
-	const ids = alsKeuzeIds(keuzeIds, keuzeId);
-	return ids === null ? null : { kwestie, optie, toelichting: toelichting ?? '', keuzeIds: ids, gegeven };
-}
-
-function alsKeuzeIds(keuzeIds: unknown, oudKeuzeId: unknown): string[] | null {
-	if (keuzeIds === undefined) {
-		if (oudKeuzeId === null) return [];
-		return typeof oudKeuzeId === 'string' ? [oudKeuzeId] : null;
-	}
+	const { kwestie, optie, toelichting, keuzeIds, gegeven } = waarde as Record<string, unknown>;
+	if (typeof kwestie !== 'string' || typeof optie !== 'string' || typeof toelichting !== 'string' || typeof gegeven !== 'string') return null;
 	if (!Array.isArray(keuzeIds) || !keuzeIds.every((id) => typeof id === 'string')) return null;
-	return [...new Set<string>(keuzeIds)];
+	return { kwestie, optie, toelichting, keuzeIds: [...new Set<string>(keuzeIds)], gegeven };
 }
 
 /** Alle antwoorden van een boek, op volgorde van bewaren; onleesbare opslag geeft een lege lijst, een onleesbaar antwoord wordt overgeslagen. */
@@ -78,7 +66,7 @@ export function bewaarAntwoord(opslag: Opslag, boek: string, antwoord: Antwoord)
 
 export type Uitkomst = { gelukt: true } | { gelukt: false; melding: string };
 
-const OPSLAG_VOL = 'Het antwoord kon niet worden bewaard, waarschijnlijk is de opslag vol.';
+const OPSLAG_VOL = `${nietOpgeslagen('Het antwoord')} ${RUIMTE_MAKEN} ${TEKST_BLIJFT}`;
 const TOELICHTING_VERPLICHT = 'Bij een eigen antwoord is een toelichting of regel verplicht.';
 
 /** Wat de vertaler invult bij het vastleggen van een antwoord. */
@@ -123,16 +111,18 @@ export function voegKeuzeToe(opslag: Opslag, boek: string, vraag: { kwestie: str
 }
 
 /**
- * Haalt een (teruggedraaide) keuze uit alle antwoorden die ernaar wijzen. Een antwoord dat daarna geen keuzes en geen toelichting meer heeft, verdwijnt;
- * met toelichting blijft het staan.
+ * Haalt (teruggedraaide) keuzes uit alle antwoorden die ernaar wijzen, in één schrijfactie. Een antwoord dat daarna geen keuzes en geen toelichting meer heeft, verdwijnt;
+ * met toelichting blijft het staan. Wijst geen antwoord naar een van de keuzes, dan wordt er niets geschreven. Geeft onwaar als de opslag weigert.
  */
-export function haalKeuzeUitAntwoorden(opslag: Opslag, boek: string, keuzeId: string): void {
-	const overgebleven = leesAntwoorden(opslag, boek).flatMap((antwoord): Antwoord[] => {
-		if (!antwoord.keuzeIds.includes(keuzeId)) return [antwoord];
-		const keuzeIds = antwoord.keuzeIds.filter((id) => id !== keuzeId);
-		return keuzeIds.length === 0 && antwoord.toelichting === '' ? [] : [{ ...antwoord, keuzeIds }];
+export function haalKeuzesUitAntwoorden(opslag: Opslag, boek: string, keuzeIds: readonly string[]): boolean {
+	const antwoorden = leesAntwoorden(opslag, boek);
+	if (!antwoorden.some((antwoord) => antwoord.keuzeIds.some((id) => keuzeIds.includes(id)))) return true;
+	const overgebleven = antwoorden.flatMap((antwoord): Antwoord[] => {
+		const keuzes = antwoord.keuzeIds.filter((id) => !keuzeIds.includes(id));
+		if (keuzes.length === antwoord.keuzeIds.length) return [antwoord];
+		return keuzes.length === 0 && antwoord.toelichting === '' ? [] : [{ ...antwoord, keuzeIds: keuzes }];
 	});
-	schrijfAntwoorden(opslag, boek, overgebleven);
+	return schrijfAntwoorden(opslag, boek, overgebleven);
 }
 
 /** De keuzes onder het antwoord die nog bestaan; een keuze die verdwenen is (bv. na een back-up) telt niet mee. */

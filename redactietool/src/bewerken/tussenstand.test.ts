@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Hoofdstuk, Tekstalinea } from '../formaat/types';
-import { bewaarKeuzeVers, bewaarOfWis, bewaarVers, isVerouderd, leesTussenstand, pasTussenstandToe, wisVers } from './tussenstand';
+import { bewaarOfWis } from './terugNaarRepo';
+import { bewaarKeuzeVers, bewaarVers, isVerouderd, leesTussenstand, pasTussenstandToe, wisVers } from './tussenstand';
 import type { Opslag } from './tussenstand';
 import type { Tussenstand, VersInhoud } from './types';
 import { knipVers } from './versknip';
@@ -140,14 +141,13 @@ describe('bewaarVers', () => {
 		expect(Object.keys(leesTussenstand(opslag, 'lukas', 3).verzen)).toEqual(['1']);
 	});
 
-	it('meldt in het Nederlands dat de opslag vol is, zonder te crashen', () => {
+	it('meldt in het Nederlands dat de opslag vol is, met de stap', () => {
 		const uitkomst = bewaarVers(new VolleOpslag(), 'lukas', 3, 7, inhoud(' een'), inhoud(' oud'));
 		expect(uitkomst).toEqual({
 			gelukt: false,
-			melding: expect.stringContaining('Vers 7 kon niet in de browser worden bewaard'),
+			melding:
+				'Vers 7 kon niet worden opgeslagen: de opslag van de browser is vol. Kopieer je tekst voordat je op Klaar drukt. Download een back-up en maak ruimte vrij in de browser (Instellingen, browsergegevens).',
 		});
-		expect(uitkomst.gelukt ? '' : uitkomst.melding).not.toContain('Je wijziging is niet bewaard');
-		expect(uitkomst.gelukt ? '' : uitkomst.melding).toContain('Kopieer je tekst voordat je op Klaar drukt.');
 	});
 });
 
@@ -325,6 +325,7 @@ function tussenstandMet(verzen: Record<number, VersInhoud>): Tussenstand {
 					inhoud: bewerkt,
 					basis: inhoud(''),
 					bewaard: '2026-11-15T16:00:00.000Z',
+					herkomst: 'zelf getypt',
 				},
 			]),
 		),
@@ -378,19 +379,22 @@ describe('herkomst in de tussenstand', () => {
 	it('leest herkomst en keuze-id van een structurele keuze', () => {
 		const vers = leesTussenstand(bewaardMet({ herkomst: 'structurele keuze', keuzeId: '17' }), 'lukas', 3).verzen[1];
 		expect(vers?.herkomst).toBe('structurele keuze');
-		expect(vers?.keuzeId).toBe('17');
+		expect(vers).toMatchObject({ keuzeId: '17' });
 	});
 
-	it('laat herkomst weg bij opslag van voor de herkomst bestond, en bij een onbekende waarde', () => {
-		expect(leesTussenstand(bewaardMet({}), 'lukas', 3).verzen[1]?.herkomst).toBeUndefined();
-		const onbekend = leesTussenstand(bewaardMet({ herkomst: 'door een robot', keuzeId: '17' }), 'lukas', 3).verzen[1];
-		expect(onbekend?.herkomst).toBeUndefined();
-		expect(onbekend?.keuzeId).toBeUndefined();
+	it('leest een zelf getypt vers zonder keuze-id', () => {
+		const vers = leesTussenstand(bewaardMet({ herkomst: 'zelf getypt' }), 'lukas', 3).verzen[1];
+		expect(vers).toMatchObject({ herkomst: 'zelf getypt' });
+		expect(vers).not.toHaveProperty('keuzeId');
 	});
 
-	it('negeert een structurele keuze zonder keuze-id', () => {
-		const vers = leesTussenstand(bewaardMet({ herkomst: 'structurele keuze' }), 'lukas', 3).verzen[1];
-		expect(vers?.herkomst).toBeUndefined();
+	it('laat een vers zonder herkomst of met een onbekende herkomst weg', () => {
+		expect(leesTussenstand(bewaardMet({}), 'lukas', 3).verzen).toEqual({});
+		expect(leesTussenstand(bewaardMet({ herkomst: 'door een robot', keuzeId: '17' }), 'lukas', 3).verzen).toEqual({});
+	});
+
+	it('laat een structurele keuze zonder keuze-id weg', () => {
+		expect(leesTussenstand(bewaardMet({ herkomst: 'structurele keuze' }), 'lukas', 3).verzen).toEqual({});
 	});
 
 	it('zet bewaarVers op zelf getypt', () => {

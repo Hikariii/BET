@@ -23,14 +23,14 @@ export type Backup = {
 	tussenstanden: BackupHoofdstuk[];
 	/** Op volgorde van toepassen, oudste eerst, zoals in de opslag. */
 	keuzes: StructureleKeuze[];
-	/**
-	 * Antwoorden op vertaalvragen, op volgorde van bewaren, met toelichting en `keuzeIds`.
-	 * Versie 1 heeft geen antwoorden; versie 2 heeft antwoorden met één `keuzeId` (of `null`) en zonder toelichting. Beide worden als versie 3 gelezen.
-	 */
+	/** Antwoorden op vertaalvragen, op volgorde van bewaren, met toelichting en `keuzeIds`. */
 	antwoorden: Antwoord[];
 };
 
-export type LeesUitkomst = { gelukt: true; backup: Backup } | { gelukt: false; melding: string };
+/**
+ * `melding` zegt de redacteur wat er is en wat te doen; `details` is de technische reden, voor wie hulp zoekt (het scherm toont hem achter "Details").
+ */
+export type LeesUitkomst = { gelukt: true; backup: Backup } | { gelukt: false; melding: string; details: string };
 
 export type InlaadModus = 'samenvoegen' | 'vervangen';
 
@@ -61,8 +61,17 @@ function isObject(waarde: unknown): waarde is Record<string, unknown> {
 	return typeof waarde === 'object' && waarde !== null && !Array.isArray(waarde);
 }
 
-function fout(melding: string): LeesUitkomst {
-	return { gelukt: false, melding };
+const GEEN_BACKUP = 'Dit is geen back-up van deze tool. Kies het bestand dat je met Back-up downloaden hebt gemaakt; de naam eindigt op .bet-bewaard.json.';
+const TE_OUD = 'Deze back-up komt van een oudere versie van de tool en kan niet meer worden ingeladen. Vraag de eigenaar om hulp.';
+const TE_NIEUW = 'Deze back-up komt van een nieuwere versie van de tool. Ververs de pagina om de nieuwste versie te laden en probeer het opnieuw.';
+const BESCHADIGD = 'Deze back-up is beschadigd en kan niet worden ingeladen. Maak met Back-up downloaden een nieuwe, of kies een eerdere back-up.';
+
+function fout(melding: string, details: string): LeesUitkomst {
+	return { gelukt: false, melding, details };
+}
+
+function beschadigd(details: string): LeesUitkomst {
+	return fout(BESCHADIGD, details);
 }
 
 function leesHoofdstuk(waarde: unknown): BackupHoofdstuk | string {
@@ -101,41 +110,44 @@ export function leesBackup(tekst: string, boek: string): LeesUitkomst {
 	try {
 		json = JSON.parse(tekst);
 	} catch {
-		return fout('Dit bestand is geen back-up: de inhoud is geen geldige JSON.');
+		return fout(GEEN_BACKUP, 'De inhoud is geen geldige JSON.');
 	}
 	if (!isObject(json) || json['formaat'] !== 'bet-bewaard') {
-		return fout('Dit bestand is geen back-up van de redactietool (het formaat is niet "bet-bewaard").');
+		return fout(GEEN_BACKUP, 'Het formaat is niet "bet-bewaard".');
 	}
 	const versie = json['versie'];
-	if (versie !== 1 && versie !== 2 && versie !== 3) {
-		return fout(`Deze back-up heeft versie ${JSON.stringify(versie)}; deze tool kent alleen versie 1, 2 en 3.`);
-	}
+	if (typeof versie !== 'number' || !Number.isInteger(versie)) return beschadigd(`De versie ${JSON.stringify(versie)} is geen geheel getal.`);
+	if (versie < 3) return fout(TE_OUD, `De back-up heeft versie ${versie}; deze tool leest alleen versie 3.`);
+	if (versie > 3) return fout(TE_NIEUW, `De back-up heeft versie ${versie}; deze tool leest alleen versie 3.`);
 	if (json['boek'] !== boek) {
-		return fout(`Deze back-up is van het boek "${String(json['boek'])}", niet van "${boek}".`);
+		return fout(
+			`Deze back-up hoort bij een ander boek. Open eerst het boek "${String(json['boek'])}" en laad de back-up daar.`,
+			`Het boek in de back-up is "${String(json['boek'])}", het geopende boek is "${boek}".`,
+		);
 	}
 	const { gemaakt, repoCommit, tussenstanden: ruweStanden, keuzes: ruweKeuzes } = json;
-	if (typeof gemaakt !== 'string' || Number.isNaN(Date.parse(gemaakt))) return fout('In de back-up ontbreekt een geldige datum.');
-	if (repoCommit !== null && typeof repoCommit !== 'string') return fout('In de back-up is de versie van de teksten onleesbaar.');
-	if (!Array.isArray(ruweStanden) || !Array.isArray(ruweKeuzes)) return fout('In de back-up ontbreken de bewerkte verzen of de keuzes.');
+	if (typeof gemaakt !== 'string' || Number.isNaN(Date.parse(gemaakt))) return beschadigd('In de back-up ontbreekt een geldige datum.');
+	if (repoCommit !== null && typeof repoCommit !== 'string') return beschadigd('In de back-up is de repo-commit onleesbaar.');
+	if (!Array.isArray(ruweStanden) || !Array.isArray(ruweKeuzes)) return beschadigd('In de back-up ontbreken de bewerkte verzen of de vervangingen.');
 
 	const tussenstanden: BackupHoofdstuk[] = [];
 	for (const ruw of ruweStanden) {
 		const hoofdstuk = leesHoofdstuk(ruw);
-		if (typeof hoofdstuk === 'string') return fout(hoofdstuk);
+		if (typeof hoofdstuk === 'string') return beschadigd(hoofdstuk);
 		if (tussenstanden.some((bestaand) => bestaand.hoofdstuk === hoofdstuk.hoofdstuk)) {
-			return fout(`Hoofdstuk ${hoofdstuk.hoofdstuk} staat twee keer in de back-up.`);
+			return beschadigd(`Hoofdstuk ${hoofdstuk.hoofdstuk} staat twee keer in de back-up.`);
 		}
 		tussenstanden.push(hoofdstuk);
 	}
 	const keuzes: StructureleKeuze[] = [];
 	for (const ruw of ruweKeuzes) {
 		const keuze = alsKeuze(ruw);
-		if (keuze === null) return fout('Een keuze in de back-up is onleesbaar.');
-		if (keuzes.some((bestaand) => bestaand.id === keuze.id)) return fout(`De keuze met id ${keuze.id} staat twee keer in de back-up.`);
+		if (keuze === null) return beschadigd('Een vervanging in de back-up is onleesbaar.');
+		if (keuzes.some((bestaand) => bestaand.id === keuze.id)) return beschadigd(`De vervanging met id ${keuze.id} staat twee keer in de back-up.`);
 		keuzes.push(keuze);
 	}
-	const antwoorden = versie === 1 ? [] : leesAntwoordenUitBackup(json['antwoorden']);
-	if (typeof antwoorden === 'string') return fout(antwoorden);
+	const antwoorden = leesAntwoordenUitBackup(json['antwoorden']);
+	if (typeof antwoorden === 'string') return beschadigd(antwoorden);
 	return { gelukt: true, backup: { formaat: 'bet-bewaard', versie: 3, boek, gemaakt, repoCommit, tussenstanden, keuzes, antwoorden } };
 }
 
@@ -266,12 +278,15 @@ function schrijfHoofdstuk(opslag: Opslag, boek: string, hoofdstuk: number, verze
 	}
 }
 
+/** Bij inladen helpt een back-up downloaden niet (die is er al); de stap is ruimte maken en opnieuw inladen. */
+const STAP_INLADEN = 'Maak ruimte vrij in de browser (Instellingen, browsergegevens) en laad de back-up opnieuw.';
+
 function nietBewaard(hoofdstuk: number): string {
-	return `Hoofdstuk ${hoofdstuk} kon niet in de browser worden opgeslagen, waarschijnlijk is de opslag vol.`;
+	return `Hoofdstuk ${hoofdstuk} kon niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
 }
 
-const KEUZES_NIET_BEWAARD = 'De keuzes konden niet in de browser worden opgeslagen, waarschijnlijk is de opslag vol.';
-const ANTWOORDEN_NIET_BEWAARD = 'De antwoorden konden niet in de browser worden opgeslagen, waarschijnlijk is de opslag vol.';
+const KEUZES_NIET_BEWAARD = `De vervangingen konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
+const ANTWOORDEN_NIET_BEWAARD = `De antwoorden konden niet worden opgeslagen: de opslag van de browser is vol. ${STAP_INLADEN}`;
 
 function voegSamen(opslag: Opslag, boek: string, backup: Backup): InlaadUitkomst {
 	const meldingen: string[] = [];

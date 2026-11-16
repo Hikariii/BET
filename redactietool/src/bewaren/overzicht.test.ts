@@ -75,8 +75,8 @@ describe('bewaardOverzicht', () => {
 			'bet-tussenstand/lukas/1',
 			JSON.stringify({
 				verzen: {
-					1: { inhoud: inhoud(' a'), basis: inhoud(' b'), bewaard: '2026-11-16T10:00:00.000Z' },
-					2: { inhoud: inhoud(' c'), basis: inhoud(' d'), bewaard: '2026-11-16T13:32:00.000Z' },
+					1: { inhoud: inhoud(' a'), basis: inhoud(' b'), bewaard: '2026-11-16T10:00:00.000Z', herkomst: 'zelf getypt' },
+					2: { inhoud: inhoud(' c'), basis: inhoud(' d'), bewaard: '2026-11-16T13:32:00.000Z', herkomst: 'zelf getypt' },
 				},
 			}),
 		);

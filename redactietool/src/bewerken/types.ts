@@ -20,20 +20,21 @@ export type Tussenstand = {
 	verzen: Record<number, BewerktVers>;
 };
 
-export type BewerktVers = {
+type BewerktVersBasis = {
 	inhoud: VersInhoud;
-	/** De inhoud uit de repo waarop de bewerking begon; wijkt de repo daar nu van af, dan is de bewerking verouderd. */
+	/** De inhoud uit de tekst van Claude waarop de bewerking begon; wijkt die daar nu van af, dan is de bewerking verouderd. */
 	basis: VersInhoud;
-	/** ISO-tijd van het laatste bewaren. */
+	/** ISO-tijd van het laatste opslaan. */
 	bewaard: string;
-	/**
-	 * Waar de bewerking vandaan komt; ontbreekt in opslag van voor fase 4 (dan: zelf getypt).
-	 * Optioneel om oude opslag leesbaar te houden; zelf typen in het vers zet hem terug op 'zelf getypt'.
-	 */
-	herkomst?: 'zelf getypt' | 'structurele keuze';
-	/** Bij een structurele keuze: het id van die keuze, om hem in één keer terug te draaien. */
-	keuzeId?: string;
 };
+
+/** Een vers dat de vertaler zelf getypt heeft. */
+export type ZelfGetypt = BewerktVersBasis & { herkomst: 'zelf getypt' };
+
+/** Een vers dat een vervanging veranderde; `keuzeId` is het id van die vervanging, om hem in één keer terug te draaien. */
+export type DoorKeuze = BewerktVersBasis & { herkomst: 'structurele keuze'; keuzeId: string };
+
+export type BewerktVers = ZelfGetypt | DoorKeuze;
 
 /** Een waarschuwing bij een bewerkt vers; blokkeert niets. */
 export type Waarschuwing = {

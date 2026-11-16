@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { bewaarOfWis, leesTussenstand } from '../bewerken/tussenstand';
+import { leesTussenstand } from '../bewerken/tussenstand';
+import { bewaarOfWis } from '../bewerken/terugNaarRepo';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
 import type { HoofdstukData } from '../data/types';
@@ -138,7 +139,7 @@ describe('pasKeuzeToe', () => {
 		const anderAantalDelen: VersInhoud = { delen: [...inhoud(' a').delen, ...inhoud(' b').delen] };
 		opslag.setItem(
 			'bet-tussenstand/lukas/6',
-			JSON.stringify({ verzen: { 22: { inhoud: inhoud(VERS_22), basis: anderAantalDelen, bewaard: NU.toISOString() } } }),
+			JSON.stringify({ verzen: { 22: { inhoud: inhoud(VERS_22), basis: anderAantalDelen, bewaard: NU.toISOString(), herkomst: 'zelf getypt' } } }),
 		);
 
 		const { keuze, meldingen } = pasToe(opslag);
@@ -165,8 +166,8 @@ describe('pasKeuzeToe', () => {
 		const { keuze, meldingen } = pasToe(vol);
 
 		expect(meldingen).toEqual([
-			expect.stringContaining('Vers 22 kon niet in de browser worden bewaard'),
-			expect.stringContaining('Vers 23 kon niet in de browser worden bewaard'),
+			expect.stringContaining('Vers 22 kon niet worden opgeslagen: de opslag van de browser is vol.'),
+			expect.stringContaining('Vers 23 kon niet worden opgeslagen: de opslag van de browser is vol.'),
 		]);
 		expect(keuze.verzen).toEqual([]);
 		expect(leesKeuzes(vol, 'lukas')).toEqual([]);
@@ -301,7 +302,7 @@ describe('draaiKeuzeTerug', () => {
 		const vers = leesTussenstand(opslag, 'lukas', 6).verzen[22];
 		expect(vers?.inhoud).toEqual(inhoud(eigenTekst));
 		expect(vers?.herkomst).toBe('zelf getypt');
-		expect(vers?.keuzeId).toBeUndefined();
+		expect(vers).not.toHaveProperty('keuzeId');
 	});
 
 	it('meldt een keuze die niet (meer) bestaat', () => {
@@ -318,7 +319,7 @@ describe('herkomst', () => {
 
 		const vers = leesTussenstand(opslag, 'lukas', 6).verzen[22];
 		expect(vers?.herkomst).toBe('zelf getypt');
-		expect(vers?.keuzeId).toBeUndefined();
+		expect(vers).not.toHaveProperty('keuzeId');
 	});
 
 	it('komt in de export terug, naast een vers dat de vertaler zelf typte', () => {

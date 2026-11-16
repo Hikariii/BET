@@ -1,7 +1,8 @@
 import { alsInhoud, bewaarKeuzeVers, bewaarVers, leesTussenstand, wisVers, zelfdeInhoud } from '../bewerken/tussenstand';
 import type { Opslag } from '../bewerken/tussenstand';
 import type { VersInhoud } from '../bewerken/types';
-import { haalKeuzeUitAntwoorden, voegKeuzeToe } from '../antwoorden/antwoorden';
+import { haalKeuzesUitAntwoorden, voegKeuzeToe } from '../antwoorden/antwoorden';
+import { nietOpgeslagen, RUIMTE_MAKEN } from '../bewerken/opslagVol';
 import { vervangInVers } from './zoekEnVervang';
 import { DOMEINEN, type Domein } from '../formaat/types';
 import type { HoofdstukVerzen, Vondst } from './types';
@@ -212,7 +213,9 @@ function pasVerzenToe<T extends Vondst>(
 	}
 	const keuzeBewaard = keuze.verzen.length > 0 && schrijfKeuzes(opslag, boek, [...bewaard, keuze]);
 	if (keuze.verzen.length > 0 && !keuzeBewaard) {
-		meldingen.push('De keuze kon niet worden bewaard, waarschijnlijk is de opslag vol. Terugdraaien in één keer kan niet.');
+		meldingen.push(
+			`${nietOpgeslagen('De vervanging')} De verzen zijn wel aangepast, maar je kunt de vervanging niet meer in één keer terugdraaien. Zet de verzen een voor een terug met Vers terugzetten. ${RUIMTE_MAKEN}`,
+		);
 	}
 	return { meldingen, keuzeBewaard };
 }
@@ -255,7 +258,7 @@ function draaiKeuzeVersTerug(opslag: Opslag, boek: string, keuzes: readonly Stru
 	const naam = versNaam(hoofdstuk, vers);
 	const bewerkt = leesTussenstand(opslag, boek, hoofdstuk).verzen[vers];
 	if (bewerkt === undefined) return { melding: `Vers ${naam} staat al weer op de vereenvoudiging van Claude.`, blijftBijKeuze: false };
-	const latereKeuze = keuzes.find((k) => k.id === bewerkt.keuzeId && k.id !== keuze.id);
+	const latereKeuze = bewerkt.herkomst === 'structurele keuze' ? keuzes.find((k) => k.id === bewerkt.keuzeId && k.id !== keuze.id) : undefined;
 	if (latereKeuze !== undefined) {
 		return { melding: `Vers ${naam} is daarna veranderd door de keuze "${latereKeuze.zoekterm}"; draai die eerst terug.`, blijftBijKeuze: true };
 	}
@@ -273,23 +276,23 @@ function draaiKeuzeVersTerug(opslag: Opslag, boek: string, keuzes: readonly Stru
 	return { melding: null, blijftBijKeuze: false };
 }
 
+/** Wat er van een keuze overblijft na terugdraaien: alleen de `overgebleven` verzen en de `overgeslagen` plekken. */
+type KeuzeNaTerugdraaien = { keuze: StructureleKeuze; overgebleven: StructureleKeuze['verzen']; overgeslagen: StructureleKeuze['overgeslagen'] };
+
 /**
- * Schrijft de keuzelijst met alleen `overgebleven` verzen en de `overgeslagen` plekken voor `keuze`; zonder verzen is de keuze uit de lijst
+ * Schrijft de keuzelijst met de uitkomst van het terugdraaien, in één schrijfactie; een keuze zonder verzen is uit de lijst
  * en ook uit de antwoorden die ernaar wijzen (een antwoord zonder keuzes en zonder toelichting verdwijnt dan).
+ * Geeft onwaar als de opslag een van beide weigert.
  */
-function bewaarKeuzeNaTerugdraaien(
-	opslag: Opslag,
-	boek: string,
-	keuzes: readonly StructureleKeuze[],
-	keuze: StructureleKeuze,
-	overgebleven: StructureleKeuze['verzen'],
-	overgeslagen: StructureleKeuze['overgeslagen'],
-): void {
+function bewaarKeuzesNaTerugdraaien(opslag: Opslag, boek: string, keuzes: readonly StructureleKeuze[], uitkomsten: readonly KeuzeNaTerugdraaien[]): boolean {
 	const nieuweLijst = keuzes.flatMap((k) => {
-		if (k.id !== keuze.id) return [k];
-		return overgebleven.length === 0 ? [] : [{ ...k, verzen: overgebleven, overgeslagen }];
+		const uitkomst = uitkomsten.find((kandidaat) => kandidaat.keuze.id === k.id);
+		if (uitkomst === undefined) return [k];
+		return uitkomst.overgebleven.length === 0 ? [] : [{ ...k, verzen: uitkomst.overgebleven, overgeslagen: uitkomst.overgeslagen }];
 	});
-	if (schrijfKeuzes(opslag, boek, nieuweLijst) && overgebleven.length === 0) haalKeuzeUitAntwoorden(opslag, boek, keuze.id);
+	if (!schrijfKeuzes(opslag, boek, nieuweLijst)) return false;
+	const verdwenen = uitkomsten.filter((uitkomst) => uitkomst.overgebleven.length === 0).map((uitkomst) => uitkomst.keuze.id);
+	return haalKeuzesUitAntwoorden(opslag, boek, verdwenen);
 }
 
 const KEUZE_ONTBREEKT = 'Deze keuze staat niet meer in de lijst.';
@@ -305,7 +308,7 @@ export function draaiKeuzeTerug(opslag: Opslag, boek: string, keuzeId: string): 
 	if (keuze === undefined) return [KEUZE_ONTBREEKT];
 	const uitkomsten = keuze.verzen.map((keuzeVers) => ({ keuzeVers, ...draaiKeuzeVersTerug(opslag, boek, keuzes, keuze, keuzeVers) }));
 	const overgebleven = uitkomsten.filter((uitkomst) => uitkomst.blijftBijKeuze).map((uitkomst) => uitkomst.keuzeVers);
-	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven, keuze.overgeslagen);
+	bewaarKeuzesNaTerugdraaien(opslag, boek, keuzes, [{ keuze, overgebleven, overgeslagen: keuze.overgeslagen }]);
 	return uitkomsten.flatMap((uitkomst) => uitkomst.melding ?? []);
 }
 
@@ -325,8 +328,27 @@ export function draaiVersTerug(opslag: Opslag, boek: string, keuzeId: string, ho
 	const overgebleven = keuze.verzen.filter((v) => v !== keuzeVers || uitkomst.blijftBijKeuze);
 	const teruggedraaid: OvergeslagenPlek = { hoofdstuk, vers, gevonden: keuze.zoekterm, reden: 'teruggedraaid' };
 	const overgeslagen = uitkomst.melding === null && !uitkomst.blijftBijKeuze ? [...keuze.overgeslagen, teruggedraaid] : keuze.overgeslagen;
-	bewaarKeuzeNaTerugdraaien(opslag, boek, keuzes, keuze, overgebleven, overgeslagen);
+	bewaarKeuzesNaTerugdraaien(opslag, boek, keuzes, [{ keuze, overgebleven, overgeslagen }]);
 	return uitkomst.melding === null ? [] : [uitkomst.melding];
+}
+
+/**
+ * Haalt het vers uit elke keuze die het noemt, omdat het vers weer de tekst van Claude heeft (of een eigen tekst die geen vervanging meer is).
+ * Zoals bij `draaiVersTerug` komt de plek bij de overgeslagen plekken van de keuze, met reden `teruggedraaid`;
+ * gaat het laatste vers eruit, dan verdwijnt de keuze en gaat hij ook uit het antwoord dat ernaar wijst.
+ * Noemt geen keuze het vers, dan wordt er niets geschreven. Geeft onwaar als de opslag weigert.
+ */
+export function haalVersUitKeuzes(opslag: Opslag, boek: string, hoofdstuk: number, vers: number): boolean {
+	const keuzes = leesOpVolgorde(opslag, boek);
+	const noemtVers = (keuzeVers: KeuzeVers) => keuzeVers.hoofdstuk === hoofdstuk && keuzeVers.vers === vers;
+	const uitkomsten = keuzes
+		.filter((keuze) => keuze.verzen.some(noemtVers))
+		.map((keuze): KeuzeNaTerugdraaien => ({
+			keuze,
+			overgebleven: keuze.verzen.filter((keuzeVers) => !noemtVers(keuzeVers)),
+			overgeslagen: [...keuze.overgeslagen, { hoofdstuk, vers, gevonden: keuze.zoekterm, reden: 'teruggedraaid' }],
+		}));
+	return uitkomsten.length === 0 || bewaarKeuzesNaTerugdraaien(opslag, boek, keuzes, uitkomsten);
 }
 
 /** De vraag die met een keuze beantwoord wordt, met de gekozen optie zoals hij in de vraag staat. */
@@ -375,7 +397,7 @@ export function pasOpdrachtToe(opslag: Opslag, boek: string, toepassing: Toepass
 		wijzigVers(inhoud, plekken, opdracht, toepassing.variantVervangingen),
 	);
 	if (vraag !== null && keuzeBewaard) {
-		if (!voegKeuzeToe(opslag, boek, vraag, keuze.id, nu)) meldingen.push('Het antwoord op de vraag kon niet worden bewaard, waarschijnlijk is de opslag vol.');
+		if (!voegKeuzeToe(opslag, boek, vraag, keuze.id, nu)) meldingen.push(`${nietOpgeslagen('Het antwoord op de vraag')} ${RUIMTE_MAKEN}`);
 	}
 	return { keuze, meldingen };
 }

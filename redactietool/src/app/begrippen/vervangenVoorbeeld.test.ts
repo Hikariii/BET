@@ -66,7 +66,7 @@ describe('bouwHoofdstukVerzen', () => {
 		const repo = inhoudVan('Oud.');
 		const bewerkt = inhoudVan('Nieuw.');
 		const tussenstanden: Record<number, Tussenstand> = {
-			2: { verzen: { 1: { inhoud: bewerkt, basis: repo, bewaard: '2026-11-15T10:00:00.000Z' } } },
+			2: { verzen: { 1: { inhoud: bewerkt, basis: repo, bewaard: '2026-11-15T10:00:00.000Z', herkomst: 'zelf getypt' } } },
 		};
 
 		const uitkomst = bouwHoofdstukVerzen(
