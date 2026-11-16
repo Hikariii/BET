@@ -548,8 +548,8 @@ table.verzen td.regels {
 }
 
 .verwijzing {
-	margin-left: 0.3rem;
-	font-size: var(--t-basis);
+	margin-left: 0;
+	font-size: inherit;
 	padding: 0;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;

@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { BoekData, Referentie } from '../../data/types';
 import { aantalOpenVragen } from '../vertaalvragen';
-import { stripStatusWoord } from './hoofdstukLabel';
 import { KortHoofdstuk } from './KortHoofdstuk';
 import { stripStop } from './toetsenbord';
-import { gewoneStatusVan } from '../Zijbalk';
 import { schuifAfstand, schuifstand, type Schuifstand } from './stripSchuiven';
 
 type Props = {
@@ -33,7 +31,6 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 	const [stand, zetStand] = useState<Schuifstand>({ terug: false, verder: false });
 	const huidigeIndex = Math.max(0, boek.hoofdstukken.findIndex((hoofdstuk) => hoofdstuk.nummer === huidigHoofdstuk));
 	const [tabstop, zetTabstop] = useState(huidigeIndex);
-	const gewoneStatus = gewoneStatusVan(boek.hoofdstukken.map((hoofdstuk) => hoofdstuk.status));
 
 	useEffect(() => {
 		const element = lijst.current;
@@ -101,7 +98,6 @@ export function HoofdstukStrip({ boek, referentie, huidigHoofdstuk }: Props) {
 							hoofdstuk={hoofdstuk}
 							aantalOpenVragen={aantalOpenVragen(referentie.openVragen, hoofdstuk.nummer)}
 							huidig={hoofdstuk.nummer === huidigHoofdstuk}
-							statusWoord={stripStatusWoord(hoofdstuk.status, gewoneStatus, hoofdstuk.nummer === huidigHoofdstuk)}
 							tabstop={index === tabstop}
 						/>
 					</li>

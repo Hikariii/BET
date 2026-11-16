@@ -38,11 +38,6 @@
 	text-align: center;
 }
 
-.hoofdstuk-kort .hoofdstuk-kort-status {
-	color: var(--gedempt);
-	font-weight: 500;
-}
-
 .hoofdstuk-kort .hoofdstuk-kort-vragen {
 	color: var(--gedempt);
 	font-size: var(--t-klein);

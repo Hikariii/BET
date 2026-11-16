@@ -65,10 +65,10 @@ function Hoofdstukken({ boek }: { boek: BoekData }) {
 				<nav class="hoofdstukstrip" aria-label="Voorbeeld van de hoofdstukstrip">
 					<ul>
 						<li>
-							<KortHoofdstuk boek={boek.id} hoofdstuk={goedgekeurd} aantalOpenVragen={0} huidig={false} statusWoord={null} tabstop={false} />
+							<KortHoofdstuk boek={boek.id} hoofdstuk={goedgekeurd} aantalOpenVragen={0} huidig={false} tabstop={false} />
 						</li>
 						<li>
-							<KortHoofdstuk boek={boek.id} hoofdstuk={ander} aantalOpenVragen={3} huidig={false} statusWoord={null} tabstop={false} />
+							<KortHoofdstuk boek={boek.id} hoofdstuk={ander} aantalOpenVragen={3} huidig={false} tabstop={false} />
 						</li>
 					</ul>
 				</nav>

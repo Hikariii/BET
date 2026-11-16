@@ -1,8 +1,11 @@
+import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
 import type { LogVers, OpenVraag, Verwijzing } from '../data/types';
 import { registerVraagSleutel, vraagAdres as maakVraagAdres } from './begrippen/vraagAdres';
 import { kapRegels } from './kapRegels';
+import { splitsOpVerwijzingen } from '../log/leesLog';
 import { InlineMarkdown } from './Markdownweergave';
+import { parseerInline, type Inline } from './markdown';
 import { zelfdeNaslag, type Naslag } from './naslag';
 import { isOpen } from './vertaalvragen';
 import './regels.css';
@@ -40,22 +43,12 @@ export function Regels({ boekId, vraagAdres, logVerzen, vragen, gekapt, openNasl
 					<ul>
 						{logVers.wijzigingen.slice(0, zichtbaarPerBlok[blok]).map((regel) => (
 							<li>
-								<InlineMarkdown tekst={regel.tekst} />
-								{regel.verwijzingen.map((verwijzing) => {
-									const naslag = naarNaslag(verwijzing, regel.tekst);
-									return (
-										<button
-											type="button"
-											class="verwijzing"
-											data-help="naslag-verwijzing"
-											aria-expanded={openNaslag !== null && zelfdeNaslag(openNaslag, naslag)}
-											aria-controls={kaartId}
-											onClick={(gebeurtenis) => onOpenNaslag(naslag, gebeurtenis.currentTarget)}
-										>
-											{verwijzingsLabel(verwijzing)}
-										</button>
-									);
-								})}
+								<RegelTekst
+									tekst={regel.tekst}
+									openNaslag={openNaslag}
+									kaartId={kaartId}
+									onOpenNaslag={onOpenNaslag}
+								/>
 							</li>
 						))}
 					</ul>
@@ -73,8 +66,41 @@ export function Regels({ boekId, vraagAdres, logVerzen, vragen, gekapt, openNasl
 	);
 }
 
-function verwijzingsLabel(verwijzing: Verwijzing): string {
-	return verwijzing.soort === 'paragraaf' ? `§${verwijzing.paragraaf}` : 'vertaalkeuze';
+type RegelTekstProps = Pick<RegelsProps, 'openNaslag' | 'kaartId' | 'onOpenNaslag'> & { tekst: string };
+
+/** Een vertaalregel met de verwijzingen (`§11`, `precedent`) als knop op hun eigen plek in de tekst, zodat elke verwijzing er één keer staat. */
+function RegelTekst({ tekst, openNaslag, kaartId, onOpenNaslag }: RegelTekstProps) {
+	const metKnoppen = (stuk: string) =>
+		splitsOpVerwijzingen(stuk).map((deel) => {
+			if (deel.soort === 'tekst') return deel.tekst;
+			const naslag = naarNaslag(deel.verwijzing, tekst);
+			return (
+				<button
+					type="button"
+					class="verwijzing"
+					data-help="naslag-verwijzing"
+					aria-expanded={openNaslag !== null && zelfdeNaslag(openNaslag, naslag)}
+					aria-controls={kaartId}
+					onClick={(gebeurtenis) => onOpenNaslag(naslag, gebeurtenis.currentTarget)}
+				>
+					{deel.tekst}
+				</button>
+			);
+		});
+	return <>{parseerInline(tekst).map((deel: Inline) => opmaak(deel.soort, metKnoppen(deel.tekst)))}</>;
+}
+
+function opmaak(soort: Inline['soort'], inhoud: ComponentChildren) {
+	switch (soort) {
+		case 'vet':
+			return <strong>{inhoud}</strong>;
+		case 'cursief':
+			return <em>{inhoud}</em>;
+		case 'code':
+			return <code>{inhoud}</code>;
+		case 'tekst':
+			return inhoud;
+	}
 }
 
 function bereik(verzen: readonly number[]): string {

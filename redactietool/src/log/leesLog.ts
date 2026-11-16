@@ -31,6 +31,23 @@ function splitsRegels(tekst: string): string[] {
 	return regels;
 }
 
+/** Een stuk tekst uit een logregel: gewone tekst, of een verwijzing zoals die in de tekst staat (`§11`, `precedent`). */
+export type Tekstdeel = { soort: 'tekst'; tekst: string } | { soort: 'verwijzing'; tekst: string; verwijzing: Verwijzing };
+
+/** Knipt tekst op de plekken waar een verwijzing staat, zodat de weergave die verwijzingen zelf klikbaar kan maken. */
+export function splitsOpVerwijzingen(tekst: string): Tekstdeel[] {
+	const delen: Tekstdeel[] = [];
+	let vorigeEinde = 0;
+	for (const treffer of tekst.matchAll(VERWIJZING)) {
+		if (treffer.index > vorigeEinde) delen.push({ soort: 'tekst', tekst: tekst.slice(vorigeEinde, treffer.index) });
+		const paragraaf = treffer[1];
+		delen.push({ soort: 'verwijzing', tekst: treffer[0], verwijzing: paragraaf === undefined ? { soort: 'precedent' } : { soort: 'paragraaf', paragraaf } });
+		vorigeEinde = treffer.index + treffer[0].length;
+	}
+	if (vorigeEinde < tekst.length) delen.push({ soort: 'tekst', tekst: tekst.slice(vorigeEinde) });
+	return delen;
+}
+
 function leesVerwijzingen(tekst: string): Verwijzing[] {
 	const verwijzingen: Verwijzing[] = [];
 	const gezien = new Set<string>();

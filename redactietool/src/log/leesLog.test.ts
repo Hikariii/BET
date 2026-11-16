@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Verwijzing } from '../data/types';
-import { leesLog } from './leesLog';
+import { leesLog, splitsOpVerwijzingen } from './leesLog';
 
 /** In de logs scheidt de em-dash de wijziging van de reden. */
 const STREEP = String.fromCharCode(0x2014);
@@ -262,5 +262,24 @@ describe('bestandsvormen', () => {
 
 	it('geeft een lege log voor een lege tekst', () => {
 		expect(leesLog('')).toEqual({ verzen: [], algemeneVragen: [] });
+	});
+});
+
+describe('splitsOpVerwijzingen', () => {
+	it('knipt paragrafen en het woord precedent uit de tekst, op hun plek en zoals ze er staan', () => {
+		expect(splitsOpVerwijzingen('"smaad" → "schande" — §11 (tabel) en §7A; Precedent na 4.')).toEqual([
+			{ soort: 'tekst', tekst: '"smaad" → "schande" — ' },
+			{ soort: 'verwijzing', tekst: '§11', verwijzing: { soort: 'paragraaf', paragraaf: '11' } },
+			{ soort: 'tekst', tekst: ' (tabel) en ' },
+			{ soort: 'verwijzing', tekst: '§7A', verwijzing: { soort: 'paragraaf', paragraaf: '7A' } },
+			{ soort: 'tekst', tekst: '; ' },
+			{ soort: 'verwijzing', tekst: 'Precedent', verwijzing: { soort: 'precedent' } },
+			{ soort: 'tekst', tekst: ' na 4.' },
+		]);
+	});
+
+	it('laat tekst zonder verwijzing heel, en tekst die met een verwijzing begint of eindigt zonder lege stukken', () => {
+		expect(splitsOpVerwijzingen('geen vaste regel')).toEqual([{ soort: 'tekst', tekst: 'geen vaste regel' }]);
+		expect(splitsOpVerwijzingen('§8')).toEqual([{ soort: 'verwijzing', tekst: '§8', verwijzing: { soort: 'paragraaf', paragraaf: '8' } }]);
 	});
 });
