@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { adresMetDichtheid, DICHTHEDEN, DICHTHEID_TITELS, leesDichtheid, plaatsNotities } from './dichtheid';
+import { adresMetDichtheid, cssVanDichtheid, tabelklassenVanDichtheid, DICHTHEDEN, DICHTHEID_TITELS, leesDichtheid, plaatsNotities } from './dichtheid';
 
 describe('leesDichtheid', () => {
 	it('geeft zonder parameter geen dichtheid', () => {
@@ -8,11 +8,11 @@ describe('leesDichtheid', () => {
 	});
 
 	it('negeert een onbekende waarde', () => {
-		expect(leesDichtheid('?verzen=d4')).toBeNull();
+		expect(leesDichtheid('?verzen=d9')).toBeNull();
 		expect(leesDichtheid('?verzen=')).toBeNull();
 	});
 
-	it('kent d1 tot d3, ook naast een ontwerpvariant', () => {
+	it('kent d1 tot d4, ook naast een ontwerpvariant', () => {
 		for (const naam of DICHTHEDEN) {
 			expect(leesDichtheid(`?verzen=${naam}`)).toBe(naam);
 			expect(leesDichtheid(`?ontwerp=v3&verzen=${naam}`)).toBe(naam);
@@ -89,5 +89,17 @@ describe('plaatsNotities', () => {
 
 	it('geeft niets terug zonder notities', () => {
 		expect(plaatsNotities([], 8)).toEqual([]);
+	});
+});
+
+describe('d4 bouwt voort op d1', () => {
+	it('laadt de css van d1 vóór die van d4, en d1 tot d3 alleen hun eigen', () => {
+		expect(cssVanDichtheid('d4')).toEqual(['dicht', 'd1', 'd4']);
+		expect(cssVanDichtheid('d2')).toEqual(['dicht', 'd2']);
+	});
+
+	it('geeft de tabel ook de klasse van d1, zodat de regels van d1 gelden', () => {
+		expect(tabelklassenVanDichtheid('d4')).toBe('verzen verzen-dicht verzen-d1 verzen-d4');
+		expect(tabelklassenVanDichtheid('d3')).toBe('verzen verzen-dicht verzen-d3');
 	});
 });

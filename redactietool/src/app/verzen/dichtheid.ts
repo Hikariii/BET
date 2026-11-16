@@ -1,18 +1,34 @@
-/** De drie manieren om de verzen dicht op elkaar te zetten; `?verzen=d2` kiest er één. Combineerbaar met `?ontwerp=`. */
-export const DICHTHEDEN = ['d1', 'd2', 'd3'] as const;
+/** De manieren om de verzen dicht op elkaar te zetten; `?verzen=d2` kiest er één. Combineerbaar met `?ontwerp=`. */
+export const DICHTHEDEN = ['d1', 'd2', 'd3', 'd4'] as const;
 export type Dichtheid = (typeof DICHTHEDEN)[number];
 
 export const DICHTHEID_TITELS: Record<Dichtheid, string> = {
 	d1: 'Overloop zweeft',
 	d2: 'Samenvatting',
 	d3: 'Kanttekeningen',
+	d4: 'Overloop, vast bij naslag',
 };
+
+/** d4 bouwt voort op d1: dezelfde zwevende cel, plus een vaste, volledige kolom zolang de naslagkaart onder dat vers open staat. */
+const BOUWT_VOORT_OP: Partial<Record<Dichtheid, Dichtheid>> = { d4: 'd1' };
+
+/** De css-bestanden van een variant, in laadvolgorde: de gedeelde basis, dan de variant waarop hij voortbouwt, dan hemzelf. */
+export function cssVanDichtheid(dichtheid: Dichtheid): string[] {
+	const basis = BOUWT_VOORT_OP[dichtheid];
+	return ['dicht', ...(basis === undefined ? [] : [basis]), dichtheid];
+}
+
+/** De klassen op de verzentabel, zodat de regels van de variant waarop hij voortbouwt ook gelden. */
+export function tabelklassenVanDichtheid(dichtheid: Dichtheid): string {
+	const basis = BOUWT_VOORT_OP[dichtheid];
+	return ['verzen', 'verzen-dicht', ...(basis === undefined ? [] : [`verzen-${basis}`]), `verzen-${dichtheid}`].join(' ');
+}
 
 function isDichtheid(waarde: string | null): waarde is Dichtheid {
 	return DICHTHEDEN.some((naam) => naam === waarde);
 }
 
-/** Leest `?verzen=d1` tot `d3` uit het zoekdeel van het adres; een onbekende waarde telt als geen. */
+/** Leest `?verzen=d1` tot `d4` uit het zoekdeel van het adres; een onbekende waarde telt als geen. */
 export function leesDichtheid(zoekdeel: string): Dichtheid | null {
 	const waarde = new URLSearchParams(zoekdeel).get('verzen');
 	return isDichtheid(waarde) ? waarde : null;

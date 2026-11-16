@@ -13,7 +13,7 @@ import { vragenBijVers } from './vertaalvragen';
 import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
 import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { VersTekst } from './VersTekst';
-import type { Dichtheid } from './verzen/dichtheid';
+import { tabelklassenVanDichtheid, type Dichtheid } from './verzen/dichtheid';
 import { useKanttekeningen } from './verzen/useKanttekeningen';
 import { VersRegelsCel } from './verzen/VersRegelsCel';
 
@@ -105,7 +105,7 @@ export function HoofdstukScherm({
 					</header>
 				)
 			)}
-			<table ref={tabel} class={dichtheid === null ? 'verzen' : `verzen verzen-dicht verzen-${dichtheid}`}>
+			<table ref={tabel} class={dichtheid === null ? 'verzen' : tabelklassenVanDichtheid(dichtheid)}>
 				<thead>
 					<tr>
 						<th scope="col">Vers</th>
@@ -248,7 +248,14 @@ export function VersRij({
 					(dichtheid === null ? (
 						<td class="regels">{regels(ZICHTBARE_REGELS)}</td>
 					) : (
-						<VersRegelsCel dichtheid={dichtheid} nummer={nummer} logVerzen={logVerzen} heeftVraag={heeftVraag} regels={regels} />
+						<VersRegelsCel
+							dichtheid={dichtheid}
+							nummer={nummer}
+							logVerzen={logVerzen}
+							heeftVraag={heeftVraag}
+							naslagOpen={openNaslag !== null}
+							regels={regels}
+						/>
 					))}
 			</tr>
 			{!regelsInKolom && geselecteerd && (

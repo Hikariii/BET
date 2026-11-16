@@ -12,6 +12,8 @@ type Props = {
 	nummer: number | null;
 	logVerzen: readonly LogVers[];
 	heeftVraag: boolean;
+	/** Of de naslagkaart onder dit vers open staat; bij d4 staat de kolom dan vast en volledig. */
+	naslagOpen: boolean;
 	/** De vertaalregels van het vers; `kapNa` bewaart na zoveel regels de rest achter "nog N regels", `null` toont alles. */
 	regels: (kapNa: number | null) => ComponentChildren;
 };
@@ -28,6 +30,8 @@ export function VersRegelsCel({ dichtheid, ...rest }: Props) {
 			return <SamenvattingCel {...rest} />;
 		case 'd3':
 			return <KanttekeningCel {...rest} />;
+		case 'd4':
+			return <OverloopCel {...rest} vastBijNaslag />;
 	}
 }
 
@@ -39,8 +43,12 @@ function heeftInhoud(logVerzen: readonly LogVers[], heeftVraag: boolean): boolea
 	return heeftVraag || logVerzen.some((logVers) => logVers.wijzigingen.length > 0);
 }
 
-/** d1: de cel is zo hoog als het vers; wat niet past vervaagt en klapt bij aanwijzen of focus uit over de volgende verzen. */
-function OverloopCel({ nummer, regels }: Omit<Props, 'dichtheid'>) {
+/**
+ * d1: de cel is zo hoog als het vers; wat niet past vervaagt en klapt bij aanwijzen of focus uit over de volgende verzen.
+ * d4 (`vastBijNaslag`): zolang de naslagkaart onder het vers open staat, staat de cel vast in de kolom met alle regels; de rij groeit mee.
+ */
+function OverloopCel({ nummer, regels, naslagOpen, vastBijNaslag = false }: Omit<Props, 'dichtheid'> & { vastBijNaslag?: boolean }) {
+	const vast = vastBijNaslag && naslagOpen;
 	const { open, handelers } = useAanwijzen();
 	const celRef = useRef<HTMLTableCellElement>(null);
 	const inhoudRef = useRef<HTMLDivElement>(null);
@@ -61,12 +69,12 @@ function OverloopCel({ nummer, regels }: Omit<Props, 'dichtheid'>) {
 	return (
 		<td ref={celRef} class="regels" {...handelers}>
 			<div
-				class={klassen('zweefvak', overloopt && 'overloopt', overloopt && open && 'open')}
-				tabIndex={overloopt ? 0 : undefined}
-				role={overloopt ? 'group' : undefined}
-				aria-label={overloopt ? `Vertaalregels van vers ${nummer}` : undefined}
+				class={klassen('zweefvak', vast && 'vast', !vast && overloopt && 'overloopt', !vast && overloopt && open && 'open')}
+				tabIndex={overloopt && !vast ? 0 : undefined}
+				role={overloopt && !vast ? 'group' : undefined}
+				aria-label={overloopt && !vast ? `Vertaalregels van vers ${nummer}` : undefined}
 			>
-				<div ref={inhoudRef}>{regels(ZICHTBARE_REGELS)}</div>
+				<div ref={inhoudRef}>{regels(vast ? null : ZICHTBARE_REGELS)}</div>
 			</div>
 		</td>
 	);
