@@ -1,20 +1,25 @@
 # Redactietool
 
-De broncode van de tool. Het plan staat in [`stap1-plan.md`](stap1-plan.md) (afgesloten: uitgangspunten, architectuur, fase 0 tot 5) en [`stap2-plan.md`](stap2-plan.md) (wat nog moet). De tool kan lezen, begrippen en vertaalvragen tonen, per vers bewerken, zoeken en vervangen over het boek, en het resultaat naar Word en naar Claude brengen. Hij staat op https://hikariii.github.io/BET/.
+De broncode van de tool. Het plan staat in [`stap1-plan.md`](stap1-plan.md) (afgesloten: uitgangspunten, architectuur, fase 0 tot 5; bovenaan staat wat nu afwijkt) en [`stap2-plan.md`](stap2-plan.md) (stand per fase en wat nog moet). De tool kan lezen, vertaalkeuzes en vertaalvragen tonen, per vers bewerken, zoeken en vervangen over het boek, vragen beantwoorden, een back-up bewaren en inladen, en het resultaat naar Word en naar Claude brengen. Hij staat op https://hikariii.github.io/BET/.
 
 | Map | Inhoud |
 |---|---|
 | `src/formaat/` | parser en serializer voor het Markdown-formaat uit [`../FORMAAT.md`](../FORMAAT.md) |
 | `src/bouw/` | bouwscript: zet `bijbel/` en de richtlijn om naar JSON in `public/data/` |
-| `src/app/` | de Preact-app die die JSON toont. De boekpagina heeft een bovenbalk (boekbalk met de plekken van het boek als tabbladen, Opgeslagen, de grootte en Help; hoofdstukbalk met titel, hoofdstukstrip en acties). De css daarvan staat in `src/app/indeling.css`, die `main.tsx` na `vormgeving.css` laadt |
+| `src/app/` | de Preact-app die die JSON toont. De submappen: `begrippen/` (het scherm Keuzes en vragen met de tabbladen Vertaalkeuzes, Zo vertaald, Vertaalvragen en Zoeken en vervangen), `bewaren/` (de pagina Opgeslagen, de bewaarstatus, back-up downloaden en inladen), `bewerken/` (de vers-editor in de tabel), `naarWord/` (de hoofdstukacties), `navigatie/`, `bovenbalk/`, `verzen/`, `welkom/` en `galerij/`. De boekpagina heeft een bovenbalk (boekbalk met de plekken van het boek als tabbladen, Opgeslagen, de grootte en Help; hoofdstukbalk met titel, hoofdstukstrip en acties). De css daarvan staat in `src/app/indeling.css`, die `main.tsx` na `vormgeving.css` laadt |
 | `src/help/`, `src/app/help/` | de help: de tekst als Markdown per onderdeel (`src/help/*.md`) en het venster dat hem toont (knop Help in de boekbalk, toets `?`). In de tekst vullen `{{plek:…}}`, `{{boek}}`, `{{back-upbestand}}` en `{{exportbestand}}` namen in uit de code, `{{legenda}}` toont de legenda uit het Word-sjabloon en `{{wijs sleutel \| naam \| waar}}` maakt een regel met een knop "Wijs aan" die het element met `data-help="sleutel"` laat oplichten. `sleutels.test.ts` bewaakt dat de sleutels in de tekst en in de schermen gelijk zijn |
-| `ontwerp/` | analyse en ontwerpvarianten van fase 7 (schermafbeeldingen, `opmaakcontrole.mjs`, de meting van de omzetting naar v8e in `v8e-omzetting/`); geen onderdeel van de build |
+| `ontwerp/` | archief van fase 7: de besluitnotities (`*.md`) en `opmaakcontrole.mjs`, dat de opmaak van de tool met Word vergelijkt. De schermafbeeldingen, html-pagina's en proefscripts zijn verwijderd; ze staan in de git-geschiedenis tot en met commit `15ef416`. Geen onderdeel van de build |
 | `src/data/` | het gegevenscontract (types) tussen bouwscript en app |
 | `src/log/`, `src/referentie/`, `src/sjabloon/` | de lezers voor wijzigingslogs, referentiebestanden, `STATUS.md`, richtlijn en Word-stijlen |
-| `src/begrippen/` | rekenfuncties voor het scherm Begrippen: precedenten tellen (`telPrecedenten`) en vertaalvragen verzamelen (`verzamelVragen`) |
+| `src/begrippen/` | rekenfuncties voor het scherm Keuzes en vragen: vertaalkeuzes tellen (`telPrecedenten`), vertaalvragen verzamelen (`verzamelVragen`) en de opties van een vraag (`opties`) |
+| `src/vervangen/` | zoeken en vervangen: de zoekopdracht, het voorstel per plek en de bewaarde keuzes met terugdraaien |
+| `src/bewerken/` | de tussenstand per vers in de browser (`localStorage`), de opmaakwaarschuwing en het knippen van een bewerkt vers |
+| `src/antwoorden/` | de antwoorden op vertaalvragen, inclusief het genuanceerde antwoord |
+| `src/bewaren/` | wat de browser bewaart: overzicht, back-up (download en inladen, versie 3) en de meldingen bij een wijziging |
+| `src/export/` | Export voor Claude (`<prefix>-NN.redactie.json`, versie 3) |
 | `src/uitlijning/` | woorduitlijning bron ↔ vereenvoudigd per vers en "Gevonden": hoe bronwoorden vertaald zijn (voor het begrippenoverzicht) |
-| `src/editor/` | ProseMirror-schema en omzetting voor de editor (nog zonder scherm) |
-| `src/klembord/` | Word-HTML voor kopiëren naar Word met de echte stijlnamen, en de copy-handler (nog zonder knop) |
+| `src/editor/` | ProseMirror-schema, omzetting en toetsen voor de vers-editor (`src/app/bewerken/VersEditor.tsx`) |
+| `src/klembord/` | Word-HTML voor kopiëren naar Word met de echte stijlnamen, en de copy-handler (knop Hoofdstuktekst kopiëren voor Word) |
 
 ## Draaien
 
@@ -32,9 +37,9 @@ mise x -- npm run data      # alleen de data opnieuw bouwen
 
 Een hoofdstuk zonder `vereenvoudigd/`- of logbestand toont de bron met lege kolommen. Een hoofdstuk zonder rij in `STATUS.md` heeft de status `nog niet begonnen`.
 
-Adressen: `#/lukas/9` is hoofdstuk 9, `#/lukas/9/22` vers 22 (dat vers wordt gekozen en in beeld gebracht). `#/lukas/begrippen` opent het scherm Keuzes en vragen (tabblad Vertaalkeuzes); `#/lukas/begrippen/gevonden` en `#/lukas/begrippen/vragen` de andere tabbladen. Dat scherm laadt alle hoofdstukken en rekent in de browser. `#/lukas/bewaard` toont wat de browser bewaard heeft (met back-up downloaden en inladen); `#/galerij` toont de componenten in hun lastige toestanden.
+Adressen: `#/lukas/9` is hoofdstuk 9, `#/lukas/9/22` vers 22 (dat vers wordt gekozen en in beeld gebracht). `#/lukas/begrippen` opent het scherm Keuzes en vragen (tabblad Vertaalkeuzes); `#/lukas/begrippen/gevonden` en `#/lukas/begrippen/vragen` de andere tabbladen. Dat scherm laadt alle hoofdstukken en rekent in de browser. `#/lukas/opgeslagen` toont wat de browser bewaard heeft (met back-up downloaden en inladen; het oude adres `#/lukas/bewaard` werkt nog); `#/galerij` toont de componenten in hun lastige toestanden. De adressen en de bestandsnamen in de code hebben de oude namen (Besloten, Gevonden, Vervangen, Bewaard) bewust behouden.
 
-De site gaat via GitHub Actions (`../.github/workflows/pages.yml`) naar Pages. Eenmalig in de repo-instellingen: Pages, bron "GitHub Actions". Het basispad `/BET/` staat in `vite.config.ts`.
+De site gaat via GitHub Actions (`../.github/workflows/pages.yml`) naar Pages. Het basispad `/BET/` staat in `vite.config.ts`.
 
 ## Tests draaien
 
@@ -65,6 +70,9 @@ De tests hebben `python3` nodig (alleen de standaardbibliotheek).
 | `src/sjabloon/*.test.ts` | Stijlen uit `styles.xml` van het echte sjabloon (namen, kleuren, vet en cursief) |
 | `src/klembord/*.test.ts` | Word-HTML byte-gelijk aan het geslaagde prototype van fase 0 (Lukas 2, 3, 5, 17) |
 | `src/editor/*.test.ts` | md → ProseMirror → md byte-gelijk voor alle 48 bestanden; opmaak blijft bij bewerken; versnummers zonder opmaak |
+| `src/bewerken/*.test.ts` | Tussenstand bewaren, terugzetten en verouderen; een bewerkt vers knippen; de opmaakwaarschuwing |
+| `src/vervangen/*.test.ts` | Zoeken, het voorstel per plek en toepassen en terugdraaien van keuzes, ook op de echte hoofdstukken van Lukas |
+| `src/antwoorden/*.test.ts`, `src/bewaren/*.test.ts`, `src/export/*.test.ts` | Antwoorden, het overzicht van wat bewaard is, back-up (voorbeeld, samenvoegen, vervangen) en de export |
 | `src/uitlijning/*.test.ts` | Uitlijning op kleine handgemaakte verzen en bekende vervangingen op Lukas (Heere → Heer, Zoon des mensen → Mensenzoon); rekentijd |
 
 De pariteitstest draait `scripts/formaat_naar_json.py --boek lukas`, dat de uitvoer van `parse_md` als JSON geeft. Dat script geeft ook de lijsten met alineastijlen, domeinen en directe opmaak, zodat de test controleert dat TypeScript dezelfde kent.

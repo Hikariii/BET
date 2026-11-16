@@ -11,8 +11,8 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 | `richtlijn/` | Redactierichtlijn in Markdown (geldt voor alle boeken); `richtlijn/origineel/` bevat de aangeleverde Word-versie. **Origineel nooit wijzigen.** | redactie |
 | `sjablonen/` | Sjablonen, zoals het wijzigingslog. | - |
 | `scripts/` | Omzetten uit Word, controles, terugzetten naar Word. Werken voor elk boek (`--boek`). | - |
-| `.claude/` | Configuratie voor Claude Code: skills, `/intent` en `/pr`, rules en een hook tegen em-dashes. Zie [`.claude/README.md`](.claude/README.md). | - |
-| `redactietool/` | Web-tool om vertalingen te lezen, te redigeren en naast het origineel te vergelijken (broncode; de build gaat via GitHub Actions naar Pages). Plan: `redactietool/stap1-plan.md` (afgesloten) en `redactietool/stap2-plan.md`. | - |
+| `.claude/` | Configuratie voor Claude Code: skills, `/intent`, `/pr` en `/autopilot`, rules en een hook tegen em-dashes. Zie [`.claude/README.md`](.claude/README.md). | - |
+| `redactietool/` | Web-tool om vertalingen te lezen, te redigeren en naast het origineel te vergelijken (broncode; de build gaat via GitHub Actions naar Pages). Plan: `redactietool/stap1-plan.md` (afgesloten) en `redactietool/stap2-plan.md` (stand per fase en wat nog moet). | - |
 | `bijbel/<boek>/` | Alles van één Bijbelboek, zie hieronder. | |
 | `FORMAAT.md` | Het Markdown-formaat met opmaak-tags: de gedeelde specificatie voor de scripts en de web-tool. | - |
 | `WERKPLAN.md` | De stappen per hoofdstuk (en de autonome modus). | - |
@@ -23,20 +23,20 @@ De inhoudelijke regels staan in de redactierichtlijn. Dit document beschrijft **
 | Map / bestand | Inhoud | Wie schrijft erin |
 |---|---|---|
 | `boek.json` | Naam, bestandsprefix, Word-stijlsjabloon en versindeling (zie `scripts/boek.py`). | - |
-| `controle.json` | Optioneel: extra oude vormen uit de precedenten van dit boek, voor het controlescript. | hoofdsessie |
+| `controle.json` | Optioneel: extra oude vormen uit de precedenten van dit boek, en de afwijkingen die bij de omzetting uit Word geaccepteerd zijn, voor de controlescripts. | hoofdsessie |
 | `CLAUDE.md` | Wat specifiek voor dit boek geldt. | - |
 | `STATUS.md` | Per hoofdstuk: waar het staat. | hoofdsessie |
 | `TAKEN.md` | Openstaande taken en beslissingen voor dit boek. | hoofdsessie |
 | `origineel/` | De aangeleverde Word-bestanden. **Nooit wijzigen.** Nieuwe versies komen naast de oude. | alleen aanleveren |
 | `bron/` | De brontekst per hoofdstuk, automatisch uit `origineel/` gehaald. **Niet met de hand bewerken.** | `scripts/` |
 | `vereenvoudigd/` | De vereenvoudigde tekst per hoofdstuk: zelfde bestandsnamen en tags als `bron/`. | Claude → redactie |
-| `wijzigingslog/` | Per hoofdstuk: per vers wat er veranderd is en op grond van welke regel. Hierop doet de redactie de review. | Claude → redactie |
+| `wijzigingslog/` | Per hoofdstuk `<prefix>-NN.md`: per vers wat er veranderd is en op grond van welke regel (formaat: `FORMAAT.md`, "Wijzigingslog"). Daarnaast `<prefix>-NN-controle.md`: de bevindingen van de onafhankelijke controle (WERKPLAN stap 3). Hierop doet de redactie de review. | Claude → redactie |
 | `referentie/` | Precedenten, open vragen en andere afgeleide besluiten voor dit boek (§25). | redactie / hoofdsessie |
-| `export/` | Gegenereerde Word-bestanden. Niet in git; altijd opnieuw te maken. | `scripts/` |
+| `export/` | Gegenereerde Word-bestanden. Niet in git; altijd opnieuw te maken. De redacteur krijgt ze niet via de repo: de eigenaar geeft ze door (zie `WERKPLAN.md`, Overdracht). | `scripts/` |
 
 Boeken nu: [`bijbel/lukas/`](bijbel/lukas/).
 
-Versies houden we bij met git (commits en tags), niet met versienummers in bestandsnamen. Git-tags per boek en hoofdstuk: `lukas-04-v1.0`.
+Versies houden we bij met git (commits en tags), niet met versienummers in bestandsnamen. Git-tags per boek en hoofdstuk: `lukas-04-v1.0`. Er zijn nog geen tags gezet; of Lukas 1 tot 3 v1.0 krijgen, beslist de eigenaar (zie `TAKEN.md`).
 
 ## Scripts
 
@@ -48,7 +48,7 @@ B=bijbel/lukas
 # Word -> bron/ (zonder argumenten: het sjabloon uit boek.json naar $B/bron/)
 python3 -I scripts/docx_naar_md.py --boek lukas
 
-# Controle van de omzetting: md tegen het Word-bestand
+# Controle van de omzetting: md tegen het Word-bestand (exit 0 als alle afwijkingen in controle.json onder docx_geaccepteerd staan)
 python3 -I scripts/controleer_docx_md.py --boek lukas
 
 # Controle van een vereenvoudigd hoofdstuk tegen de bron (WERKPLAN stap 3)
@@ -58,12 +58,16 @@ python3 -I scripts/controleer_hoofdstuk.py 4-24 --boek lukas
 python3 -I scripts/md_naar_docx.py --boek lukas review --hoofdstuk 4 -o $B/export/lukas-04-review.docx
 python3 -I scripts/md_naar_docx.py --boek lukas doc $B/vereenvoudigd/lukas-*.md -o $B/export/lukas-vereenvoudigd.docx
 
-# parse_md-uitvoer als JSON (voor de pariteitstest van de tool, zie redactietool/README.md)
+# parse_md- en parse_log-uitvoer als JSON (voor de pariteitstests van de tool, zie redactietool/README.md)
 python3 -I scripts/formaat_naar_json.py --boek lukas
+python3 -I scripts/log_naar_json.py --boek lukas
 
-# Heen-en-terugtest: bron zonder vereenvoudiging terug naar Word
-python3 -I scripts/md_naar_docx.py --boek lukas doc $B/bron/lukas-*.md -o $B/export/heen-en-terug.docx
+# Heen-en-terugtest: bron zonder vereenvoudiging naar een tijdelijk Word-bestand en terug naar md,
+# daarna byte voor byte vergeleken met bron/ (exit 1 bij een verschil)
+python3 -I scripts/controleer_heen_en_terug.py --boek lukas
 ```
+
+De heen-en-terugtest hoort bij elke wijziging aan de omzet- of exportscripts. Wie hem met de hand wil doen: `md_naar_docx.py doc` over `bron/`, dan `docx_naar_md.py <docx> <map>` en `diff -rq <map> bijbel/lukas/bron`.
 
 ## Een nieuw boek toevoegen
 
