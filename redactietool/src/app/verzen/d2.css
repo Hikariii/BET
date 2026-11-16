@@ -1,0 +1,68 @@
+/*
+ * d2 Samenvatting, breed bij aanwijzen: per vers één regel (de eerste vertaalregel, ingekort, met de labels).
+ * Bij aanwijzen of toetsenbordfocus staat onder het vers een breed vak met alle regels, dat naar links uitwaaiert over de bron
+ * en de vereenvoudiging van de volgende verzen; het vers zelf blijft leesbaar. De rij is het referentiepunt van het vak.
+ */
+
+.verzen-d2 tr.vers {
+	position: relative;
+}
+
+.hoofdstuk table.verzen.verzen-d2 td.regels {
+	padding-top: 0.85rem;
+	padding-bottom: 0;
+	vertical-align: top;
+}
+
+.verzen-d2 .samenvatting {
+	display: flex;
+	align-items: baseline;
+	gap: 0.6rem;
+	min-width: 0;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+.verzen-d2 .samenvatting:focus-visible {
+	outline: 2px solid var(--tekst);
+	outline-offset: 2px;
+}
+
+.verzen-d2 .samenvatting-tekst {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.verzen-d2 .samenvatting-labels {
+	display: flex;
+	flex: none;
+	gap: 0.5rem;
+	color: var(--zacht);
+	font-size: 0.6875rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.verzen-d2 .zweefvak {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	display: none;
+	width: calc(100% - 3.25rem);
+	column-gap: 2rem;
+	column-width: 24rem;
+	max-height: 70vh;
+	padding: 0.7rem calc(1rem - 1px) 0.9rem calc(1.25rem - 1px);
+	overflow-y: auto;
+	white-space: normal;
+}
+
+.verzen-d2 .zweefvak.open {
+	display: block;
+}
+
+.verzen-d2 .zweefvak li,
+.verzen-d2 .zweefvak .vraag {
+	break-inside: avoid;
+}

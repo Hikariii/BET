@@ -6,12 +6,16 @@ import { versAdres } from './adres';
 import { groepeerPerVers, type VersGroep } from './groepeerPerVers';
 import { Naslagkaart } from './Naslagkaart';
 import { wisselNaslag, type Naslag, type OpenNaslag } from './naslag';
+import { ZICHTBARE_REGELS } from './kapRegels';
 import { Regels } from './Regels';
 import { statusKlasse } from './Zijbalk';
 import { vragenBijVers } from './vertaalvragen';
 import { BewerkbaarVers } from './bewerken/BewerkbaarVers';
 import { Hoofdstukacties } from './naarWord/Hoofdstukacties';
 import { VersTekst } from './VersTekst';
+import type { Dichtheid } from './verzen/dichtheid';
+import { useKanttekeningen } from './verzen/useKanttekeningen';
+import { VersRegelsCel } from './verzen/VersRegelsCel';
 
 const LABEL_GOEDGEKEURD = 'Goedgekeurd, referentie voor de rest van het boek. Wijzigingen gaan opnieuw langs de redactie.';
 
@@ -22,6 +26,8 @@ type Props = {
 	referentie: Referentie;
 	hoofdstuk: HoofdstukData;
 	info: HoofdstukInfo;
+	/** `?verzen=`: de verzen dicht op elkaar, of `null` voor de ruime indeling. */
+	dichtheid: Dichtheid | null;
 	gekozenVers: number | null;
 	regelsAltijdZichtbaar: boolean;
 	onWisselRegels: () => void;
@@ -52,6 +58,7 @@ export function HoofdstukScherm({
 	referentie,
 	hoofdstuk,
 	info,
+	dichtheid,
 	gekozenVers,
 	regelsAltijdZichtbaar,
 	onWisselRegels,
@@ -62,6 +69,8 @@ export function HoofdstukScherm({
 	const [bewerktAdres, zetBewerktAdres] = useState<string | null>(null);
 	const [openNaslag, zetOpenNaslag] = useState<OpenNaslag | null>(null);
 	const verwijzing = useRef<HTMLElement | null>(null);
+	const tabel = useRef<HTMLTableElement>(null);
+	useKanttekeningen(tabel, dichtheid === 'd3' && regelsAltijdZichtbaar, hoofdstuk.nummer);
 	const weergave = pasTussenstandToe(hoofdstuk.vereenvoudigd, tussenstand);
 	const groepen = groepeerPerVers(hoofdstuk.bron, weergave);
 	const adresVan = (nummer: number | null) => (nummer === null ? null : versAdres(boek.id, hoofdstuk.nummer, nummer));
@@ -96,7 +105,7 @@ export function HoofdstukScherm({
 					</header>
 				)
 			)}
-			<table class="verzen">
+			<table ref={tabel} class={dichtheid === null ? 'verzen' : `verzen verzen-dicht verzen-${dichtheid}`}>
 				<thead>
 					<tr>
 						<th scope="col">Vers</th>
@@ -109,6 +118,7 @@ export function HoofdstukScherm({
 					{groepen.map((groep, index) => (
 						<VersRij
 							groep={groep}
+							dichtheid={dichtheid}
 							boek={boek}
 							hoofdstuk={hoofdstuk}
 							referentie={referentie}
@@ -139,6 +149,7 @@ export function HoofdstukScherm({
 
 type VersRijProps = {
 	groep: VersGroep;
+	dichtheid: Dichtheid | null;
 	boek: BoekData;
 	hoofdstuk: HoofdstukData;
 	referentie: Referentie;
@@ -159,6 +170,7 @@ type VersRijProps = {
 
 export function VersRij({
 	groep,
+	dichtheid,
 	boek,
 	hoofdstuk,
 	referentie,
@@ -184,8 +196,8 @@ export function VersRij({
 	const adres = nummer === null ? null : versAdres(boek.id, hoofdstuk.nummer, nummer);
 	const { logVerzen, vragen, heeftVraag } = versRegels(groep, hoofdstuk, referentie);
 	const kaartId = `vers-${nummer}-naslag`;
-	const regels = (kapAf: boolean) => (
-		<Regels logVerzen={logVerzen} vragen={vragen} kapAf={kapAf} openNaslag={openNaslag} kaartId={kaartId} onOpenNaslag={onOpenNaslag} />
+	const regels = (kapNa: number | null) => (
+		<Regels logVerzen={logVerzen} vragen={vragen} kapNa={kapNa} openNaslag={openNaslag} kaartId={kaartId} onOpenNaslag={onOpenNaslag} />
 	);
 
 	const kiesVers = (gebeurtenis: MouseEvent) => {
@@ -232,11 +244,16 @@ export function VersRij({
 						/>
 					)}
 				</td>
-				{regelsInKolom && <td class="regels">{regels(true)}</td>}
+				{regelsInKolom &&
+					(dichtheid === null ? (
+						<td class="regels">{regels(ZICHTBARE_REGELS)}</td>
+					) : (
+						<VersRegelsCel dichtheid={dichtheid} nummer={nummer} logVerzen={logVerzen} heeftVraag={heeftVraag} regels={regels} />
+					))}
 			</tr>
 			{!regelsInKolom && geselecteerd && (
 				<tr class="regels-onder">
-					<td colSpan={KOLOMMEN_ZONDER_REGELS}>{regels(false)}</td>
+					<td colSpan={KOLOMMEN_ZONDER_REGELS}>{regels(null)}</td>
 				</tr>
 			)}
 			{openNaslag !== null && (

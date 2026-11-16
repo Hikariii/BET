@@ -1,0 +1,40 @@
+/* Keuzestrook voor de dichte-verzenvarianten, rechtsonder boven de strook van de ontwerpvarianten (.ontwerpkeuze). */
+.verzenkeuze {
+	position: fixed;
+	right: 0.75rem;
+	bottom: 4.5rem;
+	z-index: 40;
+	padding: 0.35rem 0.5rem;
+	background: #fff;
+	border: 1px solid var(--rand-donker);
+	font-size: 0.75rem;
+}
+
+.verzenkeuze ul {
+	display: flex;
+	gap: 0.15rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.verzenkeuze a {
+	display: block;
+	padding: 0.1rem 0.4rem;
+	text-decoration: none;
+}
+
+.verzenkeuze a:hover {
+	background: var(--vlak);
+}
+
+.verzenkeuze a[aria-current='true'] {
+	background: var(--tekst);
+	color: #fff;
+}
+
+.verzenkeuze .verzenkeuze-titel {
+	margin: 0.2rem 0 0;
+	color: var(--gedempt);
+	text-align: center;
+}

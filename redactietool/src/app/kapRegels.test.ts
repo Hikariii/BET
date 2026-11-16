@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { kapRegels } from './kapRegels';
+import { kapRegels as kapRegelsMetAantal, ZICHTBARE_REGELS } from './kapRegels';
+
+function kapRegels(aantalPerBlok: readonly number[], uitgeklapt: boolean) {
+	return kapRegelsMetAantal(aantalPerBlok, uitgeklapt, ZICHTBARE_REGELS);
+}
 
 describe('kapRegels', () => {
 	it('laat een vers met drie of vier regels ongemoeid', () => {
@@ -22,5 +26,11 @@ describe('kapRegels', () => {
 
 	it('geeft niets terug voor een vers zonder regels', () => {
 		expect(kapRegels([], false)).toEqual({ zichtbaarPerBlok: [], verborgen: 0 });
+	});
+
+	it('kapt na het gevraagde aantal regels', () => {
+		expect(kapRegelsMetAantal([4], false, 1)).toEqual({ zichtbaarPerBlok: [1], verborgen: 3 });
+		expect(kapRegelsMetAantal([4], true, 1)).toEqual({ zichtbaarPerBlok: [4], verborgen: 0 });
+		expect(kapRegelsMetAantal([2], false, 1)).toEqual({ zichtbaarPerBlok: [2], verborgen: 0 });
 	});
 });

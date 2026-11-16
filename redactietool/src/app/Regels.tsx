@@ -1,18 +1,18 @@
 import { useState } from 'preact/hooks';
 import type { LogVers, OpenVraag, Verwijzing } from '../data/types';
-import { kapRegels } from './kapRegels';
+import { kapRegels, ZICHTBARE_REGELS } from './kapRegels';
 import { InlineMarkdown } from './Markdownweergave';
 import { zelfdeNaslag, type Naslag } from './naslag';
 import { isOpen } from './vertaalvragen';
 import './regels.css';
 
-type Props = {
+export type RegelsProps = {
 	/** De logblokken waar dit vers in valt. */
 	logVerzen: readonly LogVers[];
 	/** De vertaalvragen uit de referentie die aan dit vers hangen. */
 	vragen: readonly OpenVraag[];
-	/** In de smalle kolom: na de eerste regels staat de rest achter "nog N regels". */
-	kapAf: boolean;
+	/** In de smalle kolom: na zoveel regels staat de rest achter "nog N regels"; `null` toont alles. */
+	kapNa: number | null;
 	/** De naslagkaart die onder dit vers open staat; die verwijzing meldt `aria-expanded`. */
 	openNaslag: Naslag | null;
 	/** Het element van de naslagkaart onder dit vers, voor `aria-controls`. */
@@ -20,11 +20,12 @@ type Props = {
 	onOpenNaslag: (naslag: Naslag, verwijzing: HTMLElement) => void;
 };
 
-export function Regels({ logVerzen, vragen, kapAf, openNaslag, kaartId, onOpenNaslag }: Props) {
+export function Regels({ logVerzen, vragen, kapNa, openNaslag, kaartId, onOpenNaslag }: RegelsProps) {
 	const [uitgeklapt, zetUitgeklapt] = useState(false);
+	const zichtbaar = kapNa ?? ZICHTBARE_REGELS;
 	const aantalPerBlok = logVerzen.map((logVers) => logVers.wijzigingen.length);
-	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || !kapAf);
-	const inklapbaar = kapAf ? kapRegels(aantalPerBlok, false).verborgen : 0;
+	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || kapNa === null, zichtbaar);
+	const inklapbaar = kapNa === null ? 0 : kapRegels(aantalPerBlok, false, kapNa).verborgen;
 	const logVragen = logVerzen.flatMap((logVers) => logVers.vragen);
 	const heeftRegels = logVerzen.some((logVers) => logVers.wijzigingen.length > 0);
 	return (

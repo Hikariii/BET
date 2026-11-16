@@ -55,6 +55,7 @@ export function VersVoorbeeld({ boek, referentie, hoofdstuk, vers, bewerkenBijSt
 			<tbody>
 				<VersRij
 					groep={groep}
+					dichtheid={null}
 					boek={boek}
 					hoofdstuk={hoofdstuk}
 					referentie={referentie}
