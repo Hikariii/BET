@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { BoekData, HoofdstukData, HoofdstukInfo, LogVers, OpenVraag, Referentie } from '../data/types';
 import { pasTussenstandToe } from '../bewerken/tussenstand';
 import type { BewerktVers, Tussenstand } from '../bewerken/types';
 import { versAdres } from './adres';
 import { groepeerPerVers, type VersGroep } from './groepeerPerVers';
+import { maakVersVraagAdres } from './begrippen/vraagAdres';
 import { Naslagkaart } from './Naslagkaart';
 import { wisselNaslag, type Naslag, type OpenNaslag } from './naslag';
 import { Regels } from './Regels';
@@ -56,6 +57,7 @@ export function HoofdstukScherm({
 	const verwijzing = useRef<HTMLElement | null>(null);
 	const weergave = pasTussenstandToe(hoofdstuk.vereenvoudigd, tussenstand);
 	const groepen = groepeerPerVers(hoofdstuk.bron, weergave);
+	const vraagAdresBij = useMemo(() => maakVersVraagAdres(boek.id, referentie.openVragen, hoofdstuk), [boek.id, referentie, hoofdstuk]);
 	const adresVan = (nummer: number | null) => (nummer === null ? null : versAdres(boek.id, hoofdstuk.nummer, nummer));
 
 	const sluitNaslag = useCallback(() => {
@@ -92,6 +94,7 @@ export function HoofdstukScherm({
 							boek={boek}
 							hoofdstuk={hoofdstuk}
 							referentie={referentie}
+							vraagAdres={groep.nummer === null ? null : vraagAdresBij(groep.nummer)}
 							geselecteerd={groep.nummer !== null && groep.nummer === gekozenVers}
 							openNaslag={openNaslag?.rij === index ? openNaslag.naslag : null}
 							onOpenNaslag={(naslag, opener) => openNaslagBij(index, naslag, opener)}
@@ -114,6 +117,8 @@ type VersRijProps = {
 	boek: BoekData;
 	hoofdstuk: HoofdstukData;
 	referentie: Referentie;
+	/** Het adres van de eerste vertaalvraag bij dit vers op Vertaalvragen, of `null`. */
+	vraagAdres: string | null;
 	geselecteerd: boolean;
 	/** De vertaalregels staan in een eigen kolom; anders onder het vers als het gekozen is. */
 	/** De naslag die als kaart onder dit vers open staat, of `null`. */
@@ -133,6 +138,7 @@ export function VersRij({
 	boek,
 	hoofdstuk,
 	referentie,
+	vraagAdres,
 	geselecteerd,
 	openNaslag,
 	onOpenNaslag,
@@ -155,7 +161,7 @@ export function VersRij({
 	const { logVerzen, vragen, heeftVraag } = versRegels(groep, hoofdstuk, referentie);
 	const kaartId = `vers-${nummer}-naslag`;
 	const regels = (gekapt: boolean) => (
-		<Regels logVerzen={logVerzen} vragen={vragen} gekapt={gekapt} openNaslag={openNaslag} kaartId={kaartId} onOpenNaslag={onOpenNaslag} />
+		<Regels boekId={boek.id} vraagAdres={vraagAdres} logVerzen={logVerzen} vragen={vragen} gekapt={gekapt} openNaslag={openNaslag} kaartId={kaartId} onOpenNaslag={onOpenNaslag} />
 	);
 
 	return (
@@ -168,11 +174,16 @@ export function VersRij({
 			>
 				<th scope="row" class="versnummer">
 					{adres === null ? null : <a href={adres}>{nummer}</a>}
-					{heeftVraag && (
-						<span class="vraagmarkering" data-help="vraagmarkering" role="img" aria-label="Dit vers hoort bij een vertaalvraag" title="Vertaalvraag">
-							?
-						</span>
-					)}
+					{heeftVraag &&
+						(vraagAdres === null ? (
+							<span class="vraagmarkering" data-help="vraagmarkering" role="img" aria-label="Dit vers hoort bij een vertaalvraag" title="Vertaalvraag">
+								?
+							</span>
+						) : (
+							<a class="vraagmarkering" data-help="vraagmarkering" href={vraagAdres} aria-label="Dit vers hoort bij een vertaalvraag. Naar de vraag" title="Naar de vertaalvraag bij dit vers">
+								?
+							</a>
+						))}
 				</th>
 				<td>
 					<VersTekst delen={groep.bron} stijlen={boek.stijlen} />

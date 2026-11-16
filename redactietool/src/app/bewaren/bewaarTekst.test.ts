@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { BewaardOverzicht } from '../../bewaren/overzicht';
-import { bewaarRegel, bewaarTelling, tijdVan } from './bewaarTekst';
+import { bewaarRegel, bewaarTelling, tijdVan, verouderdMelding, vervangingRegel } from './bewaarTekst';
 
 function overzicht(deel: Partial<BewaardOverzicht> & Pick<BewaardOverzicht, 'totaal'>): BewaardOverzicht {
 	return { hoofdstukken: [], keuzes: [], antwoorden: [], verouderdBekend: true, laatstBewaard: null, ...deel };
@@ -27,17 +27,17 @@ describe('bewaarTelling', () => {
 		expect(bewaarTelling(overzicht({ totaal: { verzen: 1, hoofdstukken: 1, verouderd: 0, keuzes: 0, antwoorden: 0 } }))).toBe('1 vers in 1 hoofdstuk');
 	});
 
-	it('noemt de keuzes erbij, ook als er geen bewerkte verzen zijn', () => {
-		expect(bewaarTelling(overzicht({ totaal: { verzen: 2, hoofdstukken: 1, verouderd: 0, keuzes: 2, antwoorden: 0 } }))).toBe('2 verzen in 1 hoofdstuk, 2 keuzes');
-		expect(bewaarTelling(overzicht({ totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 1, antwoorden: 0 } }))).toBe('1 keuze');
+	it('noemt de vervangingen erbij, ook als er geen bewerkte verzen zijn', () => {
+		expect(bewaarTelling(overzicht({ totaal: { verzen: 2, hoofdstukken: 1, verouderd: 0, keuzes: 2, antwoorden: 0 } }))).toBe('2 verzen in 1 hoofdstuk, 2 vervangingen');
+		expect(bewaarTelling(overzicht({ totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 1, antwoorden: 0 } }))).toBe('1 vervanging');
 	});
 });
 
 describe('bewaarTelling met antwoorden', () => {
-	it('telt antwoorden mee, ook als er verder niets bewaard is', () => {
+	it('telt alleen antwoorden als opgeslagen werk', () => {
 		expect(bewaarTelling(overzicht({ totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 1 } }))).toBe('1 antwoord');
-		expect(bewaarTelling(overzicht({ totaal: { verzen: 2, hoofdstukken: 1, verouderd: 0, keuzes: 1, antwoorden: 3 } }))).toBe(
-			'2 verzen in 1 hoofdstuk, 1 keuze, 3 antwoorden',
+		expect(bewaarTelling(overzicht({ totaal: { verzen: 9, hoofdstukken: 5, verouderd: 0, keuzes: 1, antwoorden: 2 } }))).toBe(
+			'9 verzen in 5 hoofdstukken, 1 vervanging, 2 antwoorden',
 		);
 	});
 });
@@ -58,10 +58,39 @@ describe('bewaarRegel', () => {
 			overzicht({ totaal: { verzen: 3, hoofdstukken: 1, verouderd: 2, keuzes: 0, antwoorden: 0 }, laatstBewaard: new Date().toISOString() }),
 		);
 
-		expect(regel.endsWith(' · 2 verouderd')).toBe(true);
+		expect(regel.endsWith(' · 2 door Claude veranderd')).toBe(true);
 	});
 
 	it('zegt dat er niets opgeslagen is', () => {
 		expect(bewaarRegel(overzicht({ totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 0, antwoorden: 0 } }))).toBe('Nog niets opgeslagen in deze browser');
+	});
+});
+
+describe('vervangingRegel', () => {
+	const nu = lokaal(11, 16, 20, 0);
+	const toegepast = lokaal(11, 16, 11, 2).toISOString();
+
+	it('noemt bij een markeringswissel de markeringen, niet een lege nieuwe tekst', () => {
+		const regel = vervangingRegel({ id: 'k', soort: 'markering', zoekterm: 'Gezegend', nieuw: '', van: 'eeuwigleven', naar: 'genade', toegepast, aantalVerzen: 9 }, nu);
+
+		expect(regel).toBe('markering van "Gezegend": eeuwigleven wordt genade, 9 verzen, toegepast 11:02.');
+	});
+
+	it('noemt bij een tekstvervanging oude en nieuwe tekst', () => {
+		const regel = vervangingRegel({ id: 'k', soort: 'tekst', zoekterm: 'Mensenzoon', nieuw: 'de Mensenzoon', van: null, naar: null, toegepast, aantalVerzen: 1 }, nu);
+
+		expect(regel).toBe('"Mensenzoon" door "de Mensenzoon", 1 vers, toegepast 11:02.');
+	});
+});
+
+describe('verouderdMelding', () => {
+	it('noemt het vers en wat de lezer kan doen', () => {
+		expect(verouderdMelding(['vers 12'], 'voordat je kopieert')).toBe(
+			'Claude heeft vers 12 veranderd nadat jij het bewerkte. Lees je tekst na voordat je kopieert. Wil je de tekst van Claude, kies dan bij dat vers Vers terugzetten (je eigen wijziging gaat dan weg).',
+		);
+	});
+
+	it('noemt meer verzen met een komma en "en"', () => {
+		expect(verouderdMelding(['vers 2', 'vers 5', 'vers 9'], 'voordat je kopieert')).toContain('vers 2, vers 5 en vers 9 veranderd nadat jij ze bewerkte');
 	});
 });

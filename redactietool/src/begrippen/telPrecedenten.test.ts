@@ -140,7 +140,7 @@ describe('telPrecedenten op kleine hoofdstukken', () => {
 		const uitkomst = telEen(precedent('verzoeken', 'op de proef stellen', '4:1, 4:2–3'), tekst);
 
 		expect(uitkomst.telbaar).toBe(true);
-		expect(uitkomst.opmerkingen.join(' ')).toContain('geteld vanuit Plaats');
+		expect(uitkomst.opmerkingen.join(' ')).toContain('geteld vanuit de verzen die de vertaalkeuze noemt');
 		expect(uitkomst.toegepast).toEqual(verzen(4, 1));
 		expect(uitkomst.nietToegepast).toEqual([]);
 	});
@@ -150,15 +150,15 @@ describe('telPrecedenten op kleine hoofdstukken', () => {
 
 		const uitkomst = telEen(precedent('zonde', 'blijft', '4:1, 4:2'), tekst);
 
-		expect(uitkomst.opmerkingen).toEqual(['1 van de 2 verzen uit Plaats: bronvorm niet teruggevonden in de bron']);
+		expect(uitkomst.opmerkingen).toEqual(['1 van de 2 verzen die de vertaalkeuze noemt: oude vorm niet teruggevonden in de bron']);
 	});
 
-	it('meldt dat de haakjes in de kolom Bron niet zijn gebruikt', () => {
+	it('meldt dat woorden tussen haakjes niet zijn meegezocht', () => {
 		const tekst = hoofdstuk(1, '[1] Hij moest dan komen.', '[1] Hij moest behalve komen.');
 
 		const uitkomst = telEen(precedent('dan (= behalve)', 'behalve'), tekst);
 
-		expect(uitkomst.opmerkingen).toEqual(['de haakjes in de kolom Bron zijn niet gebruikt bij het zoeken']);
+		expect(uitkomst.opmerkingen).toEqual(['woorden tussen haakjes zijn niet meegezocht']);
 		expect(uitkomst.toegepast).toEqual(verzen(1, 1));
 	});
 
@@ -172,7 +172,7 @@ describe('telPrecedenten op kleine hoofdstukken', () => {
 		expect([open, werkregel, verschijnsel].map((uitkomst) => uitkomst.telbaar)).toEqual([false, false, false]);
 		expect(open.reden).toContain('open plek');
 		expect(werkregel.reden).toContain('werkregel');
-		expect(verschijnsel.reden).toContain('verschijnsel');
+		expect(verschijnsel.reden).toContain('opmaak, een leesteken of zinsbouw');
 		expect([open, werkregel, verschijnsel].flatMap((uitkomst) => [...uitkomst.toegepast, ...uitkomst.nietToegepast])).toEqual([]);
 	});
 
@@ -181,7 +181,7 @@ describe('telPrecedenten op kleine hoofdstukken', () => {
 
 		const uitkomst = telEen(precedent('honen', 'beledigen'), tekst);
 
-		expect(uitkomst).toMatchObject({ telbaar: false, reden: 'de bronvorm komt in de bron niet voor en Plaats noemt geen verzen' });
+		expect(uitkomst).toMatchObject({ telbaar: false, reden: 'deze vertaalkeuze noemt geen vers en de oude vorm komt niet voor' });
 	});
 
 	it('telt over hoofdstukken heen en geeft de verzen op volgorde', () => {

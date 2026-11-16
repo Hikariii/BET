@@ -21,6 +21,20 @@ describe('leesAdres', () => {
 		expect(leesAdres('#/lukas/begrippen/vragen/')).toEqual({ soort: 'begrippen', boek: 'lukas', tabblad: 'vragen' });
 	});
 
+	it('leest één vraag op het tabblad Vertaalvragen, met een sleutel vol vreemde tekens', () => {
+		const sleutel = 'register-"Gezegend" / zalig: eeuwigleven?-1';
+		const adres = maakAdres({ soort: 'begrippen', boek: 'lukas', tabblad: 'vragen', vraag: sleutel });
+
+		expect(leesAdres(adres)).toEqual({ soort: 'begrippen', boek: 'lukas', tabblad: 'vragen', vraag: sleutel });
+		expect(leesAdres('#/lukas/begrippen/vragen/vers-4-2-1/')).toEqual({ soort: 'begrippen', boek: 'lukas', tabblad: 'vragen', vraag: 'vers-4-2-1' });
+	});
+
+	it('geeft null voor een vraag op een ander tabblad of met een ongeldige procentcodering', () => {
+		expect(leesAdres('#/lukas/begrippen/gevonden/vers-4-2-1')).toBeNull();
+		expect(leesAdres('#/lukas/begrippen/vragen/%E0%A4%A')).toBeNull();
+		expect(leesAdres('#/lukas/begrippen/vragen/a/b')).toBeNull();
+	});
+
 	it('leest het overzicht van wat opgeslagen is, ook met een slash achteraan', () => {
 		expect(leesAdres('#/lukas/opgeslagen')).toEqual({ soort: 'bewaard', boek: 'lukas' });
 		expect(leesAdres('#/lukas/opgeslagen/')).toEqual({ soort: 'bewaard', boek: 'lukas' });

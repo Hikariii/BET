@@ -13,7 +13,7 @@ function klikVerwijzing(opschrift: (tekst: string) => boolean): NaPlaatsen {
 	};
 }
 
-export const openPrecedent = klikVerwijzing((tekst) => tekst === 'precedent');
+export const openPrecedent = klikVerwijzing((tekst) => tekst === 'vertaalkeuze');
 
 export const openParagraaf = klikVerwijzing((tekst) => tekst.startsWith('§'));
 

@@ -51,24 +51,24 @@ function totVormen(tekst: string): Vormwoorden[] {
 
 /** De vormen uit de kolom Bron. Haakjes met een spatie ervoor (context of een optioneel deel) doen niet mee. */
 export function leesBronVormen(cel: string): BronVormen {
-	if (OPEN_PLEK.test(cel)) return { soort: 'niet telbaar', reden: 'de bronkolom heeft een open plek (…), die niet te zoeken is' };
-	if (VERSCHIJNSEL.test(cel)) return { soort: 'niet telbaar', reden: 'de bronkolom beschrijft een verschijnsel (opmaak, leesteken of zinsbouw), geen woord' };
+	if (OPEN_PLEK.test(cel)) return { soort: 'niet telbaar', reden: 'de oude vorm heeft een open plek (…), die niet te zoeken is' };
+	if (VERSCHIJNSEL.test(cel)) return { soort: 'niet telbaar', reden: 'de oude vorm beschrijft opmaak, een leesteken of zinsbouw, geen woord' };
 	const uitgevouwen = vasteHaakjesUitgevouwen(cel);
 	const haakjesGenegeerd = uitgevouwen.some((tekst) => tekst.includes('('));
 	const vormen = uitgevouwen.flatMap((tekst) => totVormen(tekst.replace(HAAKJES, ' ')));
-	if (vormen.length === 0) return { soort: 'niet telbaar', reden: 'de bronkolom bevat geen woorden' };
+	if (vormen.length === 0) return { soort: 'niet telbaar', reden: 'de oude vorm bevat geen woorden' };
 	return { soort: 'vormen', vormen, haakjesGenegeerd };
 }
 
 /** De vormen uit de kolom Vereenvoudigd. "blijft" en een cel met alleen "eerste keer …" betekenen: de bronvorm blijft staan. */
 export function leesDoelVormen(cel: string): DoelVormen {
 	if (/^blijf/.test(cel) || /^eerste keer/.test(cel)) return { soort: 'blijft' };
-	if (OPEN_PLEK.test(cel)) return { soort: 'niet telbaar', reden: 'de kolom Vereenvoudigd heeft een open plek (…), die niet te zoeken is' };
+	if (OPEN_PLEK.test(cel)) return { soort: 'niet telbaar', reden: 'de nieuwe vorm heeft een open plek (…), die niet te zoeken is' };
 	const eersteDeel = (cel.split(/;| \u2014 /)[0] ?? '').split('→').at(-1) ?? '';
-	if (WERKREGEL.test(eersteDeel)) return { soort: 'niet telbaar', reden: 'de kolom Vereenvoudigd beschrijft een werkregel, geen vaste vorm' };
+	if (WERKREGEL.test(eersteDeel)) return { soort: 'niet telbaar', reden: 'de nieuwe vorm is een werkregel, geen vaste vorm' };
 	const zonderUitleg = eersteDeel.replace(/eerste keer.*$/, '');
 	const vormen = vasteHaakjesUitgevouwen(zonderUitleg).flatMap((tekst) => totVormen(tekst.replace(HAAKJES, ' ')));
-	if (vormen.length === 0) return { soort: 'niet telbaar', reden: 'de kolom Vereenvoudigd bevat geen woorden' };
+	if (vormen.length === 0) return { soort: 'niet telbaar', reden: 'de nieuwe vorm bevat geen woorden' };
 	return { soort: 'vormen', vormen };
 }
 

@@ -22,7 +22,7 @@ function alleTekst(): string {
 describe('vulIn', () => {
 	it('vult de plekken, het boek en de bestandsnamen in', () => {
 		expect(vulIn('Ga naar {{plek:vervangen}} in {{boek}}: {{back-upbestand}} en {{exportbestand}}.', NAMEN)).toBe(
-			`Ga naar ${PLEKNAAM.vervangen} in Lukas: lukas.bet-bewaard.json en lukas-04.redactie.json.`,
+			`Ga naar ${PLEKNAAM.vervangen} in Lukas: lukas.bet-bewaard-2026-11-16-1103.json en lukas-04.redactie.json.`,
 		);
 	});
 

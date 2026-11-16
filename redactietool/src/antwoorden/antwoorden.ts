@@ -84,7 +84,7 @@ export function legAntwoordVast(opslag: Opslag, boek: string, { kwestie, optie, 
 	const schoon = toelichting.trim();
 	if (optie === EIGEN_ANTWOORD && schoon === '') return { gelukt: false, melding: TOELICHTING_VERPLICHT };
 	if (leesAntwoorden(opslag, boek).some((bestaand) => bestaand.kwestie === kwestie)) {
-		return { gelukt: false, melding: 'Er is al een antwoord op deze vraag. Pas de toelichting aan, of draai de keuzes terug en trek het antwoord in.' };
+		return { gelukt: false, melding: 'Er is al een antwoord op deze vraag. Pas de toelichting aan, of draai de vervangingen terug en trek het antwoord in.' };
 	}
 	return vastgelegd(opslag, boek, { kwestie, optie, toelichting: schoon, keuzeIds: [], gegeven: nu.toISOString() });
 }
@@ -136,7 +136,7 @@ export function trekAntwoordIn(opslag: Opslag, boek: string, kwestie: string, be
 	const antwoord = antwoorden.find((kandidaat) => kandidaat.kwestie === kwestie);
 	if (antwoord === undefined) return { gelukt: true };
 	if (levendeKeuzeIds(antwoord, bestaandeKeuzes).length > 0) {
-		return { gelukt: false, melding: 'Er hangen nog keuzes onder dit antwoord. Draai die eerst terug onder Zoeken en vervangen.' };
+		return { gelukt: false, melding: 'Er hangen nog vervangingen onder dit antwoord. Draai die eerst terug onder Zoeken en vervangen.' };
 	}
 	return schrijfAntwoorden(opslag, boek, antwoorden.filter((kandidaat) => kandidaat !== antwoord)) ? { gelukt: true } : { gelukt: false, melding: OPSLAG_VOL };
 }
@@ -154,7 +154,7 @@ export function controleerKeuze(bestaand: Antwoord | null, optie: string): Uitko
 	if (bestaand === null || bestaand.optie === EIGEN_ANTWOORD || bestaand.optie === optie) return { gelukt: true };
 	return {
 		gelukt: false,
-		melding: `Het antwoord op deze vraag is ${bestaand.optie}. Kies een optie die erbij past, of draai de keuzes terug, trek het antwoord in en leg een eigen antwoord vast.`,
+		melding: `Het antwoord op deze vraag is ${bestaand.optie}. Kies een optie die erbij past, of draai de vervangingen terug, trek het antwoord in en leg een eigen antwoord vast.`,
 	};
 }
 

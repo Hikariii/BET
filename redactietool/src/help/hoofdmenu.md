@@ -10,7 +10,7 @@ Hier lees en bewerk je een hoofdstuk. Je komt uit bij het hoofdstuk dat je het l
 
 ## {{plek:besloten}}
 
-De vertaalkeuzes die al vastliggen. Per keuze zie je op hoeveel plekken in het boek ze al zijn toegepast en op hoeveel de oude vorm nog staat. Elk versnummer is een link naar die plek. Je komt uit bij een tabel.
+De vertaalkeuzes die al vastliggen. Per vertaalkeuze zie je op hoeveel plekken in het boek hij al is toegepast en op hoeveel de oude vorm nog staat. Elk versnummer is een link naar die plek. Je komt uit bij een tabel.
 
 {{wijs plek-besloten | {{plek:besloten}} | Bovenaan in de balk.}}
 
@@ -22,7 +22,7 @@ Per bronwoord zie je hoe het in het boek is vertaald. Standaard zie je alleen de
 
 ## {{plek:vragen}}
 
-De vertaalvragen die nog open staan, en de vragen die al een besluit hebben. Hier beantwoord je ze. Het getal naast de naam is het aantal open vragen.
+De vertaalvragen die nog open staan, en de vragen die al een besluit hebben. Hier beantwoord je ze; je komt er ook via het vraagteken bij een vers. Het getal naast de naam is het aantal open vragen.
 
 {{wijs plek-vragen | {{plek:vragen}} | Bovenaan in de balk, met het aantal open vragen erachter.}}
 

@@ -6,6 +6,7 @@ import { exportBestandsnaam, maakExport } from '../../export/maakExport';
 import type { Hoofdstuk } from '../../formaat/types';
 import { maakKlembordInhoud, vulKopieerGebeurtenis } from '../../klembord/kopieer';
 import { leesKeuzes } from '../../vervangen/keuzes';
+import { meervoud, verouderdMelding } from '../bewaren/bewaarTekst';
 import { browseropslag } from '../bewerken/useTussenstand';
 import { downloadAlsJson } from '../downloadBestand';
 import './hoofdstukacties.css';
@@ -31,10 +32,6 @@ const ANDERE_BROWSER = /Chrome|Chromium|Edg|CriOS|FxiOS|OPR/;
 
 function isSafari(): boolean {
 	return SAFARI.test(navigator.userAgent) && !ANDERE_BROWSER.test(navigator.userAgent);
-}
-
-function meervoud(aantal: number, enkelvoud: string, meervoudsvorm: string): string {
-	return `${aantal} ${aantal === 1 ? enkelvoud : meervoudsvorm}`;
 }
 
 /** Zet het hoofdstuk op het klembord via een eigen `copy`-handler; de standaardkopie van de browser laat de Word-stijlnamen weg. */
@@ -64,6 +61,7 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 	const [kopie, zetKopie] = useState<KopieUitkomst | null>(null);
 	const [exportOpen, zetExportOpen] = useState(false);
 	const [toelichting, zetToelichting] = useState('');
+	const [gedownload, zetGedownload] = useState('');
 
 	const bouwExport = (tekst: string) =>
 		maakExport({
@@ -77,15 +75,22 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 			toelichting: tekst,
 			nu: new Date(),
 		});
-	const { aantalBewerkt, aantalVerouderd } = useMemo(() => {
+	const { aantalBewerkt, verouderdeVerzen } = useMemo(() => {
 		const verzen = bouwExport('').verzen;
-		return { aantalBewerkt: verzen.length, aantalVerouderd: verzen.filter((vers) => vers.verouderd).length };
+		return { aantalBewerkt: verzen.length, verouderdeVerzen: verzen.filter((vers) => vers.verouderd).map((vers) => `vers ${vers.vers}`) };
 	}, [boek.id, repo, tussenstand]);
 
-	const kopieer = () => zetKopie(kopieerNaarKlembord(weergave, boek, tussenstand));
+	const kopieer = () => {
+		zetGedownload('');
+		zetKopie(kopieerNaarKlembord(weergave, boek, tussenstand));
+	};
 	const download = (gebeurtenis: SubmitEvent) => {
 		gebeurtenis.preventDefault();
-		downloadAlsJson(exportBestandsnaam(boek.prefix, repo.nummer), bouwExport(toelichting));
+		const bestandsnaam = exportBestandsnaam(boek.prefix, repo.nummer);
+		downloadAlsJson(bestandsnaam, bouwExport(toelichting));
+		zetKopie(null);
+		zetGedownload(`Gedownload als ${bestandsnaam} (${meervoud(aantalBewerkt, 'vers', 'verzen')}). Lever het samen met je Word-bestand aan.`);
+		zetExportOpen(false);
 	};
 
 	return (
@@ -101,24 +106,25 @@ export function Hoofdstukacties({ boek, repo, weergave, tussenstand, openVragen 
 			</div>
 			{isSafari() && <p class="hoofdstukacties-safari">Hoofdstuktekst kopiëren voor Word werkt in Chrome of Edge.</p>}
 			<div role="status" class="hoofdstukacties-status">
-				{kopie?.soort === 'gekopieerd' && kopie.van === tussenstand && 'Gekopieerd'}
-				{kopie?.soort === 'mislukt' && `Kopiëren mislukt: ${kopie.melding}`}
+				{kopie?.soort === 'gekopieerd' && kopie.van === tussenstand && 'Gekopieerd. Plak het in Word.'}
+				{kopie?.soort === 'mislukt' && `Kopiëren mislukt (${kopie.melding.replace(/\.$/, '')}). Probeer het opnieuw, of gebruik Chrome of Edge.`}
+				{gedownload}
 			</div>
-			{aantalVerouderd > 0 && (
+			{verouderdeVerzen.length > 0 && (
 				<p class="hoofdstukacties-verouderd" role="status">
-					{meervoud(aantalVerouderd, 'bewerking is', 'bewerkingen zijn')} verouderd: Claude heeft de tekst na je bewerking veranderd. Lees
-					{aantalVerouderd === 1 ? ' die' : ' ze'} na voordat je kopieert.
+					{verouderdMelding(verouderdeVerzen, 'voordat je kopieert')}
 				</p>
 			)}
 			{exportOpen && (
 				<form class="hoofdstukacties-export" onSubmit={download}>
-					<label for="export-toelichting">Toelichting voor de verwerking</label>
+					<label for="export-toelichting">Toelichting voor Claude (mag leeg)</label>
 					<textarea
 						id="export-toelichting"
 						rows={3}
 						value={toelichting}
 						onInput={(gebeurtenis) => zetToelichting(gebeurtenis.currentTarget.value)}
 					/>
+					<p class="hoofdstukacties-hulp">Dit bestand is uitleg bij je Word-bestand. Lever het samen met dat bestand aan.</p>
 					{aantalBewerkt === 0 && <p role="status">Niets gewijzigd in dit hoofdstuk.</p>}
 					<button type="submit">Downloaden</button>
 				</form>

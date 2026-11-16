@@ -28,6 +28,7 @@ export const KNOPSLEUTELS: readonly string[] = [
 	'export-voor-claude',
 	'terug-naar-de-repo',
 	'vragen-kiezen',
+	'vragen-zoek-plekken',
 	'vervangen-zoeken',
 	'back-up-downloaden',
 	'back-up-inladen',
@@ -99,7 +100,7 @@ function voorbeeldVan({ sleutel, naam, context }: Props): ComponentChildren {
 		case 'nog-n-regels':
 			return (
 				<button type="button" class="meerregels">
-					nog 3 regels
+					nog 3 vertaalregels
 				</button>
 			);
 		case 'naslag-verwijzing':
@@ -109,7 +110,7 @@ function voorbeeldVan({ sleutel, naam, context }: Props): ComponentChildren {
 						§11
 					</button>{' '}
 					<button type="button" class="verwijzing">
-						precedent
+						vertaalkeuze
 					</button>
 				</>
 			);

@@ -78,16 +78,16 @@ describe('pastBijZoekterm en pastBijStatus', () => {
 });
 
 describe('beslotenSamenvatting', () => {
-	it('telt de precedenten met een bronvorm die nog staat en daarvan de onzekere', () => {
+	it('telt de vertaalkeuzes met een oude vorm die nog staat en daarvan de onzekere', () => {
 		const zichtbaar = [zekerNogOud, onzekerNogOud, onzekerNogOud, allesToegepast, nietTelbaar];
 
-		expect(beslotenSamenvatting(zichtbaar, 478)).toBe('5 van 478 vertaalkeuzes, waarvan 3 met een bronvorm die nog staat, waarvan 2 met een onzekere telling.');
+		expect(beslotenSamenvatting(zichtbaar, 478)).toBe('5 van 478 vertaalkeuzes. Bij 3 staat de oude vorm nog in de tekst (bij 2 daarvan is dat niet zeker).');
 	});
 
 	it('telt een onzekere telling zonder nog oude verzen niet mee', () => {
 		const onzekerKlaar = telling({ toegepast: 3, opmerkingen: ['haakjes genegeerd'] });
 
-		expect(beslotenSamenvatting([onzekerKlaar], 1)).toBe('1 van 1 vertaalkeuzes, waarvan 0 met een bronvorm die nog staat, waarvan 0 met een onzekere telling.');
+		expect(beslotenSamenvatting([onzekerKlaar], 1)).toBe('1 vertaalkeuze. Bij 0 staat de oude vorm nog in de tekst.');
 	});
 });
 

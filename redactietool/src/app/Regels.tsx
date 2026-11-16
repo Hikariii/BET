@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks';
 import type { LogVers, OpenVraag, Verwijzing } from '../data/types';
+import { registerVraagSleutel, vraagAdres as maakVraagAdres } from './begrippen/vraagAdres';
 import { kapRegels } from './kapRegels';
 import { InlineMarkdown } from './Markdownweergave';
 import { zelfdeNaslag, type Naslag } from './naslag';
@@ -7,6 +8,9 @@ import { isOpen } from './vertaalvragen';
 import './regels.css';
 
 export type RegelsProps = {
+	boekId: string;
+	/** Het adres van de eerste vertaalvraag bij dit vers op Vertaalvragen, of `null` als er geen is. */
+	vraagAdres: string | null;
 	/** De logblokken waar dit vers in valt. */
 	logVerzen: readonly LogVers[];
 	/** De vertaalvragen uit de referentie die aan dit vers hangen. */
@@ -20,7 +24,7 @@ export type RegelsProps = {
 	onOpenNaslag: (naslag: Naslag, verwijzing: HTMLElement) => void;
 };
 
-export function Regels({ logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenNaslag }: RegelsProps) {
+export function Regels({ boekId, vraagAdres, logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenNaslag }: RegelsProps) {
 	const [uitgeklapt, zetUitgeklapt] = useState(false);
 	const aantalPerBlok = logVerzen.map((logVers) => logVers.wijzigingen.length);
 	const { zichtbaarPerBlok } = kapRegels(aantalPerBlok, uitgeklapt || !gekapt);
@@ -60,17 +64,17 @@ export function Regels({ logVerzen, vragen, gekapt, openNaslag, kaartId, onOpenN
 			)}
 			{inklapbaar > 0 && (
 				<button type="button" class="meerregels" data-help="nog-n-regels" aria-expanded={uitgeklapt} onClick={() => zetUitgeklapt(!uitgeklapt)}>
-					{uitgeklapt ? 'minder regels' : `nog ${inklapbaar} regels`}
+					{uitgeklapt ? 'minder vertaalregels' : `nog ${inklapbaar} vertaalregels`}
 				</button>
 			)}
-			{!heeftRegels && <p class="geen-regels">Geen vertaalregels in het log.</p>}
-			{(vragen.length > 0 || logVragen.length > 0) && <Vraag vragen={vragen} logVragen={logVragen} />}
+			{!heeftRegels && <p class="geen-regels">Claude heeft bij dit vers niets aangepast.</p>}
+			{(vragen.length > 0 || logVragen.length > 0) && <Vraag boekId={boekId} vraagAdres={vraagAdres} vragen={vragen} logVragen={logVragen} />}
 		</>
 	);
 }
 
 function verwijzingsLabel(verwijzing: Verwijzing): string {
-	return verwijzing.soort === 'paragraaf' ? `§${verwijzing.paragraaf}` : 'precedent';
+	return verwijzing.soort === 'paragraaf' ? `§${verwijzing.paragraaf}` : 'vertaalkeuze';
 }
 
 function bereik(verzen: readonly number[]): string {
@@ -85,39 +89,51 @@ function naarNaslag(verwijzing: Verwijzing, regel: string): Naslag {
 		: { soort: 'precedenten', regel };
 }
 
-function Vraag({ vragen, logVragen }: { vragen: readonly OpenVraag[]; logVragen: readonly string[] }) {
+type VraagProps = { boekId: string; vraagAdres: string | null; vragen: readonly OpenVraag[]; logVragen: readonly string[] };
+
+function Vraag({ boekId, vraagAdres, vragen, logVragen }: VraagProps) {
 	return (
 		<details class={vragen.some(isOpen) ? 'vraag vraag-open' : 'vraag'}>
 			<summary>vraag</summary>
 			{vragen.map((vraag) => (
+				<>
 				<dl>
-					<dt>Kwestie</dt>
+					<dt>Vraag</dt>
 					<dd>
 						<InlineMarkdown tekst={vraag.kwestie} /> <span class="vraagstatus">({vraag.status})</span>
 					</dd>
-					<dt>Gekozen</dt>
+					<dt>Nu in de tekst</dt>
 					<dd>
 						<InlineMarkdown tekst={vraag.gekozen} />
 					</dd>
-					<dt>Alternatief</dt>
+					<dt>Andere opties</dt>
 					<dd>
 						<InlineMarkdown tekst={vraag.alternatief} />
 					</dd>
 					{vraag.besluit !== '' && (
 						<>
-							<dt>Besluit</dt>
+							<dt>Besluit van de redactie</dt>
 							<dd>
 								<InlineMarkdown tekst={vraag.besluit} />
 							</dd>
 						</>
 					)}
 				</dl>
+				<p class="vraagkoppeling-link">
+					<a href={maakVraagAdres(boekId, registerVraagSleutel(vraag.kwestie))}>Beantwoorden bij Vertaalvragen</a>
+				</p>
+				</>
 			))}
 			{logVragen.map((tekst) => (
 				<p>
 					<InlineMarkdown tekst={tekst} />
 				</p>
 			))}
+			{vragen.length === 0 && vraagAdres !== null && (
+				<p class="vraagkoppeling-link">
+					<a href={vraagAdres}>Naar de vraag bij Vertaalvragen</a>
+				</p>
+			)}
 		</details>
 	);
 }

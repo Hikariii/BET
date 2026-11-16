@@ -142,7 +142,7 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 			)}
 			{verouderd && (
 				<p class="versverouderd" role="status">
-					Claude heeft dit vers veranderd nadat jij het bewerkte. Je wijziging bouwt op de oude tekst; lees hem na voor je hem gebruikt.
+					Claude heeft dit vers veranderd nadat jij het bewerkte. Lees je tekst na. Wil je de tekst van Claude, kies dan Vers terugzetten (je eigen wijziging gaat dan weg).
 				</p>
 			)}
 			{opslagmelding !== null && (
@@ -153,7 +153,9 @@ export function BewerkbaarVers({ boek, hoofdstuk, nummer, delen, bewerkt, bewerk
 			{waarschuwingen.length > 0 && (
 				<ul class="verswaarschuwingen" aria-label={`Waarschuwingen bij vers ${nummer}`}>
 					{waarschuwingen.map((waarschuwing) => (
-						<li>{waarschuwing.tekst}</li>
+						<li>
+							{waarschuwing.tekst} Zet de markering in Word, of kies Vers terugzetten.
+						</li>
 					))}
 				</ul>
 			)}

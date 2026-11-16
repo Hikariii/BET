@@ -31,7 +31,7 @@ export function Naslagkaart({ naslag, boekId, referentie, id, onSluit }: Props) 
 		return () => window.removeEventListener('keydown', bijToets);
 	}, [naslag, onSluit]);
 
-	const titel = naslag.soort === 'richtlijn' ? `Richtlijn §${naslag.paragraaf}` : 'Precedenten';
+	const titel = naslag.soort === 'richtlijn' ? `Richtlijn §${naslag.paragraaf}` : 'Vertaalkeuzes';
 	return (
 		<aside class="naslagkaart" data-help="naslagkaart" id={id} aria-labelledby={`${id}-titel`}>
 			<header>
@@ -76,7 +76,7 @@ function zoekSectie(secties: readonly RichtlijnSectie[], paragraaf: string): Ric
 }
 
 type PrecedentenProps = {
-	/** De precedenten die bij de logregel horen. */
+	/** De vertaalkeuzes die bij de regel van Claude horen. */
 	precedenten: readonly Precedent[];
 	aantalInTabel: number;
 	boekId: string;
@@ -86,13 +86,13 @@ function PrecedentenInhoud({ precedenten, aantalInTabel, boekId }: PrecedentenPr
 	const alleKeuzes = <a href={maakAdres({ soort: 'begrippen', boek: boekId, tabblad: 'besloten' })}>tabblad Vertaalkeuzes</a>;
 	if (precedenten.length === 0) {
 		return <p class="naslagmelding">
-				Het log wijst niet aan welke vertaalkeuze bedoeld is, en op de woorden van deze regel is er geen gevonden. Bekijk alle vertaalkeuzes op het {alleKeuzes}.
+				Claude heeft niet vastgelegd welke vertaalkeuze bedoeld is, en op de woorden van deze regel is er geen gevonden. Bekijk alle vertaalkeuzes op het {alleKeuzes}.
 			</p>;
 	}
 	return (
 		<>
 			<p class="naslagmelding">
-				Mogelijk horen {precedenten.length} van de {aantalInTabel} vertaalkeuzes bij deze regel: gevonden op de woorden van de regel, want het log wijst niet aan welke bedoeld is. De rest staat op het {alleKeuzes}.
+				Mogelijk horen {precedenten.length} van de {aantalInTabel} vertaalkeuzes bij deze regel: gevonden op de woorden van de regel, want Claude heeft niet vastgelegd welke bedoeld is. De rest staat op het {alleKeuzes}.
 			</p>
 			<div class="tabelrand">
 				<table>

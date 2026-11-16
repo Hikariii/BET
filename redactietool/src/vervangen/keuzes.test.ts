@@ -182,7 +182,7 @@ describe('draaiKeuzeTerug met twee keuzes op hetzelfde vers', () => {
 
 		const meldingen = draaiKeuzeTerug(opslag, 'lukas', eerste.id);
 
-		expect(meldingen).toEqual(['Vers 6:22 is daarna veranderd door de keuze "woorden"; draai die eerst terug.']);
+		expect(meldingen).toEqual(['Vers 6:22 is daarna veranderd door de vervanging "woorden"; draai die eerst terug.']);
 		expect(huidig(opslag, 22)).toEqual(inhoud(' Hij sprak scherpe zinnen.'));
 		expect(huidig(opslag, 23)).toBeUndefined();
 		expect(leesKeuzes(opslag, 'lukas').find((k) => k.id === eerste.id)?.verzen.map((v) => v.vers)).toEqual([22]);
@@ -263,7 +263,7 @@ describe('draaiKeuzeTerug', () => {
 
 		const meldingen = draaiKeuzeTerug(opslag, 'lukas', keuze.id);
 
-		expect(meldingen).toEqual(['Vers 6:22 is na de keuze zelf bewerkt en blijft staan.']);
+		expect(meldingen).toEqual(['Vers 6:22 is na de vervanging zelf bewerkt en blijft staan.']);
 		expect(huidig(opslag, 22)).toEqual(inhoud(' Hij sprak scherpe, eigen woorden.'));
 		expect(huidig(opslag, 23)).toBeUndefined();
 		expect(leesKeuzes(opslag, 'lukas')).toEqual([]);
@@ -284,7 +284,7 @@ describe('draaiKeuzeTerug', () => {
 	});
 
 	it('meldt een keuze die niet (meer) bestaat', () => {
-		expect(draaiKeuzeTerug(opslag, 'lukas', 'bestaat-niet')).toEqual(['Deze keuze staat niet meer in de lijst.']);
+		expect(draaiKeuzeTerug(opslag, 'lukas', 'bestaat-niet')).toEqual(['Deze vervanging staat niet meer in de lijst.']);
 	});
 });
 
@@ -514,7 +514,7 @@ describe('draaiVersTerug', () => {
 
 		const meldingen = draaiVersTerug(opslag, 'lukas', keuze.id, 6, 22);
 
-		expect(meldingen).toEqual(['Vers 6:22 is na de keuze zelf bewerkt en blijft staan.']);
+		expect(meldingen).toEqual(['Vers 6:22 is na de vervanging zelf bewerkt en blijft staan.']);
 		expect(leesKeuzes(opslag, 'lukas')[0]?.verzen.map((v) => v.vers)).toEqual([23]);
 	});
 
@@ -530,7 +530,7 @@ describe('draaiVersTerug', () => {
 
 		const meldingen = draaiVersTerug(opslag, 'lukas', eerste.id, 6, 22);
 
-		expect(meldingen).toEqual(['Vers 6:22 is daarna veranderd door de keuze "gezegend"; draai die eerst terug.']);
+		expect(meldingen).toEqual(['Vers 6:22 is daarna veranderd door de vervanging "gezegend"; draai die eerst terug.']);
 		expect(leesKeuzes(opslag, 'lukas').find((k) => k.id === eerste.id)?.verzen.map((v) => v.vers)).toEqual([22, 23]);
 		expect(leesAntwoorden(opslag, 'lukas').some((antwoord) => antwoord.keuzeIds.includes(eerste.id))).toBe(true);
 	});
@@ -538,8 +538,8 @@ describe('draaiVersTerug', () => {
 	it('meldt een vers dat niet bij de keuze hoort en een keuze die er niet is', () => {
 		const keuze = keuzeOverTweeVerzen();
 
-		expect(draaiVersTerug(opslag, 'lukas', keuze.id, 6, 24)).toEqual(['Vers 6:24 hoort niet (meer) bij deze keuze.']);
-		expect(draaiVersTerug(opslag, 'lukas', 'bestaat-niet', 6, 22)).toEqual(['Deze keuze staat niet meer in de lijst.']);
+		expect(draaiVersTerug(opslag, 'lukas', keuze.id, 6, 24)).toEqual(['Vers 6:24 hoort niet (meer) bij deze vervanging.']);
+		expect(draaiVersTerug(opslag, 'lukas', 'bestaat-niet', 6, 22)).toEqual(['Deze vervanging staat niet meer in de lijst.']);
 		expect(leesKeuzes(opslag, 'lukas')[0]?.verzen).toHaveLength(2);
 	});
 });

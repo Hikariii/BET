@@ -49,7 +49,7 @@ export const VERSRIJ: VersOnderdeel = {
 		),
 		toestand('Met een vraag', VERZEN.metVraag, 'De vraag staat dicht achter ‘vraag’.'),
 		toestand('Met een open vraag', VERZEN.metOpenVraag, 'De vraag staat nog open en is uitgeklapt.', 'gewoon', openVraag),
-		toestand('Zonder regels', VERZEN.zonderRegels, 'Het log zegt niets over dit vers.'),
+		toestand('Zonder regels', VERZEN.zonderRegels, 'Claude heeft bij dit vers niets aangepast.'),
 		toestand('Gekozen vers', VERZEN.gekozen, 'Het vers uit het adres, zoals #/lukas/4/26.', 'gekozen'),
 	],
 };
@@ -57,7 +57,7 @@ export const VERSRIJ: VersOnderdeel = {
 export const NASLAG: VersOnderdeel = {
 	titel: 'Naslagkaart onder een vers',
 	toestanden: [
-		toestand('Precedent', VERZEN.naslagPrecedent, 'Een klik op ‘precedent’ opent de bijbehorende vertaalkeuzes onder het vers.', 'gewoon', openPrecedent),
+		toestand('Vertaalkeuze', VERZEN.naslagPrecedent, 'Een klik op ‘vertaalkeuze’ opent de bijbehorende vertaalkeuzes onder het vers.', 'gewoon', openPrecedent),
 		toestand('Richtlijnparagraaf', VERZEN.naslagParagraaf, 'Een klik op een § opent die paragraaf van de richtlijn onder het vers.', 'gewoon', openParagraaf),
 	],
 };

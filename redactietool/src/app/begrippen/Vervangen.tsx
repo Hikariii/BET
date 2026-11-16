@@ -19,6 +19,8 @@ import {
 	kiesBereik,
 	kortUit,
 	optieOmschrijving,
+	aangepastZin,
+	gevondenZin,
 	plekken as plekkenTekst,
 	standaardAangevinkt,
 	verdeelPlekken,
@@ -202,7 +204,7 @@ function nietLegeVervangingen(vervangingen: ReadonlyMap<string, string>): Map<st
 	return new Map([...vervangingen].filter(([, nieuw]) => nieuw !== ''));
 }
 
-/** Tabblad Zoeken en vervangen: een verwoording of een markering in het boek (of de verzen van een vraag) wijzigen via een voorbeeldvenster. */
+/** Tabblad Zoeken en vervangen: een woord, zin of markering in het boek (of de verzen van een vraag) wijzigen na een voorbeeld van elke plek. */
 export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 	const [voorstel] = useState(() => neemVoorstel(sessieopslag(), boek.id));
 	const [soort, zetSoort] = useState<Soort>(voorstel?.opdracht ?? 'tekst');
@@ -217,6 +219,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 	const [aangevinkt, zetAangevinkt] = useState<ReadonlySet<string>>(new Set());
 	const [variantVervangingen, zetVariantVervangingen] = useState<ReadonlyMap<string, string>>(new Map());
 	const [meldingen, zetMeldingen] = useState<string[]>([]);
+	const [naToepassen, zetNaToepassen] = useState(false);
 	const [keuzes, zetKeuzes] = useState<StructureleKeuze[]>(() => leesKeuzes(browseropslag(), boek.id));
 	const [antwoorden, zetAntwoorden] = useState<Antwoord[]>(() => leesAntwoorden(browseropslag(), boek.id));
 	const zoekveld = useRef<HTMLInputElement>(null);
@@ -246,7 +249,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 		if (zoekterm === '') return 'Vul eerst in wat je zoekt.';
 		if (soort === 'tekst') return { soort, zoekterm, nieuw, bereik };
 		if (van === '' || naar === '') return 'Kies bij Van en Naar een markering.';
-		if (van === naar) return 'Van en Naar zijn dezelfde markering; er valt niets te wisselen.';
+		if (van === naar) return 'Van en Naar zijn dezelfde markering; er valt niets te wisselen. Kies bij Naar een andere markering.';
 		return { soort, zoekterm, van, naar, bereik };
 	}
 
@@ -269,6 +272,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 	function zoeken(gebeurtenis: Event) {
 		gebeurtenis.preventDefault();
 		zetMeldingen([]);
+		zetNaToepassen(false);
 		zoekMet(vraag, heleBoek, new Map());
 	}
 
@@ -281,7 +285,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 	function koppelLos() {
 		zetVraag(null);
 		zetHeleBoek(false);
-		zetMeldingen(['De zoekopdracht is niet meer aan de vraag gekoppeld en zoekt in het hele boek.']);
+		zetMeldingen(['De zoekopdracht is niet meer aan de vraag gekoppeld en zoekt in het hele boek. Kies Zoeken om opnieuw te zoeken.']);
 		if (opdracht !== null) zoekMet(null, false, variantVervangingen);
 	}
 
@@ -316,13 +320,14 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 			nu,
 		);
 		const aangepast = verdeling.toe.filter((plek) => uitkomst.keuze.verzen.some(({ hoofdstuk, vers }) => hoofdstuk === plek.hoofdstuk && vers === plek.vers)).length;
-		const regels = [...uitkomst.meldingen, `${plekkenTekst(aangepast)} aangepast.`];
+		const regels = [...uitkomst.meldingen, aangepastZin(aangepast, uitkomst.keuze.verzen.length)];
 		const beantwoord = vraag !== null && leesAntwoorden(browseropslag(), boek.id).some(({ keuzeIds }) => keuzeIds.includes(uitkomst.keuze.id));
 		if (beantwoord) {
-			regels.push(`De keuze staat nu onder het antwoord op "${kortUit(vraag.kwestie, 80)}". De zoekopdracht blijft aan dat antwoord gekoppeld: een volgende keuze komt er ook onder. Met Loslaten zoek je weer in het hele boek.`);
+			regels.push(`De vervanging staat nu onder het antwoord op "${kortUit(vraag.kwestie, 80)}". De zoekopdracht blijft aan die vraag gekoppeld: een volgende vervanging komt er ook onder. Kies Los van de vraag om weer in het hele boek te zoeken.`);
 		}
 		zetMeldingen(regels);
 		zoekMet(vraag, heleBoek, variantVervangingen);
+		zetNaToepassen(true);
 		herlees();
 		meldingenvak.current?.focus();
 	}
@@ -335,12 +340,12 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 
 	function terugdraaien(keuze: StructureleKeuze) {
 		const regels = draaiKeuzeTerug(browseropslag(), boek.id, keuze.id);
-		naTerugdraaien([...regels, `Keuze "${keuze.zoekterm}" teruggedraaid.`]);
+		naTerugdraaien([...regels, `Vervanging "${keuze.zoekterm}" teruggedraaid.`]);
 	}
 
 	function versTerugdraaien(keuze: StructureleKeuze, hoofdstuk: number, vers: number) {
 		const regels = draaiVersTerug(browseropslag(), boek.id, keuze.id, hoofdstuk, vers);
-		naTerugdraaien([...regels, `Vers ${hoofdstuk}:${vers} van keuze "${keuze.zoekterm}" teruggedraaid.`]);
+		naTerugdraaien([...regels, `Vers ${hoofdstuk}:${vers} van vervanging "${keuze.zoekterm}" teruggedraaid.`]);
 	}
 
 	const groepen = groepeerPlekken(gevonden);
@@ -355,16 +360,16 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 	return (
 		<div class="vervangen">
 			<p class="uitleg">
-				Zoek een verwoording in het hele boek, of wissel alleen de markering op dezelfde woorden. Bekijk in het voorbeeld elke plek en pas daarna de aangevinkte plekken toe. De bewerking komt in de tussenstand van de verzen; de rest van het vers blijft zoals het was.
+				Zoek een woord of zin in de vereenvoudigde tekst van het hele boek, of wissel alleen de markering op dezelfde woorden. Bekijk elke plek en pas toe wat je aanvinkt. Je wijzigingen komen in je bewerkte verzen; de rest van het vers blijft zoals het was.
 			</p>
 
 			{vraag !== null && (
 				<div class="vraagkoppeling">
 					<p title={`${vraag.kwestie}, ${koppelingOptie}`}>
-						Hoort bij het antwoord op: {kortUit(vraag.kwestie, 80)} ({kortUit(koppelingOptie, 80)})
+						Hoort bij de vraag: {kortUit(vraag.kwestie, 80)} ({kortUit(koppelingOptie, 80)})
 					</p>
 					<button type="button" onClick={koppelLos}>
-						Loslaten
+						Los van de vraag
 					</button>
 				</div>
 			)}
@@ -413,7 +418,7 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 			)}
 
 			<p role="status" class="vervangen-samenvatting">
-				{opdracht !== null && `${plekkenTekst(gevonden.length)} gevonden voor "${opdracht.zoekterm}".`}
+				{opdracht !== null && !(naToepassen && gevonden.length === 0) && gevondenZin(gevonden.length, opdracht.zoekterm)}
 				{vervangingLeeg && gevonden.length > 0 && ' Bij Vervang door staat niets: de gevonden tekst wordt verwijderd.'}
 			</p>
 
@@ -457,8 +462,8 @@ export function Vervangen({ boek, hoofdstukken }: TabbladProps) {
 					)}
 					{groepen.metDeHand.length > 0 && (
 						<section class="vondstgroep">
-							<h2>Met de hand (opmaakgrens)</h2>
-							<p class="uitleg">Deze plekken lopen over een opmaakgrens of vallen maar deels onder de markering en worden niet gewijzigd. Pas ze zelf aan in het vers.</p>
+							<h2>Met de hand aanpassen</h2>
+							<p class="uitleg">Hier verandert de opmaak midden in het woord of de zin. De tool kan dit niet veilig wijzigen; pas het zelf aan in het vers.</p>
 							<PlekkenLijst boek={boek.id} plekken={groepen.metDeHand} wijziging={wijziging} stijlen={boek.stijlen} aangevinkt={new Set()} bijWissel={wissel} />
 						</section>
 					)}

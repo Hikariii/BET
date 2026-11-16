@@ -119,7 +119,7 @@ describe('legAntwoordVast', () => {
 
 		expect(uitkomst).toEqual({
 			gelukt: false,
-			melding: 'Er is al een antwoord op deze vraag. Pas de toelichting aan, of draai de keuzes terug en trek het antwoord in.',
+			melding: 'Er is al een antwoord op deze vraag. Pas de toelichting aan, of draai de vervangingen terug en trek het antwoord in.',
 		});
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([GEZEGEND]);
 	});
@@ -213,7 +213,7 @@ describe('trekAntwoordIn', () => {
 		bewaarAntwoord(opslag, 'lukas', GEZEGEND);
 
 		const geweigerd = trekAntwoordIn(opslag, 'lukas', 'Gezegend', new Set(['k1']));
-		expect(geweigerd).toEqual({ gelukt: false, melding: expect.stringContaining('keuzes') });
+		expect(geweigerd).toEqual({ gelukt: false, melding: expect.stringContaining('vervangingen') });
 		expect(leesAntwoorden(opslag, 'lukas')).toEqual([GEZEGEND]);
 
 		expect(trekAntwoordIn(opslag, 'lukas', 'Gezegend', new Set(['elders']))).toEqual({ gelukt: true });
@@ -244,7 +244,7 @@ describe('controleerKeuze', () => {
 		expect(controleerKeuze(GEZEGEND, andereOptie)).toEqual({
 			gelukt: false,
 			melding:
-				'Het antwoord op deze vraag is a) genade. Kies een optie die erbij past, of draai de keuzes terug, trek het antwoord in en leg een eigen antwoord vast.',
+				'Het antwoord op deze vraag is a) genade. Kies een optie die erbij past, of draai de vervangingen terug, trek het antwoord in en leg een eigen antwoord vast.',
 		});
 	});
 
@@ -266,7 +266,7 @@ describe('meldingHoudenBijBestaandAntwoord', () => {
 		const bestaand = { ...HOUDEN, keuzeIds: ['k1'] };
 
 		expect(meldingHoudenBijBestaandAntwoord(bestaand, 'a) iets anders')).toBe(
-			'Het antwoord op deze vraag is b) niets doen. Kies een optie die erbij past, of draai de keuzes terug, trek het antwoord in en leg een eigen antwoord vast.',
+			'Het antwoord op deze vraag is b) niets doen. Kies een optie die erbij past, of draai de vervangingen terug, trek het antwoord in en leg een eigen antwoord vast.',
 		);
 		expect(meldingHoudenBijBestaandAntwoord(bestaand, bestaand.optie)).toBe('Het antwoord op deze vraag ligt al vast. Er verandert niets in de tekst.');
 	});

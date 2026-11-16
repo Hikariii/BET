@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { BewaardOverzicht } from '../../bewaren/overzicht';
-import { backupHerinnering, laatsteBackupRegel, tijdGeleden } from './backupTekst';
+import { backupBestandsnaamMetTijd, backupHerinnering, laatsteBackupRegel, tijdGeleden } from './backupTekst';
 
 /** Een tijdstip in de lokale tijdzone, zodat de test niet van de tijdzone van de machine afhangt. */
-function lokaal(maand: number, dag: number, uur = 12): Date {
-	return new Date(2026, maand - 1, dag, uur, 0);
+function lokaal(maand: number, dag: number, uur = 12, minuut = 0): Date {
+	return new Date(2026, maand - 1, dag, uur, minuut);
 }
 
 const NU = lokaal(11, 20, 15);
@@ -53,7 +53,18 @@ describe('laatsteBackupRegel', () => {
 	});
 
 	it('noemt hoe lang geleden de back-up was', () => {
-		expect(laatsteBackupRegel(lokaal(11, 19).toISOString(), NU)).toBe('Laatste back-up: gisteren');
+		expect(laatsteBackupRegel(lokaal(11, 19, 9, 5).toISOString(), NU)).toContain('Laatste back-up: gisteren (');
+	});
+
+	it('zet de tijd erbij als de back-up vandaag was', () => {
+		expect(laatsteBackupRegel(lokaal(11, 20, 14, 32).toISOString(), lokaal(11, 20, 16))).toBe('Laatste back-up: vandaag (14:32)');
+	});
+
+	it('zet bij een eerdere dag ook de datum erbij', () => {
+		const regel = laatsteBackupRegel(lokaal(11, 17, 9, 5).toISOString(), NU);
+
+		expect(regel).toContain('3 dagen geleden (');
+		expect(regel).toContain('09:05');
 	});
 });
 
@@ -86,7 +97,7 @@ describe('backupHerinnering', () => {
 	it('telt een toegepaste keuze als bewerking', () => {
 		const overzicht: BewaardOverzicht = {
 			...LEEG_OVERZICHT,
-			keuzes: [{ id: 'k', zoekterm: 'a', nieuw: 'b', toegepast: lokaal(11, 10).toISOString(), aantalVerzen: 2 }],
+			keuzes: [{ id: 'k', soort: 'tekst', zoekterm: 'a', nieuw: 'b', van: null, naar: null, toegepast: lokaal(11, 10).toISOString(), aantalVerzen: 2 }],
 			totaal: { verzen: 0, hoofdstukken: 0, verouderd: 0, keuzes: 1, antwoorden: 0 },
 			laatstBewaard: lokaal(11, 10).toISOString(),
 		};
@@ -120,5 +131,15 @@ describe('backupHerinnering', () => {
 
 	it('zwijgt bij een back-up van minder dan 7 dagen oud, ook als er daarna bewerkt is', () => {
 		expect(backupHerinnering(overzichtMetBewerking(lokaal(11, 19)), lokaal(11, 15).toISOString(), NU)).toBeNull();
+	});
+});
+
+describe('backupBestandsnaamMetTijd', () => {
+	it('zet datum en tijd in de naam, met nullen voor een enkel cijfer', () => {
+		expect(backupBestandsnaamMetTijd('lukas', lokaal(11, 6, 9, 5))).toBe('lukas.bet-bewaard-2026-11-06-0905.json');
+	});
+
+	it('geeft twee back-ups van verschillende minuten een verschillende naam', () => {
+		expect(backupBestandsnaamMetTijd('lukas', lokaal(11, 20, 14, 32))).not.toBe(backupBestandsnaamMetTijd('lukas', lokaal(11, 20, 14, 33)));
 	});
 });

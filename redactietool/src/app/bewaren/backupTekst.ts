@@ -1,4 +1,6 @@
+import { backupBestandsnaam } from '../../bewaren/backup';
 import type { BewaardOverzicht } from '../../bewaren/overzicht';
+import { tijdVan } from './bewaarTekst';
 
 const DAG_IN_MS = 24 * 60 * 60 * 1000;
 
@@ -22,12 +24,12 @@ export function tijdGeleden(iso: string, nu: Date): string {
 	return `${Math.floor(dagen / 30)} maanden geleden`;
 }
 
-/** "Laatste back-up: nooit" of "Laatste back-up: gisteren". */
+/** "Laatste back-up: nooit" of "Laatste back-up: vandaag (14:32)"; een eerdere dag krijgt ook de datum: "gisteren (15 nov, 09:00)". */
 export function laatsteBackupRegel(laatsteBackup: string | null, nu: Date): string {
-	return `Laatste back-up: ${laatsteBackup === null ? 'nooit' : tijdGeleden(laatsteBackup, nu)}`;
+	return `Laatste back-up: ${laatsteBackup === null ? 'nooit' : `${tijdGeleden(laatsteBackup, nu)} (${tijdVan(laatsteBackup, nu)})`}`;
 }
 
-/** Het moment van elke bewerkte vers, elke toegepaste keuze en elk gegeven antwoord. */
+/** Het moment van elke bewerkte vers, elke toegepaste vervanging en elk antwoord. */
 function bewerkingTijden(overzicht: BewaardOverzicht): number[] {
 	return [
 		...overzicht.hoofdstukken.flatMap((hoofdstuk) => hoofdstuk.verzen.map((vers) => Date.parse(vers.bewaard))),
@@ -50,4 +52,15 @@ export function backupHerinnering(overzicht: BewaardOverzicht, laatsteBackup: st
 	const backupMs = Date.parse(laatsteBackup);
 	const bewerktNaBackup = tijden.some((tijd) => tijd > backupMs);
 	return bewerktNaBackup && backupMs < grens ? `Maak een back-up: je laatste is van ${tijdGeleden(laatsteBackup, nu)}.` : null;
+}
+
+function tweeCijfers(getal: number): string {
+	return String(getal).padStart(2, '0');
+}
+
+/** De bestandsnaam van een back-up met datum en tijd in de lokale tijd, zodat de nieuwste te zien is: `lukas.bet-bewaard-2026-11-16-1103.json`. */
+export function backupBestandsnaamMetTijd(boek: string, nu: Date): string {
+	const datum = `${nu.getFullYear()}-${tweeCijfers(nu.getMonth() + 1)}-${tweeCijfers(nu.getDate())}`;
+	const tijd = `${tweeCijfers(nu.getHours())}${tweeCijfers(nu.getMinutes())}`;
+	return backupBestandsnaam(boek).replace(/\.json$/, `-${datum}-${tijd}.json`);
 }

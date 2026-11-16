@@ -1,6 +1,6 @@
-import { backupBestandsnaam } from '../../bewaren/backup';
 import type { BoekData } from '../../data/types';
 import { exportBestandsnaam } from '../../export/maakExport';
+import { backupBestandsnaamMetTijd } from '../bewaren/backupTekst';
 import { BEWAARD_NAAM, PLEKNAAM } from '../navigatie/boekplekken';
 import { alleOnderdelen, type HelpOnderdeel } from './onderdelen';
 
@@ -23,8 +23,11 @@ export type Helpnamen = {
 /** Het hoofdstuk in de voorbeeldnaam van het exportbestand. */
 const VOORBEELDHOOFDSTUK = 4;
 
+/** Het moment in de voorbeeldnaam van het back-upbestand. */
+const VOORBEELDMOMENT = new Date(2026, 10, 16, 11, 3);
+
 export function helpnamen(boek: BoekData): Helpnamen {
-	return { boek: boek.naam, backupBestand: backupBestandsnaam(boek.id), exportBestand: exportBestandsnaam(boek.prefix, VOORBEELDHOOFDSTUK) };
+	return { boek: boek.naam, backupBestand: backupBestandsnaamMetTijd(boek.id, VOORBEELDMOMENT), exportBestand: exportBestandsnaam(boek.prefix, VOORBEELDHOOFDSTUK) };
 }
 
 export type Helpblok =

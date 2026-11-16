@@ -3,7 +3,7 @@ import type { Tussenstand, VersInhoud } from '../../bewerken/types';
 import type { BoekData, HoofdstukData, Status } from '../../data/types';
 import type { Hoofdstuk } from '../../formaat/types';
 import type { Plek } from '../../vervangen/zoekopdracht';
-import { bouwHoofdstukVerzen, groepeerPlekken, keuzeBeschrijving, kiesBereik, kortUit, plekken, standaardAangevinkt, vondstSleutel, verdeelPlekken } from './vervangenVoorbeeld';
+import { aangepastZin, bouwHoofdstukVerzen, gevondenZin, groepeerPlekken, keuzeBeschrijving, kiesBereik, kortUit, plekken, standaardAangevinkt, vondstSleutel, verdeelPlekken } from './vervangenVoorbeeld';
 
 const GEEN_TUSSENSTAND: Tussenstand = { verzen: {} };
 
@@ -228,7 +228,7 @@ describe('kiesBereik', () => {
 		const uitkomst = kiesBereik([], false);
 
 		expect(uitkomst.bereik).toBeNull();
-		expect(uitkomst.melding).toContain('geen verzen');
+		expect(uitkomst.melding).toContain('hoort bij geen enkel vers');
 		expect(kiesBereik([], true).bereik).toEqual({ soort: 'boek' });
 	});
 });
@@ -262,5 +262,15 @@ describe('keuzeBeschrijving', () => {
 describe('plekken', () => {
 	it('gebruikt het enkelvoud bij één plek', () => {
 		expect([plekken(0), plekken(1), plekken(2)]).toEqual(['0 plekken', '1 plek', '2 plekken']);
+	});
+
+	it('zegt bij nul plekken dat alleen de vereenvoudigde tekst doorzocht is', () => {
+		expect(gevondenZin(0, 'zalig')).toBe('Geen plekken gevonden voor "zalig" in de vereenvoudigde tekst. De bron wordt hier niet doorzocht.');
+		expect(gevondenZin(1, 'zalig')).toBe('1 plek gevonden voor "zalig" in de vereenvoudigde tekst.');
+	});
+
+	it('zegt na Toepassen in één zin hoeveel plekken in hoeveel verzen zijn aangepast', () => {
+		expect(aangepastZin(10, 9)).toBe('10 plekken in 9 verzen aangepast.');
+		expect(aangepastZin(1, 1)).toBe('1 plek in 1 vers aangepast.');
 	});
 });

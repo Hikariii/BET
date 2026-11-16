@@ -15,7 +15,7 @@ import { meervoud, tijdVan } from './bewaarTekst';
 import './bewaren.css';
 
 type Toestand =
-	| { soort: 'fout'; bestandsnaam: string; melding: string }
+	| { soort: 'fout'; bestandsnaam: string; melding: string; details: string }
 	| { soort: 'voorbeeld'; bestandsnaam: string; backup: Backup; voorbeeld: InlaadVoorbeeld }
 	| { soort: 'klaar'; modus: InlaadModus; uitkomst: InlaadUitkomst };
 
@@ -63,7 +63,7 @@ export function BackupInladen({ boek, focusNaSluiten, invoer }: Props) {
 		if (bestand === undefined) return;
 		const uitkomst = leesBackup(await bestand.text(), boek.id);
 		if (!uitkomst.gelukt) {
-			zetToestand({ soort: 'fout', bestandsnaam: bestand.name, melding: uitkomst.melding });
+			zetToestand({ soort: 'fout', bestandsnaam: bestand.name, melding: uitkomst.melding, details: uitkomst.details });
 			return;
 		}
 		zetToestand({
@@ -107,6 +107,10 @@ function Geweigerd({ toestand, onSluit }: { toestand: Extract<Toestand, { soort:
 			<p role="alert">
 				<strong>{toestand.bestandsnaam}</strong> kan niet worden ingeladen. {toestand.melding}
 			</p>
+			<details class="bewaren-venster-details">
+				<summary>Details</summary>
+				<p>{toestand.details}</p>
+			</details>
 			<p class="bewaren-venster-knoppen">
 				<button type="button" onClick={onSluit}>
 					Sluiten
@@ -134,7 +138,7 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 					de nieuwste staan: {telling.jouweBlijft} keer jouw versie, {telling.overschrijft} keer die uit de back-up.
 				</li>
 				<li>{meervoud(telling.gelijk, 'vers is', 'verzen zijn')} al gelijk.</li>
-				<li>{meervoud(telling.keuzesNieuw, 'keuze komt', 'keuzes komen')} erbij.</li>
+				<li>{meervoud(telling.keuzesNieuw, 'vervanging komt', 'vervangingen komen')} erbij.</li>
 				<li>{meervoud(telling.antwoordenNieuw, 'antwoord komt', 'antwoorden komen')} erbij.</li>
 			</ul>
 			{voorbeeld.verzen.length > 0 && (
@@ -151,9 +155,9 @@ function Voorbeeld({ toestand, onKies, onAnnuleer }: VoorbeeldProps) {
 			)}
 			<p class="bewaren-venster-uitleg">
 				<strong>Samenvoegen</strong> houdt alles wat je nu hebt en zet de back-up erbij; staat een vers in beide, dan blijft de nieuwste versie staan.{' '}
-				<strong>Vervangen</strong> wist eerst alles wat deze browser van het boek bewaart
+				<strong>Vervangen</strong> wist eerst alles wat deze browser van het boek opslaat
 				{vervangenWist.verzen + vervangenWist.keuzes + vervangenWist.antwoorden > 0 &&
-					`, dus ook ${meervoud(vervangenWist.verzen, 'vers', 'verzen')}, ${meervoud(vervangenWist.keuzes, 'keuze', 'keuzes')} en ${meervoud(vervangenWist.antwoorden, 'antwoord', 'antwoorden')} die niet in de back-up staan`}
+					`, dus ook ${meervoud(vervangenWist.verzen, 'vers', 'verzen')}, ${meervoud(vervangenWist.keuzes, 'vervanging', 'vervangingen')} en ${meervoud(vervangenWist.antwoorden, 'antwoord', 'antwoorden')} die niet in de back-up staan`}
 				.
 			</p>
 			<p class="bewaren-venster-knoppen">
@@ -178,8 +182,8 @@ function Klaar({ toestand, onSluit }: { toestand: Extract<Toestand, { soort: 'kl
 		<>
 			<p role={gelukt ? 'status' : 'alert'}>
 				{gelukt
-					? `Klaar: ${meervoud(geschreven.verzen, 'vers', 'verzen')}, ${meervoud(geschreven.keuzes, 'keuze', 'keuzes')} en ${meervoud(geschreven.antwoorden, 'antwoord', 'antwoorden')} opgeslagen (${toestand.modus}).`
-					: 'Het inladen is niet helemaal gelukt.'}
+					? `Klaar: ${meervoud(geschreven.verzen, 'vers', 'verzen')}, ${meervoud(geschreven.keuzes, 'vervanging', 'vervangingen')} en ${meervoud(geschreven.antwoorden, 'antwoord', 'antwoorden')} opgeslagen (${toestand.modus === 'samenvoegen' ? 'samengevoegd' : 'alles vervangen'}).`
+					: 'Het inladen is niet helemaal gelukt. Sluit dit venster en laad de back-up opnieuw in; lukt het weer niet, maak dan ruimte vrij in de browser.'}
 			</p>
 			{!gelukt && (
 				<ul>

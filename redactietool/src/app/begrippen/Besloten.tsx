@@ -21,7 +21,7 @@ function TellingCellen({ boek, telling }: TellingCellenProps) {
 	if (!telling.telbaar) {
 		return (
 			<td colSpan={2} class="niet-telbaar">
-				Niet automatisch te tellen: {telling.reden}
+				Niet te tellen: {telling.reden}
 			</td>
 		);
 	}
@@ -48,7 +48,7 @@ function TellingCellen({ boek, telling }: TellingCellenProps) {
 	);
 }
 
-/** Tabblad Vertaalkeuzes: de precedenten met per precedent het aantal plekken en links naar de verzen. */
+/** Tabblad Vertaalkeuzes: de vertaalkeuzes met per vertaalkeuze het aantal plekken en links naar de verzen. */
 export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 	const [zoekterm, zetZoekterm] = useState('');
 	const [statusfilter, zetStatusfilter] = useState<Statusfilter>('alle');
@@ -82,15 +82,15 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 			</p>
 			<div class="tabelrand">
 				<table class="besloten-tabel" data-help="besloten-tabel">
-					<caption class="alleen-lezers">Vertaalkeuzes (precedenten) met het aantal plekken in het boek</caption>
+					<caption class="alleen-lezers">Vertaalkeuzes met het aantal plekken in het boek</caption>
 					<thead>
 						<tr>
 							<th scope="col">Bron</th>
 							<th scope="col">Vereenvoudigd</th>
 							<th scope="col">Status</th>
 							<th scope="col">Toegepast</th>
-							<th scope="col">Bronvorm staat nog</th>
-							<th scope="col">Plaats of aantal</th>
+							<th scope="col">Oude vorm staat nog</th>
+							<th scope="col">Waar het geldt</th>
 							<th scope="col">Opmerking</th>
 						</tr>
 					</thead>
@@ -104,7 +104,7 @@ export function Besloten({ boek, referentie, hoofdstukken }: TabbladProps) {
 								<td>{telling.precedent.plaats}</td>
 								<td>
 									{telling.precedent.opmerking}
-									{telling.opmerkingen.length > 0 && <p class="onzeker">Telling onzeker: {telling.opmerkingen.join('; ')}.</p>}
+									{telling.opmerkingen.length > 0 && <p class="onzeker">Aantal niet zeker: {telling.opmerkingen.join('; ')}.</p>}
 								</td>
 							</tr>
 						))}

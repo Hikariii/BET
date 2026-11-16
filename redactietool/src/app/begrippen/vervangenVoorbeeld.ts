@@ -141,13 +141,24 @@ type BereikUitkomst = { bereik: Bereik; melding: null } | { bereik: null; meldin
 export function kiesBereik(vraagVerzen: readonly VersRef[] | null, heleBoek: boolean): BereikUitkomst {
 	if (vraagVerzen === null || heleBoek) return { bereik: { soort: 'boek' }, melding: null };
 	if (vraagVerzen.length === 0) {
-		return { bereik: null, melding: 'Deze vraag heeft geen verzen in open-vragen.md. Zet "Hele boek" aan om toch in het hele boek te zoeken.' };
+		return { bereik: null, melding: 'Deze vraag hoort bij geen enkel vers. Zet Hele boek aan om toch overal te zoeken.' };
 	}
 	return { bereik: { soort: 'verzen', verzen: [...vraagVerzen] }, melding: null };
 }
 
 export function plekken(aantal: number): string {
 	return aantal === 1 ? '1 plek' : `${aantal} plekken`;
+}
+
+/** De zin boven de plekken na het zoeken: `3 plekken gevonden voor "zalig" in de vereenvoudigde tekst.`; bij nul ook dat de bron niet doorzocht wordt. */
+export function gevondenZin(aantal: number, zoekterm: string): string {
+	if (aantal === 0) return `Geen plekken gevonden voor "${zoekterm}" in de vereenvoudigde tekst. De bron wordt hier niet doorzocht.`;
+	return `${plekken(aantal)} gevonden voor "${zoekterm}" in de vereenvoudigde tekst.`;
+}
+
+/** De melding na Toepassen: `10 plekken in 9 verzen aangepast.` */
+export function aangepastZin(aantalPlekken: number, aantalVerzen: number): string {
+	return `${plekken(aantalPlekken)} in ${aantalVerzen === 1 ? '1 vers' : `${aantalVerzen} verzen`} aangepast.`;
 }
 
 /** De tekst op ten hoogste `maximum` tekens, op een woordgrens afgekapt met "…"; de kwestie van een vraag is soms een hele alinea. */

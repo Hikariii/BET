@@ -1,4 +1,5 @@
 import type { GetelPrecedent } from '../../begrippen/telPrecedenten';
+import { meervoud } from '../bewaren/bewaarTekst';
 
 export const STATUSFILTERS = [
 	{ waarde: 'alle', label: 'Alle statussen' },
@@ -48,7 +49,9 @@ export function staatZekerNogOud(telling: GetelPrecedent): boolean {
 export function beslotenSamenvatting(zichtbaar: readonly GetelPrecedent[], totaal: number): string {
 	const metBronvormNog = zichtbaar.filter((telling) => telling.nietToegepast.length > 0);
 	const waarvanOnzeker = metBronvormNog.filter(isOnzeker);
-	return `${zichtbaar.length} van ${totaal} vertaalkeuzes, waarvan ${metBronvormNog.length} met een bronvorm die nog staat, waarvan ${waarvanOnzeker.length} met een onzekere telling.`;
+	const aantal = zichtbaar.length === totaal ? meervoud(totaal, 'vertaalkeuze', 'vertaalkeuzes') : `${zichtbaar.length} van ${totaal} vertaalkeuzes`;
+	const nietZeker = waarvanOnzeker.length > 0 ? ` (bij ${waarvanOnzeker.length} daarvan is dat niet zeker)` : '';
+	return `${aantal}. Bij ${metBronvormNog.length} staat de oude vorm nog in de tekst${nietZeker}.`;
 }
 
 /** Sleutel van een rij: bron en vereenvoudigd samen zijn uniek over alle precedenten. */

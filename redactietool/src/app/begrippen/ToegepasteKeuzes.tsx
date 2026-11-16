@@ -19,12 +19,12 @@ function toegepastOp(keuze: StructureleKeuze): string {
 	return new Date(keuze.toegepast).toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' });
 }
 
-/** De toegepaste keuzes van het boek, elk uit te klappen tot de verzen, met terugdraaien per keuze en per vers. */
+/** De toegepaste vervangingen van het boek, elk uit te klappen tot de verzen, met terugdraaien per vervanging en per vers. */
 export function ToegepasteKeuzes({ boek, keuzes, antwoorden, onTerugdraaien, onVersTerugdraaien }: Props) {
 	return (
 		<section class="toegepaste-keuzes" data-help="vervangen-terugdraaien">
-			<h2>Toegepaste keuzes</h2>
-			{keuzes.length === 0 && <p class="melding">Nog geen keuzes toegepast.</p>}
+			<h2>Toegepaste vervangingen</h2>
+			{keuzes.length === 0 && <p class="melding">Nog geen vervangingen toegepast.</p>}
 			<ul>
 				{keuzes.map((keuze) => {
 					const beschrijving = keuzeBeschrijving(keuze);
@@ -37,7 +37,7 @@ export function ToegepasteKeuzes({ boek, keuzes, antwoorden, onTerugdraaien, onV
 								</summary>
 								{keuze.vraag !== null && (
 									<p class="keuzevraag" title={keuze.vraag}>
-										Hoort bij het antwoord op: {kortUit(keuze.vraag, 80)}
+										Hoort bij de vraag: {kortUit(keuze.vraag, 80)}
 										{antwoord !== undefined && `, ${optieOmschrijving(kortUit(antwoord.optie, 80))}`}
 									</p>
 								)}
@@ -52,7 +52,7 @@ export function ToegepasteKeuzes({ boek, keuzes, antwoorden, onTerugdraaien, onV
 											</a>
 											<button
 												type="button"
-												aria-label={`Vers ${hoofdstuk}:${vers} van keuze ${beschrijving} terugdraaien`}
+												aria-label={`Vers ${hoofdstuk}:${vers} van vervanging ${beschrijving} terugdraaien`}
 												onClick={() => onVersTerugdraaien(keuze, hoofdstuk, vers)}
 											>
 												Terugdraaien
@@ -61,7 +61,7 @@ export function ToegepasteKeuzes({ boek, keuzes, antwoorden, onTerugdraaien, onV
 									))}
 								</ul>
 							</details>
-							<button type="button" aria-label={`Keuze ${beschrijving} helemaal terugdraaien`} onClick={() => onTerugdraaien(keuze)}>
+							<button type="button" aria-label={`Vervanging ${beschrijving} helemaal terugdraaien`} onClick={() => onTerugdraaien(keuze)}>
 								Alles terugdraaien
 							</button>
 						</li>

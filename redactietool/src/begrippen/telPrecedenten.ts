@@ -55,16 +55,16 @@ function telPrecedent(precedent: Precedent, verzen: readonly Vers[], verzenOpSle
 	const inBron = verzen.filter((vers) => komtEenVanVoor(vers.bron, bronZoekvormen));
 	const uitPlaats = leesPlaatsVerzen(precedent.plaats).flatMap((ref) => verzenOpSleutel.get(sleutel(ref)) ?? []);
 	if (inBron.length === 0 && uitPlaats.length === 0) {
-		return nietTelbaar(precedent, 'de bronvorm komt in de bron niet voor en Plaats noemt geen verzen');
+		return nietTelbaar(precedent, 'deze vertaalkeuze noemt geen vers en de oude vorm komt niet voor');
 	}
 	const plekken = [...new Set([...inBron, ...uitPlaats])].sort((een, ander) => een.ref.hoofdstuk - ander.ref.hoofdstuk || een.ref.vers - ander.ref.vers);
 
 	const opmerkingen: string[] = [];
-	if (bronVormen.haakjesGenegeerd) opmerkingen.push('de haakjes in de kolom Bron zijn niet gebruikt bij het zoeken');
-	if (inBron.length === 0) opmerkingen.push('de bronvorm is in de bron niet teruggevonden: geteld vanuit Plaats');
+	if (bronVormen.haakjesGenegeerd) opmerkingen.push('woorden tussen haakjes zijn niet meegezocht');
+	if (inBron.length === 0) opmerkingen.push('de oude vorm is in de bron niet teruggevonden: geteld vanuit de verzen die de vertaalkeuze noemt');
 	else {
 		const nietGevonden = uitPlaats.filter((vers) => !inBron.includes(vers)).length;
-		if (nietGevonden > 0) opmerkingen.push(`${nietGevonden} van de ${uitPlaats.length} verzen uit Plaats: bronvorm niet teruggevonden in de bron`);
+		if (nietGevonden > 0) opmerkingen.push(`${nietGevonden} van de ${uitPlaats.length} verzen die de vertaalkeuze noemt: oude vorm niet teruggevonden in de bron`);
 	}
 
 	const staatNogOud = (vers: Vers) => komtEenVanVoor(vers.vereenvoudigd, bronZoekvormen);

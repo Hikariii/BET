@@ -260,9 +260,9 @@ function draaiKeuzeVersTerug(opslag: Opslag, boek: string, keuzes: readonly Stru
 	if (bewerkt === undefined) return { melding: `Vers ${naam} staat al weer op de vereenvoudiging van Claude.`, blijftBijKeuze: false };
 	const latereKeuze = bewerkt.herkomst === 'structurele keuze' ? keuzes.find((k) => k.id === bewerkt.keuzeId && k.id !== keuze.id) : undefined;
 	if (latereKeuze !== undefined) {
-		return { melding: `Vers ${naam} is daarna veranderd door de keuze "${latereKeuze.zoekterm}"; draai die eerst terug.`, blijftBijKeuze: true };
+		return { melding: `Vers ${naam} is daarna veranderd door de vervanging "${latereKeuze.zoekterm}"; draai die eerst terug.`, blijftBijKeuze: true };
 	}
-	if (!zelfdeInhoud(bewerkt.inhoud, na)) return { melding: `Vers ${naam} is na de keuze zelf bewerkt en blijft staan.`, blijftBijKeuze: false };
+	if (!zelfdeInhoud(bewerkt.inhoud, na)) return { melding: `Vers ${naam} is na de vervanging zelf bewerkt en blijft staan.`, blijftBijKeuze: false };
 	const kanNietTerug = { melding: `Vers ${naam} kon niet worden teruggezet en blijft staan.`, blijftBijKeuze: true };
 	if (zelfdeInhoud(voor, bewerkt.basis)) {
 		try {
@@ -295,7 +295,7 @@ function bewaarKeuzesNaTerugdraaien(opslag: Opslag, boek: string, keuzes: readon
 	return haalKeuzesUitAntwoorden(opslag, boek, verdwenen);
 }
 
-const KEUZE_ONTBREEKT = 'Deze keuze staat niet meer in de lijst.';
+const KEUZE_ONTBREEKT = 'Deze vervanging staat niet meer in de lijst.';
 
 /**
  * Draait een keuze terug, vers voor vers met de regels van `draaiKeuzeVersTerug`. Verzen die blijven staan zonder bij de keuze te blijven
@@ -323,7 +323,7 @@ export function draaiVersTerug(opslag: Opslag, boek: string, keuzeId: string, ho
 	const keuze = keuzes.find((k) => k.id === keuzeId);
 	if (keuze === undefined) return [KEUZE_ONTBREEKT];
 	const keuzeVers = keuze.verzen.find((v) => v.hoofdstuk === hoofdstuk && v.vers === vers);
-	if (keuzeVers === undefined) return [`Vers ${versNaam(hoofdstuk, vers)} hoort niet (meer) bij deze keuze.`];
+	if (keuzeVers === undefined) return [`Vers ${versNaam(hoofdstuk, vers)} hoort niet (meer) bij deze vervanging.`];
 	const uitkomst = draaiKeuzeVersTerug(opslag, boek, keuzes, keuze, keuzeVers);
 	const overgebleven = keuze.verzen.filter((v) => v !== keuzeVers || uitkomst.blijftBijKeuze);
 	const teruggedraaid: OvergeslagenPlek = { hoofdstuk, vers, gevonden: keuze.zoekterm, reden: 'teruggedraaid' };

@@ -2,7 +2,7 @@ import { isBewerkingVerouderd, leesTussenstand, type Opslag } from '../bewerken/
 import { knipVers } from '../bewerken/versknip';
 import { leesAntwoorden } from '../antwoorden/antwoorden';
 import type { HoofdstukData } from '../data/types';
-import { leesKeuzes } from '../vervangen/keuzes';
+import { leesKeuzes, type StructureleKeuze } from '../vervangen/keuzes';
 import type { BoekMetHoofdstukken } from './types';
 
 export type BewaardVers = {
@@ -19,7 +19,7 @@ export type BewaardHoofdstuk = {
 	verzen: BewaardVers[];
 };
 
-export type BewaardeKeuze = {
+export type BewaardeKeuze = Pick<StructureleKeuze, 'soort' | 'van' | 'naar'> & {
 	id: string;
 	zoekterm: string;
 	nieuw: string;
@@ -89,7 +89,7 @@ export function bewaardOverzicht(opslag: Opslag, boek: BoekMetHoofdstukken, repo
 		hoofdstukken.push({ hoofdstuk: nummer, verzen });
 	}
 	const keuzes = leesKeuzes(opslag, boek.id).map(
-		({ id, zoekterm, nieuw, toegepast, verzen }): BewaardeKeuze => ({ id, zoekterm, nieuw, toegepast, aantalVerzen: verzen.length }),
+		({ id, soort, zoekterm, nieuw, van, naar, toegepast, verzen }): BewaardeKeuze => ({ id, soort, zoekterm, nieuw, van, naar, toegepast, aantalVerzen: verzen.length }),
 	);
 	const antwoorden = leesAntwoorden(opslag, boek.id)
 		.map(({ kwestie, optie, gegeven }): BewaardAntwoord => ({ kwestie, optie, gegeven }))

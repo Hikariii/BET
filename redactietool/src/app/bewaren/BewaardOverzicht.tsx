@@ -1,14 +1,22 @@
 import { useRef, useState } from 'preact/hooks';
+import type { BewaardOverzicht } from '../../bewaren/overzicht';
 import type { BoekData } from '../../data/types';
 import { versAdres } from '../adres';
+import { registerVraagSleutel, vraagAdres } from '../begrippen/vraagAdres';
 import { BackupInladen } from './BackupInladen';
-import { bewaarRegel, meervoud, tijdVan } from './bewaarTekst';
+import { kortUit, optieOmschrijving } from '../begrippen/vervangenVoorbeeld';
+import { bewaarRegel, tijdVan, verouderdMelding, vervangingRegel } from './bewaarTekst';
 import { downloadBackup } from './downloadBackup';
 import { useBackupStand } from './useBackupStand';
 import { useBewaardOverzicht } from './useBewaardOverzicht';
 import './bewaren.css';
 
-/** De pagina `#/<boek>/opgeslagen`: wat de browser bewaart per hoofdstuk, de toegepaste keuzes en de back-upknoppen. */
+/** De verzen met een bewerking die Claude sinds de bewerking heeft veranderd, als "Lukas 4:2". */
+function verouderdeVerzen(overzicht: BewaardOverzicht, boekNaam: string): string[] {
+	return overzicht.hoofdstukken.flatMap(({ hoofdstuk, verzen }) => verzen.filter((vers) => vers.verouderd).map((vers) => `${boekNaam} ${hoofdstuk}:${vers.vers}`));
+}
+
+/** De pagina `#/<boek>/opgeslagen`: wat de browser bewaart per hoofdstuk, de toegepaste vervangingen, de antwoorden en de back-upknoppen. */
 export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 	const overzicht = useBewaardOverzicht(boek);
 	const backup = useBackupStand(boek.id, overzicht);
@@ -34,9 +42,9 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 				{melding}
 			</p>
 			<BackupInladen boek={boek} focusNaSluiten={inladenKnop} invoer={invoer} />
-			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && (
+			{overzicht.totaal.verzen === 0 && overzicht.totaal.keuzes === 0 && overzicht.totaal.antwoorden === 0 && (
 				<div class="bewaard-leeg">
-					<p class="melding">Er is niets opgeslagen. Bewerk een vers of pas een keuze toe en het staat hier.</p>
+					<p class="melding">Er is niets opgeslagen. Bewerk een vers, pas een vervanging toe of beantwoord een vertaalvraag en het staat hier.</p>
 					<p class="bewaard-leeg-tip">Werkte je eerder in een andere browser of op een andere computer? Laad dan je back-up in.</p>
 					<p>
 						<button type="button" onClick={() => invoer.current?.click()}>
@@ -46,10 +54,7 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 				</div>
 			)}
 			{overzicht.totaal.verouderd > 0 && (
-				<p class="bewaard-verouderd">
-					{meervoud(overzicht.totaal.verouderd, 'bewerking is', 'bewerkingen zijn')} verouderd: Claude heeft de tekst na je bewerking veranderd. Kijk die
-					verzen na voordat je ze naar Word brengt.
-				</p>
+				<p class="bewaard-verouderd">{verouderdMelding(verouderdeVerzen(overzicht, boek.naam), 'voordat je het naar Word brengt')}</p>
 			)}
 			{overzicht.hoofdstukken.map(({ hoofdstuk, verzen }) => (
 				<section class="bewaard-hoofdstuk" aria-labelledby={`bewaard-hoofdstuk-${hoofdstuk}`}>
@@ -63,8 +68,8 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 							<li>
 								<a href={versAdres(boek.id, hoofdstuk, vers.vers)}>vers {vers.vers}</a>
 								<span class="bewaard-tijd">opgeslagen {tijdVan(vers.bewaard)}</span>
-								{vers.herkomst === 'structurele keuze' && <span class="bewaard-label">via keuze</span>}
-								{vers.verouderd && <span class="bewaard-label bewaard-label-verouderd">verouderd</span>}
+								{vers.herkomst === 'structurele keuze' && <span class="bewaard-label">via vervanging</span>}
+								{vers.verouderd && <span class="bewaard-label bewaard-label-verouderd">door Claude veranderd</span>}
 							</li>
 						))}
 					</ul>
@@ -72,18 +77,28 @@ export function BewaardOverzicht({ boek }: { boek: BoekData }) {
 			))}
 			{overzicht.keuzes.length > 0 && (
 				<section class="bewaard-keuzes" aria-labelledby="bewaard-keuzes-titel">
-					<h2 id="bewaard-keuzes-titel">Toegepaste keuzes</h2>
+					<h2 id="bewaard-keuzes-titel">Toegepaste vervangingen</h2>
 					<ul>
 						{overzicht.keuzes.map((keuze) => (
-							<li>
-								<strong>{keuze.zoekterm}</strong> werd <strong>{keuze.nieuw}</strong>, in {meervoud(keuze.aantalVerzen, 'vers', 'verzen')},
-								toegepast {tijdVan(keuze.toegepast)}.
-							</li>
+							<li>{vervangingRegel(keuze)}</li>
 						))}
 					</ul>
 					<p>
 						Terugdraaien kan bij <a href={`#/${encodeURIComponent(boek.id)}/begrippen/vervangen`}>Zoeken en vervangen</a>.
 					</p>
+				</section>
+			)}
+			{overzicht.antwoorden.length > 0 && (
+				<section class="bewaard-antwoorden" aria-labelledby="bewaard-antwoorden-titel">
+					<h2 id="bewaard-antwoorden-titel">Antwoorden op vertaalvragen</h2>
+					<ul>
+						{overzicht.antwoorden.map((antwoord) => (
+							<li>
+								<a href={vraagAdres(boek.id, registerVraagSleutel(antwoord.kwestie))}>{kortUit(antwoord.kwestie, 80)}</a>: <strong>{kortUit(optieOmschrijving(antwoord.optie), 80)}</strong>, gegeven{' '}
+								{tijdVan(antwoord.gegeven)}.
+							</li>
+						))}
+					</ul>
 				</section>
 			)}
 		</section>

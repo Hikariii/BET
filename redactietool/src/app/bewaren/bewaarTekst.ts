@@ -1,4 +1,5 @@
-import type { BewaardOverzicht } from '../../bewaren/overzicht';
+import type { BewaardeKeuze, BewaardOverzicht } from '../../bewaren/overzicht';
+import { keuzeBeschrijving } from '../begrippen/vervangenVoorbeeld';
 
 export function meervoud(aantal: number, enkelvoud: string, meervoudsvorm: string): string {
 	return `${aantal} ${aantal === 1 ? enkelvoud : meervoudsvorm}`;
@@ -17,13 +18,13 @@ export function tijdVan(iso: string, nu: Date = new Date()): string {
 	return (zelfdeDag(moment, nu) ? TIJD : DATUM_EN_TIJD).format(moment);
 }
 
-/** Het aantal verzen, hoofdstukken, keuzes en antwoorden in één zin, zonder de tijd: "12 verzen in 3 hoofdstukken". */
+/** Het aantal verzen, hoofdstukken, vervangingen en antwoorden in één zin, zonder de tijd: "12 verzen in 3 hoofdstukken, 1 antwoord". */
 export function bewaarTelling(overzicht: BewaardOverzicht): string {
 	const { verzen, hoofdstukken, keuzes, antwoorden } = overzicht.totaal;
 	if (verzen === 0 && keuzes === 0 && antwoorden === 0) return 'nog niets';
 	const delen: string[] = [];
 	if (verzen > 0) delen.push(`${meervoud(verzen, 'vers', 'verzen')} in ${meervoud(hoofdstukken, 'hoofdstuk', 'hoofdstukken')}`);
-	if (keuzes > 0) delen.push(meervoud(keuzes, 'keuze', 'keuzes'));
+	if (keuzes > 0) delen.push(meervoud(keuzes, 'vervanging', 'vervangingen'));
 	if (antwoorden > 0) delen.push(meervoud(antwoorden, 'antwoord', 'antwoorden'));
 	return delen.join(', ');
 }
@@ -32,6 +33,24 @@ export function bewaarTelling(overzicht: BewaardOverzicht): string {
 export function bewaarRegel(overzicht: BewaardOverzicht, nu: Date = new Date()): string {
 	if (overzicht.laatstBewaard === null) return 'Nog niets opgeslagen in deze browser';
 	const delen = ['Opgeslagen in deze browser', bewaarTelling(overzicht), tijdVan(overzicht.laatstBewaard, nu)];
-	if (overzicht.totaal.verouderd > 0) delen.push(`${overzicht.totaal.verouderd} verouderd`);
+	if (overzicht.totaal.verouderd > 0) delen.push(`${overzicht.totaal.verouderd} door Claude veranderd`);
 	return delen.join(' · ');
+}
+
+function somOp(delen: readonly string[]): string {
+	return delen.length <= 1 ? (delen[0] ?? '') : `${delen.slice(0, -1).join(', ')} en ${delen.at(-1)}`;
+}
+
+/**
+ * De melding bij bewerkingen waar Claude de tekst sinds de bewerking heeft veranderd: welke plekken, wat te doen en hoe de eigen wijziging terug te zetten.
+ * `plekken` zijn al leesbaar ("vers 12"); `voordat` zegt wanneer de lezer de tekst moet nalezen ("voordat je kopieert").
+ */
+export function verouderdMelding(plekken: readonly string[], voordat: string): string {
+	const enkel = plekken.length === 1;
+	return `Claude heeft ${somOp(plekken)} veranderd nadat jij ${enkel ? 'het' : 'ze'} bewerkte. Lees je tekst na ${voordat}. Wil je de tekst van Claude, kies dan bij ${enkel ? 'dat vers' : 'zo\'n vers'} Vers terugzetten (je eigen wijziging gaat dan weg).`;
+}
+
+/** Een toegepaste vervanging in één zin, ook bij een markeringswissel: `"Gezegend" door "Geprezen", 9 verzen, toegepast 11:02.` */
+export function vervangingRegel(keuze: BewaardeKeuze, nu: Date = new Date()): string {
+	return `${keuzeBeschrijving(keuze)}, ${meervoud(keuze.aantalVerzen, 'vers', 'verzen')}, toegepast ${tijdVan(keuze.toegepast, nu)}.`;
 }
