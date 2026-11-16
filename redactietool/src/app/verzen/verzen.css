@@ -61,6 +61,11 @@
 	border-color: var(--tekst);
 }
 
+/* De aanwijzer is weg en het vak sluit zo: de rand wordt meteen gestreept. */
+.verzen-dicht .zweefvak.open.sluitend {
+	border-style: dashed;
+}
+
 /* Toolkleur in plaats van het rood van de gewone focus: rood hoort niet in of rond de tekstkolommen. */
 .verzen-dicht .zweefvak:focus-visible {
 	outline: 2px solid var(--tekst);

@@ -16,13 +16,14 @@ type Aanwijshandelers = {
 
 /**
  * Een vak dat opengaat bij aanwijzen (met een korte vertraging) of toetsenbordfocus in de cel, en dichtgaat met Escape.
- * Na het verlaten blijft het even open; komt de aanwijzer binnen die tijd terug, dan blijft het gewoon open.
+ * Na het verlaten blijft het even open en is `sluitend` waar, zodat het vak meteen laat zien dat de aanwijzer weg is; komt de aanwijzer binnen die tijd terug, dan blijft het gewoon open.
  * Escape houdt het vak dicht tot de aanwijzer de cel opnieuw ingaat of de focus er opnieuw in komt.
  */
-export function useAanwijzen(): { open: boolean; handelers: Aanwijshandelers } {
+export function useAanwijzen(): { open: boolean; sluitend: boolean; handelers: Aanwijshandelers } {
 	const [aangewezen, zetAangewezen] = useState(false);
 	const [focus, zetFocus] = useState(false);
 	const [weggedrukt, zetWeggedrukt] = useState(false);
+	const [verlaten, zetVerlaten] = useState(false);
 	const vertraging = useRef<number | null>(null);
 	const open = (aangewezen || focus) && !weggedrukt;
 
@@ -43,9 +44,11 @@ export function useAanwijzen(): { open: boolean; handelers: Aanwijshandelers } {
 
 	return {
 		open,
+		sluitend: open && verlaten && aangewezen && !focus,
 		handelers: {
 			onPointerEnter: () => {
 				stopVertraging();
+				zetVerlaten(false);
 				vertraging.current = window.setTimeout(() => {
 					zetWeggedrukt(false);
 					zetAangewezen(true);
@@ -53,7 +56,11 @@ export function useAanwijzen(): { open: boolean; handelers: Aanwijshandelers } {
 			},
 			onPointerLeave: () => {
 				stopVertraging();
-				vertraging.current = window.setTimeout(() => zetAangewezen(false), VERLAATVERTRAGING_MS);
+				zetVerlaten(true);
+				vertraging.current = window.setTimeout(() => {
+					zetAangewezen(false);
+					zetVerlaten(false);
+				}, VERLAATVERTRAGING_MS);
 			},
 			onFocusIn: (gebeurtenis) => {
 				// Een klik met de muis op een knop in de cel telt niet: dan opent het vak alleen door aanwijzen.

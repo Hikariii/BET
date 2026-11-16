@@ -20,7 +20,7 @@ type Props = {
  * De punaise rechtsonder zet een uitgeklapt vak vast in de kolom met alle regels, net als zolang de naslagkaart onder het vers open staat.
  */
 export function VertaalregelsCel({ nummer, naslagOpen, alleVast, regels }: Props) {
-	const { open, handelers } = useAanwijzen();
+	const { open, sluitend, handelers } = useAanwijzen();
 	const celRef = useRef<HTMLTableCellElement>(null);
 	const inhoudRef = useRef<HTMLDivElement>(null);
 	const [overloopt, zetOverloopt] = useState(false);
@@ -47,7 +47,7 @@ export function VertaalregelsCel({ nummer, naslagOpen, alleVast, regels }: Props
 	return (
 		<td ref={celRef} class="regels" {...handelers}>
 			<div
-				class={toestand.klassen}
+				class={sluitend ? `${toestand.klassen} sluitend` : toestand.klassen}
 				tabIndex={toestand.focusbaar ? 0 : undefined}
 				role={toestand.focusbaar ? 'group' : undefined}
 				aria-label={toestand.focusbaar ? `Vertaalregels van vers ${nummer}` : undefined}
