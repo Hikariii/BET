@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { VersInhoud } from '../bewerken/types';
-import { knipVers } from '../bewerken/versknip';
 import { leesBijbelbestanden } from '../formaat/bijbelbestanden.testhulp';
-import { parseerHoofdstuk } from '../formaat/parseer';
 import type { Tekststuk } from '../formaat/types';
+import { leesVereenvoudigdeHoofdstukken } from './lukasverzen.testhulp';
 import type { HoofdstukVerzen } from './types';
 import { vervangInVers, zoekVondsten } from './zoekEnVervang';
 
@@ -260,18 +259,6 @@ describe('op de vereenvoudiging van Lukas', () => {
 		const verwacht = bestanden.reduce((totaal, bestand) => totaal + tellingInRuweTekst(bestand.tekst), 0);
 		expect(verwacht).toBeGreaterThan(10);
 
-		const hoofdstukken = bestanden.map((bestand): HoofdstukVerzen => {
-			const geparseerd = parseerHoofdstuk(bestand.tekst);
-			const nummers = geparseerd.alineas.flatMap((alinea) =>
-				alinea.soort === 'tekst' ? alinea.stukken.flatMap((stuk) => (stuk.soort === 'vers' ? [stuk.nummer] : [])) : [],
-			);
-			const verzen = [...new Set(nummers)].flatMap((nummer) => {
-				const inhoud = knipVers(geparseerd, nummer);
-				return inhoud === null ? [] : [{ vers: nummer, inhoud, repo: inhoud }];
-			});
-			return { hoofdstuk: Number(/(\d+)\.md$/u.exec(bestand.naam)?.[1]), goedgekeurd: false, verzen };
-		});
-
-		expect(zoekVondsten(hoofdstukken, 'de Mensenzoon')).toHaveLength(verwacht);
+		expect(zoekVondsten(leesVereenvoudigdeHoofdstukken(), 'de Mensenzoon')).toHaveLength(verwacht);
 	});
 });

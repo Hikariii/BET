@@ -17,13 +17,13 @@ function isWoordteken(teken: string | undefined): boolean {
 }
 
 /** Waar een tekststuk begint en eindigt in de platte tekst van een deel. */
-type StukBereik = {
+export type StukBereik = {
 	stuk: Tekststuk;
 	van: number;
 	tot: number;
 };
 
-function stukBereiken(stukken: readonly Tekststuk[]): StukBereik[] {
+export function stukBereiken(stukken: readonly Tekststuk[]): StukBereik[] {
 	let positie = 0;
 	return stukken.map((stuk) => {
 		const bereik = { stuk, van: positie, tot: positie + stuk.tekst.length };
@@ -32,7 +32,7 @@ function stukBereiken(stukken: readonly Tekststuk[]): StukBereik[] {
 	});
 }
 
-function platteTekst(deel: VersAlineadeel): string {
+export function platteTekst(deel: VersAlineadeel): string {
 	return deel.stukken.map((stuk) => stuk.tekst).join('');
 }
 
@@ -41,7 +41,7 @@ function stukVanPlek(bereiken: readonly StukBereik[], van: number, tot: number):
 	return bereiken.find((bereik) => bereik.van <= van && tot <= bereik.tot) ?? null;
 }
 
-function ontsnapRegexTekens(tekst: string): string {
+export function ontsnapRegexTekens(tekst: string): string {
 	return tekst.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
 }
 
@@ -95,7 +95,11 @@ function contextErna(tekst: string, tot: number): string {
 /** Alle plekken van de zoekterm, hoofdletterongevoelig en op woordgrenzen, in volgorde van hoofdstuk, vers, deel en positie. */
 export function zoekVondsten(hoofdstukken: readonly HoofdstukVerzen[], zoekterm: string): Vondst[] {
 	if (zoekterm.trim() === '') return [];
-	const patroon = zoekpatroon(zoekterm);
+	return zoekVondstenMetPatroon(hoofdstukken, zoekpatroon(zoekterm));
+}
+
+/** Zoals `zoekVondsten`, voor een eigen patroon (met vlaggen `g`, `i` en `u`) in plaats van een zoekterm; zo delen varianten de context en de vervangbaarheid. */
+export function zoekVondstenMetPatroon(hoofdstukken: readonly HoofdstukVerzen[], patroon: RegExp): Vondst[] {
 	const vondsten: Vondst[] = [];
 	for (const { hoofdstuk, goedgekeurd, verzen } of hoofdstukken) {
 		for (const { vers, inhoud } of verzen) {
