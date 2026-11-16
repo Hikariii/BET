@@ -1,31 +1,27 @@
 /*
  * De pagina Richtlijn: bovenaan de titel en "Over deze versie" over de hele breedte,
- * daaronder de inhoudsopgave en de tekst naast elkaar, elk met een eigen scrollbalk.
- * De tekst houdt de regellengte van de help.
+ * daaronder de inhoudsopgave en de tekst naast elkaar.
+ * De inhoudsopgave bepaalt de hoogte van dat blok; alleen de tekst scrolt in een eigen paneel, zodat er naast de inhoudsopgave geen tweede scrollbalk staat.
+ * De tekst in het paneel houdt de regellengte van de help.
  */
 
 .richtlijn {
 	line-height: 1.55;
 }
 
-.richtlijn-kop .richtlijn-sectie > .markdown {
-	max-width: 60rem;
-}
-
 .richtlijn-kolommen {
 	display: grid;
 	grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr);
 	gap: 0 2rem;
-	/* Het blok vult het scherm onder de vaste balk; de scrollbalken staan in de kolommen, niet op de pagina. */
-	height: calc(100vh - var(--balk-hoogte, 0px) - 1rem);
 	margin-top: 1.5rem;
 	border-top: 1px solid var(--rand);
 	scroll-margin-top: var(--balk-hoogte, 0px);
 }
 
-.richtlijn-inhoud,
 .richtlijn-paneel {
-	min-height: 0;
+	/* Met size-containment telt de lange tekst niet mee voor de hoogte van de rij: het paneel wordt zo hoog als de inhoudsopgave en scrolt zelf. */
+	contain: size;
+	min-height: 20rem;
 	overflow-y: auto;
 	overscroll-behavior: contain;
 }
@@ -80,8 +76,8 @@
 		height: auto;
 	}
 
-	.richtlijn-inhoud,
 	.richtlijn-paneel {
+		contain: none;
 		overflow: visible;
 	}
 

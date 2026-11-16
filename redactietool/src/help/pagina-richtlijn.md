@@ -4,7 +4,7 @@ Hier staat de hele redactierichtlijn als tekst, voor alle boeken. Je leest hem h
 
 ## Lezen
 
-Bovenaan staat over de hele breedte wat er nieuw is in deze versie. Daaronder staan twee kolommen: links de inhoud, elke paragraaf met zijn nummer en titel, en rechts de tekst, die apart scrolt. Een klik in de inhoud scrolt de tekst naar de paragraaf, met de focus erop. Terwijl je leest, is in de inhoud de paragraaf onderstreept waar je bent. Het adres bevat het paragraafnummer (bijvoorbeeld `#/lukas/richtlijn/17B`), dus je kunt het delen. De link **Lees in de richtlijn** in de kaart bij een § in de vertaalregels opent dezelfde plek.
+Bovenaan staat over de hele breedte wat er nieuw is in deze versie. Daaronder staan twee kolommen: links de inhoud, elke paragraaf met zijn nummer en titel, en rechts de tekst in een vak dat even hoog is als de inhoud en zelf scrolt. Een klik in de inhoud scrolt de tekst naar de paragraaf, met de focus erop. Terwijl je leest, is in de inhoud de paragraaf onderstreept waar je bent. Het adres bevat het paragraafnummer (bijvoorbeeld `#/lukas/richtlijn/17B`), dus je kunt het delen. De link **Lees in de richtlijn** in de kaart bij een § in de vertaalregels opent dezelfde plek.
 
 {{wijs richtlijn-inhoud | Inhoud | Links, onder de tekst over deze versie.}}
 

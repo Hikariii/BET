@@ -129,19 +129,7 @@ type InhoudsopgaveProps = {
 };
 
 function Inhoudsopgave({ boek, secties, reactiePerId, aantalVoorstellen, huidig, scrolNaar }: InhoudsopgaveProps) {
-	const lijst = useRef<HTMLElement>(null);
 	const paginaAdres = maakAdres({ soort: 'richtlijn', boek, paragraaf: null });
-
-	// De gemarkeerde link blijft in beeld als de inhoudsopgave zelf langer is dan het scherm.
-	useEffect(() => {
-		const link = lijst.current?.querySelector<HTMLElement>('[aria-current="location"]');
-		const houder = lijst.current;
-		if (link === null || link === undefined || houder === null) return;
-		const marge = link.getBoundingClientRect();
-		const rand = houder.getBoundingClientRect();
-		if (marge.top < rand.top) houder.scrollTop -= rand.top - marge.top;
-		else if (marge.bottom > rand.bottom) houder.scrollTop += marge.bottom - rand.bottom;
-	}, [huidig]);
 
 	/** Scrolt het paneel en zet het adres zonder een nieuwe navigatie, zodat terug en delen blijven werken. */
 	const kies = (gebeurtenis: MouseEvent, id: string, href: string) => {
@@ -157,7 +145,7 @@ function Inhoudsopgave({ boek, secties, reactiePerId, aantalVoorstellen, huidig,
 	);
 
 	return (
-		<nav class="richtlijn-inhoud" ref={lijst} aria-labelledby="richtlijn-inhoud-titel" data-help="richtlijn-inhoud">
+		<nav class="richtlijn-inhoud" aria-labelledby="richtlijn-inhoud-titel" data-help="richtlijn-inhoud">
 			<h2 id="richtlijn-inhoud-titel">Inhoud</h2>
 			<ol>
 				{secties.map((sectie, index) => {
